@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
 import { updateDraftProject, publishProject, repostProject } from "../actions";
+import CountdownTimer from "@/components/CountdownTimer";
 
 export default async function EditProjectPage({
   params,
@@ -30,9 +31,16 @@ export default async function EditProjectPage({
   const defaultState = locParts[1] ?? "";
 
   const isDraft = project.state === "DRAFT";
+  const isPublished = !isDraft;
+
+  const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
+  const now = new Date();
+  const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
+  const bidsUnlocked = deadlinePassed || project.state !== "OPEN";
 
   return (
-    <main className="max-w-xl">
+    <main className="max-w-xl p-6">
+      {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">
@@ -41,7 +49,7 @@ export default async function EditProjectPage({
           <p className="mt-1 text-sm text-gray-600">
             Status: <span className="font-medium">{project.state}</span>
           </p>
-          {!isDraft && project.deadline_at && (
+          {isPublished && project.deadline_at && (
             <p className="mt-1 text-sm text-gray-600">
               Deadline:{" "}
               <span className="font-medium">
@@ -51,9 +59,7 @@ export default async function EditProjectPage({
           )}
         </div>
 
-        {/* Right side actions */}
         <div className="flex items-center gap-2">
-          {/* Repost (new bid round) */}
           <form action={repostProject.bind(null, id)}>
             <button
               type="submit"
@@ -73,7 +79,38 @@ export default async function EditProjectPage({
         </div>
       </div>
 
-      {/* Edit form (draft only) */}
+      {/* Countdown timer */}
+      {isPublished && project.deadline_at && project.state === "OPEN" && (
+        <div className="mt-4">
+          <CountdownTimer deadline={project.deadline_at} />
+        </div>
+      )}
+
+      {/* Action buttons */}
+      {isPublished && (
+        <div className="mt-4 flex gap-2 flex-wrap">
+          <Link
+            href={`/dashboard/client/projects/${id}/bids`}
+            className="inline-flex items-center gap-2 rounded-md bg-black text-white px-4 py-2 text-sm"
+          >
+            {bidsUnlocked ? "✅ View Bids (Unlocked)" : "🔒 View Bids (Locked)"}
+          </Link>
+          <Link
+            href={`/dashboard/client/projects/${id}/rfis`}
+            className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm"
+          >
+            Questions (RFIs)
+          </Link>
+        </div>
+      )}
+
+      {!bidsUnlocked && isPublished && (
+        <p className="mt-1 text-xs text-gray-500">
+          Bids are sealed until the deadline passes.
+        </p>
+      )}
+
+      {/* Edit form */}
       <form
         action={updateDraftProject.bind(null, id)}
         className="mt-6 space-y-4"

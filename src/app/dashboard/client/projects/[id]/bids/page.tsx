@@ -7,6 +7,7 @@ type BidRow = {
   amount_cents: number | string;
   version_number: number;
   submitted_at: string;
+  notes: string | null;
 };
 
 function centsToMoney(cents: number | string) {
@@ -383,8 +384,13 @@ export default async function ClientProjectBidsPage({
                   </div>
 
                   <div className="mt-2 text-sm text-gray-600">
-                    Submitted: {new Date(b.submitted_at).toLocaleString()}
-                  </div>
+  Submitted: {new Date(b.submitted_at).toLocaleString()}
+</div>
+{b.notes && (
+  <div className="mt-2 text-sm text-gray-700">
+    <span className="font-medium">Notes:</span> {b.notes}
+  </div>
+)}
 
                   {/* Award button */}
                   {!award ? (

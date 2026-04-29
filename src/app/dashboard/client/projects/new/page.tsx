@@ -50,6 +50,12 @@ export default async function NewDraftProjectPage() {
           <textarea name="description" className="mt-1 w-full rounded-md border px-3 py-2" rows={6} />
         </div>
 
+        <div className="rounded-lg border p-4 text-sm space-y-2 bg-gray-50">
+  <div className="font-medium text-gray-700">Platform Rules (shown to all contractors)</div>
+  <div className="text-gray-600">✅ The contractor is responsible for pulling all required permits.</div>
+  <div className="text-gray-600">✅ The contractor is responsible for all debris removal and disposal.</div>
+</div>
+
         <div className="flex gap-3">
           <button className="rounded-md bg-black text-white px-3 py-2 text-sm">Create Draft</button>
           <Link className="rounded-md border px-3 py-2 text-sm" href="/dashboard/client/projects">
