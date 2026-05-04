@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import HoverCard from "@/components/HoverCard";
 
 type OpenProject = {
   id: string;
@@ -18,6 +19,16 @@ function fmt(dt: string | null) {
   return new Date(dt).toLocaleString();
 }
 
+function timeRemaining(deadline: string | null) {
+  if (!deadline) return null;
+  const diff = new Date(deadline).getTime() - Date.now();
+  if (diff <= 0) return null;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  if (days > 0) return `${days}d ${hours}h remaining`;
+  return `${hours}h remaining`;
+}
+
 export default async function ContractorOpenProjectsPage({
   searchParams,
 }: {
@@ -25,7 +36,6 @@ export default async function ContractorOpenProjectsPage({
 }) {
   const { supabase } = await requireRole(["CONTRACTOR", "ADMIN"]);
   const sp = await searchParams;
-
   const sort = sp.sort === "newest" ? "newest" : "deadline";
 
   const { data, error } = await supabase.rpc("list_open_projects", {
@@ -39,78 +49,164 @@ export default async function ContractorOpenProjectsPage({
   const projects = (data ?? []) as OpenProject[];
 
   return (
-    <main>
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold">Open Projects</h1>
+    <div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+        <div>
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
+            Open Projects
+          </h1>
+          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+            {projects.length} project{projects.length !== 1 ? "s" : ""} available • Client identities hidden until award
+          </p>
+        </div>
 
-        <div className="flex gap-2">
-          <Link
-            href="/dashboard/contractor/projects?sort=deadline"
-            className={`rounded-md border px-3 py-2 text-sm ${
-              sort === "deadline" ? "bg-gray-50" : ""
-            }`}
-          >
-            Sort: Deadline
-          </Link>
-          <Link
-            href="/dashboard/contractor/projects?sort=newest"
-            className={`rounded-md border px-3 py-2 text-sm ${
-              sort === "newest" ? "bg-gray-50" : ""
-            }`}
-          >
-            Sort: Newest
-          </Link>
+        {/* Sort controls */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          {[
+            { label: "By Deadline", value: "deadline" },
+            { label: "Newest", value: "newest" },
+          ].map((s) => (
+            <Link
+              key={s.value}
+              href={`/dashboard/contractor/projects?sort=${s.value}`}
+              style={{
+                background: sort === s.value ? "#1B4F8A" : "transparent",
+                color: sort === s.value ? "#fff" : "#7A9CC4",
+                border: "1px solid #1B4F8A",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 500,
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              {s.label}
+            </Link>
+          ))}
         </div>
       </div>
 
-      <p className="mt-2 text-sm text-gray-600">
-        Client identities and exact addresses are hidden. Only general location
-        is shown.
-      </p>
+      {/* Project list */}
+      {projects.length === 0 ? (
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "48px",
+          textAlign: "center",
+          color: "#7A9CC4",
+          fontSize: "14px",
+        }}>
+          No open projects at the moment. Check back soon.
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {projects.map((p) => {
+            const remaining = timeRemaining(p.deadline_at);
+            const isUrgent = remaining && remaining.includes("h remaining") && !remaining.includes("d");
 
-      <div className="mt-6 space-y-3">
-        {projects.length === 0 ? (
-          <div className="rounded-lg border p-4 text-sm text-gray-600">
-            No open projects at the moment.
-          </div>
-        ) : (
-          projects.map((p) => (
-            <Link
-              key={p.id}
-              href={`/dashboard/contractor/projects/${p.id}`}
-              className="block rounded-lg border p-4 hover:bg-gray-50"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="font-medium">
-                    {p.title ?? "Untitled Project"}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {p.category ?? "—"} • {p.location_general ?? "—"}
-                  </div>
-                </div>
+            return (
+              <Link
+                key={p.id}
+                href={`/dashboard/contractor/projects/${p.id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <HoverCard style={{
+                  background: "#0F2040",
+                  border: "1px solid #1B4F8A",
+                  borderRadius: "10px",
+                  padding: "20px",
+                  cursor: "pointer",
+                }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+                        <div style={{ fontWeight: 600, fontSize: "16px", color: "#fff" }}>
+                          {p.title ?? "Untitled Project"}
+                        </div>
+                        {isUrgent && (
+                          <span style={{
+                            fontSize: "10px",
+                            fontWeight: 600,
+                            padding: "2px 8px",
+                            borderRadius: "20px",
+                            background: "#3D0A0A",
+                            color: "#F87171",
+                            border: "1px solid #991B1B",
+                            letterSpacing: "0.5px",
+                          }}>
+                            CLOSING SOON
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "8px" }}>
+                        {p.category ?? "—"} • {p.location_general ?? "—"}
+                      </div>
+                      {p.description && (
+                        <div style={{
+                          fontSize: "13px",
+                          color: "#4A7FB5",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}>
+                          {p.description}
+                        </div>
+                      )}
+                    </div>
 
-                <div className="text-sm text-gray-600 text-right">
-                  <div>
-                    <span className="font-medium">Deadline:</span>{" "}
-                    {fmt(p.deadline_at)}
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{
+                        fontSize: "11px",
+                        color: "#7A9CC4",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        marginBottom: "4px",
+                      }}>
+                        Deadline
+                      </div>
+                      <div style={{
+                        fontSize: "13px",
+                        color: isUrgent ? "#F87171" : "#fff",
+                        fontWeight: 500,
+                        marginBottom: "4px",
+                      }}>
+                        {p.deadline_at ? new Date(p.deadline_at).toLocaleDateString() : "—"}
+                      </div>
+                      {remaining && (
+                        <div style={{
+                          fontSize: "12px",
+                          color: isUrgent ? "#F87171" : "#4ADE80",
+                          fontWeight: 600,
+                        }}>
+                          {remaining}
+                        </div>
+                      )}
+                      <div style={{
+                        fontSize: "11px",
+                        color: "#3A5A7A",
+                        marginTop: "8px",
+                      }}>
+                        Published {p.published_at ? new Date(p.published_at).toLocaleDateString() : "—"}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-medium">Published:</span>{" "}
-                    {fmt(p.published_at)}
-                  </div>
-                </div>
-              </div>
-
-              {p.description && (
-                <p className="mt-3 text-sm text-gray-700 line-clamp-3">
-                  {p.description}
-                </p>
-              )}
-            </Link>
-          ))
-        )}
-      </div>
-    </main>
+                </HoverCard>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

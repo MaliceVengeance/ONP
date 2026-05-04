@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { stateBadge } from "@/lib/ui";
+import HoverCard from "@/components/HoverCard";
 
 type Project = {
   id: string;
@@ -10,19 +12,6 @@ type Project = {
   deadline_at: string | null;
   created_at: string;
 };
-
-function stateColor(state: string) {
-  switch (state) {
-    case "DRAFT": return "border-gray-300 text-gray-600";
-    case "OPEN": return "border-green-300 text-green-700";
-    case "BIDDING_CLOSED": return "border-yellow-300 text-yellow-700";
-    case "BIDS_UNLOCKED": return "border-blue-300 text-blue-700";
-    case "AWARDED": return "border-purple-300 text-purple-700";
-    case "COMPLETED": return "border-emerald-300 text-emerald-700";
-    case "CANCELED": return "border-red-300 text-red-700";
-    default: return "border-gray-300 text-gray-600";
-  }
-}
 
 export default async function ClientDashboard() {
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
@@ -35,52 +24,77 @@ export default async function ClientDashboard() {
     .limit(10);
 
   const projects = (data ?? []) as Project[];
-
   const drafts = projects.filter((p) => p.state === "DRAFT");
   const open = projects.filter((p) => p.state === "OPEN");
-  const needsAction = projects.filter((p) =>
-    ["BIDDING_CLOSED", "BIDS_UNLOCKED"].includes(p.state)
-  );
+  const needsAction = projects.filter((p) => ["BIDDING_CLOSED", "BIDS_UNLOCKED"].includes(p.state));
   const awarded = projects.filter((p) => p.state === "AWARDED");
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
+    <div>
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
-          <h1 className="text-2xl font-semibold">Client Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-600">Signed in as {user.email}</p>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#fff", margin: 0 }}>
+            Client Dashboard
+          </h1>
+          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+            {user.email}
+          </p>
         </div>
-        <Link
-          href="/dashboard/client/projects/new"
-          className="rounded-md bg-black text-white px-4 py-2 text-sm"
-        >
+        <Link href="/dashboard/client/projects/new" style={{
+          background: "#C8102E",
+          color: "#fff",
+          border: "none",
+          padding: "10px 20px",
+          borderRadius: "6px",
+          fontFamily: "'Barlow', sans-serif",
+          fontWeight: 600,
+          fontSize: "13px",
+          letterSpacing: "0.5px",
+          textDecoration: "none",
+          display: "inline-block",
+        }}>
           + New Project
         </Link>
       </div>
 
-      {/* Quick stats */}
-      <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
         {[
-          { label: "Drafts", count: drafts.length, color: "border-gray-200" },
-          { label: "Open", count: open.length, color: "border-green-200" },
-          { label: "Needs Action", count: needsAction.length, color: "border-yellow-200" },
-          { label: "Awarded", count: awarded.length, color: "border-purple-200" },
+          { label: "Drafts", count: drafts.length, accent: false },
+          { label: "Open", count: open.length, accent: false },
+          { label: "Needs Action", count: needsAction.length, accent: needsAction.length > 0 },
+          { label: "Awarded", count: awarded.length, accent: false },
         ].map((s) => (
-          <div key={s.label} className={`rounded-lg border-2 ${s.color} p-4 text-center`}>
-            <div className="text-2xl font-bold">{s.count}</div>
-            <div className="text-xs text-gray-600 mt-1">{s.label}</div>
+          <div key={s.label} style={{
+            background: "#0F2040",
+            border: `1px solid ${s.accent ? "#C8102E" : "#1B4F8A"}`,
+            borderRadius: "10px",
+            padding: "16px",
+            textAlign: "center",
+          }}>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "32px",
+              color: s.accent ? "#C8102E" : "#fff",
+            }}>
+              {s.count}
+            </div>
+            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+              {s.label}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Needs action — show first if any */}
+      {/* Needs Action */}
       {needsAction.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-semibold text-lg text-yellow-700">
-            ⚠️ Needs Your Attention ({needsAction.length})
+        <div style={{ marginBottom: "32px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#C8102E", textTransform: "uppercase", marginBottom: "12px" }}>
+            ⚠ Needs Your Attention
           </h2>
-          <div className="mt-3 space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {needsAction.map((p) => (
               <ProjectCard key={p.id} p={p} />
             ))}
@@ -88,39 +102,37 @@ export default async function ClientDashboard() {
         </div>
       )}
 
-      {/* Recent projects */}
-      <div className="mt-8">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">Recent Projects</h2>
-          <Link
-            href="/dashboard/client/projects"
-            className="text-sm underline text-gray-600"
-          >
+      {/* Recent Projects */}
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#fff", textTransform: "uppercase", margin: 0 }}>
+            Recent Projects
+          </h2>
+          <Link href="/dashboard/client/projects" style={{ fontSize: "13px", color: "#7A9CC4", textDecoration: "underline" }}>
             View all
           </Link>
         </div>
 
         {error ? (
-          <div className="mt-3 rounded-lg border p-4 text-sm text-red-700">
+          <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px" }}>
             Failed to load projects.
           </div>
         ) : projects.length === 0 ? (
-          <div className="mt-3 rounded-lg border p-4 text-sm text-gray-600">
+          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
             No projects yet.{" "}
-            <Link href="/dashboard/client/projects/new" className="underline">
+            <Link href="/dashboard/client/projects/new" style={{ color: "#fff", textDecoration: "underline" }}>
               Create your first project
             </Link>
-            .
           </div>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {projects.map((p) => (
               <ProjectCard key={p.id} p={p} />
             ))}
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -131,31 +143,37 @@ function ProjectCard({ p }: { p: Project }) {
   const bidsUnlocked = deadlinePassed || !["DRAFT", "OPEN"].includes(p.state);
 
   return (
-    <Link
-      href={`/dashboard/client/projects/${p.id}`}
-      className="block rounded-lg border p-4 hover:bg-gray-50 transition"
-    >
-      <div className="flex items-start justify-between gap-4">
+    <Link href={`/dashboard/client/projects/${p.id}`} style={{ textDecoration: "none" }}>
+      <HoverCard style={{
+        background: "#0F2040",
+        border: "1px solid #1B4F8A",
+        borderRadius: "10px",
+        padding: "18px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        cursor: "pointer",
+      }}>
         <div>
-          <div className="font-medium">{p.title ?? "Untitled"}</div>
-          <div className="text-sm text-gray-600">
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+            {p.title ?? "Untitled"}
+          </div>
+          <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
             {p.category ?? "—"} • {p.city ?? "—"}
           </div>
           {deadline && (
-            <div className={`text-xs mt-1 ${deadlinePassed ? "text-red-600" : "text-gray-500"}`}>
+            <div style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5" }}>
               {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
             </div>
           )}
         </div>
-        <div className="flex flex-col items-end gap-2 shrink-0">
-          <span className={`text-xs px-2 py-1 rounded-full border font-medium ${stateColor(p.state)}`}>
-            {p.state}
-          </span>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
+          <span style={stateBadge(p.state)}>{p.state}</span>
           {bidsUnlocked && p.state !== "DRAFT" && (
-            <span className="text-xs text-green-700">✅ Bids unlocked</span>
+            <span style={{ fontSize: "11px", color: "#4ADE80" }}>✓ Bids unlocked</span>
           )}
         </div>
-      </div>
+      </HoverCard>
     </Link>
   );
 }

@@ -4,7 +4,6 @@ import { requireRole } from "@/lib/auth/requireRole";
 export default async function AdminDashboard() {
   const { supabase, user } = await requireRole(["ADMIN"]);
 
-  // Quick stats
   const [
     { count: userCount },
     { count: projectCount },
@@ -13,15 +12,8 @@ export default async function AdminDashboard() {
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("projects").select("id", { count: "exact", head: true }),
-    supabase
-      .from("support_requests")
-      .select("id", { count: "exact", head: true })
-      .eq("status", "OPEN"),
-    supabase
-      .from("contractor_profiles")
-      .select("id", { count: "exact", head: true })
-      .eq("veteran_verified", false)
-      .not("veteran_applied_at", "is", null),
+    supabase.from("support_requests").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
+    supabase.from("contractor_profiles").select("id", { count: "exact", head: true }).eq("veteran_verified", false).not("veteran_applied_at", "is", null),
   ]);
 
   const cards = [
@@ -31,7 +23,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/users",
       stat: userCount ?? 0,
       statLabel: "total users",
-      color: "border-blue-200",
+      accent: "#1B4F8A",
     },
     {
       title: "Projects",
@@ -39,7 +31,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/projects",
       stat: projectCount ?? 0,
       statLabel: "total projects",
-      color: "border-purple-200",
+      accent: "#1B4F8A",
     },
     {
       title: "Vet Certification",
@@ -47,7 +39,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/vet-certification",
       stat: vetCount ?? 0,
       statLabel: "pending reviews",
-      color: "border-yellow-200",
+      accent: (vetCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
     {
       title: "Support Requests",
@@ -55,39 +47,93 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/support",
       stat: supportCount ?? 0,
       statLabel: "open tickets",
-      color: "border-red-200",
+      accent: (supportCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
   ];
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-600">Signed in as {user.email}</p>
+    <div>
+      {/* Header */}
+      <div style={{ marginBottom: "32px" }}>
+        <h1 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: "36px",
+          letterSpacing: "1px",
+          color: "#fff",
+          margin: 0,
+        }}>
+          Admin Dashboard
+        </h1>
+        <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          {user.email}
+        </p>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Stat cards grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
         {cards.map((card) => (
-          <Link
-            key={card.href}
-            href={card.href}
-            className={`block rounded-lg border-2 ${card.color} p-5 hover:bg-gray-50 transition`}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="font-semibold text-lg">{card.title}</div>
-                <div className="mt-1 text-sm text-gray-600">
-                  {card.description}
+          <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
+            <div style={{
+              background: "#0F2040",
+              border: `1px solid ${card.accent}`,
+              borderRadius: "12px",
+              padding: "24px",
+              cursor: "pointer",
+              height: "100%",
+              transition: "border-color 0.2s",
+            }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                <div>
+                  <div style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontWeight: 700,
+                    fontSize: "22px",
+                    letterSpacing: "0.5px",
+                    color: "#fff",
+                    marginBottom: "6px",
+                  }}>
+                    {card.title}
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#7A9CC4", lineHeight: 1.5 }}>
+                    {card.description}
+                  </div>
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontWeight: 700,
+                    fontSize: "40px",
+                    color: card.accent === "#C8102E" ? "#C8102E" : "#fff",
+                    lineHeight: 1,
+                  }}>
+                    {card.stat}
+                  </div>
+                  <div style={{
+                    fontSize: "11px",
+                    color: "#7A9CC4",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    marginTop: "4px",
+                  }}>
+                    {card.statLabel}
+                  </div>
                 </div>
               </div>
-              <div className="text-right shrink-0">
-                <div className="text-2xl font-bold">{card.stat}</div>
-                <div className="text-xs text-gray-500">{card.statLabel}</div>
+
+              <div style={{
+                marginTop: "16px",
+                paddingTop: "16px",
+                borderTop: "1px solid #1B4F8A",
+                fontSize: "12px",
+                color: "#4A7FB5",
+              }}>
+                View {card.title} →
               </div>
             </div>
           </Link>
         ))}
       </div>
-    </main>
+    </div>
   );
 }

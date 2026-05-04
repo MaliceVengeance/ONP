@@ -3,22 +3,59 @@ import Link from "next/link";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen">
-      <header className="border-b">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="font-semibold">
-            ONP Dashboard
-          </Link>
+    <div style={{ minHeight: "100vh", background: "#0A1628" }}>
+      <header style={{
+        background: "#0A1628",
+        borderBottom: "2px solid #C8102E",
+        padding: "14px 28px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <Link href="/dashboard" style={{ textDecoration: "none" }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: "26px",
+            letterSpacing: "2px",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}>
+            <span style={{ color: "#C8102E" }}>★</span> ONP
+          </div>
+          <div style={{
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 400,
+            fontSize: "11px",
+            letterSpacing: "3px",
+            color: "#7A9CC4",
+            textTransform: "uppercase",
+          }}>
+            Our Next Project
+          </div>
+        </Link>
 
-          <form action="/auth/signout" method="post">
-            <button className="rounded-md border px-3 py-2 text-sm hover:bg-gray-50">
-              Sign out
-            </button>
-          </form>
-        </div>
+        <form action="/auth/signout" method="post">
+          <button style={{
+            background: "transparent",
+            border: "1px solid #1B4F8A",
+            color: "#7A9CC4",
+            padding: "6px 16px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "13px",
+            cursor: "pointer",
+          }}>
+            Sign out
+          </button>
+        </form>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-6">{children}</main>
+      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 24px" }}>
+        {children}
+      </main>
     </div>
   );
 }
