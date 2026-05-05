@@ -12,6 +12,16 @@ type SupportRequest = {
   project_id: string | null;
 };
 
+function statusStyle(status: string) {
+  switch (status) {
+    case "OPEN": return { background: "#3D0A0A", color: "#F87171", border: "1px solid #991B1B" };
+    case "ASSIGNED": return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
+    case "WAITING_ON_USER": return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
+    case "CLOSED": return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+    default: return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+  }
+}
+
 export default async function AdminSupportPage() {
   const { supabase } = await requireRole(["ADMIN"]);
 
@@ -28,87 +38,137 @@ export default async function AdminSupportPage() {
   const others = requests.filter((r) => r.status !== "OPEN");
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Support Requests</h1>
-        <Link href="/dashboard/admin" className="rounded-md border px-3 py-2 text-sm">
+    <div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+        <div>
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
+            Support Requests
+          </h1>
+          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+            {open.length} open ticket{open.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <Link
+          href="/dashboard/admin"
+          style={{
+            background: "transparent",
+            color: "#7A9CC4",
+            border: "1px solid #1B4F8A",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "13px",
+            textDecoration: "none",
+          }}
+        >
           Back
         </Link>
       </div>
 
       {/* Open tickets */}
-      <div className="mt-6">
-        <h2 className="font-semibold text-lg">Open ({open.length})</h2>
-        <div className="mt-3 space-y-3">
-          {open.length === 0 ? (
-            <div className="rounded-lg border p-4 text-sm text-gray-600">
-              No open requests.
-            </div>
-          ) : (
-            open.map((r) => <SupportCard key={r.id} r={r} />)
-          )}
-        </div>
+      <div style={{ marginBottom: "32px" }}>
+        <h2 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: "18px",
+          letterSpacing: "1px",
+          color: open.length > 0 ? "#F87171" : "#fff",
+          textTransform: "uppercase",
+          marginBottom: "12px",
+        }}>
+          Open ({open.length})
+        </h2>
+
+        {open.length === 0 ? (
+          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+            No open requests.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {open.map((r) => <SupportCard key={r.id} r={r} />)}
+          </div>
+        )}
       </div>
 
       {/* Other tickets */}
       {others.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-semibold text-lg">Other ({others.length})</h2>
-          <div className="mt-3 space-y-3">
+        <div>
+          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+          <h2 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "18px",
+            letterSpacing: "1px",
+            color: "#7A9CC4",
+            textTransform: "uppercase",
+            marginBottom: "12px",
+          }}>
+            Other ({others.length})
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {others.map((r) => <SupportCard key={r.id} r={r} />)}
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }
 
 function SupportCard({ r }: { r: SupportRequest }) {
   return (
-    <div className="rounded-lg border p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <div className="font-medium">
+    <div style={{
+      background: "#0F2040",
+      border: "1px solid #1B4F8A",
+      borderRadius: "10px",
+      padding: "18px",
+    }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
             {r.subject ?? "No subject"}
           </div>
           {r.type && (
-            <div className="text-xs text-gray-500 mt-0.5">
-              Type: {r.type}
+            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+              {r.type}
             </div>
           )}
           {r.description && (
-            <div className="mt-2 text-sm text-gray-700 line-clamp-2">
+            <div style={{
+              fontSize: "13px",
+              color: "#4A7FB5",
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              marginBottom: "8px",
+            }}>
               {r.description}
             </div>
           )}
-          <div className="mt-2 text-xs text-gray-500">
+          <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
             Submitted: {new Date(r.created_at).toLocaleString()}
-            {r.project_id && (
-              <> •{" "}
-                <Link
-                  href={`/dashboard/admin/projects`}
-                  className="underline"
-                >
-                  View project
-                </Link>
-              </>
-            )}
           </div>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full border font-medium shrink-0 ${statusColor(r.status)}`}>
+        <span style={{
+          fontSize: "11px",
+          fontWeight: 600,
+          padding: "4px 10px",
+          borderRadius: "20px",
+          letterSpacing: "0.5px",
+          flexShrink: 0,
+          ...statusStyle(r.status),
+        }}>
           {r.status}
         </span>
       </div>
     </div>
   );
-}
-
-function statusColor(status: string) {
-  switch (status) {
-    case "OPEN": return "border-red-300 text-red-700";
-    case "ASSIGNED": return "border-yellow-300 text-yellow-700";
-    case "WAITING_ON_USER": return "border-blue-300 text-blue-700";
-    case "CLOSED": return "border-gray-300 text-gray-600";
-    default: return "border-gray-300 text-gray-600";
-  }
 }

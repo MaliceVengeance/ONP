@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { awardBid } from "./actions";
+import { stateBadge } from "@/lib/ui";
 
 type BidRow = {
   bid_id: string;
@@ -13,7 +14,7 @@ type BidRow = {
 function centsToMoney(cents: number | string) {
   const n = Number(cents);
   if (!Number.isFinite(n)) return "—";
-  return `$${(n / 100).toFixed(2)}`;
+  return `$${(n / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
 }
 
 function moneyToCents(input: string | undefined) {
@@ -36,7 +37,6 @@ export default async function ClientProjectBidsPage({
   const { id: projectId } = await params;
   const sp = await searchParams;
 
-  // 1) Load project (RLS restricts to owner client or admin)
   const { data: project, error: pErr } = await supabase
     .from("projects")
     .select("id,title,state,deadline_at")
@@ -45,380 +45,426 @@ export default async function ClientProjectBidsPage({
 
   if (pErr) {
     return (
-      <main className="max-w-3xl p-6">
-        <h1 className="text-2xl font-semibold">Bids</h1>
-        <div className="mt-6 rounded-lg border p-4 text-sm text-red-700">
+      <div style={{ maxWidth: "700px" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", color: "#fff" }}>
+          Bids
+        </h1>
+        <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px", marginTop: "16px" }}>
           Failed to load project: {JSON.stringify(pErr)}
         </div>
-      </main>
+      </div>
     );
   }
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
-
-  // Unlock condition:
-  // - deadline passed, OR
-  // - project not OPEN (e.g. AWARDED, CANCELLED, etc.)
-  const unlocked =
-    (deadline && deadline.getTime() <= now.getTime()) || project.state !== "OPEN";
-
+  const unlocked = (deadline && deadline.getTime() <= now.getTime()) || project.state !== "OPEN";
   const sort = sp.sort === "amount_desc" ? "amount_desc" : "amount_asc";
   const minCents = moneyToCents(sp.min);
   const maxCents = moneyToCents(sp.max);
 
-  // 2) Load bids (only if unlocked)
   let bids: BidRow[] = [];
   let bidsErrText: string | null = null;
 
   if (unlocked) {
     const { data, error } = await supabase.rpc("list_project_bids_for_client", {
       p_project_id: projectId,
-      // BIGINT safety: send as strings or null
       p_min_cents: minCents === null ? null : String(minCents),
       p_max_cents: maxCents === null ? null : String(maxCents),
       p_sort: sort,
     });
-
-    if (error) {
-      bidsErrText = JSON.stringify(error, null, 2);
-    } else {
-      bids = (data ?? []) as BidRow[];
-    }
+    if (error) bidsErrText = JSON.stringify(error, null, 2);
+    else bids = (data ?? []) as BidRow[];
   }
 
-  // 3) Load award (only if unlocked)
+  let award: any = undefined;
   let awardErrText: string | null = null;
-  let award:
-    | {
-        project_id: string;
-        bid_id: string | null;
-        contractor_id: string;
-        awarded_at: string;
-        contractor: any;
-      }
-    | undefined;
 
   if (unlocked) {
     const { data: awardData, error: awardErr } = await supabase.rpc(
       "get_project_award_for_client",
       { p_project_id: projectId }
     );
-
-    if (awardErr) {
-      awardErrText = JSON.stringify(awardErr, null, 2);
-    } else {
-      award = (awardData ?? [])[0] as any;
-    }
+    if (awardErr) awardErrText = JSON.stringify(awardErr, null, 2);
+    else award = (awardData ?? [])[0] as any;
   }
 
+  const inputStyle = {
+    background: "#0A1628",
+    border: "1px solid #1B4F8A",
+    color: "#F0F4FF",
+    borderRadius: "6px",
+    padding: "8px 12px",
+    fontFamily: "'Barlow', sans-serif",
+    fontSize: "13px",
+    outline: "none",
+  } as React.CSSProperties;
+
   return (
-    <main className="max-w-3xl p-6">
-      <div className="flex items-start justify-between gap-4">
+    <div style={{ maxWidth: "700px" }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
-          <h1 className="text-2xl font-semibold">Bids</h1>
-          <div className="mt-1 text-sm text-gray-600">
-            Project:{" "}
-            <span className="font-medium">{project.title ?? "Untitled"}</span>
-          </div>
-          <div className="mt-1 text-xs text-gray-500">
-            Signed in as: {user.email}
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
+            Bids
+          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+            <span style={{ fontSize: "14px", color: "#7A9CC4" }}>
+              {project.title ?? "Untitled"}
+            </span>
+            <span style={stateBadge(project.state)}>{project.state}</span>
           </div>
         </div>
-
         <Link
           href={`/dashboard/client/projects/${projectId}`}
-          className="rounded-md border px-3 py-2 text-sm"
+          style={{
+            background: "transparent",
+            color: "#7A9CC4",
+            border: "1px solid #1B4F8A",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "13px",
+            textDecoration: "none",
+          }}
         >
-          Back to project
+          Back
         </Link>
       </div>
 
-      {/* Deadline / state card */}
-      <div className="mt-4 rounded-lg border p-4 text-sm">
+      {/* Lock status */}
+      <div style={{
+        background: "#0F2040",
+        border: `1px solid ${unlocked ? "#166534" : "#1B4F8A"}`,
+        borderRadius: "10px",
+        padding: "16px 20px",
+        marginBottom: "20px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "16px",
+      }}>
         <div>
-          <span className="font-medium">Deadline:</span>{" "}
-          {deadline ? deadline.toLocaleString() : "—"}
-        </div>
-        <div>
-          <span className="font-medium">State:</span> {project.state}
-        </div>
-      </div>
-
-      {/* Locked / Unlocked badge */}
-      <div
-        className={`mt-4 rounded-lg border p-4 ${
-          unlocked ? "bg-green-50" : "bg-yellow-50"
-        }`}
-      >
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-lg font-semibold">
-            {unlocked ? "✅ UNLOCKED" : "🔒 LOCKED"}
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            color: unlocked ? "#4ADE80" : "#7A9CC4",
+            letterSpacing: "1px",
+          }}>
+            {unlocked ? "✅ BIDS UNLOCKED" : "🔒 BIDS LOCKED"}
           </div>
-          <div className="text-sm text-gray-700">
+          <div style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
             {unlocked
               ? award
-                ? "Bids are visible (project already awarded)."
-                : "Bids are visible and awardable."
-              : "Bids are hidden until the deadline passes."}
+                ? "Project has been awarded."
+                : "Bids are visible and ready to award."
+              : "Bids are sealed until the deadline passes."}
           </div>
         </div>
-
-        <div className="mt-3 text-sm text-gray-700 space-y-1">
-          <div>
-            <span className="font-medium">Unlock rule:</span> Bids become visible
-            after the deadline passes (or if the project is no longer OPEN).
+        <div style={{ textAlign: "right", flexShrink: 0 }}>
+          <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px" }}>
+            Deadline
           </div>
-          <div>
-            <span className="font-medium">State:</span>{" "}
-            <code>{project.state}</code>
-          </div>
-          <div>
-            <span className="font-medium">Deadline:</span>{" "}
-            <code>{deadline ? deadline.toISOString() : "null"}</code>
-          </div>
-          <div>
-            <span className="font-medium">Now (browser):</span>{" "}
-            <code>{now.toISOString()}</code>
-          </div>
-          <div>
-            <span className="font-medium">Computed:</span>{" "}
-            <code>{String(unlocked)}</code>
+          <div style={{ fontSize: "14px", color: "#fff", fontWeight: 500, marginTop: "2px" }}>
+            {deadline ? deadline.toLocaleDateString() : "—"}
           </div>
         </div>
       </div>
 
       {/* Award saved banner */}
       {sp.award === "ok" && (
-        <div className="mt-6 rounded-lg border p-4 text-sm">
-          ✅ Award saved.
+        <div style={{
+          background: "#0D3320",
+          border: "1px solid #166534",
+          color: "#4ADE80",
+          padding: "14px 18px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "20px",
+        }}>
+          ✅ Award saved successfully.
         </div>
       )}
 
-      {/* RPC errors shown on-page */}
+      {/* RPC errors */}
       {bidsErrText && (
-        <div className="mt-6 rounded-lg border p-4 text-sm text-red-700">
-          <div className="font-semibold">
-            RPC error: list_project_bids_for_client
-          </div>
-          <pre className="mt-2 whitespace-pre-wrap text-xs bg-gray-50 p-2 rounded">
-            {bidsErrText}
-          </pre>
+        <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
+          <div style={{ fontWeight: 600, marginBottom: "8px" }}>Error loading bids</div>
+          <pre style={{ fontSize: "11px", whiteSpace: "pre-wrap" }}>{bidsErrText}</pre>
         </div>
       )}
 
-      {awardErrText && (
-        <div className="mt-6 rounded-lg border p-4 text-sm text-red-700">
-          <div className="font-semibold">
-            RPC error: get_project_award_for_client
+      {/* Winner card */}
+      {award && (() => {
+        const c = award?.contractor || {};
+        const hasProfile = c && Object.keys(c).length > 0;
+        const name = (hasProfile && (c.business_name || c.company_name || c.name)) || "Contractor profile not set up yet";
+        const city = (hasProfile && (c.city || c.location_city)) || "";
+        const state = (hasProfile && (c.state || c.location_state)) || "";
+        const veteran = hasProfile ? c.veteran_verified ?? c.certified_veteran_owned : null;
+
+        return (
+          <div style={{
+            background: "#0F2040",
+            border: "1px solid #5B21B6",
+            borderRadius: "12px",
+            padding: "20px",
+            marginBottom: "24px",
+          }}>
+            <div style={{ fontSize: "11px", color: "#A78BFA", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
+              ★ Winner Selected
+            </div>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#fff", marginBottom: "4px" }}>
+              {String(name)}
+            </div>
+            <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "12px" }}>
+              {[city, state].filter(Boolean).join(", ") || "Location not listed"}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                Awarded: {new Date(award.awarded_at).toLocaleString()}
+              </span>
+              {veteran === true && (
+                <span style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  padding: "3px 10px",
+                  borderRadius: "20px",
+                  background: "#1e1a00",
+                  color: "#FBBF24",
+                  border: "1px solid #92400E",
+                }}>
+                  ★ Veteran Owned
+                </span>
+              )}
+            </div>
           </div>
-          <pre className="mt-2 whitespace-pre-wrap text-xs bg-gray-50 p-2 rounded">
-            {awardErrText}
-          </pre>
-        </div>
-      )}
+        );
+      })()}
 
-      {/* Winner box */}
-      {award && (
-        <div className="mt-6 rounded-lg border p-4">
-          <div className="text-sm text-gray-600">Winner selected</div>
-          <div className="mt-1 text-lg font-semibold">Awarded Contractor</div>
-
-          <div className="mt-2 text-sm text-gray-700">
-            Awarded at: {new Date(award.awarded_at).toLocaleString()}
-          </div>
-
-          {/* Contractor Card Block */}
-          {(() => {
-            const c = award?.contractor || {};
-            const hasProfile = c && Object.keys(c).length > 0;
-
-            const name =
-              (hasProfile &&
-                (c.business_name ||
-                  c.company_name ||
-                  c.name ||
-                  c.legal_name)) ||
-              "Contractor profile not set up yet";
-
-            const city =
-              (hasProfile && (c.city || c.location_city || c.base_city)) || "";
-
-            const state =
-              (hasProfile && (c.state || c.location_state || c.base_state)) ||
-              "";
-
-            const veteran = hasProfile
-              ? c.veteran_verified ??
-                c.certified_veteran_owned ??
-                c.is_veteran_owned
-              : null;
-
-            return (
-              <div className="mt-3 rounded-md border p-3 text-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="font-semibold">{String(name)}</div>
-                    <div className="text-sm text-gray-600">
-                      {[city, state].filter(Boolean).join(", ") ||
-                        (hasProfile
-                          ? "Location not listed"
-                          : "Location not set up yet")}
-                    </div>
-                  </div>
-
-                  {veteran === true ? (
-                    <span className="rounded-full border px-2 py-1 text-xs">
-                      ✅ Veteran-owned (verified)
-                    </span>
-                  ) : veteran === false ? (
-                    <span className="rounded-full border px-2 py-1 text-xs text-gray-500">
-                      Veteran status not verified
-                    </span>
-                  ) : (
-                    <span className="rounded-full border px-2 py-1 text-xs text-gray-500">
-                      Profile pending
-                    </span>
-                  )}
-                </div>
-
-                {!hasProfile && (
-                  <div className="mt-3 text-xs text-gray-500">
-                    Contractor identity has been revealed, but the contractor
-                    profile page has not been completed yet.
-                  </div>
-                )}
-
-                {hasProfile && (
-                  <div className="mt-3 text-xs text-gray-500">
-                    (Contractor identity is revealed only after award.)
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* Locked/unlocked behavior */}
+      {/* Locked state */}
       {!unlocked ? (
-        <div className="mt-6 rounded-lg border p-4 text-sm text-gray-600">
-          🔒 Bids are locked until the deadline passes.
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "32px",
+          textAlign: "center",
+          color: "#7A9CC4",
+          fontSize: "14px",
+        }}>
+          🔒 Bids are sealed until the deadline passes. Check back after{" "}
+          <span style={{ color: "#fff" }}>
+            {deadline ? deadline.toLocaleDateString() : "the deadline"}
+          </span>.
         </div>
       ) : (
         <>
           {/* Filters */}
-          <div className="mt-6 rounded-lg border p-4">
-            <h2 className="font-semibold">Filter by price</h2>
+          <div style={{
+            background: "#0F2040",
+            border: "1px solid #1B4F8A",
+            borderRadius: "10px",
+            padding: "20px",
+            marginBottom: "20px",
+          }}>
+            <h2 style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "16px",
+              letterSpacing: "1px",
+              color: "#fff",
+              textTransform: "uppercase",
+              marginBottom: "14px",
+            }}>
+              Filter Bids
+            </h2>
 
-            <form className="mt-3 flex flex-wrap gap-3 items-end">
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600">Min ($)</label>
-                <input
-                  name="min"
-                  defaultValue={sp.min ?? ""}
-                  className="rounded-md border px-3 py-2"
-                  placeholder="e.g. 25000"
-                />
+            <form style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                  Min ($)
+                </label>
+                <input name="min" defaultValue={sp.min ?? ""} style={{ ...inputStyle, width: "120px" }} placeholder="e.g. 25000" />
               </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600">Max ($)</label>
-                <input
-                  name="max"
-                  defaultValue={sp.max ?? ""}
-                  className="rounded-md border px-3 py-2"
-                  placeholder="e.g. 30000"
-                />
+              <div>
+                <label style={{ display: "block", fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                  Max ($)
+                </label>
+                <input name="max" defaultValue={sp.max ?? ""} style={{ ...inputStyle, width: "120px" }} placeholder="e.g. 50000" />
               </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600">Sort</label>
-                <select
-                  name="sort"
-                  defaultValue={sort}
-                  className="rounded-md border px-3 py-2"
-                >
+              <div>
+                <label style={{ display: "block", fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                  Sort
+                </label>
+                <select name="sort" defaultValue={sort} style={inputStyle}>
                   <option value="amount_asc">Lowest first</option>
                   <option value="amount_desc">Highest first</option>
                 </select>
               </div>
-
-              <button className="rounded-md bg-black text-white px-3 py-2 text-sm">
+              <button type="submit" style={{
+                background: "#1B4F8A",
+                color: "#fff",
+                border: "none",
+                padding: "8px 20px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer",
+              }}>
                 Apply
               </button>
-
               <Link
-                className="rounded-md border px-3 py-2 text-sm"
                 href={`/dashboard/client/projects/${projectId}/bids`}
+                style={{
+                  background: "transparent",
+                  color: "#7A9CC4",
+                  border: "1px solid #1B4F8A",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: "13px",
+                  textDecoration: "none",
+                }}
               >
                 Clear
               </Link>
             </form>
 
-            <p className="mt-2 text-xs text-gray-500">
-              Bids are anonymous. Contractor identities are not shown until an
-              award is made.
+            <p style={{ fontSize: "12px", color: "#3A5A7A", marginTop: "12px" }}>
+              Bids are anonymous. Contractor identities are revealed only after award.
             </p>
           </div>
 
           {/* Bid cards */}
-          <div className="mt-6 space-y-3">
-            {bids.length === 0 ? (
-              <div className="rounded-lg border p-4 text-sm text-gray-600">
-                No bids match your filters.
-              </div>
-            ) : (
-              bids.map((b, idx) => (
-                <div key={b.bid_id} className="rounded-lg border p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="font-medium">Bid #{idx + 1}</div>
-                    <div className="text-right">
-                      <div className="text-lg font-semibold">
-                        {centsToMoney(b.amount_cents)}
+          {bids.length === 0 ? (
+            <div style={{
+              background: "#0F2040",
+              border: "1px solid #1B4F8A",
+              borderRadius: "10px",
+              padding: "32px",
+              textAlign: "center",
+              color: "#7A9CC4",
+              fontSize: "14px",
+            }}>
+              No bids match your filters.
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {bids.map((b, idx) => {
+                const isAwarded = award?.bid_id === b.bid_id;
+                return (
+                  <div key={b.bid_id} style={{
+                    background: "#0F2040",
+                    border: `1px solid ${isAwarded ? "#5B21B6" : "#1B4F8A"}`,
+                    borderRadius: "10px",
+                    padding: "20px",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                      <div>
+                        <div style={{
+                          fontFamily: "'Barlow Condensed', sans-serif",
+                          fontWeight: 700,
+                          fontSize: "18px",
+                          color: "#7A9CC4",
+                          textTransform: "uppercase",
+                          letterSpacing: "1px",
+                          marginBottom: "4px",
+                        }}>
+                          Bid #{idx + 1}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#3A5A7A" }}>
+                          Submitted: {new Date(b.submitted_at).toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#3A5A7A" }}>
+                          Version {b.version_number}
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        v{b.version_number}
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{
+                          fontFamily: "'Barlow Condensed', sans-serif",
+                          fontWeight: 700,
+                          fontSize: "32px",
+                          color: "#fff",
+                          lineHeight: 1,
+                        }}>
+                          {centsToMoney(b.amount_cents)}
+                        </div>
                       </div>
+                    </div>
+
+                    {b.notes && (
+                      <div style={{
+                        background: "#0A1628",
+                        border: "1px solid #1B4F8A",
+                        borderRadius: "6px",
+                        padding: "12px",
+                        marginTop: "12px",
+                        fontSize: "13px",
+                        color: "#7A9CC4",
+                      }}>
+                        <span style={{ color: "#4A7FB5", fontWeight: 600 }}>Notes: </span>
+                        {b.notes}
+                      </div>
+                    )}
+
+                    <div style={{ marginTop: "16px" }}>
+                      {!award ? (
+                        <form action={awardBid.bind(null, projectId, b.bid_id)}>
+                          <button
+                            type="submit"
+                            style={{
+                              background: "#C8102E",
+                              color: "#fff",
+                              border: "none",
+                              padding: "10px 24px",
+                              borderRadius: "6px",
+                              fontFamily: "'Barlow', sans-serif",
+                              fontWeight: 600,
+                              fontSize: "13px",
+                              cursor: "pointer",
+                              letterSpacing: "0.5px",
+                            }}
+                          >
+                            Award This Bid
+                          </button>
+                          <p style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "6px" }}>
+                            Reveals contractor identity for this bid only.
+                          </p>
+                        </form>
+                      ) : isAwarded ? (
+                        <div style={{
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          color: "#A78BFA",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}>
+                          ★ Awarded Bid
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: "13px", color: "#3A5A7A" }}>
+                          Not selected
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  <div className="mt-2 text-sm text-gray-600">
-  Submitted: {new Date(b.submitted_at).toLocaleString()}
-</div>
-{b.notes && (
-  <div className="mt-2 text-sm text-gray-700">
-    <span className="font-medium">Notes:</span> {b.notes}
-  </div>
-)}
-
-                  {/* Award button */}
-                  {!award ? (
-                    <form
-                      action={awardBid.bind(null, projectId, b.bid_id)}
-                      className="mt-4"
-                    >
-                      <button className="rounded-md bg-black text-white px-3 py-2 text-sm">
-                        Award this bid
-                      </button>
-                      <p className="mt-2 text-xs text-gray-500">
-                        This selects the winner and reveals the contractor
-                        identity for this bid only.
-                      </p>
-                    </form>
-                  ) : award.bid_id === b.bid_id ? (
-                    <div className="mt-4 text-sm font-medium text-green-700">
-                      ✅ Awarded bid
-                    </div>
-                  ) : (
-                    <div className="mt-4 text-sm text-gray-500">Not selected</div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </>
       )}
-    </main>
+    </div>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { submitBid } from "@/app/dashboard/contractor/bids/actions";
 import CountdownTimer from "@/components/CountdownTimer";
+import { stateBadge } from "@/lib/ui";
 
 type ProjectDetail = {
   id: string;
@@ -46,21 +47,20 @@ export default async function ContractorProjectDetail({
 
   if (pErr || !project) {
     return (
-      <main className="max-w-3xl p-6">
-        <h1 className="text-2xl font-semibold">Project not found</h1>
-        <div className="mt-4 rounded-lg border p-4 text-sm text-gray-700">
-          It may be closed, unpublished, or you may not have access.
+      <div style={{ maxWidth: "700px" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#fff" }}>
+          Project Not Found
+        </h1>
+        <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "20px", marginTop: "16px", fontSize: "14px", color: "#7A9CC4" }}>
+          This project may be closed, unpublished, or you may not have access.
         </div>
-        <div className="mt-4">
-          <Link className="underline text-sm" href="/dashboard/contractor/projects">
-            Back to Open Projects
-          </Link>
-        </div>
-      </main>
+        <Link href="/dashboard/contractor/projects" style={{ color: "#7A9CC4", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
+          ← Back to Open Projects
+        </Link>
+      </div>
     );
   }
 
-  // Fetch existing bid for this contractor on this project
   const { data: bidRow } = await supabase
     .from("bids")
     .select("id")
@@ -79,9 +79,7 @@ export default async function ContractorProjectDetail({
       .limit(1)
       .maybeSingle();
 
-    if (versionRow) {
-      existingBid = versionRow as ExistingBid;
-    }
+    if (versionRow) existingBid = versionRow as ExistingBid;
   }
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
@@ -99,90 +97,183 @@ export default async function ContractorProjectDetail({
   const award = awardRows?.[0];
 
   function fmtMoney(cents: number) {
-    return `$${(cents / 100).toFixed(2)}`;
+    return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
   }
 
+  const inputStyle = {
+    width: "100%",
+    background: "#0A1628",
+    border: "1px solid #1B4F8A",
+    color: "#F0F4FF",
+    borderRadius: "6px",
+    padding: "10px 14px",
+    fontFamily: "'Barlow', sans-serif",
+    fontSize: "14px",
+    outline: "none",
+    marginTop: "6px",
+  } as React.CSSProperties;
+
+  const labelStyle = {
+    display: "block",
+    fontSize: "11px",
+    fontWeight: 500,
+    color: "#7A9CC4",
+    textTransform: "uppercase" as const,
+    letterSpacing: "1px",
+    marginTop: "16px",
+  };
+
   return (
-    <main className="max-w-3xl p-6">
+    <div style={{ maxWidth: "700px" }}>
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
             {project.title ?? "Untitled Project"}
           </h1>
-          <div className="mt-1 text-sm text-gray-600">
-            {project.category ?? "—"} • {project.location_general ?? "—"}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+            <span style={{ fontSize: "13px", color: "#7A9CC4" }}>
+              {project.category ?? "—"} • {project.location_general ?? "—"}
+            </span>
+            <span style={stateBadge(project.state)}>{project.state}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
           {isOpen && (
             <Link
-              className="rounded-md border px-3 py-2 text-sm"
               href={`/dashboard/contractor/projects/${projectId}/rfis`}
+              style={{
+                background: "transparent",
+                color: "#7A9CC4",
+                border: "1px solid #1B4F8A",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
             >
-              Questions (RFIs)
+              Questions
             </Link>
           )}
           <Link
-            className="rounded-md border px-3 py-2 text-sm"
             href="/dashboard/contractor/projects"
+            style={{
+              background: "transparent",
+              color: "#7A9CC4",
+              border: "1px solid #1B4F8A",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
           >
             Back
           </Link>
         </div>
       </div>
 
-      {/* Status info */}
-      <div className="mt-4 rounded-lg border p-4 text-sm space-y-1">
-        <div>
-          <span className="font-medium">Status:</span> {project.state}
-        </div>
-        <div>
-          <span className="font-medium">Deadline:</span>{" "}
-          {deadline ? deadline.toLocaleString() : "—"}
-        </div>
-        <div>
-          <span className="font-medium">Published:</span>{" "}
-          {project.published_at
-            ? new Date(project.published_at).toLocaleString()
-            : "—"}
-        </div>
-      </div>
-
       {/* Countdown timer */}
       {isOpen && project.deadline_at && (
-        <div className="mt-4">
+        <div style={{ marginBottom: "20px" }}>
           <CountdownTimer deadline={project.deadline_at} />
         </div>
       )}
 
+      {/* Project info */}
+      <div style={{
+        background: "#0F2040",
+        border: "1px solid #1B4F8A",
+        borderRadius: "10px",
+        padding: "18px",
+        marginBottom: "16px",
+        display: "flex",
+        gap: "24px",
+        flexWrap: "wrap",
+      }}>
+        <div>
+          <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px" }}>Published</div>
+          <div style={{ fontSize: "14px", color: "#fff", marginTop: "2px" }}>
+            {project.published_at ? new Date(project.published_at).toLocaleDateString() : "—"}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px" }}>Deadline</div>
+          <div style={{ fontSize: "14px", color: "#fff", marginTop: "2px" }}>
+            {deadline ? deadline.toLocaleDateString() : "—"}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px" }}>Category</div>
+          <div style={{ fontSize: "14px", color: "#fff", marginTop: "2px" }}>
+            {project.category ?? "—"}
+          </div>
+        </div>
+      </div>
+
       {/* Description */}
       {project.description && (
-        <div className="mt-4 rounded-lg border p-4 text-sm whitespace-pre-wrap">
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "18px",
+          marginBottom: "16px",
+          fontSize: "14px",
+          color: "#F0F4FF",
+          lineHeight: 1.7,
+          whiteSpace: "pre-wrap",
+        }}>
           {project.description}
         </div>
       )}
 
       {/* Platform rules */}
-      <div className="mt-4 rounded-lg border p-4 text-sm space-y-2 bg-gray-50">
-        <div className="font-medium text-gray-700">Platform Rules</div>
-        <div className="text-gray-600">✅ The contractor is responsible for pulling all required permits.</div>
-        <div className="text-gray-600">✅ The contractor is responsible for all debris removal and disposal.</div>
+      <div style={{
+        background: "#0A1628",
+        border: "1px solid #1B4F8A",
+        borderRadius: "10px",
+        padding: "16px 18px",
+        marginBottom: "16px",
+      }}>
+        <div style={{ fontSize: "11px", fontWeight: 600, color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+          Platform Rules
+        </div>
+        <div style={{ fontSize: "13px", color: "#4ADE80", marginBottom: "6px" }}>
+          ✅ The contractor is responsible for pulling all required permits.
+        </div>
+        <div style={{ fontSize: "13px", color: "#4ADE80" }}>
+          ✅ The contractor is responsible for all debris removal and disposal.
+        </div>
       </div>
 
-      {/* Awarded */}
+      {/* Awarded banner */}
       {project.state === "AWARDED" && (
-        <div className="mt-6 rounded-lg border p-4">
-          <div className="text-lg font-semibold text-green-700">
-            ✅ This project was awarded
+        <div style={{
+          background: "#2D1B69",
+          border: "1px solid #5B21B6",
+          borderRadius: "10px",
+          padding: "18px",
+          marginBottom: "16px",
+        }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "20px", color: "#A78BFA", marginBottom: "6px" }}>
+            ★ This project has been awarded
           </div>
           {award?.awarded_at && (
-            <div className="mt-2 text-sm text-gray-600">
-              Awarded at: {new Date(award.awarded_at).toLocaleString()}
+            <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+              Awarded: {new Date(award.awarded_at).toLocaleString()}
             </div>
           )}
-          <div className="mt-2 text-sm text-gray-700">
+          <div style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
             Bidding is closed. You can no longer submit or revise bids.
           </div>
         </div>
@@ -190,85 +281,145 @@ export default async function ContractorProjectDetail({
 
       {/* Success banner */}
       {bidSubmitted && (
-        <div className="mt-6 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-800">
+        <div style={{
+          background: "#0D3320",
+          border: "1px solid #166534",
+          color: "#4ADE80",
+          padding: "14px 18px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "16px",
+        }}>
           ✅ Your bid was submitted successfully.
         </div>
       )}
 
       {/* Existing bid summary */}
       {existingBid && (
-        <div className="mt-6 rounded-lg border p-4 space-y-1">
-          <div className="font-semibold">Your Current Bid</div>
-          <div className="text-sm text-gray-700">
-            <span className="font-medium">Amount:</span>{" "}
-            {fmtMoney(existingBid.amount_cents)}
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "18px",
+          marginBottom: "16px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "16px",
+            color: "#7A9CC4",
+            textTransform: "uppercase",
+            letterSpacing: "1px",
+            marginBottom: "12px",
+          }}>
+            Your Current Bid
+          </div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "8px" }}>
+            <span style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "32px",
+              color: "#fff",
+            }}>
+              {fmtMoney(existingBid.amount_cents)}
+            </span>
+            <span style={{ fontSize: "12px", color: "#7A9CC4" }}>
+              v{existingBid.version_number}
+              {existingBid.submitted_at ? ` • ${new Date(existingBid.submitted_at).toLocaleDateString()}` : ""}
+            </span>
           </div>
           {existingBid.notes && (
-            <div className="text-sm text-gray-700">
-              <span className="font-medium">Notes:</span> {existingBid.notes}
+            <div style={{
+              background: "#0A1628",
+              border: "1px solid #1B4F8A",
+              borderRadius: "6px",
+              padding: "10px 12px",
+              fontSize: "13px",
+              color: "#7A9CC4",
+            }}>
+              <span style={{ color: "#4A7FB5", fontWeight: 600 }}>Notes: </span>
+              {existingBid.notes}
             </div>
           )}
-          <div className="text-xs text-gray-500">
-            Version {existingBid.version_number}
-            {existingBid.submitted_at
-              ? ` • Submitted ${new Date(existingBid.submitted_at).toLocaleString()}`
-              : ""}
-          </div>
         </div>
       )}
 
       {/* Bid form */}
       {canBid ? (
-        <div className="mt-6 rounded-lg border p-4">
-          <div className="font-semibold">
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "12px",
+          padding: "24px",
+        }}>
+          <h2 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            letterSpacing: "1px",
+            color: "#fff",
+            textTransform: "uppercase",
+            marginBottom: "4px",
+          }}>
             {existingBid ? "Revise Your Bid" : "Submit a Bid"}
-          </div>
+          </h2>
+          <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "4px" }}>
+            Bids are sealed until the deadline. You can revise anytime before it closes.
+          </p>
 
-          <form
-            action={submitBid.bind(null, projectId)}
-            className="mt-4 space-y-3"
-          >
-            <div>
-              <label className="text-sm font-medium">Bid amount (USD)</label>
-              <input
-                name="amount"
-                className="mt-1 w-full rounded-md border px-3 py-2"
-                placeholder="e.g., 25000"
-                defaultValue={
-                  existingBid
-                    ? (existingBid.amount_cents / 100).toFixed(2)
-                    : ""
-                }
-                required
-              />
-            </div>
+          <form action={submitBid.bind(null, projectId)}>
+            <label style={{ ...labelStyle, marginTop: "16px" }}>Bid Amount (USD)</label>
+            <input
+              name="amount"
+              style={inputStyle}
+              placeholder="e.g. 25000"
+              defaultValue={existingBid ? (existingBid.amount_cents / 100).toFixed(2) : ""}
+              required
+            />
 
-            <div>
-              <label className="text-sm font-medium">Notes (optional)</label>
-              <textarea
-                name="notes"
-                className="mt-1 w-full rounded-md border px-3 py-2 min-h-[90px]"
-                placeholder="Clarifying assumptions, schedule notes, etc."
-                defaultValue={existingBid?.notes ?? ""}
-              />
-            </div>
+            <label style={labelStyle}>Notes (optional)</label>
+            <textarea
+              name="notes"
+              style={{ ...inputStyle, minHeight: "90px", resize: "vertical" }}
+              placeholder="Clarifying assumptions, schedule notes, material preferences…"
+              defaultValue={existingBid?.notes ?? ""}
+            />
 
-            <button className="rounded-md bg-black text-white px-4 py-2 text-sm">
+            <button
+              type="submit"
+              style={{
+                marginTop: "20px",
+                background: "#C8102E",
+                color: "#fff",
+                border: "none",
+                padding: "12px 28px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "14px",
+                letterSpacing: "0.5px",
+                cursor: "pointer",
+              }}
+            >
               {existingBid ? "Revise Bid" : "Submit Bid"}
             </button>
-
-            <p className="text-xs text-gray-500">
-              You can revise until the deadline. Bids are sealed until bidding closes.
-            </p>
           </form>
         </div>
       ) : (
         isOpen && (
-          <div className="mt-6 rounded-lg border p-4 text-sm text-gray-700">
-            Bidding is closed (deadline passed).
+          <div style={{
+            background: "#0F2040",
+            border: "1px solid #1B4F8A",
+            borderRadius: "10px",
+            padding: "20px",
+            fontSize: "14px",
+            color: "#7A9CC4",
+            textAlign: "center",
+          }}>
+            Bidding is closed — the deadline has passed.
           </div>
         )
       )}
-    </main>
+    </div>
   );
 }

@@ -12,6 +12,16 @@ type Profile = {
 
 const ALL_ROLES = ["CLIENT", "CONTRACTOR", "INSPECTOR", "ADMIN"];
 
+function roleColor(role: string) {
+  switch (role) {
+    case "ADMIN": return { background: "#3D0A0A", color: "#F87171", border: "1px solid #991B1B" };
+    case "CLIENT": return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
+    case "CONTRACTOR": return { background: "#0D3320", color: "#4ADE80", border: "1px solid #166534" };
+    case "INSPECTOR": return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
+    default: return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+  }
+}
+
 export default async function AdminUsersPage() {
   const { supabase, user: adminUser } = await requireRole(["ADMIN"]);
 
@@ -25,68 +35,122 @@ export default async function AdminUsersPage() {
   const profiles = (data ?? []) as Profile[];
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Users</h1>
-        <Link href="/dashboard/admin" className="rounded-md border px-3 py-2 text-sm">
+    <div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+        <div>
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
+            Users
+          </h1>
+          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+            {profiles.length} total users
+          </p>
+        </div>
+        <Link
+          href="/dashboard/admin"
+          style={{
+            background: "transparent",
+            color: "#7A9CC4",
+            border: "1px solid #1B4F8A",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "13px",
+            textDecoration: "none",
+          }}
+        >
           Back
         </Link>
       </div>
 
-      <p className="mt-2 text-sm text-gray-600">
-        {profiles.length} total users
-      </p>
-
-      <div className="mt-6 space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {profiles.length === 0 ? (
-          <div className="rounded-lg border p-4 text-sm text-gray-600">
+          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
             No users found.
           </div>
         ) : (
           profiles.map((p) => (
-            <div key={p.id} className="rounded-lg border p-4">
-              <div className="flex items-start justify-between gap-4">
+            <div key={p.id} style={{
+              background: "#0F2040",
+              border: "1px solid #1B4F8A",
+              borderRadius: "10px",
+              padding: "18px",
+            }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                 <div>
-                  <div className="font-medium">
+                  <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
                     {p.display_name ?? p.company_name ?? "No name set"}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div style={{ fontSize: "11px", color: "#3A5A7A", marginBottom: "6px" }}>
                     {p.id}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
                     Joined: {new Date(p.created_at).toLocaleDateString()}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-xs px-2 py-1 rounded-full border font-medium ${roleColor(p.role)}`}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+                  <span style={{
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    padding: "4px 10px",
+                    borderRadius: "20px",
+                    letterSpacing: "0.5px",
+                    ...roleColor(p.role),
+                  }}>
                     {p.role}
                   </span>
 
-                  {/* Don't allow changing your own role */}
                   {p.id !== adminUser.id && (
                     <form action={async (formData: FormData) => {
                       "use server";
                       const newRole = formData.get("role") as string;
                       await changeUserRole(p.id, newRole);
                     }}>
-                      <select
-                        name="role"
-                        defaultValue={p.role}
-                        className="rounded-md border px-2 py-1 text-xs"
-                      >
-                        {ALL_ROLES.map((r) => (
-                          <option key={r} value={r}>{r}</option>
-                        ))}
-                      </select>
-                      <button className="ml-2 rounded-md border px-2 py-1 text-xs hover:bg-gray-50">
-                        Change
-                      </button>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <select
+                          name="role"
+                          defaultValue={p.role}
+                          style={{
+                            background: "#0A1628",
+                            border: "1px solid #1B4F8A",
+                            color: "#F0F4FF",
+                            borderRadius: "6px",
+                            padding: "6px 10px",
+                            fontFamily: "'Barlow', sans-serif",
+                            fontSize: "12px",
+                            outline: "none",
+                          }}
+                        >
+                          {ALL_ROLES.map((r) => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                        <button style={{
+                          background: "transparent",
+                          color: "#7A9CC4",
+                          border: "1px solid #1B4F8A",
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          fontFamily: "'Barlow', sans-serif",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                        }}>
+                          Change
+                        </button>
+                      </div>
                     </form>
                   )}
 
                   {p.id === adminUser.id && (
-                    <span className="text-xs text-gray-400">(you)</span>
+                    <span style={{ fontSize: "12px", color: "#3A5A7A" }}>(you)</span>
                   )}
                 </div>
               </div>
@@ -94,16 +158,6 @@ export default async function AdminUsersPage() {
           ))
         )}
       </div>
-    </main>
+    </div>
   );
-}
-
-function roleColor(role: string) {
-  switch (role) {
-    case "ADMIN": return "border-red-300 text-red-700";
-    case "CLIENT": return "border-blue-300 text-blue-700";
-    case "CONTRACTOR": return "border-green-300 text-green-700";
-    case "INSPECTOR": return "border-yellow-300 text-yellow-700";
-    default: return "border-gray-300 text-gray-700";
-  }
 }

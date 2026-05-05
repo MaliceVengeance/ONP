@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { stateBadge } from "@/lib/ui";
+import HoverCard from "@/components/HoverCard";
 
 type Project = {
   id: string;
@@ -25,56 +27,77 @@ export default async function AdminProjectsPage() {
   const projects = (data ?? []) as Project[];
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">All Projects</h1>
-        <Link href="/dashboard/admin" className="rounded-md border px-3 py-2 text-sm">
+    <div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+        <div>
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
+            All Projects
+          </h1>
+          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+            {projects.length} total projects
+          </p>
+        </div>
+        <Link
+          href="/dashboard/admin"
+          style={{
+            background: "transparent",
+            color: "#7A9CC4",
+            border: "1px solid #1B4F8A",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "13px",
+            textDecoration: "none",
+          }}
+        >
           Back
         </Link>
       </div>
 
-      <div className="mt-6 space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {projects.length === 0 ? (
-          <div className="rounded-lg border p-4 text-sm text-gray-600">
+          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
             No projects found.
           </div>
         ) : (
           projects.map((p) => (
-            <div key={p.id} className="rounded-lg border p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="font-medium">{p.title ?? "Untitled"}</div>
-                  <div className="text-sm text-gray-600">
-                    {p.category ?? "—"} • {p.city ?? "—"}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Created: {new Date(p.created_at).toLocaleDateString()}
-                    {p.deadline_at && (
-                      <> • Deadline: {new Date(p.deadline_at).toLocaleDateString()}</>
-                    )}
-                  </div>
+            <HoverCard key={p.id} style={{
+              background: "#0F2040",
+              border: "1px solid #1B4F8A",
+              borderRadius: "10px",
+              padding: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+            }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                  {p.title ?? "Untitled"}
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full border font-medium shrink-0 ${stateColor(p.state)}`}>
-                  {p.state}
-                </span>
+                <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                  {p.category ?? "—"} • {p.city ?? "—"}
+                </div>
+                <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                  Created: {new Date(p.created_at).toLocaleDateString()}
+                  {p.deadline_at && (
+                    <> • Deadline: {new Date(p.deadline_at).toLocaleDateString()}</>
+                  )}
+                </div>
               </div>
-            </div>
+              <span style={stateBadge(p.state)}>{p.state}</span>
+            </HoverCard>
           ))
         )}
       </div>
-    </main>
+    </div>
   );
-}
-
-function stateColor(state: string) {
-  switch (state) {
-    case "DRAFT": return "border-gray-300 text-gray-600";
-    case "OPEN": return "border-green-300 text-green-700";
-    case "BIDDING_CLOSED": return "border-yellow-300 text-yellow-700";
-    case "BIDS_UNLOCKED": return "border-blue-300 text-blue-700";
-    case "AWARDED": return "border-purple-300 text-purple-700";
-    case "COMPLETED": return "border-emerald-300 text-emerald-700";
-    case "CANCELED": return "border-red-300 text-red-700";
-    default: return "border-gray-300 text-gray-600";
-  }
 }

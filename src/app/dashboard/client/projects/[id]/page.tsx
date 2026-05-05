@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
 import { updateDraftProject, publishProject, repostProject } from "../actions";
 import CountdownTimer from "@/components/CountdownTimer";
+import { stateBadge } from "@/lib/ui";
 
 export default async function EditProjectPage({
   params,
@@ -38,32 +39,68 @@ export default async function EditProjectPage({
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
   const bidsUnlocked = deadlinePassed || project.state !== "OPEN";
 
+  const inputStyle = {
+    width: "100%",
+    background: "#0A1628",
+    border: "1px solid #1B4F8A",
+    color: "#F0F4FF",
+    borderRadius: "6px",
+    padding: "10px 14px",
+    fontFamily: "'Barlow', sans-serif",
+    fontSize: "14px",
+    outline: "none",
+    marginTop: "6px",
+  } as React.CSSProperties;
+
+  const labelStyle = {
+    display: "block",
+    fontSize: "11px",
+    fontWeight: 500,
+    color: "#7A9CC4",
+    textTransform: "uppercase" as const,
+    letterSpacing: "1px",
+    marginTop: "16px",
+  };
+
   return (
-    <main className="max-w-xl p-6">
+    <div style={{ maxWidth: "600px" }}>
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
-          <h1 className="text-2xl font-semibold">
-            {isDraft ? "Edit Draft" : "Project"}
+          <h1 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "36px",
+            letterSpacing: "1px",
+            color: "#fff",
+            margin: 0,
+          }}>
+            {isDraft ? "Edit Draft" : project.title ?? "Project"}
           </h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Status: <span className="font-medium">{project.state}</span>
-          </p>
-          {isPublished && project.deadline_at && (
-            <p className="mt-1 text-sm text-gray-600">
-              Deadline:{" "}
-              <span className="font-medium">
-                {new Date(project.deadline_at).toLocaleString()}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+            <span style={stateBadge(project.state)}>{project.state}</span>
+            {isPublished && project.deadline_at && (
+              <span style={{ fontSize: "13px", color: "#7A9CC4" }}>
+                Deadline: {new Date(project.deadline_at).toLocaleDateString()}
               </span>
-            </p>
-          )}
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div style={{ display: "flex", gap: "8px" }}>
           <form action={repostProject.bind(null, id)}>
             <button
               type="submit"
-              className="rounded-md border px-3 py-2 text-sm"
+              style={{
+                background: "transparent",
+                color: "#7A9CC4",
+                border: "1px solid #1B4F8A",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                cursor: "pointer",
+              }}
               title="Creates a new draft copy with a new bidding window"
             >
               Repost
@@ -71,8 +108,18 @@ export default async function EditProjectPage({
           </form>
 
           <Link
-            className="rounded-md border px-3 py-2 text-sm"
             href="/dashboard/client/projects"
+            style={{
+              background: "transparent",
+              color: "#7A9CC4",
+              border: "1px solid #1B4F8A",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
           >
             Back
           </Link>
@@ -81,23 +128,44 @@ export default async function EditProjectPage({
 
       {/* Countdown timer */}
       {isPublished && project.deadline_at && project.state === "OPEN" && (
-        <div className="mt-4">
+        <div style={{ marginBottom: "20px" }}>
           <CountdownTimer deadline={project.deadline_at} />
         </div>
       )}
 
       {/* Action buttons */}
       {isPublished && (
-        <div className="mt-4 flex gap-2 flex-wrap">
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "24px" }}>
           <Link
             href={`/dashboard/client/projects/${id}/bids`}
-            className="inline-flex items-center gap-2 rounded-md bg-black text-white px-4 py-2 text-sm"
+            style={{
+              background: bidsUnlocked ? "#C8102E" : "#0F2040",
+              color: "#fff",
+              border: `1px solid ${bidsUnlocked ? "#C8102E" : "#1B4F8A"}`,
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
           >
             {bidsUnlocked ? "✅ View Bids (Unlocked)" : "🔒 View Bids (Locked)"}
           </Link>
           <Link
             href={`/dashboard/client/projects/${id}/rfis`}
-            className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm"
+            style={{
+              background: "transparent",
+              color: "#7A9CC4",
+              border: "1px solid #1B4F8A",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
           >
             Questions (RFIs)
           </Link>
@@ -105,33 +173,49 @@ export default async function EditProjectPage({
       )}
 
       {!bidsUnlocked && isPublished && (
-        <p className="mt-1 text-xs text-gray-500">
+        <p style={{ fontSize: "12px", color: "#3A5A7A", marginBottom: "20px" }}>
           Bids are sealed until the deadline passes.
         </p>
       )}
 
       {/* Edit form */}
-      <form
-        action={updateDraftProject.bind(null, id)}
-        className="mt-6 space-y-4"
-      >
-        <fieldset disabled={!isDraft} className={!isDraft ? "opacity-60" : ""}>
-          <div>
-            <label className="text-sm font-medium">Title</label>
+      <div style={{
+        background: "#0F2040",
+        border: "1px solid #1B4F8A",
+        borderRadius: "12px",
+        padding: "24px",
+        marginBottom: "20px",
+      }}>
+        <h2 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: "18px",
+          letterSpacing: "1px",
+          color: "#fff",
+          textTransform: "uppercase",
+          marginBottom: "4px",
+        }}>
+          Project Details
+        </h2>
+        <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "16px" }}>
+          {isDraft ? "Edit your project before publishing." : "Published projects cannot be edited."}
+        </p>
+
+        <form action={updateDraftProject.bind(null, id)}>
+          <fieldset disabled={!isDraft} style={{ border: "none", padding: 0, opacity: isDraft ? 1 : 0.5 }}>
+            <label style={labelStyle}>Title</label>
             <input
               name="title"
               defaultValue={project.title ?? ""}
-              className="mt-1 w-full rounded-md border px-3 py-2"
+              style={inputStyle}
               required
             />
-          </div>
 
-          <div>
-            <label className="text-sm font-medium">Category</label>
+            <label style={labelStyle}>Category</label>
             <select
               name="category"
               defaultValue={project.category ?? ""}
-              className="mt-1 w-full rounded-md border px-3 py-2"
+              style={inputStyle}
               required
             >
               <option value="">Select…</option>
@@ -141,84 +225,147 @@ export default async function EditProjectPage({
                 </option>
               ))}
             </select>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium">City</label>
-              <input
-                name="city"
-                defaultValue={defaultCity}
-                className="mt-1 w-full rounded-md border px-3 py-2"
-                required
-              />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div>
+                <label style={labelStyle}>City</label>
+                <input
+                  name="city"
+                  defaultValue={defaultCity}
+                  style={inputStyle}
+                  required
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>State</label>
+                <input
+                  name="us_state"
+                  defaultValue={defaultState}
+                  style={inputStyle}
+                  required
+                  placeholder="TX"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium">State</label>
-              <input
-                name="us_state"
-                defaultValue={defaultState}
-                className="mt-1 w-full rounded-md border px-3 py-2"
-                required
-                placeholder="TX"
-              />
-            </div>
-          </div>
 
-          <div>
-            <label className="text-sm font-medium">Description</label>
+            <label style={labelStyle}>Description</label>
             <textarea
               name="description"
               defaultValue={project.description ?? ""}
-              className="mt-1 w-full rounded-md border px-3 py-2"
+              style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }}
               rows={6}
             />
-          </div>
 
-          {isDraft && (
-            <button className="rounded-md bg-black text-white px-3 py-2 text-sm">
-              Save Draft
-            </button>
-          )}
-        </fieldset>
-      </form>
+            {isDraft && (
+              <button
+                type="submit"
+                style={{
+                  marginTop: "20px",
+                  background: "transparent",
+                  color: "#7A9CC4",
+                  border: "1px solid #1B4F8A",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 500,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                }}
+              >
+                Save Draft
+              </button>
+            )}
+          </fieldset>
+        </form>
+      </div>
 
       {/* Publish controls */}
       {isDraft ? (
-        <div className="mt-8 rounded-lg border p-4">
-          <h2 className="text-lg font-semibold">Publish to Contractors</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Choose how long bidding stays open (min 5 days, max 10 days).
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "12px",
+          padding: "24px",
+        }}>
+          <h2 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "18px",
+            letterSpacing: "1px",
+            color: "#fff",
+            textTransform: "uppercase",
+            marginBottom: "4px",
+          }}>
+            Publish to Contractors
+          </h2>
+          <p style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "20px" }}>
+            Choose how long bidding stays open. Minimum 5 days, maximum 10 days.
           </p>
 
-          <form
-            action={publishProject.bind(null, id)}
-            className="mt-4 flex items-center gap-3"
-          >
-            <label className="text-sm font-medium">Bid duration</label>
-            <select
-              name="bid_days"
-              defaultValue="7"
-              className="rounded-md border px-3 py-2 text-sm"
-            >
-              {[5, 6, 7, 8, 9, 10].map((d) => (
-                <option key={d} value={d}>
-                  {d} days
-                </option>
-              ))}
-            </select>
+          <form action={publishProject.bind(null, id)}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <label style={{
+                fontSize: "11px",
+                fontWeight: 500,
+                color: "#7A9CC4",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                flexShrink: 0,
+              }}>
+                Bid Duration
+              </label>
+              <select
+                name="bid_days"
+                defaultValue="7"
+                style={{
+                  background: "#0A1628",
+                  border: "1px solid #1B4F8A",
+                  color: "#F0F4FF",
+                  borderRadius: "6px",
+                  padding: "8px 12px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: "14px",
+                  outline: "none",
+                }}
+              >
+                {[5, 6, 7, 8, 9, 10].map((d) => (
+                  <option key={d} value={d}>{d} days</option>
+                ))}
+              </select>
 
-            <button className="ml-auto rounded-md bg-black text-white px-3 py-2 text-sm">
-              Publish
-            </button>
+              <button
+                type="submit"
+                style={{
+                  marginLeft: "auto",
+                  background: "#C8102E",
+                  color: "#fff",
+                  border: "none",
+                  padding: "10px 24px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "13px",
+                  letterSpacing: "0.5px",
+                  cursor: "pointer",
+                }}
+              >
+                Publish Project
+              </button>
+            </div>
           </form>
         </div>
       ) : (
-        <div className="mt-8 rounded-lg border p-4 text-sm text-gray-600">
-          This project is published. Edits will later trigger a revision workflow
-          (Step 6).
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "12px",
+          padding: "20px",
+          fontSize: "13px",
+          color: "#7A9CC4",
+        }}>
+          This project is published. Edits will trigger a revision workflow in a future update.
         </div>
       )}
-    </main>
+    </div>
   );
 }
