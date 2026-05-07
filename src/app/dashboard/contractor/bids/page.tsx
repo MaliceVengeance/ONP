@@ -77,7 +77,7 @@ export default async function ContractorMyBidsPage() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "28px" }}>
         {[
-          { label: "Active Bids", count: openBids.length, accent: false },
+          { label: "Pending Bids", count: openBids.length, accent: false },
           { label: "Closed Bids", count: closedBids.length, accent: false },
         ].map((s) => (
           <div key={s.label} style={{
@@ -131,7 +131,7 @@ export default async function ContractorMyBidsPage() {
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
-                Active ({openBids.length})
+                Pending ({openBids.length})
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {openBids.map((b) => (

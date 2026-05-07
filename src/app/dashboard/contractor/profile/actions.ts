@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 
 function normalizeCategories(input: string) {
-  // comma-separated -> array of trimmed strings
   return input
     .split(",")
     .map((s) => s.trim())
@@ -22,6 +21,7 @@ export async function saveContractorProfile(formData: FormData) {
   const categoriesText = String(formData.get("categories") ?? "").trim();
   const is_listed = formData.get("is_listed") === "on";
   const apply_veteran = formData.get("apply_veteran") === "on";
+  const military_branch = String(formData.get("military_branch") ?? "").trim() || null;
 
   const categories = normalizeCategories(categoriesText);
 
@@ -33,9 +33,9 @@ export async function saveContractorProfile(formData: FormData) {
     description: description || null,
     categories,
     is_listed,
+    military_branch,
   };
 
-  // If they checked "apply", set applied_at (but don't auto-verify)
   if (apply_veteran) {
     payload.veteran_applied_at = new Date().toISOString();
   }

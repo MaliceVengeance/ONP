@@ -82,19 +82,36 @@ export default async function ContractorProjectDetail({
     if (versionRow) existingBid = versionRow as ExistingBid;
   }
 
+  // Fetch RFI summary
+  const { data: rfiData } = await supabase
+    .from("rfis")
+    .select("id, response")
+    .eq("project_id", projectId);
+
+  const totalRfis = rfiData?.length ?? 0;
+  const answeredRfis = rfiData?.filter((r) => r.response)?.length ?? 0;
+
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
   const isOpen = project.state === "OPEN";
   const beforeDeadline = !!deadline && deadline.getTime() > now.getTime();
   const canBid = isOpen && beforeDeadline;
 
-  const { data: awardRows } = await supabase
+const { data: awardRows } = await supabase
     .from("project_awards")
     .select("project_id, awarded_at")
     .eq("project_id", projectId)
     .limit(1);
 
   const award = awardRows?.[0];
+
+  // Fetch client info if this contractor won the project
+  const { data: clientInfoRows } = await supabase.rpc(
+    "get_awarded_project_client_info",
+    { p_project_id: projectId }
+  );
+
+  const clientInfo = (clientInfoRows as any[])?.[0] ?? null;
 
   function fmtMoney(cents: number) {
     return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
@@ -147,23 +164,23 @@ export default async function ContractorProjectDetail({
         </div>
 
         <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-          {isOpen && (
-            <Link
-              href={`/dashboard/contractor/projects/${projectId}/rfis`}
-              style={{
-                background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                fontFamily: "'Barlow', sans-serif",
-                fontSize: "13px",
-                textDecoration: "none",
-              }}
-            >
-              Questions
-            </Link>
-          )}
+          <Link
+            href={`/dashboard/contractor/projects/${projectId}/rfis`}
+            style={{
+              background: totalRfis > 0 ? "#0D2040" : "transparent",
+              color: answeredRfis < totalRfis ? "#FBBF24" : "#7A9CC4",
+              border: `1px solid ${answeredRfis < totalRfis ? "#92400E" : "#1B4F8A"}`,
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
+          >
+            {totalRfis > 0
+              ? `Questions (${answeredRfis}/${totalRfis} answered)`
+              : "Questions"}
+          </Link>
           <Link
             href="/dashboard/contractor/projects"
             style={{
@@ -269,13 +286,67 @@ export default async function ContractorProjectDetail({
             ★ This project has been awarded
           </div>
           {award?.awarded_at && (
-            <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+            <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "12px" }}>
               Awarded: {new Date(award.awarded_at).toLocaleString()}
             </div>
           )}
-          <div style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
-            Bidding is closed. You can no longer submit or revise bids.
-          </div>
+
+          {/* Client contact info — only shown to winning contractor */}
+          {clientInfo ? (
+            <div style={{
+              background: "#1B1040",
+              border: "1px solid #4C1D95",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "12px",
+            }}>
+              <div style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "14px",
+                letterSpacing: "1px",
+                color: "#A78BFA",
+                textTransform: "uppercase",
+                marginBottom: "10px",
+              }}>
+                Client Contact Information
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px" }}>
+                {clientInfo.client_name && (
+                  <div>
+                    <span style={{ color: "#7A9CC4" }}>Name: </span>
+                    <span style={{ color: "#F0F4FF" }}>{clientInfo.client_name}</span>
+                  </div>
+                )}
+                {clientInfo.client_email && (
+                  <div>
+                    <span style={{ color: "#7A9CC4" }}>Email: </span>
+                    <a href={`mailto:${clientInfo.client_email}`} style={{ color: "#60A5FA" }}>
+                      {clientInfo.client_email}
+                    </a>
+                  </div>
+                )}
+                {clientInfo.client_phone && (
+                  <div>
+                    <span style={{ color: "#7A9CC4" }}>Phone: </span>
+                    <a href={`tel:${clientInfo.client_phone}`} style={{ color: "#60A5FA" }}>
+                      {clientInfo.client_phone}
+                    </a>
+                  </div>
+                )}
+                {clientInfo.client_address && clientInfo.client_address.trim() !== "" && (
+                  <div>
+                    <span style={{ color: "#7A9CC4" }}>Address: </span>
+                    <span style={{ color: "#F0F4FF" }}>{clientInfo.client_address}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "8px" }}>
+              Bidding is closed. You can no longer submit or revise bids.
+            </div>
+          )}
         </div>
       )}
 

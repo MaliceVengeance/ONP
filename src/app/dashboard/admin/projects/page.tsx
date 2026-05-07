@@ -69,7 +69,8 @@ export default async function AdminProjectsPage() {
           </div>
         ) : (
           projects.map((p) => (
-            <HoverCard key={p.id} style={{
+            <Link key={p.id} href={`/dashboard/admin/projects/${p.id}`} style={{ textDecoration: "none" }}>
+            <HoverCard style={{
               background: "#0F2040",
               border: "1px solid #1B4F8A",
               borderRadius: "10px",
@@ -95,6 +96,7 @@ export default async function AdminProjectsPage() {
               </div>
               <span style={stateBadge(p.state)}>{p.state}</span>
             </HoverCard>
+            </Link>
           ))
         )}
       </div>

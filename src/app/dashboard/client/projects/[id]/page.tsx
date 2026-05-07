@@ -23,6 +23,13 @@ export default async function EditProjectPage({
 
   if (error) throw error;
 
+  // Check for unanswered RFIs
+  const { count: unansweredRfiCount } = await supabase
+    .from("rfis")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", id)
+    .is("response", null);
+
   const locParts = String(project.location_general ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -38,6 +45,8 @@ export default async function EditProjectPage({
   const now = new Date();
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
   const bidsUnlocked = deadlinePassed || project.state !== "OPEN";
+
+  const hasUnansweredRfis = (unansweredRfiCount ?? 0) > 0;
 
   const inputStyle = {
     width: "100%",
@@ -153,12 +162,13 @@ export default async function EditProjectPage({
           >
             {bidsUnlocked ? "✅ View Bids (Unlocked)" : "🔒 View Bids (Locked)"}
           </Link>
+
           <Link
             href={`/dashboard/client/projects/${id}/rfis`}
             style={{
-              background: "transparent",
-              color: "#7A9CC4",
-              border: "1px solid #1B4F8A",
+              background: hasUnansweredRfis ? "#2D2000" : "transparent",
+              color: hasUnansweredRfis ? "#FBBF24" : "#7A9CC4",
+              border: `1px solid ${hasUnansweredRfis ? "#92400E" : "#1B4F8A"}`,
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -167,7 +177,9 @@ export default async function EditProjectPage({
               display: "inline-block",
             }}
           >
-            Questions (RFIs)
+            {hasUnansweredRfis
+              ? `⚠ Questions (${unansweredRfiCount} pending)`
+              : "Questions (RFIs)"}
           </Link>
         </div>
       )}
@@ -203,7 +215,7 @@ export default async function EditProjectPage({
 
         <form action={updateDraftProject.bind(null, id)}>
           <fieldset disabled={!isDraft} style={{ border: "none", padding: 0, opacity: isDraft ? 1 : 0.5 }}>
-            <label style={labelStyle}>Title</label>
+            <label style={{ ...labelStyle, marginTop: 0 }}>Title</label>
             <input
               name="title"
               defaultValue={project.title ?? ""}

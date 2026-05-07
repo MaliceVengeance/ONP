@@ -88,6 +88,28 @@ export default async function ClientDashboard() {
         ))}
       </div>
 
+{/* Quick links */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
+        {[
+          { label: "All Projects", href: "/dashboard/client/projects" },
+          { label: "My Profile", href: "/dashboard/client/profile" },
+        ].map((l) => (
+          <Link key={l.href} href={l.href} style={{
+            background: "transparent",
+            color: "#7A9CC4",
+            border: "1px solid #1B4F8A",
+            padding: "8px 18px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 500,
+            fontSize: "13px",
+            textDecoration: "none",
+          }}>
+            {l.label}
+          </Link>
+        ))}
+      </div>
+
       {/* Needs Action */}
       {needsAction.length > 0 && (
         <div style={{ marginBottom: "32px" }}>

@@ -15,3 +15,29 @@ export async function changeUserRole(userId: string, newRole: string) {
 
   revalidatePath("/dashboard/admin/users");
 }
+
+export async function deactivateUser(userId: string) {
+  const { supabase } = await requireRole(["ADMIN"]);
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ deactivated: true })
+    .eq("id", userId);
+
+  if (error) throw new Error(`deactivateUser failed: ${JSON.stringify(error)}`);
+
+  revalidatePath("/dashboard/admin/users");
+}
+
+export async function reactivateUser(userId: string) {
+  const { supabase } = await requireRole(["ADMIN"]);
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ deactivated: false })
+    .eq("id", userId);
+
+  if (error) throw new Error(`reactivateUser failed: ${JSON.stringify(error)}`);
+
+  revalidatePath("/dashboard/admin/users");
+}
