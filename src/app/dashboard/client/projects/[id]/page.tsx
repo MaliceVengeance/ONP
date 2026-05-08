@@ -45,7 +45,6 @@ export default async function EditProjectPage({
   const now = new Date();
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
   const bidsUnlocked = deadlinePassed || project.state !== "OPEN";
-
   const hasUnansweredRfis = (unansweredRfiCount ?? 0) > 0;
 
   const inputStyle = {
@@ -180,6 +179,23 @@ export default async function EditProjectPage({
             {hasUnansweredRfis
               ? `⚠ Questions (${unansweredRfiCount} pending)`
               : "Questions (RFIs)"}
+          </Link>
+
+          <Link
+            href={`/dashboard/client/projects/${id}/files`}
+            style={{
+              background: "transparent",
+              color: "#7A9CC4",
+              border: "1px solid #1B4F8A",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            📁 Files
           </Link>
         </div>
       )}

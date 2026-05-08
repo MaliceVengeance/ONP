@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { submitBid } from "@/app/dashboard/contractor/bids/actions";
 import CountdownTimer from "@/components/CountdownTimer";
 import { stateBadge } from "@/lib/ui";
+import ProjectFileLink from "./ProjectFileLink";
 
 type ProjectDetail = {
   id: string;
@@ -91,13 +92,21 @@ export default async function ContractorProjectDetail({
   const totalRfis = rfiData?.length ?? 0;
   const answeredRfis = rfiData?.filter((r) => r.response)?.length ?? 0;
 
+  // Fetch project files
+  const { data: projectFiles } = await supabase.storage
+    .from("project-files")
+    .list(projectId, {
+      sortBy: { column: "created_at", order: "desc" },
+    });
+
+
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
   const isOpen = project.state === "OPEN";
   const beforeDeadline = !!deadline && deadline.getTime() > now.getTime();
   const canBid = isOpen && beforeDeadline;
 
-const { data: awardRows } = await supabase
+  const { data: awardRows } = await supabase
     .from("project_awards")
     .select("project_id, awarded_at")
     .eq("project_id", projectId)
@@ -254,6 +263,38 @@ const { data: awardRows } = await supabase
         </div>
       )}
 
+      {/* Project files */}
+      {(projectFiles ?? []).length > 0 && (
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "18px",
+          marginBottom: "16px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "16px",
+            letterSpacing: "1px",
+            color: "#fff",
+            textTransform: "uppercase",
+            marginBottom: "12px",
+          }}>
+            📁 Project Files ({projectFiles?.length})
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {projectFiles?.map((file) => (
+              <ProjectFileLink
+                key={file.name}
+                projectId={projectId}
+                fileName={file.name}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Platform rules */}
       <div style={{
         background: "#0A1628",
@@ -291,7 +332,6 @@ const { data: awardRows } = await supabase
             </div>
           )}
 
-          {/* Client contact info — only shown to winning contractor */}
           {clientInfo ? (
             <div style={{
               background: "#1B1040",
