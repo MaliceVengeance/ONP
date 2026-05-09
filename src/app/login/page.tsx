@@ -236,6 +236,17 @@ export default async function LoginPage({
       }}>
         Honoring American Veterans
       </div>
+      
+      <div style={{
+  marginTop: "20px",
+  fontSize: "12px",
+  color: "#3A5A7A",
+  textAlign: "center",
+}}>
+  <Link href="/about" style={{ color: "#7A9CC4", textDecoration: "underline" }}>
+    About ONP
+  </Link>
+</div>
     </main>
   );
 }
