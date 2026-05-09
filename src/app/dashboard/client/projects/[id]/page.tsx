@@ -243,6 +243,25 @@ export default async function EditProjectPage({
           >
             {inspectorButtonLabel()}
           </Link>
+
+          {project.state === "OPEN" && (
+            <Link
+              href={`/dashboard/client/projects/${id}/override`}
+              style={{
+                background: "transparent",
+                color: "#7A9CC4",
+                border: "1px solid #1B4F8A",
+                padding: "10px 20px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              ⏰ Request Extension
+            </Link>
+          )}
         </div>
       )}
 

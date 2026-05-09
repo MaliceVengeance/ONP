@@ -10,12 +10,14 @@ export default async function AdminDashboard() {
     { count: supportCount },
     { count: vetCount },
     { count: inspectorCount },
+    { count: overrideCount },
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("projects").select("id", { count: "exact", head: true }),
     supabase.from("support_requests").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
     supabase.from("contractor_profiles").select("id", { count: "exact", head: true }).eq("veteran_verified", false).not("veteran_applied_at", "is", null),
     supabase.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
+    supabase.from("projects").select("id", { count: "exact", head: true }).not("override_requested_at", "is", null).eq("urgent_override", false),
   ]);
 
   const cards = [
@@ -25,7 +27,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/users",
       stat: userCount ?? 0,
       statLabel: "total users",
-      accent: (userCount ?? 0) > 0 ? "#1B4F8A" : "#1B4F8A",
+      accent: "#1B4F8A",
     },
     {
       title: "Projects",
@@ -58,6 +60,14 @@ export default async function AdminDashboard() {
       stat: inspectorCount ?? 0,
       statLabel: "pending",
       accent: (inspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+    },
+    {
+      title: "Override Requests",
+      description: "Review and approve client deadline extension requests.",
+      href: "/dashboard/admin/override-requests",
+      stat: overrideCount ?? 0,
+      statLabel: "pending",
+      accent: (overrideCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
   ];
 

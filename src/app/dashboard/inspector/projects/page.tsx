@@ -9,15 +9,16 @@ export default async function InspectorProjectsPage() {
     .from("project_inspector_assignments")
     .select("id, project_id, request_status, requested_at, assigned_at, takeoff_completed_at, notes")
     .eq("inspector_id", user.id)
-    .order("requested_at", { ascending: false });
+    .order("assigned_at", { ascending: false });
 
   const assignmentList = assignments ?? [];
 
-  // Fetch project details for each assignment
+  // Fetch project details separately using admin-level access
   const projectIds = assignmentList.map((a) => a.project_id).filter(Boolean);
+
   const { data: projects } = await supabase
     .from("projects")
-    .select("id, title, category, city, state, deadline_at")
+    .select("id, title, category, city, state, deadline_at, location_general")
     .in("id", projectIds.length > 0 ? projectIds : ["none"]);
 
   const projectMap = new Map((projects ?? []).map((p) => [p.id, p]));
@@ -81,6 +82,8 @@ export default async function InspectorProjectsPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {pending.map((a) => {
               const p = projectMap.get(a.project_id);
+              const deadline = p?.deadline_at ? new Date(p.deadline_at) : null;
+              const deadlinePassed = !!deadline && deadline.getTime() <= Date.now();
               return (
                 <Link
                   key={a.id}
@@ -104,13 +107,23 @@ export default async function InspectorProjectsPage() {
                       <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
                         {p?.category ?? "—"} • {p?.city ?? "—"}
                       </div>
+                      {p?.location_general && (
+                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
+                          📍 {p.location_general}
+                        </div>
+                      )}
                       {a.assigned_at && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
                           Assigned: {new Date(a.assigned_at).toLocaleDateString()}
                         </div>
                       )}
+                      {deadline && (
+                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5", marginTop: "2px" }}>
+                          {deadlinePassed ? "⚠ Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
+                        </div>
+                      )}
                     </div>
-                    <span style={stateBadge(p?.state ?? "OPEN")}>{p?.state ?? "—"}</span>
+                    {p && <span style={stateBadge(p.state)}>{p.state}</span>}
                   </div>
                 </Link>
               );
@@ -158,9 +171,14 @@ export default async function InspectorProjectsPage() {
                       <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                      <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
                         {p?.category ?? "—"} • {p?.city ?? "—"}
                       </div>
+                      {p?.location_general && (
+                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
+                          📍 {p.location_general}
+                        </div>
+                      )}
                       {a.takeoff_completed_at && (
                         <div style={{ fontSize: "11px", color: "#4ADE80", marginTop: "3px" }}>
                           ✅ Completed: {new Date(a.takeoff_completed_at).toLocaleDateString()}
