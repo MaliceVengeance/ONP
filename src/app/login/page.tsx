@@ -56,6 +56,32 @@ export default async function LoginPage({
         }} />
       </div>
 
+{/* Beta banner */}
+<div style={{
+  background: "#3D0A0A",
+  border: "1px solid #991B1B",
+  borderRadius: "8px",
+  padding: "12px 20px",
+  marginBottom: "20px",
+  textAlign: "center",
+  maxWidth: "380px",
+  width: "100%",
+}}>
+  <div style={{
+    fontSize: "11px",
+    fontWeight: 700,
+    color: "#F87171",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+    marginBottom: "4px",
+  }}>
+    ⚠ Experimental Beta
+  </div>
+  <div style={{ fontSize: "12px", color: "#FCA5A5", lineHeight: 1.5 }}>
+    This platform is currently in beta testing. All projects, bids, and contractor profiles are for testing purposes only and should not be considered legitimate business transactions.
+  </div>
+</div>
+
       {/* Login card */}
       <div style={{
         width: "100%",
