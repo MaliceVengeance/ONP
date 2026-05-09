@@ -30,6 +30,13 @@ export default async function EditProjectPage({
     .eq("project_id", id)
     .is("response", null);
 
+  // Check inspector request status
+  const { data: inspectorAssignment } = await supabase
+    .from("project_inspector_assignments")
+    .select("request_status")
+    .eq("project_id", id)
+    .maybeSingle();
+
   const locParts = String(project.location_general ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -46,6 +53,30 @@ export default async function EditProjectPage({
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
   const bidsUnlocked = deadlinePassed || project.state !== "OPEN";
   const hasUnansweredRfis = (unansweredRfiCount ?? 0) > 0;
+
+  const inspectorStatus = inspectorAssignment?.request_status ?? null;
+
+  function inspectorButtonStyle() {
+    switch (inspectorStatus) {
+      case "COMPLETED":
+        return { background: "#0D3320", color: "#4ADE80", border: "1px solid #166534" };
+      case "ASSIGNED":
+        return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
+      case "PENDING":
+        return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
+      default:
+        return { background: "transparent", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+    }
+  }
+
+  function inspectorButtonLabel() {
+    switch (inspectorStatus) {
+      case "COMPLETED": return "🔍 Takeoff Complete";
+      case "ASSIGNED": return "🔍 Inspector Assigned";
+      case "PENDING": return "🔍 Inspector Requested";
+      default: return "🔍 Inspector";
+    }
+  }
 
   const inputStyle = {
     width: "100%",
@@ -196,6 +227,21 @@ export default async function EditProjectPage({
             }}
           >
             📁 Files
+          </Link>
+
+          <Link
+            href={`/dashboard/client/projects/${id}/inspector`}
+            style={{
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+              ...inspectorButtonStyle(),
+            }}
+          >
+            {inspectorButtonLabel()}
           </Link>
         </div>
       )}

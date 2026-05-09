@@ -9,11 +9,13 @@ export default async function AdminDashboard() {
     { count: projectCount },
     { count: supportCount },
     { count: vetCount },
+    { count: inspectorCount },
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("projects").select("id", { count: "exact", head: true }),
     supabase.from("support_requests").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
     supabase.from("contractor_profiles").select("id", { count: "exact", head: true }).eq("veteran_verified", false).not("veteran_applied_at", "is", null),
+    supabase.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
   ]);
 
   const cards = [
@@ -23,7 +25,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/users",
       stat: userCount ?? 0,
       statLabel: "total users",
-      accent: "#1B4F8A",
+      accent: (userCount ?? 0) > 0 ? "#1B4F8A" : "#1B4F8A",
     },
     {
       title: "Projects",
@@ -49,11 +51,18 @@ export default async function AdminDashboard() {
       statLabel: "open tickets",
       accent: (supportCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
+    {
+      title: "Inspector Requests",
+      description: "Assign inspectors to client takeoff requests.",
+      href: "/dashboard/admin/inspector-requests",
+      stat: inspectorCount ?? 0,
+      statLabel: "pending",
+      accent: (inspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+    },
   ];
 
   return (
     <div>
-      {/* Header */}
       <div style={{ marginBottom: "32px" }}>
         <h1 style={{
           fontFamily: "'Barlow Condensed', sans-serif",
@@ -70,7 +79,6 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
-      {/* Stat cards grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
         {cards.map((card) => (
           <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
@@ -81,7 +89,6 @@ export default async function AdminDashboard() {
               padding: "24px",
               cursor: "pointer",
               height: "100%",
-              transition: "border-color 0.2s",
             }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                 <div>
@@ -120,7 +127,6 @@ export default async function AdminDashboard() {
                   </div>
                 </div>
               </div>
-
               <div style={{
                 marginTop: "16px",
                 paddingTop: "16px",
