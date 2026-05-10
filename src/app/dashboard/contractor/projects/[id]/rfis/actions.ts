@@ -96,3 +96,6 @@ export async function submitRfi(projectId: string, formData: FormData) {
   } catch (e) {
     console.error("Failed to send RFI email:", e);
   }
+
+  redirect(`/dashboard/contractor/projects/${projectId}/rfis?submitted=1`);
+}
