@@ -65,8 +65,6 @@ export async function submitRfi(projectId: string, formData: FormData) {
       .eq("id", projectId)
       .single();
 
-    console.log("RFI email - project:", project);
-
     if (project) {
       const { data: clientProfile } = await supabase
         .from("profiles")
@@ -74,13 +72,10 @@ export async function submitRfi(projectId: string, formData: FormData) {
         .eq("id", project.client_id)
         .single();
 
-      console.log("RFI email - clientProfile:", clientProfile);
 
       const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(
         project.client_id
       );
-
-      console.log("RFI email - authUser email:", authUser?.user?.email);
 
       if (authUser?.user?.email) {
         await sendRfiSubmittedEmail({
@@ -90,7 +85,6 @@ export async function submitRfi(projectId: string, formData: FormData) {
           question: question ?? catalogItem?.prompt ?? "Question submitted",
           projectId,
         });
-        console.log("RFI email - sent successfully");
       }
     }
   } catch (e) {
