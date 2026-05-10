@@ -59,7 +59,7 @@ export async function submitRfi(projectId: string, formData: FormData) {
 
   // Send email notification to client
   try {
-    const { data: project } = await supabase
+    const { data: project } = await supabaseAdmin
       .from("projects")
       .select("title, client_id")
       .eq("id", projectId)
