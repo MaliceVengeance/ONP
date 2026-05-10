@@ -4,6 +4,7 @@ import { submitBid } from "@/app/dashboard/contractor/bids/actions";
 import CountdownTimer from "@/components/CountdownTimer";
 import { stateBadge } from "@/lib/ui";
 import ProjectFileLink from "./ProjectFileLink";
+import ProjectMap from "@/components/ProjectMap";
 
 type ProjectDetail = {
   id: string;
@@ -261,6 +262,14 @@ export default async function ContractorProjectDetail({
         }}>
           {project.description}
         </div>
+      )}
+
+      {/* General area map */}
+      {project.location_general && (
+        <ProjectMap
+          city={project.location_general.split(",")[0]?.trim() ?? ""}
+          state={project.location_general.split(",")[1]?.trim() ?? ""}
+        />
       )}
 
       {/* Project files */}
