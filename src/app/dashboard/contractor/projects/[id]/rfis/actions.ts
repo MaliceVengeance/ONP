@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
+import { sendRfiSubmittedEmail } from "@/lib/email";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
@@ -37,6 +39,13 @@ export async function submitRfi(projectId: string, formData: FormData) {
     throw new Error("This question type has already been asked on this project.");
   }
 
+  // Fetch catalog item for the prompt text
+  const { data: catalogItem } = await supabase
+    .from("rfi_catalog")
+    .select("prompt")
+    .eq("id", catalog_id)
+    .maybeSingle();
+
   const { error } = await supabase.from("rfis").insert({
     project_id: projectId,
     contractor_id: user.id,
@@ -47,6 +56,39 @@ export async function submitRfi(projectId: string, formData: FormData) {
   });
 
   if (error) throw wrapErr("rfis.insert", error);
+
+  // Send email notification to client
+  try {
+    const { data: project } = await supabase
+      .from("projects")
+      .select("title, client_id")
+      .eq("id", projectId)
+      .single();
+
+    if (project) {
+      const { data: clientProfile } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", project.client_id)
+        .single();
+
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(
+        project.client_id
+      );
+
+      if (authUser?.user?.email) {
+        await sendRfiSubmittedEmail({
+          clientEmail: authUser.user.email,
+          clientName: clientProfile?.display_name ?? "Client",
+          projectTitle: project.title ?? "Your Project",
+          question: question ?? catalogItem?.prompt ?? "Question submitted",
+          projectId,
+        });
+      }
+    }
+  } catch (e) {
+    console.error("Failed to send RFI email:", e);
+  }
 
   redirect(`/dashboard/contractor/projects/${projectId}/rfis?submitted=1`);
 }
