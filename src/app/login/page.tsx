@@ -221,6 +221,11 @@ export default async function LoginPage({
             <Link href="/signup/contractor" style={{ color: "#F0F4FF", textDecoration: "underline" }}>
               Sign up here
             </Link>
+            <p style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center" }}>
+  <Link href="/forgot-password" style={{ color: "#F0F4FF", textDecoration: "underline" }}>
+    Forgot your password?
+  </Link>
+</p>
           </p>
         </div>
       </div>
@@ -236,7 +241,7 @@ export default async function LoginPage({
       }}>
         Honoring American Veterans
       </div>
-      
+
       <div style={{
   marginTop: "20px",
   fontSize: "12px",
