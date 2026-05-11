@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 
@@ -10,12 +10,34 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
   const router = useRouter();
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+  useEffect(() => {
+    // Listen for the auth state change when the token is processed
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setReady(true);
+        }
+        if (event === "SIGNED_IN" && session) {
+          setReady(true);
+        }
+      }
+    );
+
+    // Also check if we already have a session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,6 +64,7 @@ export default function ResetPasswordPage() {
     }
 
     setSuccess(true);
+    await supabase.auth.signOut();
     setTimeout(() => router.push("/login"), 3000);
   }
 
@@ -145,6 +168,15 @@ export default function ResetPasswordPage() {
             lineHeight: 1.6,
           }}>
             ✅ Password updated successfully! Redirecting to sign in...
+          </div>
+        ) : !ready ? (
+          <div style={{
+            textAlign: "center",
+            padding: "20px",
+            color: "#7A9CC4",
+            fontSize: "13px",
+          }}>
+            Verifying reset link...
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
