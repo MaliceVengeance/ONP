@@ -7,7 +7,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <header style={{
         background: "#0A1628",
         borderBottom: "2px solid #C8102E",
-        padding: "14px 28px",
+        padding: "10px 16px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -16,20 +16,20 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
-            fontSize: "26px",
+            fontSize: "22px",
             letterSpacing: "2px",
             color: "#fff",
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "6px",
           }}>
             <span style={{ color: "#C8102E" }}>★</span> ONP
           </div>
           <div style={{
             fontFamily: "'Barlow', sans-serif",
             fontWeight: 400,
-            fontSize: "11px",
-            letterSpacing: "3px",
+            fontSize: "10px",
+            letterSpacing: "2px",
             color: "#7A9CC4",
             textTransform: "uppercase",
           }}>
@@ -42,10 +42,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             background: "transparent",
             border: "1px solid #1B4F8A",
             color: "#7A9CC4",
-            padding: "6px 16px",
+            padding: "6px 12px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
-            fontSize: "13px",
+            fontSize: "12px",
             cursor: "pointer",
           }}>
             Sign out
@@ -57,7 +57,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <div style={{
         background: "#3D0A0A",
         borderBottom: "1px solid #991B1B",
-        padding: "8px 16px",
+        padding: "6px 16px",
         textAlign: "center",
         fontSize: "11px",
         color: "#FCA5A5",
@@ -75,7 +75,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         For testing only — not legitimate business transactions.
       </div>
 
-      <main style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 24px" }}>
+      <main style={{
+        maxWidth: "900px",
+        margin: "0 auto",
+        padding: "20px 16px",
+      }}>
         {children}
       </main>
     </div>
