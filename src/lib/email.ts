@@ -2,7 +2,12 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = "ONP Notifications <notifications@ournextproject.us>";
+const FROM = "ONP Notifications <support@ournextproject.us>";
+const BASE = "https://www.ournextproject.us";
+
+function loginLink(destination: string) {
+  return `${BASE}/login?next=${encodeURIComponent(destination)}`;
+}
 
 export async function sendRfiSubmittedEmail({
   clientEmail,
@@ -37,7 +42,7 @@ export async function sendRfiSubmittedEmail({
           <p style="color: #B0C4DE;">Please log in to respond as soon as possible. Unanswered questions may delay contractor bids.</p>
         </div>
         <div style="text-align: center;">
-          <a href="https://ournextproject.us/dashboard/client/projects/${projectId}/rfis" 
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}/rfis`)}"
              style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
             View Question
           </a>
@@ -86,7 +91,7 @@ export async function sendRfiAnsweredEmail({
           </div>
         </div>
         <div style="text-align: center;">
-          <a href="https://ournextproject.us/dashboard/contractor/projects/${projectId}/rfis"
+          <a href="${loginLink(`/dashboard/contractor/projects/${projectId}/rfis`)}"
              style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
             View Project
           </a>
@@ -127,7 +132,7 @@ export async function sendBidAwardedEmail({
           <p style="color: #B0C4DE;">Please reach out to the client as soon as possible to discuss next steps.</p>
         </div>
         <div style="text-align: center;">
-          <a href="https://ournextproject.us/dashboard/contractor/projects/${projectId}"
+          <a href="${loginLink(`/dashboard/contractor/projects/${projectId}`)}"
              style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
             View Project & Client Info
           </a>
@@ -177,7 +182,7 @@ export async function sendNewProjectEmail({
           <p style="color: #B0C4DE;">Log in to view the full project details and submit your bid before the deadline.</p>
         </div>
         <div style="text-align: center;">
-          <a href="https://ournextproject.us/dashboard/contractor/projects/${projectId}"
+          <a href="${loginLink(`/dashboard/contractor/projects/${projectId}`)}"
              style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
             View Project & Bid
           </a>
@@ -224,7 +229,7 @@ export async function sendInspectorAssignedEmail({
           <p style="color: #B0C4DE;">Please log in to view the project details and submit your takeoff report.</p>
         </div>
         <div style="text-align: center;">
-          <a href="https://ournextproject.us/dashboard/inspector/projects/${assignmentId}"
+          <a href="${loginLink(`/dashboard/inspector/projects/${assignmentId}`)}"
              style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
             View Assignment
           </a>
