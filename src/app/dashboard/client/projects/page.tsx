@@ -42,14 +42,24 @@ export default async function ClientProjectsPage() {
     ["BIDDING_CLOSED", "BIDS_UNLOCKED", "COMPLETED", "CANCELED"].includes(p.state)
   );
 
+  const sectionHeader = (text: string, color = "#fff") => ({
+    fontFamily: "'Barlow Condensed', sans-serif" as const,
+    fontWeight: 700,
+    fontSize: "18px" as const,
+    letterSpacing: "1px",
+    color,
+    textTransform: "uppercase" as const,
+    marginBottom: "12px",
+  });
+
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <h1 style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
-          fontSize: "36px",
+          fontSize: "32px",
           letterSpacing: "1px",
           color: "#fff",
           margin: 0,
@@ -60,7 +70,7 @@ export default async function ClientProjectsPage() {
           background: "#C8102E",
           color: "#fff",
           border: "none",
-          padding: "10px 20px",
+          padding: "10px 16px",
           borderRadius: "6px",
           fontFamily: "'Barlow', sans-serif",
           fontWeight: 600,
@@ -68,6 +78,7 @@ export default async function ClientProjectsPage() {
           letterSpacing: "0.5px",
           textDecoration: "none",
           display: "inline-block",
+          whiteSpace: "nowrap",
         }}>
           + New Project
         </Link>
@@ -79,17 +90,32 @@ export default async function ClientProjectsPage() {
         </div>
       )}
 
+      {/* Needs Action — deadline passed but still OPEN */}
+      {needsAction.length > 0 && (
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{
+            background: "#3D0A0A",
+            border: "1px solid #991B1B",
+            borderRadius: "8px",
+            padding: "10px 14px",
+            marginBottom: "12px",
+            fontSize: "12px",
+            color: "#F87171",
+            fontWeight: 600,
+          }}>
+            ⚠ {needsAction.length} project{needsAction.length !== 1 ? "s" : ""} need{needsAction.length === 1 ? "s" : ""} your attention — deadline passed, review bids now
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {needsAction.map((p) => (
+              <ProjectCard key={p.id} p={p} urgent />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Active projects */}
-      <div style={{ marginBottom: "32px" }}>
-        <h2 style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 700,
-          fontSize: "18px",
-          letterSpacing: "1px",
-          color: "#fff",
-          textTransform: "uppercase",
-          marginBottom: "12px",
-        }}>
+      <div style={{ marginBottom: "28px" }}>
+        <h2 style={sectionHeader(`Active (${active.length})`)}>
           Active ({active.length})
         </h2>
         {active.length === 0 ? (
@@ -110,17 +136,9 @@ export default async function ClientProjectsPage() {
 
       {/* Awarded */}
       {awarded.length > 0 && (
-        <div style={{ marginBottom: "32px" }}>
+        <div style={{ marginBottom: "28px" }}>
           <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "18px",
-            letterSpacing: "1px",
-            color: "#fff",
-            textTransform: "uppercase",
-            marginBottom: "12px",
-          }}>
+          <h2 style={sectionHeader(`Awarded (${awarded.length})`)}>
             Awarded ({awarded.length})
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -131,42 +149,11 @@ export default async function ClientProjectsPage() {
         </div>
       )}
 
-      {/* Needs Action — deadline passed but still OPEN */}
-      {needsAction.length > 0 && (
-        <div style={{ marginBottom: "32px" }}>
-          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "18px",
-            letterSpacing: "1px",
-            color: "#C8102E",
-            textTransform: "uppercase",
-            marginBottom: "12px",
-          }}>
-            ⚠ Deadline Passed — Review Bids
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {needsAction.map((p) => (
-              <ProjectCard key={p.id} p={p} />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Closed / completed projects */}
       {closed.length > 0 && (
         <div>
           <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "18px",
-            letterSpacing: "1px",
-            color: "#7A9CC4",
-            textTransform: "uppercase",
-            marginBottom: "12px",
-          }}>
+          <h2 style={sectionHeader(`Closed / Completed (${closed.length})`, "#7A9CC4")}>
             Closed / Completed ({closed.length})
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -180,7 +167,7 @@ export default async function ClientProjectsPage() {
   );
 }
 
-function ProjectCard({ p }: { p: Project }) {
+function ProjectCard({ p, urgent }: { p: Project; urgent?: boolean }) {
   const deadline = p.deadline_at ? new Date(p.deadline_at) : null;
   const now = new Date();
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
@@ -190,16 +177,25 @@ function ProjectCard({ p }: { p: Project }) {
     <Link href={`/dashboard/client/projects/${p.id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
         background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        border: `1px solid ${urgent ? "#991B1B" : "#1B4F8A"}`,
         borderRadius: "10px",
-        padding: "18px",
+        padding: "16px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        gap: "12px",
         cursor: "pointer",
       }}>
-        <div>
-          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontWeight: 600,
+            fontSize: "15px",
+            color: "#fff",
+            marginBottom: "3px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}>
             {p.title ?? "Untitled"}
           </div>
           <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
@@ -208,16 +204,18 @@ function ProjectCard({ p }: { p: Project }) {
           {deadline && (
             <div style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5" }}>
               {deadlinePassed
-                ? "Deadline passed"
+                ? "⚠ Deadline passed"
                 : `Deadline: ${deadline.toLocaleDateString()}`}
             </div>
           )}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
-          <span style={stateBadge(p.state)}>{p.state}</span>
           {bidsUnlocked && (
-            <span style={{ fontSize: "11px", color: "#4ADE80" }}>✓ Bids unlocked</span>
+            <div style={{ fontSize: "11px", color: "#4ADE80", marginTop: "2px" }}>
+              ✓ Bids ready to review
+            </div>
           )}
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <span style={stateBadge(p.state)}>{p.state}</span>
         </div>
       </HoverCard>
     </Link>
