@@ -14,11 +14,6 @@ type OpenProject = {
   max_open_days: number | null;
 };
 
-function fmt(dt: string | null) {
-  if (!dt) return "—";
-  return new Date(dt).toLocaleString();
-}
-
 function timeRemaining(deadline: string | null) {
   if (!deadline) return null;
   const diff = new Date(deadline).getTime() - Date.now();
@@ -32,11 +27,13 @@ function timeRemaining(deadline: string | null) {
 export default async function ContractorOpenProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<{ sort?: string; category?: string; location?: string }>;
 }) {
   const { supabase } = await requireRole(["CONTRACTOR", "ADMIN"]);
   const sp = await searchParams;
   const sort = sp.sort === "newest" ? "newest" : "deadline";
+  const categoryFilter = sp.category ?? "";
+  const locationFilter = sp.location ?? "";
 
   const { data, error } = await supabase.rpc("list_open_projects", {
     p_sort: sort,
@@ -46,12 +43,45 @@ export default async function ContractorOpenProjectsPage({
     throw new Error(`RPC list_open_projects failed: ${JSON.stringify(error)}`);
   }
 
-  const projects = (data ?? []) as OpenProject[];
+  const allProjects = (data ?? []) as OpenProject[];
+
+  // Get unique categories and locations for filter dropdowns
+  const allCategories = [...new Set(
+    allProjects.map((p) => p.category).filter((c): c is string => !!c)
+  )].sort();
+
+  const allLocations = [...new Set(
+    allProjects
+      .map((p) => p.location_general?.split(",")[1]?.trim())
+      .filter((l): l is string => !!l)
+  )].sort();
+
+  // Apply filters
+  const projects = allProjects.filter((p) => {
+    const matchesCategory = !categoryFilter ||
+      p.category?.toLowerCase() === categoryFilter.toLowerCase();
+    const matchesLocation = !locationFilter ||
+      p.location_general?.toLowerCase().includes(locationFilter.toLowerCase());
+    return matchesCategory && matchesLocation;
+  });
+
+  const buildUrl = (params: Record<string, string>) => {
+    const base = new URLSearchParams();
+    if (sort !== "deadline") base.set("sort", sort);
+    if (categoryFilter) base.set("category", categoryFilter);
+    if (locationFilter) base.set("location", locationFilter);
+    Object.entries(params).forEach(([k, v]) => {
+      if (v) base.set(k, v);
+      else base.delete(k);
+    });
+    const str = base.toString();
+    return `/dashboard/contractor/projects${str ? `?${str}` : ""}`;
+  };
 
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -64,7 +94,7 @@ export default async function ContractorOpenProjectsPage({
             Open Projects
           </h1>
           <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
-            {projects.length} project{projects.length !== 1 ? "s" : ""} available • Client identities hidden until award
+            {projects.length} of {allProjects.length} project{allProjects.length !== 1 ? "s" : ""} shown • Client identities hidden until award
           </p>
         </div>
 
@@ -76,7 +106,7 @@ export default async function ContractorOpenProjectsPage({
           ].map((s) => (
             <Link
               key={s.value}
-              href={`/dashboard/contractor/projects?sort=${s.value}`}
+              href={buildUrl({ sort: s.value })}
               style={{
                 background: sort === s.value ? "#1B4F8A" : "transparent",
                 color: sort === s.value ? "#fff" : "#7A9CC4",
@@ -95,6 +125,151 @@ export default async function ContractorOpenProjectsPage({
         </div>
       </div>
 
+      {/* Filters */}
+      <div style={{
+        background: "#0F2040",
+        border: "1px solid #1B4F8A",
+        borderRadius: "10px",
+        padding: "16px 20px",
+        marginBottom: "20px",
+      }}>
+        <form style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" }}>
+          {/* Keep sort param */}
+          {sort !== "deadline" && <input type="hidden" name="sort" value={sort} />}
+
+          <div>
+            <label style={{
+              display: "block",
+              fontSize: "11px",
+              color: "#7A9CC4",
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              marginBottom: "4px",
+            }}>
+              Category
+            </label>
+            <select
+              name="category"
+              defaultValue={categoryFilter}
+              style={{
+                background: "#0A1628",
+                border: "1px solid #1B4F8A",
+                color: "#F0F4FF",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                outline: "none",
+                minWidth: "160px",
+              }}
+            >
+              <option value="">All Categories</option>
+              {allCategories.map((cat) => (
+                <option key={cat} value={cat}>{cat.replaceAll("_", " ")}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={{
+              display: "block",
+              fontSize: "11px",
+              color: "#7A9CC4",
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              marginBottom: "4px",
+            }}>
+              State
+            </label>
+            <select
+              name="location"
+              defaultValue={locationFilter}
+              style={{
+                background: "#0A1628",
+                border: "1px solid #1B4F8A",
+                color: "#F0F4FF",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                outline: "none",
+                minWidth: "120px",
+              }}
+            >
+              <option value="">All States</option>
+              {allLocations.map((loc) => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              background: "#1B4F8A",
+              color: "#fff",
+              border: "none",
+              padding: "8px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              cursor: "pointer",
+            }}
+          >
+            Filter
+          </button>
+
+          {(categoryFilter || locationFilter) && (
+            <Link
+              href={buildUrl({ category: "", location: "" })}
+              style={{
+                background: "transparent",
+                color: "#7A9CC4",
+                border: "1px solid #1B4F8A",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              Clear Filters
+            </Link>
+          )}
+        </form>
+
+        {/* Active filter indicators */}
+        {(categoryFilter || locationFilter) && (
+          <div style={{ display: "flex", gap: "8px", marginTop: "12px", flexWrap: "wrap" }}>
+            {categoryFilter && (
+              <span style={{
+                fontSize: "11px",
+                padding: "3px 10px",
+                borderRadius: "20px",
+                background: "#0A1628",
+                color: "#60A5FA",
+                border: "1px solid #1B4F8A",
+              }}>
+                Category: {categoryFilter.replaceAll("_", " ")}
+              </span>
+            )}
+            {locationFilter && (
+              <span style={{
+                fontSize: "11px",
+                padding: "3px 10px",
+                borderRadius: "20px",
+                background: "#0A1628",
+                color: "#60A5FA",
+                border: "1px solid #1B4F8A",
+              }}>
+                State: {locationFilter}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Project list */}
       {projects.length === 0 ? (
         <div style={{
@@ -106,7 +281,9 @@ export default async function ContractorOpenProjectsPage({
           color: "#7A9CC4",
           fontSize: "14px",
         }}>
-          No open projects at the moment. Check back soon.
+          {categoryFilter || locationFilter
+            ? "No projects match your filters. Try clearing them."
+            : "No open projects at the moment. Check back soon."}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -149,7 +326,18 @@ export default async function ContractorOpenProjectsPage({
                         )}
                       </div>
                       <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "8px" }}>
-                        {p.category ?? "—"} • {p.location_general ?? "—"}
+                        <span style={{
+                          background: "#0A1628",
+                          border: "1px solid #1B4F8A",
+                          borderRadius: "4px",
+                          padding: "2px 8px",
+                          fontSize: "11px",
+                          marginRight: "8px",
+                          color: "#60A5FA",
+                        }}>
+                          {p.category?.replaceAll("_", " ") ?? "—"}
+                        </span>
+                        {p.location_general ?? "—"}
                       </div>
                       {p.description && (
                         <div style={{
