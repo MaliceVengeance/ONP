@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { awardBid } from "./actions";
 import { stateBadge } from "@/lib/ui";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type BidRow = {
   bid_id: string;
@@ -9,6 +10,20 @@ type BidRow = {
   version_number: number;
   submitted_at: string;
   notes: string | null;
+};
+
+type ContractorInfo = {
+  contractor_id: string;
+  business_name: string | null;
+  city: string | null;
+  state: string | null;
+  directory_verified: boolean | null;
+  veteran_verified: boolean | null;
+  license_number: string | null;
+  license_expiry: string | null;
+  coi_provider: string | null;
+  coi_expiry: string | null;
+  coi_amount: number | null;
 };
 
 function centsToMoney(cents: number | string) {
@@ -26,6 +41,21 @@ function moneyToCents(input: string | undefined) {
   return Math.round(num * 100);
 }
 
+function formatDate(dateStr: string | null) {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString();
+}
+
+function isExpired(dateStr: string | null) {
+  if (!dateStr) return false;
+  return new Date(dateStr).getTime() < Date.now();
+}
+
+function fmtMoney(amount: number | null) {
+  if (!amount) return "—";
+  return `$${amount.toLocaleString("en-US")}`;
+}
+
 export default async function ClientProjectBidsPage({
   params,
   searchParams,
@@ -33,7 +63,7 @@ export default async function ClientProjectBidsPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ min?: string; max?: string; sort?: string; award?: string }>;
 }) {
-  const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
+  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
   const { id: projectId } = await params;
   const sp = await searchParams;
 
@@ -87,6 +117,39 @@ export default async function ClientProjectBidsPage({
     );
     if (awardErr) awardErrText = JSON.stringify(awardErr, null, 2);
     else award = (awardData ?? [])[0] as any;
+  }
+
+  // Fetch contractor profiles for all bids using admin client
+  const contractorMap = new Map<string, ContractorInfo>();
+  if (unlocked && bids.length > 0) {
+    try {
+      // Get bid contractor IDs
+      const { data: bidRows } = await supabaseAdmin
+        .from("bids")
+        .select("id, contractor_id")
+        .in("id", bids.map((b) => b.bid_id));
+
+      const contractorIds = (bidRows ?? []).map((b) => b.contractor_id).filter(Boolean);
+
+      if (contractorIds.length > 0) {
+        const { data: contractorProfiles } = await supabaseAdmin
+          .from("contractor_profiles")
+          .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, license_number, license_expiry, coi_provider, coi_expiry, coi_amount")
+          .in("contractor_id", contractorIds);
+
+        // Map bid_id -> contractor info
+        (bidRows ?? []).forEach((bidRow) => {
+          const profile = (contractorProfiles ?? []).find(
+            (p) => p.contractor_id === bidRow.contractor_id
+          );
+          if (profile) {
+            contractorMap.set(bidRow.id, profile as ContractorInfo);
+          }
+        });
+      }
+    } catch (e) {
+      console.error("Failed to fetch contractor profiles:", e);
+    }
   }
 
   const inputStyle = {
@@ -362,6 +425,10 @@ export default async function ClientProjectBidsPage({
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {bids.map((b, idx) => {
                 const isAwarded = award?.bid_id === b.bid_id;
+                const contractor = contractorMap.get(b.bid_id);
+                const licenseExpired = isExpired(contractor?.license_expiry ?? null);
+                const coiExpired = isExpired(contractor?.coi_expiry ?? null);
+
                 return (
                   <div key={b.bid_id} style={{
                     background: "#0F2040",
@@ -401,6 +468,109 @@ export default async function ClientProjectBidsPage({
                         </div>
                       </div>
                     </div>
+
+                    {/* Verification badges */}
+                    {contractor && (
+                      <div style={{
+                        background: "#0A1628",
+                        border: "1px solid #1B4F8A",
+                        borderRadius: "8px",
+                        padding: "12px 14px",
+                        marginTop: "12px",
+                      }}>
+                        <div style={{
+                          fontSize: "11px",
+                          color: "#7A9CC4",
+                          textTransform: "uppercase",
+                          letterSpacing: "1px",
+                          marginBottom: "10px",
+                          fontWeight: 600,
+                        }}>
+                          Contractor Credentials
+                        </div>
+
+                        {/* Verification status badges */}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
+                          {contractor.directory_verified ? (
+                            <span style={{
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              padding: "4px 10px",
+                              borderRadius: "20px",
+                              background: "#0D3320",
+                              color: "#4ADE80",
+                              border: "1px solid #166534",
+                            }}>
+                              ✅ ONP Verified
+                            </span>
+                          ) : (
+                            <span style={{
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              padding: "4px 10px",
+                              borderRadius: "20px",
+                              background: "#2D2000",
+                              color: "#FBBF24",
+                              border: "1px solid #92400E",
+                            }}>
+                              ⏳ Verification Pending
+                            </span>
+                          )}
+
+                          {contractor.veteran_verified && (
+                            <span style={{
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              padding: "4px 10px",
+                              borderRadius: "20px",
+                              background: "#1e1a00",
+                              color: "#FBBF24",
+                              border: "1px solid #92400E",
+                            }}>
+                              ★ Veteran Owned
+                            </span>
+                          )}
+                        </div>
+
+                        {/* License info */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
+                          <div>
+                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>License #</div>
+                            <div style={{ color: "#F0F4FF" }}>
+                              {contractor.license_number ?? "Not provided"}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>License Expires</div>
+                            <div style={{ color: licenseExpired ? "#F87171" : "#F0F4FF" }}>
+                              {formatDate(contractor.license_expiry)}
+                              {licenseExpired && " ⚠ Expired"}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Insurance Provider</div>
+                            <div style={{ color: "#F0F4FF" }}>
+                              {contractor.coi_provider ?? "Not provided"}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>COI Expires</div>
+                            <div style={{ color: coiExpired ? "#F87171" : "#F0F4FF" }}>
+                              {formatDate(contractor.coi_expiry)}
+                              {coiExpired && " ⚠ Expired"}
+                            </div>
+                          </div>
+                          {contractor.coi_amount && (
+                            <div>
+                              <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Coverage Amount</div>
+                              <div style={{ color: "#F0F4FF" }}>
+                                {fmtMoney(contractor.coi_amount)}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {b.notes && (
                       <div style={{
