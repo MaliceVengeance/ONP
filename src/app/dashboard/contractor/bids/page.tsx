@@ -16,6 +16,15 @@ type MyBidRow = {
   bid_updated_at: string | null;
 };
 
+type AwardedRow = {
+  project_id: string;
+  project_title: string | null;
+  category: string | null;
+  location_general: string | null;
+  awarded_at: string | null;
+  latest_amount_cents: number | string;
+};
+
 function fmtMoney(cents: number | string) {
   const n = Number(cents);
   if (!Number.isFinite(n)) return "—";
@@ -25,15 +34,26 @@ function fmtMoney(cents: number | string) {
 export default async function ContractorMyBidsPage() {
   const { supabase } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
-  const { data, error } = await supabase.rpc("list_my_active_bids");
+  const [
+    { data: bidsData, error: bidsError },
+    { data: awardedData, error: awardedError },
+  ] = await Promise.all([
+    supabase.rpc("list_my_active_bids"),
+    supabase.rpc("list_my_awarded_projects"),
+  ]);
 
-  if (error) {
-    throw new Error(`RPC list_my_active_bids failed: ${JSON.stringify(error)}`);
-  }
+  if (bidsError) throw new Error(`RPC list_my_active_bids failed: ${JSON.stringify(bidsError)}`);
 
-  const bids = (data ?? []) as MyBidRow[];
+  const bids = (bidsData ?? []) as MyBidRow[];
+  const awarded = (awardedData ?? []) as AwardedRow[];
+
   const openBids = bids.filter((b) => b.project_state === "OPEN");
-  const closedBids = bids.filter((b) => b.project_state !== "OPEN");
+  const closedBids = bids.filter((b) => b.project_state !== "OPEN" && b.project_state !== "AWARDED");
+  const awardedBidIds = new Set(awarded.map((a) => a.project_id));
+
+  // Stats
+  const totalBidValue = bids.reduce((sum, b) => sum + Number(b.latest_amount_cents), 0);
+  const wonCount = awarded.length;
 
   return (
     <div>
@@ -48,10 +68,10 @@ export default async function ContractorMyBidsPage() {
             color: "#fff",
             margin: 0,
           }}>
-            My Bids
+            Bid History
           </h1>
           <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
-            Your latest bid per project
+            All bids you have submitted across all projects
           </p>
         </div>
         <Link
@@ -75,14 +95,16 @@ export default async function ContractorMyBidsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "28px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
         {[
-          { label: "Pending Bids", count: openBids.length, accent: false },
-          { label: "Closed Bids", count: closedBids.length, accent: false },
+          { label: "Total Bids", count: bids.length, value: null, accent: false },
+          { label: "Pending", count: openBids.length, value: null, accent: openBids.length > 0 },
+          { label: "Won", count: wonCount, value: null, accent: wonCount > 0 },
+          { label: "Total Bid Value", count: null, value: fmtMoney(totalBidValue), accent: false },
         ].map((s) => (
           <div key={s.label} style={{
             background: "#0F2040",
-            border: "1px solid #1B4F8A",
+            border: `1px solid ${s.accent ? "#C8102E" : "#1B4F8A"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -90,10 +112,10 @@ export default async function ContractorMyBidsPage() {
             <div style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
-              fontSize: "32px",
-              color: "#fff",
+              fontSize: s.value ? "22px" : "32px",
+              color: s.accent ? "#C8102E" : "#fff",
             }}>
-              {s.count}
+              {s.value ?? s.count}
             </div>
             <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
@@ -102,7 +124,7 @@ export default async function ContractorMyBidsPage() {
         ))}
       </div>
 
-      {bids.length === 0 ? (
+      {bids.length === 0 && awarded.length === 0 ? (
         <div style={{
           background: "#0F2040",
           border: "1px solid #1B4F8A",
@@ -119,7 +141,81 @@ export default async function ContractorMyBidsPage() {
         </div>
       ) : (
         <>
-          {/* Active bids */}
+          {/* Won projects */}
+          {awarded.length > 0 && (
+            <div style={{ marginBottom: "32px" }}>
+              <h2 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "18px",
+                letterSpacing: "1px",
+                color: "#A78BFA",
+                textTransform: "uppercase",
+                marginBottom: "12px",
+              }}>
+                ★ Won ({awarded.length})
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {awarded.map((a) => (
+                  <Link
+                    key={a.project_id}
+                    href={`/dashboard/contractor/projects/${a.project_id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <HoverCard style={{
+                      background: "#2D1B69",
+                      border: "1px solid #5B21B6",
+                      borderRadius: "10px",
+                      padding: "18px",
+                      cursor: "pointer",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                            {a.project_title ?? "Untitled Project"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#A78BFA", marginBottom: "6px" }}>
+                            {a.category ?? "—"} • {a.location_general ?? "—"}
+                          </div>
+                          {a.awarded_at && (
+                            <div style={{ fontSize: "11px", color: "#7A9CC4" }}>
+                              Awarded: {new Date(a.awarded_at).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{
+                            fontFamily: "'Barlow Condensed', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "28px",
+                            color: "#fff",
+                            lineHeight: 1,
+                          }}>
+                            {fmtMoney(a.latest_amount_cents)}
+                          </div>
+                          <div style={{
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            padding: "3px 10px",
+                            borderRadius: "20px",
+                            background: "#1B0D4A",
+                            color: "#A78BFA",
+                            border: "1px solid #5B21B6",
+                            marginTop: "6px",
+                            display: "inline-block",
+                          }}>
+                            ★ AWARDED
+                          </div>
+                        </div>
+                      </div>
+                    </HoverCard>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pending bids */}
           {openBids.length > 0 && (
             <div style={{ marginBottom: "32px" }}>
               <h2 style={{
@@ -135,7 +231,7 @@ export default async function ContractorMyBidsPage() {
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {openBids.map((b) => (
-                  <BidCard key={b.bid_id} b={b} />
+                  <BidCard key={b.bid_id} b={b} isWon={awardedBidIds.has(b.project_id)} />
                 ))}
               </div>
             </div>
@@ -158,7 +254,7 @@ export default async function ContractorMyBidsPage() {
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {closedBids.map((b) => (
-                  <BidCard key={b.bid_id} b={b} />
+                  <BidCard key={b.bid_id} b={b} isWon={awardedBidIds.has(b.project_id)} />
                 ))}
               </div>
             </div>
@@ -169,7 +265,7 @@ export default async function ContractorMyBidsPage() {
   );
 }
 
-function BidCard({ b }: { b: MyBidRow }) {
+function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
   const deadline = b.deadline_at ? new Date(b.deadline_at) : null;
   const deadlinePassed = !!deadline && deadline.getTime() <= Date.now();
   const isOpen = b.project_state === "OPEN";
@@ -178,10 +274,11 @@ function BidCard({ b }: { b: MyBidRow }) {
     <Link href={`/dashboard/contractor/projects/${b.project_id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
         background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        border: `1px solid ${isWon ? "#5B21B6" : "#1B4F8A"}`,
         borderRadius: "10px",
         padding: "18px",
         cursor: "pointer",
+        opacity: !isOpen && !isWon ? 0.75 : 1,
       }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
           <div style={{ flex: 1 }}>
@@ -191,11 +288,16 @@ function BidCard({ b }: { b: MyBidRow }) {
             <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "8px" }}>
               {b.category ?? "—"} • {b.location_general ?? "—"}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
               <span style={stateBadge(b.project_state)}>{b.project_state}</span>
               {deadline && (
                 <span style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5" }}>
                   {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
+                </span>
+              )}
+              {b.bid_updated_at && (
+                <span style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                  Updated: {new Date(b.bid_updated_at).toLocaleDateString()}
                 </span>
               )}
             </div>
@@ -214,8 +316,13 @@ function BidCard({ b }: { b: MyBidRow }) {
             <div style={{ fontSize: "11px", color: "#7A9CC4", marginTop: "4px" }}>
               v{b.version_number}
             </div>
-            <div style={{ fontSize: "11px", color: isOpen ? "#4ADE80" : "#3A5A7A", marginTop: "4px", fontWeight: 600 }}>
-              {isOpen ? "● OPEN" : "● CLOSED"}
+            <div style={{
+              fontSize: "11px",
+              marginTop: "4px",
+              fontWeight: 600,
+              color: isWon ? "#A78BFA" : isOpen ? "#4ADE80" : "#3A5A7A",
+            }}>
+              {isWon ? "★ WON" : isOpen ? "● OPEN" : "● CLOSED"}
             </div>
           </div>
         </div>
