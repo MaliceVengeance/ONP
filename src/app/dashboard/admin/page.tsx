@@ -69,6 +69,14 @@ export default async function AdminDashboard() {
       statLabel: "pending",
       accent: (overrideCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
+    {
+  title: "Analytics",
+  description: "Platform growth, bid volume, and activity metrics.",
+  href: "/dashboard/admin/analytics",
+  stat: projectCount ?? 0,
+  statLabel: "total projects",
+  accent: "#1B4F8A",
+},
   ];
 
   return (
