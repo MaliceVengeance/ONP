@@ -57,21 +57,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <div style={{
         background: "#3D0A0A",
         borderBottom: "1px solid #991B1B",
-        padding: "10px 28px",
+        padding: "8px 16px",
         textAlign: "center",
-        fontSize: "12px",
+        fontSize: "11px",
         color: "#FCA5A5",
+        lineHeight: 1.5,
       }}>
         <span style={{
           fontWeight: 700,
           color: "#F87171",
           textTransform: "uppercase",
           letterSpacing: "1px",
-          marginRight: "8px",
+          marginRight: "6px",
         }}>
-          ⚠ Experimental Beta:
+          ⚠ Beta:
         </span>
-        This platform is in beta testing. All projects, bids, and contractor profiles are for testing purposes only and should not be considered legitimate business transactions.
+        For testing only — not legitimate business transactions.
       </div>
 
       <main style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 24px" }}>

@@ -169,7 +169,7 @@ const [
       })()}
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", marginBottom: "28px" }}>
         {[
           { label: "Pending Bids", count: openBids.length, accent: false },
           { label: "Total Bids", count: activeBids.length, accent: false },
