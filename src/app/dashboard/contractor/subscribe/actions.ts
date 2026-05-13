@@ -53,7 +53,7 @@ export async function createCheckoutSession(planType: "standard" | "veteran") {
       },
     ],
     mode: "subscription",
-    success_url: `https://www.ournextproject.us/dashboard/contractor/subscribe?success=1`,
+    success_url: `https://www.ournextproject.us/why-onp?welcome=1`,
     cancel_url: `https://www.ournextproject.us/dashboard/contractor/subscribe?canceled=1`,
     metadata: {
       contractor_id: user.id,
