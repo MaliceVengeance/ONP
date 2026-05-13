@@ -117,6 +117,23 @@ const [
         }}>
           Browse Projects
         </Link>
+        <Link
+  href="/dashboard/contractor/subscribe"
+  style={{
+    background: "#0D3320",
+    color: "#4ADE80",
+    border: "1px solid #166534",
+    padding: "10px 20px",
+    borderRadius: "6px",
+    fontFamily: "'Barlow', sans-serif",
+    fontWeight: 600,
+    fontSize: "13px",
+    textDecoration: "none",
+    display: "inline-block",
+  }}
+>
+  Manage Subscription
+</Link>
       </div>
 
 {/* Veteran thank you banner */}
