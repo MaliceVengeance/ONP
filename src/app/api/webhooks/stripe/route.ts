@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
+function getPeriodEnd(sub: any): string {
+  const raw =
+    sub.current_period_end ??
+    sub.items?.data?.[0]?.current_period_end ??
+    null;
+
+  if (raw && !isNaN(Number(raw))) {
+    return new Date(Number(raw) * 1000).toISOString();
+  }
+
+  // Safe fallback: 30 days from now
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -32,24 +46,28 @@ export async function POST(req: NextRequest) {
         const customerId = session.customer;
         const subscriptionId = session.subscription;
 
-        if (!contractorId || !subscriptionId) break;
+        if (!contractorId || !subscriptionId) {
+          console.log("Missing contractorId or subscriptionId — skipping");
+          break;
+        }
 
-        // Get subscription details from Stripe
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        console.log("SUB OBJECT:", JSON.stringify(sub, null, 2));
 
         await supabaseAdmin
           .from("contractor_subscriptions")
-          .upsert({
-            contractor_id: contractorId,
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscriptionId,
-            plan_type: planType,
-            status: "active",
-            current_period_end: new Date((sub as any).current_period_end * 1000).toISOString(),
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: "contractor_id",
-          });
+          .upsert(
+            {
+              contractor_id: contractorId,
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              plan_type: planType,
+              status: "active",
+              current_period_end: getPeriodEnd(sub),
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "contractor_id" }
+          );
 
         console.log(`Subscription activated for contractor ${contractorId}`);
         break;
@@ -59,7 +77,6 @@ export async function POST(req: NextRequest) {
         const sub = event.data.object as any;
         const customerId = sub.customer;
 
-        // Find contractor by customer ID
         const { data: existing } = await supabaseAdmin
           .from("contractor_subscriptions")
           .select("contractor_id")
@@ -72,7 +89,7 @@ export async function POST(req: NextRequest) {
           .from("contractor_subscriptions")
           .update({
             status: sub.status,
-            current_period_end: new Date((sub as any).current_period_end * 1000).toISOString(),
+            current_period_end: getPeriodEnd(sub),
             updated_at: new Date().toISOString(),
           })
           .eq("stripe_customer_id", customerId);
@@ -115,7 +132,10 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("Webhook handler error:", err);
-    return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Webhook handler failed" },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ received: true });
