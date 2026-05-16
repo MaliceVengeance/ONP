@@ -48,7 +48,6 @@ export default async function ContractorProjectDetail({
     .maybeSingle();
 
   const isSubscribed = subData?.status === "ACTIVE" || subData?.status === "TRIALING";
-  console.log("SUB STATUS:", subData?.status, "isSubscribed:", isSubscribed);
 
   const { data: rows, error: pErr } = await supabase.rpc(
     "get_open_project_detail",
