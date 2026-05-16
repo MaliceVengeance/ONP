@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { createCheckoutSession } from "./actions";
+import { createCheckoutSession, cancelSubscription } from "./actions";
 
 export default async function ContractorSubscribePage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string; canceled?: string }>;
+  searchParams: Promise<{ success?: string; canceled?: string; canceled_sub?: string }>;
 }) {
   const sp = await searchParams;
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
@@ -102,7 +102,7 @@ export default async function ContractorSubscribePage({
         </div>
       )}
 
-      {/* Canceled banner */}
+      {/* Checkout canceled banner */}
       {sp.canceled === "1" && (
         <div style={{
           background: "#2D2000",
@@ -114,6 +114,21 @@ export default async function ContractorSubscribePage({
           marginBottom: "20px",
         }}>
           ⚠ Checkout was canceled. You can try again anytime.
+        </div>
+      )}
+
+      {/* Subscription canceled banner */}
+      {sp.canceled_sub === "1" && (
+        <div style={{
+          background: "#2D0A0A",
+          border: "1px solid #7F1D1D",
+          color: "#F87171",
+          padding: "14px 18px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "20px",
+        }}>
+          ✖ Your subscription has been canceled. You'll keep access until the end of your billing period.
         </div>
       )}
 
@@ -179,6 +194,33 @@ export default async function ContractorSubscribePage({
               )}
             </div>
           </div>
+
+          {/* Cancel button — only show if active */}
+          {hasActiveSub && (
+            <div style={{ marginTop: "20px", borderTop: "1px solid #1B4F8A", paddingTop: "16px" }}>
+              <form action={cancelSubscription}>
+                <button
+                  type="submit"
+                  style={{
+                    background: "transparent",
+                    color: "#F87171",
+                    border: "1px solid #7F1D1D",
+                    padding: "8px 18px",
+                    borderRadius: "6px",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel Subscription
+                </button>
+              </form>
+              <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "8px" }}>
+                You'll keep access until {fmtDate(subscription.current_period_end)}. No refunds for partial months.
+              </div>
+            </div>
+          )}
 
           {/* Past due warning */}
           {subscription.status === "PAST_DUE" && (
