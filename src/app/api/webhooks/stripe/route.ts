@@ -12,7 +12,6 @@ function getPeriodEnd(sub: any): string {
     return new Date(Number(raw) * 1000).toISOString();
   }
 
-  // Safe fallback: 30 days from now
   return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 }
 
@@ -51,30 +50,47 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const sub = await stripe.subscriptions.retrieve(subscriptionId) as any;
         console.log("SUB OBJECT:", JSON.stringify(sub, null, 2));
 
+        const item = sub.items?.data?.[0];
+        const intervalRaw = item?.price?.recurring?.interval ?? "month";
+        const intervalMap: Record<string, string> = {
+          month: "MONTHLY",
+          quarter: "QUARTERLY",
+          year: "YEARLY",
+        };
+        const planInterval = intervalMap[intervalRaw] ?? "MONTHLY";
+        const priceCents = item?.price?.unit_amount ?? 0;
+        const currency = (sub.currency ?? "usd").toUpperCase();
+        const periodStart = sub.current_period_start
+          ? new Date(sub.current_period_start * 1000).toISOString()
+          : new Date().toISOString();
+        const periodEnd = getPeriodEnd(sub);
+
         const { error: upsertError } = await supabaseAdmin
-  .from("contractor_subscriptions")
-  .upsert(
-    {
-      contractor_id: contractorId,
-      stripe_customer_id: customerId,
-      stripe_subscription_id: subscriptionId,
-      plan_type: planType,
-      status: "ACTIVE",
-      current_period_end: getPeriodEnd(sub),
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "contractor_id" }
-  );
+          .from("contractor_subscriptions")
+          .upsert(
+            {
+              contractor_id: contractorId,
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              plan_type: planType,
+              plan_interval: planInterval,
+              price_cents: priceCents,
+              currency: currency,
+              status: "ACTIVE",
+              current_period_start: periodStart,
+              current_period_end: periodEnd,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "contractor_id" }
+          );
 
-if (upsertError) {
-  console.error("Supabase upsert error:", JSON.stringify(upsertError));
-  throw new Error(`Supabase upsert failed: ${upsertError.message}`);
-}
-
-console.log(`Subscription activated for contractor ${contractorId}`);
+        if (upsertError) {
+          console.error("Supabase upsert error:", JSON.stringify(upsertError));
+          throw new Error(`Supabase upsert failed: ${upsertError.message}`);
+        }
 
         console.log(`Subscription activated for contractor ${contractorId}`);
         break;
