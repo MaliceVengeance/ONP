@@ -17,10 +17,10 @@ export default async function ContractorSubscribePage({
     .maybeSingle();
 
   const { data: subscription } = await supabase
-    .from("contractor_subscriptions")
-    .select("status, plan_type, current_period_end, price_cents, plan_interval")
-    .eq("contractor_id", user.id)
-    .maybeSingle();
+  .from("contractor_subscriptions")
+  .select("status, plan_type, current_period_end, price_cents, plan_interval, cancel_at_period_end")
+  .eq("contractor_id", user.id)
+  .maybeSingle();
 
   const isVeteran = profile?.veteran_verified ?? false;
   const hasActiveSub =
@@ -195,8 +195,8 @@ export default async function ContractorSubscribePage({
             </div>
           </div>
 
-          {/* Cancel button — only show if active */}
-          {hasActiveSub && (
+          {/* Cancel button — only show if active and not already pending cancellation */}
+          {hasActiveSub && !subscription.cancel_at_period_end && (
             <div style={{ marginTop: "20px", borderTop: "1px solid #1B4F8A", paddingTop: "16px" }}>
               <form action={cancelSubscription}>
                 <button
@@ -218,6 +218,23 @@ export default async function ContractorSubscribePage({
               </form>
               <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "8px" }}>
                 You'll keep access until {fmtDate(subscription.current_period_end)}. No refunds for partial months.
+              </div>
+            </div>
+          )}
+
+          {/* Pending cancellation notice */}
+          {hasActiveSub && subscription.cancel_at_period_end && (
+            <div style={{ marginTop: "20px", borderTop: "1px solid #1B4F8A", paddingTop: "16px" }}>
+              <div style={{
+                padding: "12px 14px",
+                background: "#2D2000",
+                border: "1px solid #92400E",
+                borderRadius: "8px",
+                fontSize: "13px",
+                color: "#FBBF24",
+              }}>
+                ⚠ Cancellation scheduled — you'll keep full access until{" "}
+                <strong>{fmtDate(subscription.current_period_end)}</strong>.
               </div>
             </div>
           )}
