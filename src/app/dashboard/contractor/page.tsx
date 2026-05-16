@@ -50,10 +50,17 @@ function fmtMoney(cents: number | string) {
   return `$${(n / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
 }
 
-export default async function ContractorDashboard() {
+export default async function ContractorDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
+  const sp = await searchParams;
+  const showWelcome = sp?.welcome === "1";
+
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
-const [
+  const [
     { data: awardedData },
     { data: bidsData },
     { data: openProjectsData },
@@ -77,14 +84,69 @@ const [
   const openProjects = (openProjectsData ?? []) as OpenProject[];
   const openBids = activeBids.filter((b) => b.project_state === "OPEN");
 
-  // Projects contractor has already bid on
   const bidProjectIds = new Set(activeBids.map((b) => b.project_id));
-
-  // Open projects contractor has NOT bid on yet
   const unbidProjects = openProjects.filter((p) => !bidProjectIds.has(p.id));
 
   return (
     <div>
+      {/* Welcome banner */}
+      {showWelcome && (
+        <div style={{
+          background: "linear-gradient(135deg, #0D3320 0%, #0F2040 100%)",
+          border: "1px solid #166534",
+          borderRadius: "12px",
+          padding: "24px 28px",
+          marginBottom: "28px",
+          display: "flex",
+          alignItems: "center",
+          gap: "20px",
+        }}>
+          <div style={{ fontSize: "48px", flexShrink: 0 }}>🎉</div>
+          <div>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "26px",
+              letterSpacing: "1px",
+              color: "#4ADE80",
+              marginBottom: "6px",
+            }}>
+              Welcome to ONP!
+            </div>
+            <div style={{ fontSize: "14px", color: "#86EFAC", marginBottom: "12px" }}>
+              Your subscription is active. You now have full access to the ONP bidding platform.
+            </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <Link href="/dashboard/contractor/projects" style={{
+                background: "#C8102E",
+                color: "#fff",
+                padding: "8px 18px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                textDecoration: "none",
+              }}>
+                Browse Open Projects →
+              </Link>
+              <Link href="/dashboard/contractor/profile" style={{
+                background: "transparent",
+                color: "#4ADE80",
+                border: "1px solid #166534",
+                padding: "8px 18px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                textDecoration: "none",
+              }}>
+                Complete Your Profile
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
@@ -117,26 +179,23 @@ const [
         }}>
           Browse Projects
         </Link>
-        <Link
-  href="/dashboard/contractor/subscribe"
-  style={{
-    background: "#0D3320",
-    color: "#4ADE80",
-    border: "1px solid #166534",
-    padding: "10px 20px",
-    borderRadius: "6px",
-    fontFamily: "'Barlow', sans-serif",
-    fontWeight: 600,
-    fontSize: "13px",
-    textDecoration: "none",
-    display: "inline-block",
-  }}
->
-  Manage Subscription
-</Link>
+        <Link href="/dashboard/contractor/subscribe" style={{
+          background: "#0D3320",
+          color: "#4ADE80",
+          border: "1px solid #166534",
+          padding: "10px 20px",
+          borderRadius: "6px",
+          fontFamily: "'Barlow', sans-serif",
+          fontWeight: 600,
+          fontSize: "13px",
+          textDecoration: "none",
+          display: "inline-block",
+        }}>
+          Manage Subscription
+        </Link>
       </div>
 
-{/* Veteran thank you banner */}
+      {/* Veteran thank you banner */}
       {isVeteran && (() => {
         const branch = getBranchInfo(militaryBranch);
         return (
@@ -314,7 +373,6 @@ const [
         }}>
           Pending Bids
         </h2>
-
         {openBids.length === 0 ? (
           <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
             No pending bids.{" "}
