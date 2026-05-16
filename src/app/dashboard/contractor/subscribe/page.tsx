@@ -10,22 +10,49 @@ export default async function ContractorSubscribePage({
   const sp = await searchParams;
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
-  // Check contractor profile
   const { data: profile } = await supabase
     .from("contractor_profiles")
     .select("business_name, veteran_verified, directory_verified")
     .eq("contractor_id", user.id)
     .maybeSingle();
 
-  // Check existing subscription
   const { data: subscription } = await supabase
     .from("contractor_subscriptions")
-    .select("status, plan_type, current_period_end")
+    .select("status, plan_type, current_period_end, price_cents, plan_interval")
     .eq("contractor_id", user.id)
     .maybeSingle();
 
   const isVeteran = profile?.veteran_verified ?? false;
-  const hasActiveSub = subscription?.status === "active";
+  const hasActiveSub =
+    subscription?.status === "ACTIVE" || subscription?.status === "TRIALING";
+
+  function fmtDate(iso: string | null) {
+    if (!iso) return "—";
+    return new Date(iso).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+
+  function planLabel(planType: string | null) {
+    if (planType === "veteran") return "Veteran";
+    if (planType === "standard") return "Standard";
+    return planType ?? "—";
+  }
+
+  function statusColor(status: string | null) {
+    switch (status) {
+      case "ACTIVE": return { color: "#4ADE80", bg: "#0D3320", border: "#166534" };
+      case "TRIALING": return { color: "#60A5FA", bg: "#0D1F40", border: "#1B4F8A" };
+      case "PAST_DUE": return { color: "#FBBF24", bg: "#2D2000", border: "#92400E" };
+      case "CANCELED": return { color: "#F87171", bg: "#2D0A0A", border: "#7F1D1D" };
+      case "EXPIRED": return { color: "#9CA3AF", bg: "#111827", border: "#374151" };
+      default: return { color: "#7A9CC4", bg: "#0F2040", border: "#1B4F8A" };
+    }
+  }
+
+  const colors = statusColor(subscription?.status ?? null);
 
   return (
     <div style={{ maxWidth: "600px" }}>
@@ -43,27 +70,24 @@ export default async function ContractorSubscribePage({
             Subscription
           </h1>
           <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
-            Subscribe to access ONP bidding platform
+            Manage your ONP bidding platform access
           </p>
         </div>
-        <Link
-          href="/dashboard/contractor"
-          style={{
-            background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontSize: "13px",
-            textDecoration: "none",
-          }}
-        >
+        <Link href="/dashboard/contractor" style={{
+          background: "transparent",
+          color: "#7A9CC4",
+          border: "1px solid #1B4F8A",
+          padding: "8px 16px",
+          borderRadius: "6px",
+          fontFamily: "'Barlow', sans-serif",
+          fontSize: "13px",
+          textDecoration: "none",
+        }}>
           Back
         </Link>
       </div>
 
-{/* Success banner */}
+      {/* Success banner */}
       {sp.success === "1" && (
         <div style={{
           background: "#0D3320",
@@ -93,38 +117,102 @@ export default async function ContractorSubscribePage({
         </div>
       )}
 
-      {/* Active subscription */}
-      {hasActiveSub && (
+      {/* Current subscription status card */}
+      {subscription && (
         <div style={{
-          background: "#0D3320",
-          border: "1px solid #166534",
+          background: colors.bg,
+          border: `1px solid ${colors.border}`,
           borderRadius: "12px",
-          padding: "20px",
+          padding: "20px 24px",
           marginBottom: "24px",
         }}>
-          <h2 style={{
+          <div style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
-            fontSize: "20px",
-            letterSpacing: "1px",
-            color: "#4ADE80",
+            fontSize: "13px",
+            letterSpacing: "2px",
             textTransform: "uppercase",
-            marginBottom: "8px",
+            color: colors.color,
+            marginBottom: "12px",
           }}>
-            ✅ Active Subscription
-          </h2>
-          <div style={{ fontSize: "13px", color: "#B0C4DE", marginBottom: "4px" }}>
-            Plan: <strong style={{ color: "#fff" }}>{subscription?.plan_type === "veteran" ? "Veteran ($150/mo)" : "Standard ($200/mo)"}</strong>
+            Current Subscription
           </div>
-          {subscription?.current_period_end && (
-            <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
-              Renews: {new Date(subscription.current_period_end).toLocaleDateString()}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+            <div>
+              <div style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "28px",
+                color: "#fff",
+                marginBottom: "4px",
+              }}>
+                {planLabel(subscription.plan_type)} Plan
+              </div>
+              <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+                {subscription.price_cents
+                  ? `$${(subscription.price_cents / 100).toFixed(0)}/month`
+                  : "—"}
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{
+                display: "inline-block",
+                fontSize: "12px",
+                fontWeight: 700,
+                padding: "5px 14px",
+                borderRadius: "20px",
+                background: colors.bg,
+                color: colors.color,
+                border: `1px solid ${colors.border}`,
+                letterSpacing: "1px",
+                marginBottom: "8px",
+              }}>
+                {subscription.status}
+              </div>
+              {subscription.current_period_end && (
+                <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                  {subscription.status === "CANCELED" ? "Expires" : "Renews"}:{" "}
+                  <span style={{ color: "#fff" }}>
+                    {fmtDate(subscription.current_period_end)}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Past due warning */}
+          {subscription.status === "PAST_DUE" && (
+            <div style={{
+              marginTop: "14px",
+              padding: "12px 14px",
+              background: "#1A1000",
+              border: "1px solid #92400E",
+              borderRadius: "8px",
+              fontSize: "13px",
+              color: "#FBBF24",
+            }}>
+              ⚠ Your last payment failed. Please update your payment method in Stripe to restore access.
+            </div>
+          )}
+
+          {/* Canceled warning */}
+          {subscription.status === "CANCELED" && (
+            <div style={{
+              marginTop: "14px",
+              padding: "12px 14px",
+              background: "#1A0000",
+              border: "1px solid #7F1D1D",
+              borderRadius: "8px",
+              fontSize: "13px",
+              color: "#F87171",
+            }}>
+              ✖ Your subscription has been canceled. Subscribe below to restore access.
             </div>
           )}
         </div>
       )}
 
-      {/* Plans */}
+      {/* Plans — show if no active sub */}
       {!hasActiveSub && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
@@ -164,7 +252,6 @@ export default async function ContractorSubscribePage({
                 <div style={{ fontSize: "12px", color: "#7A9CC4" }}>per month</div>
               </div>
             </div>
-
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
               {[
                 "Access to all open projects",
@@ -178,24 +265,20 @@ export default async function ContractorSubscribePage({
                 </div>
               ))}
             </div>
-
             <form action={createCheckoutSession.bind(null, "standard")}>
-              <button
-                type="submit"
-                style={{
-                  width: "100%",
-                  background: "#C8102E",
-                  color: "#fff",
-                  border: "none",
-                  padding: "12px",
-                  borderRadius: "6px",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "14px",
-                  cursor: "pointer",
-                  letterSpacing: "0.5px",
-                }}
-              >
+              <button type="submit" style={{
+                width: "100%",
+                background: "#C8102E",
+                color: "#fff",
+                border: "none",
+                padding: "12px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "14px",
+                cursor: "pointer",
+                letterSpacing: "0.5px",
+              }}>
                 Subscribe — $200/month
               </button>
             </form>
@@ -250,7 +333,6 @@ export default async function ContractorSubscribePage({
                   <div style={{ fontSize: "12px", color: "#92400E" }}>per month</div>
                 </div>
               </div>
-
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
                 {[
                   "Everything in Standard",
@@ -263,24 +345,20 @@ export default async function ContractorSubscribePage({
                   </div>
                 ))}
               </div>
-
               <form action={createCheckoutSession.bind(null, "veteran")}>
-                <button
-                  type="submit"
-                  style={{
-                    width: "100%",
-                    background: "#92400E",
-                    color: "#FBBF24",
-                    border: "2px solid #FBBF24",
-                    padding: "12px",
-                    borderRadius: "6px",
-                    fontFamily: "'Barlow', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    letterSpacing: "0.5px",
-                  }}
-                >
+                <button type="submit" style={{
+                  width: "100%",
+                  background: "#92400E",
+                  color: "#FBBF24",
+                  border: "2px solid #FBBF24",
+                  padding: "12px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  letterSpacing: "0.5px",
+                }}>
                   ★ Subscribe — $150/month
                 </button>
               </form>
@@ -307,14 +385,11 @@ export default async function ContractorSubscribePage({
               <p style={{ fontSize: "13px", color: "#3A5A7A", marginBottom: "12px" }}>
                 This plan is exclusively for verified veteran-owned businesses.
               </p>
-              <Link
-                href="/dashboard/contractor/profile"
-                style={{
-                  fontSize: "13px",
-                  color: "#7A9CC4",
-                  textDecoration: "underline",
-                }}
-              >
+              <Link href="/dashboard/contractor/profile" style={{
+                fontSize: "13px",
+                color: "#7A9CC4",
+                textDecoration: "underline",
+              }}>
                 Apply for Veteran Owned Certification →
               </Link>
             </div>
@@ -333,7 +408,8 @@ export default async function ContractorSubscribePage({
         color: "#3A5A7A",
         lineHeight: 1.6,
       }}>
-        ⚠ Subscriptions are currently in test mode. No real charges will be made during beta testing. Use Stripe test card <strong style={{ color: "#7A9CC4" }}>4242 4242 4242 4242</strong> to test.
+        ⚠ Subscriptions are currently in test mode. No real charges will be made during beta testing. Use Stripe test card{" "}
+        <strong style={{ color: "#7A9CC4" }}>4242 4242 4242 4242</strong> to test.
       </div>
     </div>
   );
