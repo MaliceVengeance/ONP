@@ -40,6 +40,15 @@ export default async function ContractorProjectDetail({
   const sp = await searchParams;
   const bidSubmitted = sp.bid === "ok";
 
+  // Check subscription status
+  const { data: subData } = await supabase
+    .from("contractor_subscriptions")
+    .select("status")
+    .eq("contractor_id", user.id)
+    .maybeSingle();
+
+  const isSubscribed = subData?.status === "ACTIVE" || subData?.status === "TRIALING";
+
   const { data: rows, error: pErr } = await supabase.rpc(
     "get_open_project_detail",
     { p_project_id: projectId }
@@ -84,7 +93,6 @@ export default async function ContractorProjectDetail({
     if (versionRow) existingBid = versionRow as ExistingBid;
   }
 
-  // Fetch RFI summary
   const { data: rfiData } = await supabase
     .from("rfis")
     .select("id, response")
@@ -93,19 +101,17 @@ export default async function ContractorProjectDetail({
   const totalRfis = rfiData?.length ?? 0;
   const answeredRfis = rfiData?.filter((r) => r.response)?.length ?? 0;
 
-  // Fetch project files
   const { data: projectFiles } = await supabase.storage
     .from("project-files")
     .list(projectId, {
       sortBy: { column: "created_at", order: "desc" },
     });
 
-
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
   const isOpen = project.state === "OPEN";
   const beforeDeadline = !!deadline && deadline.getTime() > now.getTime();
-  const canBid = isOpen && beforeDeadline;
+  const canBid = isOpen && beforeDeadline && isSubscribed;
 
   const { data: awardRows } = await supabase
     .from("project_awards")
@@ -115,7 +121,6 @@ export default async function ContractorProjectDetail({
 
   const award = awardRows?.[0];
 
-  // Fetch client info if this contractor won the project
   const { data: clientInfoRows } = await supabase.rpc(
     "get_awarded_project_client_info",
     { p_project_id: projectId }
@@ -172,7 +177,6 @@ export default async function ContractorProjectDetail({
             <span style={stateBadge(project.state)}>{project.state}</span>
           </div>
         </div>
-
         <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
           <Link
             href={`/dashboard/contractor/projects/${projectId}/rfis`}
@@ -340,7 +344,6 @@ export default async function ContractorProjectDetail({
               Awarded: {new Date(award.awarded_at).toLocaleString()}
             </div>
           )}
-
           {clientInfo ? (
             <div style={{
               background: "#1B1040",
@@ -464,7 +467,7 @@ export default async function ContractorProjectDetail({
         </div>
       )}
 
-      {/* Bid form */}
+      {/* Bid form or subscription gate */}
       {canBid ? (
         <div style={{
           background: "#0F2040",
@@ -486,7 +489,6 @@ export default async function ContractorProjectDetail({
           <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "4px" }}>
             Bids are sealed until the deadline. You can revise anytime before it closes.
           </p>
-
           <form action={submitBid.bind(null, projectId)}>
             <label style={{ ...labelStyle, marginTop: "16px" }}>Bid Amount (USD)</label>
             <input
@@ -496,7 +498,6 @@ export default async function ContractorProjectDetail({
               defaultValue={existingBid ? (existingBid.amount_cents / 100).toFixed(2) : ""}
               required
             />
-
             <label style={labelStyle}>Notes (optional)</label>
             <textarea
               name="notes"
@@ -504,7 +505,6 @@ export default async function ContractorProjectDetail({
               placeholder="Clarifying assumptions, schedule notes, material preferences…"
               defaultValue={existingBid?.notes ?? ""}
             />
-
             <button
               type="submit"
               style={{
@@ -525,21 +525,57 @@ export default async function ContractorProjectDetail({
             </button>
           </form>
         </div>
-      ) : (
-        isOpen && (
+      ) : isOpen && beforeDeadline && !isSubscribed ? (
+        /* Subscription gate */
+        <div style={{
+          background: "#0F1A2E",
+          border: "1px solid #C8102E",
+          borderRadius: "12px",
+          padding: "28px 24px",
+          textAlign: "center",
+        }}>
+          <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔒</div>
           <div style={{
-            background: "#0F2040",
-            border: "1px solid #1B4F8A",
-            borderRadius: "10px",
-            padding: "20px",
-            fontSize: "14px",
-            color: "#7A9CC4",
-            textAlign: "center",
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "22px",
+            letterSpacing: "1px",
+            color: "#fff",
+            marginBottom: "8px",
           }}>
-            Bidding is closed — the deadline has passed.
+            Subscription Required to Bid
           </div>
-        )
-      )}
+          <div style={{ fontSize: "14px", color: "#7A9CC4", marginBottom: "20px", lineHeight: 1.6 }}>
+            An active ONP subscription is required to submit bids on projects.
+            Plans start at $150/month.
+          </div>
+          <Link href="/dashboard/contractor/subscribe" style={{
+            background: "#C8102E",
+            color: "#fff",
+            padding: "12px 28px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 600,
+            fontSize: "14px",
+            textDecoration: "none",
+            display: "inline-block",
+          }}>
+            View Subscription Plans →
+          </Link>
+        </div>
+      ) : isOpen ? (
+        <div style={{
+          background: "#0F2040",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "20px",
+          fontSize: "14px",
+          color: "#7A9CC4",
+          textAlign: "center",
+        }}>
+          Bidding is closed — the deadline has passed.
+        </div>
+      ) : null}
     </div>
   );
 }

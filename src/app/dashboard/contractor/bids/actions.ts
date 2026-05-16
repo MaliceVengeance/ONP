@@ -8,7 +8,6 @@ function clean(v: FormDataEntryValue | null) {
 }
 
 function moneyToCents(inputRaw: string): bigint {
-  // Accept: "25000", "25,000", "$25,000.50", "25000.5"
   const normalized = inputRaw.replace(/[$, ]/g, "");
   if (!normalized) throw new Error("Missing bid amount.");
 
@@ -34,11 +33,27 @@ type ProjectWindowRow = {
 export async function submitBid(projectId: string, formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
+  // Subscription gate — server-side enforcement
+  const { data: subData } = await supabase
+    .from("contractor_subscriptions")
+    .select("status")
+    .eq("contractor_id", user.id)
+    .maybeSingle();
+
+  const isSubscribed =
+    subData?.status === "ACTIVE" || subData?.status === "TRIALING";
+
+  if (!isSubscribed) {
+    throw new Error(
+      "An active subscription is required to submit bids. Please subscribe at /dashboard/contractor/subscribe."
+    );
+  }
+
   const amountInput = clean(formData.get("amount"));
   const notes = clean(formData.get("notes"));
   const amount_cents = moneyToCents(amountInput);
 
-  // 1) Read bidding window safely via RPC (contractors cannot select projects directly)
+  // 1) Read bidding window safely via RPC
   const { data: windowRows, error: wErr } = await supabase.rpc(
     "get_open_project_window",
     { p_project_id: projectId }
@@ -100,7 +115,7 @@ export async function submitBid(projectId: string, formData: FormData) {
     bidId = inserted.id;
   }
 
-  // 4) Compute next version_number for this bid
+  // 4) Compute next version_number
   const { data: lastV, error: lastErr } = await supabase
     .from("bid_versions")
     .select("version_number")
@@ -115,12 +130,12 @@ export async function submitBid(projectId: string, formData: FormData) {
       ? (lastV[0] as any).version_number + 1
       : 1;
 
-  // 5) Insert bid version (required by your schema)
+  // 5) Insert bid version
   const { error: vErr } = await supabase.from("bid_versions").insert({
     bid_id: bidId,
     version_number: nextVersion,
     project_revision_number: projectRevisionNumber,
-    amount_cents: amount_cents.toString(), // safe for bigint
+    amount_cents: amount_cents.toString(),
     notes,
   });
 
