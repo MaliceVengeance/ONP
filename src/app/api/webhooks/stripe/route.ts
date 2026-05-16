@@ -54,20 +54,27 @@ export async function POST(req: NextRequest) {
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
         console.log("SUB OBJECT:", JSON.stringify(sub, null, 2));
 
-        await supabaseAdmin
-          .from("contractor_subscriptions")
-          .upsert(
-            {
-              contractor_id: contractorId,
-              stripe_customer_id: customerId,
-              stripe_subscription_id: subscriptionId,
-              plan_type: planType,
-              status: "active",
-              current_period_end: getPeriodEnd(sub),
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "contractor_id" }
-          );
+        const { error: upsertError } = await supabaseAdmin
+  .from("contractor_subscriptions")
+  .upsert(
+    {
+      contractor_id: contractorId,
+      stripe_customer_id: customerId,
+      stripe_subscription_id: subscriptionId,
+      plan_type: planType,
+      status: "active",
+      current_period_end: getPeriodEnd(sub),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "contractor_id" }
+  );
+
+if (upsertError) {
+  console.error("Supabase upsert error:", JSON.stringify(upsertError));
+  throw new Error(`Supabase upsert failed: ${upsertError.message}`);
+}
+
+console.log(`Subscription activated for contractor ${contractorId}`);
 
         console.log(`Subscription activated for contractor ${contractorId}`);
         break;
