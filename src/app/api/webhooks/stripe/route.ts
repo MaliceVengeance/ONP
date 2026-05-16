@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
       plan_type: planType,
-      status: "active",
+      status: "ACTIVE",
       current_period_end: getPeriodEnd(sub),
       updated_at: new Date().toISOString(),
     },
@@ -95,7 +95,7 @@ console.log(`Subscription activated for contractor ${contractorId}`);
         await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
-            status: sub.status,
+            status: sub.status.toUpperCase(),
             current_period_end: getPeriodEnd(sub),
             updated_at: new Date().toISOString(),
           })
@@ -112,7 +112,7 @@ console.log(`Subscription activated for contractor ${contractorId}`);
         await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
-            status: "canceled",
+            status: "CANCELED",
             updated_at: new Date().toISOString(),
           })
           .eq("stripe_customer_id", customerId);
@@ -128,7 +128,7 @@ console.log(`Subscription activated for contractor ${contractorId}`);
         await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
-            status: "past_due",
+            status: "PAST_DUE",
             updated_at: new Date().toISOString(),
           })
           .eq("stripe_customer_id", customerId);
