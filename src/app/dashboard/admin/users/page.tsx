@@ -14,17 +14,32 @@ type Profile = {
 
 const ALL_ROLES = ["CLIENT", "CONTRACTOR", "INSPECTOR", "ADMIN"];
 
+const TABS = [
+  { label: "All",         value: null,         color: "#1B4F8A" },
+  { label: "Clients",     value: "CLIENT",     color: "#1B4F8A" },
+  { label: "Contractors", value: "CONTRACTOR", color: "#15803D" },
+  { label: "Inspectors",  value: "INSPECTOR",  color: "#92400E" },
+  { label: "Admins",      value: "ADMIN",      color: "#991B1B" },
+];
+
 function roleColor(role: string) {
   switch (role) {
-    case "ADMIN": return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
-    case "CLIENT": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    case "ADMIN":      return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
+    case "CLIENT":     return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
     case "CONTRACTOR": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
-    case "INSPECTOR": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
-    default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    case "INSPECTOR":  return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
+    default:           return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
   }
 }
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string }>;
+}) {
+  const sp = await searchParams;
+  const activeTab = sp.role?.toUpperCase() ?? null;
+
   const { supabase, user: adminUser } = await requireRole(["ADMIN"]);
 
   const { data, error } = await supabase
@@ -44,13 +59,24 @@ export default async function AdminUsersPage() {
     }])
   );
 
-  const active = profiles.filter((p) => !p.deactivated);
-  const deactivated = profiles.filter((p) => p.deactivated);
+  // Filter by selected role tab
+  const filtered = activeTab
+    ? profiles.filter((p) => p.role === activeTab)
+    : profiles;
+
+  const active      = filtered.filter((p) => !p.deactivated);
+  const deactivated = filtered.filter((p) => p.deactivated);
+
+  // Counts per role for badge numbers
+  const counts = Object.fromEntries(
+    ALL_ROLES.map((r) => [r, profiles.filter((p) => p.role === r && !p.deactivated).length])
+  );
+  const totalActive = profiles.filter((p) => !p.deactivated).length;
 
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -63,7 +89,7 @@ export default async function AdminUsersPage() {
             Users
           </h1>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
-            {active.length} active • {deactivated.length} deactivated
+            {totalActive} active • {profiles.filter((p) => p.deactivated).length} deactivated
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
@@ -102,12 +128,66 @@ export default async function AdminUsersPage() {
         </div>
       </div>
 
+      {/* Role tabs */}
+      <div style={{
+        display: "flex",
+        gap: "6px",
+        marginBottom: "24px",
+        borderBottom: "2px solid #B8D0E8",
+        paddingBottom: "0",
+        flexWrap: "wrap",
+      }}>
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.value;
+          const count = tab.value === null ? totalActive : counts[tab.value] ?? 0;
+          const href = tab.value
+            ? `/dashboard/admin/users?role=${tab.value}`
+            : `/dashboard/admin/users`;
+          return (
+            <Link
+              key={tab.label}
+              href={href}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "6px 6px 0 0",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: isActive ? 700 : 500,
+                fontSize: "13px",
+                textDecoration: "none",
+                color: isActive ? tab.color : "#4A7FB5",
+                background: isActive ? "#FFFFFF" : "transparent",
+                borderTop: isActive ? `2px solid ${tab.color}` : "2px solid transparent",
+                borderLeft: isActive ? "1px solid #B8D0E8" : "1px solid transparent",
+                borderRight: isActive ? "1px solid #B8D0E8" : "1px solid transparent",
+                borderBottom: isActive ? "2px solid #FFFFFF" : "none",
+                marginBottom: isActive ? "-2px" : "0",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              {tab.label}
+              <span style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                padding: "1px 7px",
+                borderRadius: "20px",
+                background: isActive ? tab.color : "#EEF4FF",
+                color: isActive ? "#fff" : "#4A7FB5",
+              }}>
+                {count}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+
       {/* Active users */}
       <div style={{ marginBottom: "32px" }}>
         <h2 style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
-          fontSize: "18px",
+          fontSize: "16px",
           letterSpacing: "1px",
           color: "#0A1628",
           textTransform: "uppercase",
@@ -116,139 +196,148 @@ export default async function AdminUsersPage() {
           Active ({active.length})
         </h2>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {active.map((p) => {
-            const auth = authMap.get(p.id);
-            return (
-              <div key={p.id} style={{
-                background: "#EEF4FF",
-                border: "1px solid #B8D0E8",
-                borderRadius: "10px",
-                padding: "18px",
-              }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
-                      {p.display_name ?? p.company_name ?? "No name set"}
+        {active.length === 0 ? (
+          <div style={{
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "10px",
+            padding: "24px",
+            textAlign: "center",
+            color: "#4A7FB5",
+            fontSize: "14px",
+          }}>
+            No {activeTab ? activeTab.toLowerCase() + " " : ""}users found.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {active.map((p) => {
+              const auth = authMap.get(p.id);
+              return (
+                <div key={p.id} style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  borderRadius: "10px",
+                  padding: "18px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                        {p.display_name ?? p.company_name ?? "No name set"}
+                      </div>
+                      <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "3px" }}>
+                        {auth?.email ?? "No email found"}
+                      </div>
+                      <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
+                        ID: {p.id}
+                      </div>
+                      <div style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#4A7FB5" }}>
+                        <span>Joined: {new Date(p.created_at).toLocaleDateString()}</span>
+                        {auth?.last_sign_in_at && (
+                          <span>Last login: {new Date(auth.last_sign_in_at).toLocaleDateString()}</span>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "3px" }}>
-                      {auth?.email ?? "No email found"}
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
-                      ID: {p.id}
-                    </div>
-                    <div style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#4A7FB5" }}>
-                      <span>Joined: {new Date(p.created_at).toLocaleDateString()}</span>
-                      {auth?.last_sign_in_at && (
-                        <span>Last login: {new Date(auth.last_sign_in_at).toLocaleDateString()}</span>
-                      )}
-                    </div>
-                  </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0 }}>
-                    <span style={{
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      padding: "4px 10px",
-                      borderRadius: "20px",
-                      letterSpacing: "0.5px",
-                      ...roleColor(p.role),
-                    }}>
-                      {p.role}
-                    </span>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0 }}>
+                      <span style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        padding: "4px 10px",
+                        borderRadius: "20px",
+                        letterSpacing: "0.5px",
+                        ...roleColor(p.role),
+                      }}>
+                        {p.role}
+                      </span>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      {/* View profile button */}
-                      <Link
-                        href={`/dashboard/admin/users/${p.id}`}
-                        style={{
-                          background: "transparent",
-                          color: "#1B4F8A",
-                          border: "1px solid #B8D0E8",
-                          padding: "5px 10px",
-                          borderRadius: "6px",
-                          fontFamily: "'Barlow', sans-serif",
-                          fontSize: "12px",
-                          textDecoration: "none",
-                        }}
-                      >
-                        View
-                      </Link>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <Link
+                          href={`/dashboard/admin/users/${p.id}`}
+                          style={{
+                            background: "transparent",
+                            color: "#1B4F8A",
+                            border: "1px solid #B8D0E8",
+                            padding: "5px 10px",
+                            borderRadius: "6px",
+                            fontFamily: "'Barlow', sans-serif",
+                            fontSize: "12px",
+                            textDecoration: "none",
+                          }}
+                        >
+                          View
+                        </Link>
 
-                      {/* Role change — not for clients or self */}
-                      {p.id !== adminUser.id && p.role !== "CLIENT" && (
-                        <form action={async (formData: FormData) => {
-                          "use server";
-                          const newRole = formData.get("role") as string;
-                          await changeUserRole(p.id, newRole);
-                        }}>
-                          <div style={{ display: "flex", gap: "6px" }}>
-                            <select
-                              name="role"
-                              defaultValue={p.role}
-                              style={{
-                                background: "#FFFFFF",
+                        {/* Role change — not for clients or self */}
+                        {p.id !== adminUser.id && p.role !== "CLIENT" && (
+                          <form action={async (formData: FormData) => {
+                            "use server";
+                            const newRole = formData.get("role") as string;
+                            await changeUserRole(p.id, newRole);
+                          }}>
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              <select
+                                name="role"
+                                defaultValue={p.role}
+                                style={{
+                                  background: "#FFFFFF",
+                                  border: "1px solid #B8D0E8",
+                                  color: "#0A1628",
+                                  borderRadius: "6px",
+                                  padding: "5px 8px",
+                                  fontFamily: "'Barlow', sans-serif",
+                                  fontSize: "12px",
+                                  outline: "none",
+                                }}
+                              >
+                                {ALL_ROLES.map((r) => (
+                                  <option key={r} value={r}>{r}</option>
+                                ))}
+                              </select>
+                              <button style={{
+                                background: "transparent",
+                                color: "#1B4F8A",
                                 border: "1px solid #B8D0E8",
-                                color: "#0A1628",
+                                padding: "5px 10px",
                                 borderRadius: "6px",
-                                padding: "5px 8px",
                                 fontFamily: "'Barlow', sans-serif",
                                 fontSize: "12px",
-                                outline: "none",
-                              }}
-                            >
-                              {ALL_ROLES.map((r) => (
-                                <option key={r} value={r}>{r}</option>
-                              ))}
-                            </select>
+                                cursor: "pointer",
+                              }}>
+                                Change
+                              </button>
+                            </div>
+                          </form>
+                        )}
+
+                        {/* Deactivate — not for self */}
+                        {p.id !== adminUser.id && (
+                          <form action={deactivateUser.bind(null, p.id)}>
                             <button style={{
-                              background: "transparent",
-                              color: "#1B4F8A",
-                              border: "1px solid #B8D0E8",
+                              background: "#FEF2F2",
+                              color: "#991B1B",
+                              border: "1px solid #FCA5A5",
                               padding: "5px 10px",
                               borderRadius: "6px",
                               fontFamily: "'Barlow', sans-serif",
                               fontSize: "12px",
                               cursor: "pointer",
                             }}>
-                              Change
+                              Deactivate
                             </button>
-                          </div>
-                        </form>
-                      )}
+                          </form>
+                        )}
 
-                      {/* Deactivate — not for self */}
-                      {p.id !== adminUser.id && (
-                        <form action={deactivateUser.bind(null, p.id)}>
-                          <button style={{
-                            background: "#FEF2F2",
-                            color: "#991B1B",
-                            border: "1px solid #FCA5A5",
-                            padding: "5px 10px",
-                            borderRadius: "6px",
-                            fontFamily: "'Barlow', sans-serif",
-                            fontSize: "12px",
-                            cursor: "pointer",
-                          }}>
-                            Deactivate
-                          </button>
-                        </form>
-                      )}
-
-                      {p.id === adminUser.id && (
-                        <span style={{ fontSize: "12px", color: "#4A7FB5" }}>(you)</span>
-                      )}
-
-                      {p.id !== adminUser.id && p.role === "CLIENT" && (
-                        <span style={{ fontSize: "12px", color: "#4A7FB5" }}>client</span>
-                      )}
+                        {p.id === adminUser.id && (
+                          <span style={{ fontSize: "12px", color: "#4A7FB5" }}>(you)</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Deactivated users */}
@@ -258,9 +347,9 @@ export default async function AdminUsersPage() {
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
-            fontSize: "18px",
+            fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1B4F8A",
+            color: "#991B1B",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -271,20 +360,29 @@ export default async function AdminUsersPage() {
               const auth = authMap.get(p.id);
               return (
                 <div key={p.id} style={{
-                  background: "#EEF4FF",
-                  border: "1px solid #B8D0E8",
+                  background: "#FEF2F2",
+                  border: "1px solid #FCA5A5",
                   borderRadius: "10px",
                   padding: "18px",
-                  opacity: 0.7,
+                  opacity: 0.8,
                 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1B4F8A", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                         {p.display_name ?? p.company_name ?? "No name set"}
                       </div>
-                      <div style={{ fontSize: "13px", color: "#4A7FB5" }}>
+                      <div style={{ fontSize: "13px", color: "#991B1B", marginBottom: "2px" }}>
                         {auth?.email ?? "No email found"}
                       </div>
+                      <span style={{
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        padding: "3px 8px",
+                        borderRadius: "20px",
+                        ...roleColor(p.role),
+                      }}>
+                        {p.role}
+                      </span>
                     </div>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <Link
