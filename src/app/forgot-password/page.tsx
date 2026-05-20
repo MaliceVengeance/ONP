@@ -21,38 +21,46 @@ export default async function ForgotPasswordPage({
       {/* Logo */}
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <div style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 800,
-          fontSize: "56px",
-          letterSpacing: "6px",
-          color: "#0A1628",
-          lineHeight: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "12px",
+          display: "inline-block",
+          background: "#0A1628",
+          borderRadius: "12px",
+          padding: "18px 36px 14px",
+          marginBottom: "4px",
         }}>
-          <span style={{ color: "#1B4F8A" }}>★</span>
-          ONP
-          <span style={{ color: "#1B4F8A" }}>★</span>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: "56px",
+            letterSpacing: "6px",
+            color: "#fff",
+            lineHeight: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+          }}>
+            <span style={{ color: "#fff" }}>★</span>
+            ONP
+            <span style={{ color: "#fff" }}>★</span>
+          </div>
+          <div style={{
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 400,
+            fontSize: "11px",
+            letterSpacing: "4px",
+            color: "#7A9CC4",
+            textTransform: "uppercase",
+            marginTop: "8px",
+          }}>
+            Our Next Project
+          </div>
+          <div style={{
+            width: "60px",
+            height: "2px",
+            background: "#C8102E",
+            margin: "12px auto 0",
+          }} />
         </div>
-        <div style={{
-          fontFamily: "'Barlow', sans-serif",
-          fontWeight: 400,
-          fontSize: "11px",
-          letterSpacing: "4px",
-          color: "#1B4F8A",
-          textTransform: "uppercase",
-          marginTop: "8px",
-        }}>
-          Our Next Project
-        </div>
-        <div style={{
-          width: "60px",
-          height: "2px",
-          background: "#C8102E",
-          margin: "16px auto 0",
-        }} />
       </div>
 
       {/* Card */}

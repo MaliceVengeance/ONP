@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             alignItems: "center",
             gap: "6px",
           }}>
-            <span style={{ color: "#C8102E" }}>★</span> ONP
+            <span style={{ color: "#fff" }}>★</span> ONP
           </div>
           <div style={{
             fontFamily: "'Barlow', sans-serif",

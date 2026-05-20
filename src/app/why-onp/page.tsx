@@ -35,7 +35,7 @@ export default async function WhyOnpPage({
             alignItems: "center",
             gap: "8px",
           }}>
-            <span style={{ color: "#C8102E" }}>★</span> ONP
+            <span style={{ color: "#fff" }}>★</span> ONP
           </div>
           <div style={{
             fontSize: "11px",
