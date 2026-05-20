@@ -8,9 +8,9 @@ export default async function NewDraftProjectPage() {
 
   const inputStyle = {
     width: "100%",
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -23,7 +23,7 @@ export default async function NewDraftProjectPage() {
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#7A9CC4",
+    color: "#1B4F8A",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -39,12 +39,12 @@ export default async function NewDraftProjectPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             New Project
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             Fill in the details below. You can publish when ready.
           </p>
         </div>
@@ -52,8 +52,8 @@ export default async function NewDraftProjectPage() {
           href="/dashboard/client/projects"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -67,8 +67,8 @@ export default async function NewDraftProjectPage() {
 
       {/* Form card */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "28px",
         marginBottom: "20px",
@@ -123,8 +123,8 @@ export default async function NewDraftProjectPage() {
 
           {/* Platform rules */}
           <div style={{
-            background: "#0A1628",
-            border: "1px solid #1B4F8A",
+            background: "#FFFFFF",
+            border: "1px solid #B8D0E8",
             borderRadius: "8px",
             padding: "16px",
             marginTop: "20px",
@@ -132,17 +132,17 @@ export default async function NewDraftProjectPage() {
             <div style={{
               fontSize: "11px",
               fontWeight: 600,
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "10px",
             }}>
               Platform Rules — Shown to All Contractors
             </div>
-            <div style={{ fontSize: "13px", color: "#4ADE80", marginBottom: "6px" }}>
+            <div style={{ fontSize: "13px", color: "#15803D", marginBottom: "6px" }}>
               ✅ The contractor is responsible for pulling all required permits.
             </div>
-            <div style={{ fontSize: "13px", color: "#4ADE80" }}>
+            <div style={{ fontSize: "13px", color: "#15803D" }}>
               ✅ The contractor is responsible for all debris removal and disposal.
             </div>
           </div>
@@ -170,8 +170,8 @@ export default async function NewDraftProjectPage() {
               href="/dashboard/client/projects"
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "12px 24px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",

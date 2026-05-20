@@ -134,12 +134,12 @@ export default async function AdminAnalyticsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Analytics
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             Platform overview and growth metrics
           </p>
         </div>
@@ -147,8 +147,8 @@ export default async function AdminAnalyticsPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -163,8 +163,8 @@ export default async function AdminAnalyticsPage() {
       {/* Platform Health */}
       {(stats.pendingVerifications + stats.pendingVetCerts + stats.unansweredRfis + stats.pendingInspectors + stats.pendingOverrides) > 0 && (
         <div style={{
-          background: "#2D2000",
-          border: "1px solid #92400E",
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
           borderRadius: "12px",
           padding: "16px 20px",
           marginBottom: "24px",
@@ -174,7 +174,7 @@ export default async function AdminAnalyticsPage() {
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#FBBF24",
+            color: "#92400E",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -187,9 +187,9 @@ export default async function AdminAnalyticsPage() {
                   fontSize: "12px",
                   padding: "6px 12px",
                   borderRadius: "6px",
-                  background: "#0A1628",
-                  color: "#FBBF24",
-                  border: "1px solid #92400E",
+                  background: "#FFFFFF",
+                  color: "#92400E",
+                  border: "1px solid #FCD34D",
                   display: "block",
                 }}>
                   {stats.pendingVerifications} directory verification{stats.pendingVerifications !== 1 ? "s" : ""} pending →
@@ -202,9 +202,9 @@ export default async function AdminAnalyticsPage() {
                   fontSize: "12px",
                   padding: "6px 12px",
                   borderRadius: "6px",
-                  background: "#0A1628",
-                  color: "#FBBF24",
-                  border: "1px solid #92400E",
+                  background: "#FFFFFF",
+                  color: "#92400E",
+                  border: "1px solid #FCD34D",
                   display: "block",
                 }}>
                   {stats.pendingVetCerts} veteran cert{stats.pendingVetCerts !== 1 ? "s" : ""} pending →
@@ -216,9 +216,9 @@ export default async function AdminAnalyticsPage() {
                 fontSize: "12px",
                 padding: "6px 12px",
                 borderRadius: "6px",
-                background: "#0A1628",
-                color: "#FBBF24",
-                border: "1px solid #92400E",
+                background: "#FFFFFF",
+                color: "#92400E",
+                border: "1px solid #FCD34D",
               }}>
                 {stats.unansweredRfis} unanswered RFI{stats.unansweredRfis !== 1 ? "s" : ""}
               </span>
@@ -229,9 +229,9 @@ export default async function AdminAnalyticsPage() {
                   fontSize: "12px",
                   padding: "6px 12px",
                   borderRadius: "6px",
-                  background: "#0A1628",
-                  color: "#FBBF24",
-                  border: "1px solid #92400E",
+                  background: "#FFFFFF",
+                  color: "#92400E",
+                  border: "1px solid #FCD34D",
                   display: "block",
                 }}>
                   {stats.pendingInspectors} inspector request{stats.pendingInspectors !== 1 ? "s" : ""} →
@@ -244,9 +244,9 @@ export default async function AdminAnalyticsPage() {
                   fontSize: "12px",
                   padding: "6px 12px",
                   borderRadius: "6px",
-                  background: "#0A1628",
-                  color: "#FBBF24",
-                  border: "1px solid #92400E",
+                  background: "#FFFFFF",
+                  color: "#92400E",
+                  border: "1px solid #FCD34D",
                   display: "block",
                 }}>
                   {stats.pendingOverrides} deadline override{stats.pendingOverrides !== 1 ? "s" : ""} →
@@ -265,8 +265,8 @@ export default async function AdminAnalyticsPage() {
           { label: "Total Bids", value: stats.totalBids, sub: `Across all projects` },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#0F2040",
-            border: "1px solid #1B4F8A",
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
             borderRadius: "12px",
             padding: "20px",
           }}>
@@ -274,7 +274,7 @@ export default async function AdminAnalyticsPage() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "40px",
-              color: "#fff",
+              color: "#0A1628",
               lineHeight: 1,
               marginBottom: "4px",
             }}>
@@ -282,14 +282,14 @@ export default async function AdminAnalyticsPage() {
             </div>
             <div style={{
               fontSize: "11px",
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "6px",
             }}>
               {s.label}
             </div>
-            <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+            <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
               {s.sub}
             </div>
           </div>
@@ -298,8 +298,8 @@ export default async function AdminAnalyticsPage() {
 
       {/* Bid volume card */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "24px",
@@ -309,7 +309,7 @@ export default async function AdminAnalyticsPage() {
           fontWeight: 700,
           fontSize: "14px",
           letterSpacing: "1px",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
@@ -319,13 +319,13 @@ export default async function AdminAnalyticsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "48px",
-          color: "#4ADE80",
+          color: "#15803D",
           lineHeight: 1,
           marginBottom: "4px",
         }}>
           ${(stats.totalBidVolume / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}
         </div>
-        <div style={{ fontSize: "12px", color: "#3A5A7A" }}>
+        <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
           Total value of all bids submitted through ONP
         </div>
       </div>
@@ -339,8 +339,8 @@ export default async function AdminAnalyticsPage() {
 
       {/* Revenue placeholder */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "24px",
         marginTop: "24px",
@@ -350,13 +350,13 @@ export default async function AdminAnalyticsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "8px",
         }}>
           Revenue Tracking
         </h2>
-        <p style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "16px" }}>
+        <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "16px" }}>
           Coming soon — will track contractor subscriptions and inspector fees.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
@@ -366,8 +366,8 @@ export default async function AdminAnalyticsPage() {
             { label: "Inspector Fees (ONP 50%)", value: "—", note: "Coming soon" },
           ].map((r) => (
             <div key={r.label} style={{
-              background: "#0A1628",
-              border: "1px solid #1B4F8A",
+              background: "#FFFFFF",
+              border: "1px solid #B8D0E8",
               borderRadius: "8px",
               padding: "16px",
               textAlign: "center",
@@ -376,14 +376,14 @@ export default async function AdminAnalyticsPage() {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "28px",
-                color: "#3A5A7A",
+                color: "#4A7FB5",
               }}>
                 {r.value}
               </div>
-              <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "4px" }}>
                 {r.label}
               </div>
-              <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
                 {r.note}
               </div>
             </div>

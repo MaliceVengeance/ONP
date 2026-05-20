@@ -36,12 +36,12 @@ export default async function AdminProjectsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             All Projects
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {projects.length} total projects
           </p>
         </div>
@@ -49,8 +49,8 @@ export default async function AdminProjectsPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -64,15 +64,15 @@ export default async function AdminProjectsPage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {projects.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No projects found.
           </div>
         ) : (
           projects.map((p) => (
             <Link key={p.id} href={`/dashboard/admin/projects/${p.id}`} style={{ textDecoration: "none" }}>
             <HoverCard style={{
-              background: "#0F2040",
-              border: "1px solid #1B4F8A",
+              background: "#EEF4FF",
+              border: "1px solid #B8D0E8",
               borderRadius: "10px",
               padding: "18px",
               display: "flex",
@@ -81,13 +81,13 @@ export default async function AdminProjectsPage() {
               gap: "16px",
             }}>
               <div>
-                <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                   {p.title ?? "Untitled"}
                 </div>
-                <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                   {p.category ?? "—"} • {p.city ?? "—"}
                 </div>
-                <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
                   Created: {new Date(p.created_at).toLocaleDateString()}
                   {p.deadline_at && (
                     <> • Deadline: {new Date(p.deadline_at).toLocaleDateString()}</>

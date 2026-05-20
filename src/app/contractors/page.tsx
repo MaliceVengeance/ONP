@@ -81,8 +81,8 @@ export default async function ContractorDirectoryPage({
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0A1628",
-      color: "#F0F4FF",
+      background: "#FFFFFF",
+      color: "#0A1628",
       fontFamily: "'Barlow', sans-serif",
     }}>
       {/* Header */}
@@ -110,7 +110,7 @@ export default async function ContractorDirectoryPage({
           <div style={{
             fontSize: "11px",
             letterSpacing: "3px",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             textTransform: "uppercase",
           }}>
             Our Next Project
@@ -121,7 +121,7 @@ export default async function ContractorDirectoryPage({
             href="/about"
             style={{
               background: "transparent",
-              color: "#7A9CC4",
+              color: "#FFFFFF",
               border: "1px solid #1B4F8A",
               padding: "8px 16px",
               borderRadius: "6px",
@@ -151,16 +151,16 @@ export default async function ContractorDirectoryPage({
 
       {/* Beta banner */}
       <div style={{
-        background: "#3D0A0A",
-        borderBottom: "1px solid #991B1B",
+        background: "#FEF2F2",
+        borderBottom: "1px solid #FCA5A5",
         padding: "10px 28px",
         textAlign: "center",
         fontSize: "12px",
-        color: "#FCA5A5",
+        color: "#991B1B",
       }}>
         <span style={{
           fontWeight: 700,
-          color: "#F87171",
+          color: "#991B1B",
           textTransform: "uppercase",
           letterSpacing: "1px",
           marginRight: "8px",
@@ -178,22 +178,22 @@ export default async function ContractorDirectoryPage({
             fontWeight: 700,
             fontSize: "48px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
             lineHeight: 1.1,
           }}>
             Contractor Directory
           </h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", margin: "12px 0 16px" }} />
-          <p style={{ fontSize: "15px", color: "#7A9CC4", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "15px", color: "#1B4F8A", lineHeight: 1.6 }}>
             All contractors listed here have been verified by ONP — licensed, insured, and ready to bid on your project.
           </p>
         </div>
 
         {/* Filters */}
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "28px",
@@ -203,7 +203,7 @@ export default async function ContractorDirectoryPage({
               <label style={{
                 display: "block",
                 fontSize: "11px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "4px",
@@ -214,9 +214,9 @@ export default async function ContractorDirectoryPage({
                 name="category"
                 defaultValue={sp.category ?? undefined}
                 style={{
-                  background: "#0A1628",
-                  border: "1px solid #1B4F8A",
-                  color: "#F0F4FF",
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  color: "#0A1628",
                   borderRadius: "6px",
                   padding: "8px 12px",
                   fontFamily: "'Barlow', sans-serif",
@@ -236,7 +236,7 @@ export default async function ContractorDirectoryPage({
               <label style={{
                 display: "block",
                 fontSize: "11px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "4px",
@@ -247,9 +247,9 @@ export default async function ContractorDirectoryPage({
                 name="state"
                 defaultValue={sp.state ?? undefined}
                 style={{
-                  background: "#0A1628",
-                  border: "1px solid #1B4F8A",
-                  color: "#F0F4FF",
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  color: "#0A1628",
                   borderRadius: "6px",
                   padding: "8px 12px",
                   fontFamily: "'Barlow', sans-serif",
@@ -269,7 +269,7 @@ export default async function ContractorDirectoryPage({
               <label style={{
                 display: "block",
                 fontSize: "11px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "4px",
@@ -280,9 +280,9 @@ export default async function ContractorDirectoryPage({
                 name="veteran"
                 defaultValue={sp.veteran || undefined}
                 style={{
-                  background: "#0A1628",
-                  border: "1px solid #1B4F8A",
-                  color: "#F0F4FF",
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  color: "#0A1628",
                   borderRadius: "6px",
                   padding: "8px 12px",
                   fontFamily: "'Barlow', sans-serif",
@@ -316,8 +316,8 @@ export default async function ContractorDirectoryPage({
               href="/contractors"
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "8px 16px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -331,7 +331,7 @@ export default async function ContractorDirectoryPage({
         </div>
 
         {/* Results count */}
-        <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "16px" }}>
+        <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "16px" }}>
           {filtered.length} verified contractor{filtered.length !== 1 ? "s" : ""} found
           {sp.category && ` in "${sp.category}"`}
           {sp.state && ` in ${sp.state}`}
@@ -341,12 +341,12 @@ export default async function ContractorDirectoryPage({
         {/* Contractor cards */}
         {filtered.length === 0 ? (
           <div style={{
-            background: "#0F2040",
-            border: "1px solid #1B4F8A",
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
             borderRadius: "12px",
             padding: "40px",
             textAlign: "center",
-            color: "#7A9CC4",
+            color: "#1B4F8A",
             fontSize: "14px",
           }}>
             No verified contractors found matching your filters.
@@ -360,8 +360,8 @@ export default async function ContractorDirectoryPage({
 
               return (
                 <div key={c.contractor_id} style={{
-                  background: "#0F2040",
-                  border: `1px solid ${c.veteran_verified ? "#92400E" : "#1B4F8A"}`,
+                  background: "#EEF4FF",
+                  border: `1px solid ${c.veteran_verified ? "#D97706" : "#B8D0E8"}`,
                   borderRadius: "12px",
                   padding: "24px",
                 }}>
@@ -371,13 +371,13 @@ export default async function ContractorDirectoryPage({
                         fontFamily: "'Barlow Condensed', sans-serif",
                         fontWeight: 700,
                         fontSize: "24px",
-                        color: "#fff",
+                        color: "#0A1628",
                         margin: 0,
                         marginBottom: "4px",
                       }}>
                         {c.business_name ?? "Unnamed Business"}
                       </h2>
-                      <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+                      <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
                         📍 {[c.city, c.state].filter(Boolean).join(", ") || "Location not listed"}
                       </div>
                     </div>
@@ -389,8 +389,8 @@ export default async function ContractorDirectoryPage({
                         fontWeight: 600,
                         padding: "4px 10px",
                         borderRadius: "20px",
-                        background: "#0D3320",
-                        color: "#4ADE80",
+                        background: "#F0FDF4",
+                        color: "#15803D",
                         border: "1px solid #166534",
                       }}>
                         ✅ ONP Verified
@@ -401,9 +401,9 @@ export default async function ContractorDirectoryPage({
                           fontWeight: 600,
                           padding: "4px 10px",
                           borderRadius: "20px",
-                          background: "#1e1a00",
-                          color: "#FBBF24",
-                          border: "1px solid #92400E",
+                          background: "#FFF7ED",
+                          color: "#B45309",
+                          border: "1px solid #D97706",
                         }}>
                           ★ Veteran Owned
                         </span>
@@ -414,9 +414,9 @@ export default async function ContractorDirectoryPage({
                           fontWeight: 600,
                           padding: "4px 10px",
                           borderRadius: "20px",
-                          background: "#3D0A0A",
-                          color: "#F87171",
-                          border: "1px solid #991B1B",
+                          background: "#FFFBEB",
+                          color: "#92400E",
+                          border: "1px solid #FCD34D",
                         }}>
                           ⚠ Review Needed
                         </span>
@@ -428,7 +428,7 @@ export default async function ContractorDirectoryPage({
                   {c.description && (
                     <p style={{
                       fontSize: "14px",
-                      color: "#B0C4DE",
+                      color: "#1B4F8A",
                       lineHeight: 1.7,
                       marginBottom: "14px",
                     }}>
@@ -444,9 +444,9 @@ export default async function ContractorDirectoryPage({
                           fontSize: "11px",
                           padding: "4px 10px",
                           borderRadius: "20px",
-                          background: "#0A1628",
-                          color: "#7A9CC4",
-                          border: "1px solid #1B4F8A",
+                          background: "#FFFFFF",
+                          color: "#1B4F8A",
+                          border: "1px solid #B8D0E8",
                         }}>
                           {cat}
                         </span>
@@ -455,12 +455,12 @@ export default async function ContractorDirectoryPage({
                   )}
 
                   {/* Expiry info */}
-                  <div style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#3A5A7A" }}>
-                    <span style={{ color: licenseExpired ? "#F87171" : "#3A5A7A" }}>
+                  <div style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#4A7FB5" }}>
+                    <span style={{ color: licenseExpired ? "#991B1B" : "#4A7FB5" }}>
                       License: {c.license_expiry ? new Date(c.license_expiry).toLocaleDateString() : "—"}
                       {licenseExpired && " ⚠"}
                     </span>
-                    <span style={{ color: coiExpired ? "#F87171" : "#3A5A7A" }}>
+                    <span style={{ color: coiExpired ? "#991B1B" : "#4A7FB5" }}>
                       COI: {c.coi_expiry ? new Date(c.coi_expiry).toLocaleDateString() : "—"}
                       {coiExpired && " ⚠"}
                     </span>
@@ -474,11 +474,11 @@ export default async function ContractorDirectoryPage({
 
       {/* Footer */}
       <footer style={{
-        borderTop: "1px solid #1B4F8A",
+        borderTop: "1px solid #B8D0E8",
         padding: "20px 28px",
         textAlign: "center",
         fontSize: "12px",
-        color: "#3A5A7A",
+        color: "#4A7FB5",
         letterSpacing: "1px",
         textTransform: "uppercase",
         marginTop: "40px",

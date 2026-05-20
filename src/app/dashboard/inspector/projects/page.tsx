@@ -35,12 +35,12 @@ export default async function InspectorProjectsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             My Assignments
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {pending.length} pending • {completed.length} completed
           </p>
         </div>
@@ -48,8 +48,8 @@ export default async function InspectorProjectsPage() {
           href="/dashboard/inspector"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -68,14 +68,14 @@ export default async function InspectorProjectsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Pending ({pending.length})
         </h2>
         {pending.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No pending assignments.
           </div>
         ) : (
@@ -91,8 +91,8 @@ export default async function InspectorProjectsPage() {
                   style={{ textDecoration: "none" }}
                 >
                   <div style={{
-                    background: "#0F2040",
-                    border: "1px solid #1B4F8A",
+                    background: "#EEF4FF",
+                    border: "1px solid #B8D0E8",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -101,10 +101,10 @@ export default async function InspectorProjectsPage() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                         {p?.category ?? "—"} • {p?.city ?? "—"}
                       </div>
                       {p?.location_general && (
@@ -113,12 +113,12 @@ export default async function InspectorProjectsPage() {
                         </div>
                       )}
                       {a.assigned_at && (
-                        <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                        <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
                           Assigned: {new Date(a.assigned_at).toLocaleDateString()}
                         </div>
                       )}
                       {deadline && (
-                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5", marginTop: "2px" }}>
+                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5", marginTop: "2px" }}>
                           {deadlinePassed ? "⚠ Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
                         </div>
                       )}
@@ -135,13 +135,13 @@ export default async function InspectorProjectsPage() {
       {/* Completed */}
       {completed.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#7A9CC4",
+            color: "#1B4F8A",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -157,8 +157,8 @@ export default async function InspectorProjectsPage() {
                   style={{ textDecoration: "none" }}
                 >
                   <div style={{
-                    background: "#0F2040",
-                    border: "1px solid #1B4F8A",
+                    background: "#EEF4FF",
+                    border: "1px solid #B8D0E8",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -168,10 +168,10 @@ export default async function InspectorProjectsPage() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                         {p?.category ?? "—"} • {p?.city ?? "—"}
                       </div>
                       {p?.location_general && (
@@ -180,7 +180,7 @@ export default async function InspectorProjectsPage() {
                         </div>
                       )}
                       {a.takeoff_completed_at && (
-                        <div style={{ fontSize: "11px", color: "#4ADE80", marginTop: "3px" }}>
+                        <div style={{ fontSize: "11px", color: "#15803D", marginTop: "3px" }}>
                           ✅ Completed: {new Date(a.takeoff_completed_at).toLocaleDateString()}
                         </div>
                       )}
@@ -190,8 +190,8 @@ export default async function InspectorProjectsPage() {
                       fontWeight: 600,
                       padding: "4px 10px",
                       borderRadius: "20px",
-                      background: "#0D3320",
-                      color: "#4ADE80",
+                      background: "#F0FDF4",
+                      color: "#15803D",
                       border: "1px solid #166534",
                     }}>
                       COMPLETED

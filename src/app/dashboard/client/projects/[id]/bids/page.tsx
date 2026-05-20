@@ -76,10 +76,10 @@ export default async function ClientProjectBidsPage({
   if (pErr) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", color: "#fff" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", color: "#0A1628" }}>
           Bids
         </h1>
-        <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px", marginTop: "16px" }}>
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B", padding: "14px", borderRadius: "8px", fontSize: "13px", marginTop: "16px" }}>
           Failed to load project: {JSON.stringify(pErr)}
         </div>
       </div>
@@ -153,9 +153,9 @@ export default async function ClientProjectBidsPage({
   }
 
   const inputStyle = {
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "8px 12px",
     fontFamily: "'Barlow', sans-serif",
@@ -173,13 +173,13 @@ export default async function ClientProjectBidsPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Bids
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
-            <span style={{ fontSize: "14px", color: "#7A9CC4" }}>
+            <span style={{ fontSize: "14px", color: "#1B4F8A" }}>
               {project.title ?? "Untitled"}
             </span>
             <span style={stateBadge(project.state)}>{project.state}</span>
@@ -189,8 +189,8 @@ export default async function ClientProjectBidsPage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -204,8 +204,8 @@ export default async function ClientProjectBidsPage({
 
       {/* Lock status */}
       <div style={{
-        background: "#0F2040",
-        border: `1px solid ${unlocked ? "#166534" : "#1B4F8A"}`,
+        background: "#EEF4FF",
+        border: `1px solid ${unlocked ? "#166534" : "#B8D0E8"}`,
         borderRadius: "10px",
         padding: "16px 20px",
         marginBottom: "20px",
@@ -219,12 +219,12 @@ export default async function ClientProjectBidsPage({
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "20px",
-            color: unlocked ? "#4ADE80" : "#7A9CC4",
+            color: unlocked ? "#15803D" : "#1B4F8A",
             letterSpacing: "1px",
           }}>
             {unlocked ? "✅ BIDS UNLOCKED" : "🔒 BIDS LOCKED"}
           </div>
-          <div style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {unlocked
               ? award
                 ? "Project has been awarded."
@@ -233,10 +233,10 @@ export default async function ClientProjectBidsPage({
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px" }}>
+          <div style={{ fontSize: "11px", color: "#4A7FB5", textTransform: "uppercase", letterSpacing: "1px" }}>
             Deadline
           </div>
-          <div style={{ fontSize: "14px", color: "#fff", fontWeight: 500, marginTop: "2px" }}>
+          <div style={{ fontSize: "14px", color: "#0A1628", fontWeight: 500, marginTop: "2px" }}>
             {deadline ? deadline.toLocaleDateString() : "—"}
           </div>
         </div>
@@ -245,9 +245,9 @@ export default async function ClientProjectBidsPage({
       {/* Award saved banner */}
       {sp.award === "ok" && (
         <div style={{
-          background: "#0D3320",
+          background: "#F0FDF4",
           border: "1px solid #166534",
-          color: "#4ADE80",
+          color: "#15803D",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -259,7 +259,7 @@ export default async function ClientProjectBidsPage({
 
       {/* RPC errors */}
       {bidsErrText && (
-        <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B", padding: "14px", borderRadius: "8px", fontSize: "13px", marginBottom: "16px" }}>
           <div style={{ fontWeight: 600, marginBottom: "8px" }}>Error loading bids</div>
           <pre style={{ fontSize: "11px", whiteSpace: "pre-wrap" }}>{bidsErrText}</pre>
         </div>
@@ -276,23 +276,23 @@ export default async function ClientProjectBidsPage({
 
         return (
           <div style={{
-            background: "#0F2040",
-            border: "1px solid #5B21B6",
+            background: "#EEF4FF",
+            border: "1px solid #1B4F8A",
             borderRadius: "12px",
             padding: "20px",
             marginBottom: "24px",
           }}>
-            <div style={{ fontSize: "11px", color: "#A78BFA", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
               ★ Winner Selected
             </div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#fff", marginBottom: "4px" }}>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#0A1628", marginBottom: "4px" }}>
               {String(name)}
             </div>
-            <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "12px" }}>
+            <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "12px" }}>
               {[city, state].filter(Boolean).join(", ") || "Location not listed"}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "12px", color: "#7A9CC4" }}>
+              <span style={{ fontSize: "12px", color: "#4A7FB5" }}>
                 Awarded: {new Date(award.awarded_at).toLocaleString()}
               </span>
               {veteran === true && (
@@ -301,9 +301,9 @@ export default async function ClientProjectBidsPage({
                   fontWeight: 600,
                   padding: "3px 10px",
                   borderRadius: "20px",
-                  background: "#1e1a00",
-                  color: "#FBBF24",
-                  border: "1px solid #92400E",
+                  background: "#FFF7ED",
+                  color: "#B45309",
+                  border: "1px solid #D97706",
                 }}>
                   ★ Veteran Owned
                 </span>
@@ -316,16 +316,16 @@ export default async function ClientProjectBidsPage({
       {/* Locked state */}
       {!unlocked ? (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "10px",
           padding: "32px",
           textAlign: "center",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           fontSize: "14px",
         }}>
           🔒 Bids are sealed until the deadline passes. Check back after{" "}
-          <span style={{ color: "#fff" }}>
+          <span style={{ color: "#0A1628" }}>
             {deadline ? deadline.toLocaleDateString() : "the deadline"}
           </span>.
         </div>
@@ -333,8 +333,8 @@ export default async function ClientProjectBidsPage({
         <>
           {/* Filters */}
           <div style={{
-            background: "#0F2040",
-            border: "1px solid #1B4F8A",
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
             borderRadius: "10px",
             padding: "20px",
             marginBottom: "20px",
@@ -344,7 +344,7 @@ export default async function ClientProjectBidsPage({
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "1px",
-              color: "#fff",
+              color: "#0A1628",
               textTransform: "uppercase",
               marginBottom: "14px",
             }}>
@@ -353,19 +353,19 @@ export default async function ClientProjectBidsPage({
 
             <form style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" }}>
               <div>
-                <label style={{ display: "block", fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                <label style={{ display: "block", fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                   Min ($)
                 </label>
                 <input name="min" defaultValue={sp.min ?? ""} style={{ ...inputStyle, width: "120px" }} placeholder="e.g. 25000" />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                <label style={{ display: "block", fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                   Max ($)
                 </label>
                 <input name="max" defaultValue={sp.max ?? ""} style={{ ...inputStyle, width: "120px" }} placeholder="e.g. 50000" />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                <label style={{ display: "block", fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                   Sort
                 </label>
                 <select name="sort" defaultValue={sort} style={inputStyle}>
@@ -390,8 +390,8 @@ export default async function ClientProjectBidsPage({
                 href={`/dashboard/client/projects/${projectId}/bids`}
                 style={{
                   background: "transparent",
-                  color: "#7A9CC4",
-                  border: "1px solid #1B4F8A",
+                  color: "#1B4F8A",
+                  border: "1px solid #B8D0E8",
                   padding: "8px 16px",
                   borderRadius: "6px",
                   fontFamily: "'Barlow', sans-serif",
@@ -403,7 +403,7 @@ export default async function ClientProjectBidsPage({
               </Link>
             </form>
 
-            <p style={{ fontSize: "12px", color: "#3A5A7A", marginTop: "12px" }}>
+            <p style={{ fontSize: "12px", color: "#4A7FB5", marginTop: "12px" }}>
               Bids are anonymous. Contractor identities are revealed only after award.
             </p>
           </div>
@@ -411,12 +411,12 @@ export default async function ClientProjectBidsPage({
           {/* Bid cards */}
           {bids.length === 0 ? (
             <div style={{
-              background: "#0F2040",
-              border: "1px solid #1B4F8A",
+              background: "#EEF4FF",
+              border: "1px solid #B8D0E8",
               borderRadius: "10px",
               padding: "32px",
               textAlign: "center",
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               fontSize: "14px",
             }}>
               No bids match your filters.
@@ -431,8 +431,8 @@ export default async function ClientProjectBidsPage({
 
                 return (
                   <div key={b.bid_id} style={{
-                    background: "#0F2040",
-                    border: `1px solid ${isAwarded ? "#5B21B6" : "#1B4F8A"}`,
+                    background: "#EEF4FF",
+                    border: `1px solid ${isAwarded ? "#1B4F8A" : "#B8D0E8"}`,
                     borderRadius: "10px",
                     padding: "20px",
                   }}>
@@ -442,17 +442,17 @@ export default async function ClientProjectBidsPage({
                           fontFamily: "'Barlow Condensed', sans-serif",
                           fontWeight: 700,
                           fontSize: "18px",
-                          color: "#7A9CC4",
+                          color: "#1B4F8A",
                           textTransform: "uppercase",
                           letterSpacing: "1px",
                           marginBottom: "4px",
                         }}>
                           Bid #{idx + 1}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#3A5A7A" }}>
+                        <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
                           Submitted: {new Date(b.submitted_at).toLocaleString()}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#3A5A7A" }}>
+                        <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
                           Version {b.version_number}
                         </div>
                       </div>
@@ -461,7 +461,7 @@ export default async function ClientProjectBidsPage({
                           fontFamily: "'Barlow Condensed', sans-serif",
                           fontWeight: 700,
                           fontSize: "32px",
-                          color: "#fff",
+                          color: "#0A1628",
                           lineHeight: 1,
                         }}>
                           {centsToMoney(b.amount_cents)}
@@ -472,15 +472,15 @@ export default async function ClientProjectBidsPage({
                     {/* Verification badges */}
                     {contractor && (
                       <div style={{
-                        background: "#0A1628",
-                        border: "1px solid #1B4F8A",
+                        background: "#FFFFFF",
+                        border: "1px solid #B8D0E8",
                         borderRadius: "8px",
                         padding: "12px 14px",
                         marginTop: "12px",
                       }}>
                         <div style={{
                           fontSize: "11px",
-                          color: "#7A9CC4",
+                          color: "#1B4F8A",
                           textTransform: "uppercase",
                           letterSpacing: "1px",
                           marginBottom: "10px",
@@ -497,8 +497,8 @@ export default async function ClientProjectBidsPage({
                               fontWeight: 600,
                               padding: "4px 10px",
                               borderRadius: "20px",
-                              background: "#0D3320",
-                              color: "#4ADE80",
+                              background: "#F0FDF4",
+                              color: "#15803D",
                               border: "1px solid #166534",
                             }}>
                               ✅ ONP Verified
@@ -509,9 +509,9 @@ export default async function ClientProjectBidsPage({
                               fontWeight: 600,
                               padding: "4px 10px",
                               borderRadius: "20px",
-                              background: "#2D2000",
-                              color: "#FBBF24",
-                              border: "1px solid #92400E",
+                              background: "#FFFBEB",
+                              color: "#92400E",
+                              border: "1px solid #FCD34D",
                             }}>
                               ⏳ Verification Pending
                             </span>
@@ -523,9 +523,9 @@ export default async function ClientProjectBidsPage({
                               fontWeight: 600,
                               padding: "4px 10px",
                               borderRadius: "20px",
-                              background: "#1e1a00",
-                              color: "#FBBF24",
-                              border: "1px solid #92400E",
+                              background: "#FFF7ED",
+                              color: "#B45309",
+                              border: "1px solid #D97706",
                             }}>
                               ★ Veteran Owned
                             </span>
@@ -535,35 +535,35 @@ export default async function ClientProjectBidsPage({
                         {/* License info */}
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>License #</div>
-                            <div style={{ color: "#F0F4FF" }}>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License #</div>
+                            <div style={{ color: "#0A1628" }}>
                               {contractor.license_number ?? "Not provided"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>License Expires</div>
-                            <div style={{ color: licenseExpired ? "#F87171" : "#F0F4FF" }}>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License Expires</div>
+                            <div style={{ color: licenseExpired ? "#991B1B" : "#0A1628" }}>
                               {formatDate(contractor.license_expiry)}
                               {licenseExpired && " ⚠ Expired"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Insurance Provider</div>
-                            <div style={{ color: "#F0F4FF" }}>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Insurance Provider</div>
+                            <div style={{ color: "#0A1628" }}>
                               {contractor.coi_provider ?? "Not provided"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>COI Expires</div>
-                            <div style={{ color: coiExpired ? "#F87171" : "#F0F4FF" }}>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>COI Expires</div>
+                            <div style={{ color: coiExpired ? "#991B1B" : "#0A1628" }}>
                               {formatDate(contractor.coi_expiry)}
                               {coiExpired && " ⚠ Expired"}
                             </div>
                           </div>
                           {contractor.coi_amount && (
                             <div>
-                              <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Coverage Amount</div>
-                              <div style={{ color: "#F0F4FF" }}>
+                              <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Coverage Amount</div>
+                              <div style={{ color: "#0A1628" }}>
                                 {fmtMoney(contractor.coi_amount)}
                               </div>
                             </div>
@@ -574,15 +574,15 @@ export default async function ClientProjectBidsPage({
 
                     {b.notes && (
                       <div style={{
-                        background: "#0A1628",
-                        border: "1px solid #1B4F8A",
+                        background: "#FFFFFF",
+                        border: "1px solid #B8D0E8",
                         borderRadius: "6px",
                         padding: "12px",
                         marginTop: "12px",
                         fontSize: "13px",
-                        color: "#7A9CC4",
+                        color: "#1B4F8A",
                       }}>
-                        <span style={{ color: "#4A7FB5", fontWeight: 600 }}>Notes: </span>
+                        <span style={{ color: "#1B4F8A", fontWeight: 600 }}>Notes: </span>
                         {b.notes}
                       </div>
                     )}
@@ -607,7 +607,7 @@ export default async function ClientProjectBidsPage({
                           >
                             Award This Bid
                           </button>
-                          <p style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "6px" }}>
+                          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "6px" }}>
                             Reveals contractor identity for this bid only.
                           </p>
                         </form>
@@ -615,7 +615,7 @@ export default async function ClientProjectBidsPage({
                         <div style={{
                           fontSize: "13px",
                           fontWeight: 600,
-                          color: "#A78BFA",
+                          color: "#1B4F8A",
                           display: "flex",
                           alignItems: "center",
                           gap: "6px",
@@ -623,7 +623,7 @@ export default async function ClientProjectBidsPage({
                           ★ Awarded Bid
                         </div>
                       ) : (
-                        <div style={{ fontSize: "13px", color: "#3A5A7A" }}>
+                        <div style={{ fontSize: "13px", color: "#4A7FB5" }}>
                           Not selected
                         </div>
                       )}

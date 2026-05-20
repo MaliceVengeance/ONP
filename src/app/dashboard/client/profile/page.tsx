@@ -18,9 +18,9 @@ export default async function ClientProfilePage({
 
   const inputStyle = {
     width: "100%",
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -33,7 +33,7 @@ export default async function ClientProfilePage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#7A9CC4",
+    color: "#1B4F8A",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -49,12 +49,12 @@ export default async function ClientProfilePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             My Profile
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
@@ -62,8 +62,8 @@ export default async function ClientProfilePage({
           href="/dashboard/client"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -78,9 +78,9 @@ export default async function ClientProfilePage({
       {/* Success banner */}
       {sp.saved === "1" && (
         <div style={{
-          background: "#0D3320",
+          background: "#F0FDF4",
           border: "1px solid #166534",
-          color: "#4ADE80",
+          color: "#15803D",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -92,8 +92,8 @@ export default async function ClientProfilePage({
 
       {/* Personal info */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "24px",
         marginBottom: "20px",
@@ -103,13 +103,13 @@ export default async function ClientProfilePage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           Personal Information
         </h2>
-        <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
           This information is kept private and is not shared with contractors.
         </p>
 
@@ -131,7 +131,7 @@ export default async function ClientProfilePage({
           />
 
           <div style={{
-            borderTop: "1px solid #1B4F8A",
+            borderTop: "1px solid #B8D0E8",
             marginTop: "24px",
             paddingTop: "20px",
           }}>
@@ -140,13 +140,13 @@ export default async function ClientProfilePage({
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "1px",
-              color: "#fff",
+              color: "#0A1628",
               textTransform: "uppercase",
               marginBottom: "4px",
             }}>
               Address
             </h3>
-            <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "8px" }}>
+            <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
               Used for billing and project location purposes only.
             </p>
 
@@ -220,24 +220,24 @@ export default async function ClientProfilePage({
 
       {/* Billing note */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "20px",
         fontSize: "13px",
-        color: "#7A9CC4",
+        color: "#1B4F8A",
       }}>
         <div style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "16px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "8px",
         }}>
           Billing Information
         </div>
-        Billing and payment processing will be available in a future update. 
+        Billing and payment processing will be available in a future update.
         Your address above will be used for billing purposes when payments are enabled.
       </div>
     </div>

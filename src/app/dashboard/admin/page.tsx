@@ -70,13 +70,13 @@ export default async function AdminDashboard() {
       accent: (overrideCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
     {
-  title: "Analytics",
-  description: "Platform growth, bid volume, and activity metrics.",
-  href: "/dashboard/admin/analytics",
-  stat: projectCount ?? 0,
-  statLabel: "total projects",
-  accent: "#1B4F8A",
-},
+      title: "Analytics",
+      description: "Platform growth, bid volume, and activity metrics.",
+      href: "/dashboard/admin/analytics",
+      stat: projectCount ?? 0,
+      statLabel: "total projects",
+      accent: "#1B4F8A",
+    },
   ];
 
   return (
@@ -87,12 +87,12 @@ export default async function AdminDashboard() {
           fontWeight: 700,
           fontSize: "36px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           margin: 0,
         }}>
           Admin Dashboard
         </h1>
-        <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+        <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
           {user.email}
         </p>
       </div>
@@ -101,7 +101,7 @@ export default async function AdminDashboard() {
         {cards.map((card) => (
           <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
             <div style={{
-              background: "#0F2040",
+              background: "#EEF4FF",
               border: `1px solid ${card.accent}`,
               borderRadius: "12px",
               padding: "24px",
@@ -115,12 +115,12 @@ export default async function AdminDashboard() {
                     fontWeight: 700,
                     fontSize: "22px",
                     letterSpacing: "0.5px",
-                    color: "#fff",
+                    color: "#0A1628",
                     marginBottom: "6px",
                   }}>
                     {card.title}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#7A9CC4", lineHeight: 1.5 }}>
+                  <div style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.5 }}>
                     {card.description}
                   </div>
                 </div>
@@ -129,14 +129,14 @@ export default async function AdminDashboard() {
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontWeight: 700,
                     fontSize: "40px",
-                    color: card.accent === "#C8102E" ? "#C8102E" : "#fff",
+                    color: card.accent === "#C8102E" ? "#C8102E" : "#0A1628",
                     lineHeight: 1,
                   }}>
                     {card.stat}
                   </div>
                   <div style={{
                     fontSize: "11px",
-                    color: "#7A9CC4",
+                    color: "#1B4F8A",
                     textTransform: "uppercase",
                     letterSpacing: "1px",
                     marginTop: "4px",
@@ -148,7 +148,7 @@ export default async function AdminDashboard() {
               <div style={{
                 marginTop: "16px",
                 paddingTop: "16px",
-                borderTop: "1px solid #1B4F8A",
+                borderTop: "1px solid #B8D0E8",
                 fontSize: "12px",
                 color: "#4A7FB5",
               }}>

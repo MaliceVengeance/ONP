@@ -47,10 +47,10 @@ export default async function AdminUserProfilePage({
   if (!profile) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#fff" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#0A1628" }}>
           User Not Found
         </h1>
-        <Link href="/dashboard/admin/users" style={{ color: "#7A9CC4", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
+        <Link href="/dashboard/admin/users" style={{ color: "#1B4F8A", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
           ← Back to Users
         </Link>
       </div>
@@ -59,11 +59,11 @@ export default async function AdminUserProfilePage({
 
   function roleColor(role: string) {
     switch (role) {
-      case "ADMIN": return { background: "#3D0A0A", color: "#F87171", border: "1px solid #991B1B" };
-      case "CLIENT": return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
-      case "CONTRACTOR": return { background: "#0D3320", color: "#4ADE80", border: "1px solid #166534" };
-      case "INSPECTOR": return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
-      default: return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+      case "ADMIN": return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
+      case "CLIENT": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+      case "CONTRACTOR": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
+      case "INSPECTOR": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
+      default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
     }
   }
 
@@ -77,7 +77,7 @@ export default async function AdminUserProfilePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             {profile.display_name ?? profile.company_name ?? "No Name"}
@@ -99,9 +99,9 @@ export default async function AdminUserProfilePage({
                 fontWeight: 600,
                 padding: "4px 10px",
                 borderRadius: "20px",
-                background: "#3D0A0A",
-                color: "#F87171",
-                border: "1px solid #991B1B",
+                background: "#FEF2F2",
+                color: "#991B1B",
+                border: "1px solid #FCA5A5",
               }}>
                 DEACTIVATED
               </span>
@@ -112,8 +112,8 @@ export default async function AdminUserProfilePage({
           href="/dashboard/admin/users"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -127,8 +127,8 @@ export default async function AdminUserProfilePage({
 
       {/* Account info */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "16px",
@@ -138,7 +138,7 @@ export default async function AdminUserProfilePage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
@@ -152,10 +152,10 @@ export default async function AdminUserProfilePage({
             { label: "Last Login", value: authUser?.user?.last_sign_in_at ? new Date(authUser.user.last_sign_in_at).toLocaleDateString() : "Never" },
           ].map((item) => (
             <div key={item.label}>
-              <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
+              <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
                 {item.label}
               </div>
-              <div style={{ fontSize: "13px", color: "#F0F4FF", wordBreak: "break-all" }}>
+              <div style={{ fontSize: "13px", color: "#0A1628", wordBreak: "break-all" }}>
                 {item.value}
               </div>
             </div>
@@ -166,8 +166,8 @@ export default async function AdminUserProfilePage({
       {/* Contact info — clients */}
       {profile.role === "CLIENT" && (profile.phone || profile.address_line1) && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "16px",
@@ -177,21 +177,21 @@ export default async function AdminUserProfilePage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}>
             Contact Information
           </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px", color: "#F0F4FF" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px", color: "#0A1628" }}>
             {profile.phone && (
               <div>
-                <span style={{ color: "#7A9CC4" }}>Phone: </span>{profile.phone}
+                <span style={{ color: "#1B4F8A" }}>Phone: </span>{profile.phone}
               </div>
             )}
             {profile.address_line1 && (
               <div>
-                <span style={{ color: "#7A9CC4" }}>Address: </span>
+                <span style={{ color: "#1B4F8A" }}>Address: </span>
                 {profile.address_line1}
                 {profile.address_line2 && `, ${profile.address_line2}`}
                 {profile.address_city && `, ${profile.address_city}`}
@@ -206,8 +206,8 @@ export default async function AdminUserProfilePage({
       {/* Contractor profile */}
       {profile.role === "CONTRACTOR" && contractorProfile && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "16px",
@@ -217,7 +217,7 @@ export default async function AdminUserProfilePage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}>
@@ -225,18 +225,18 @@ export default async function AdminUserProfilePage({
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
             <div>
-              <span style={{ color: "#7A9CC4" }}>Business: </span>
-              <span style={{ color: "#F0F4FF" }}>{contractorProfile.business_name ?? "—"}</span>
+              <span style={{ color: "#1B4F8A" }}>Business: </span>
+              <span style={{ color: "#0A1628" }}>{contractorProfile.business_name ?? "—"}</span>
             </div>
             <div>
-              <span style={{ color: "#7A9CC4" }}>Location: </span>
-              <span style={{ color: "#F0F4FF" }}>
+              <span style={{ color: "#1B4F8A" }}>Location: </span>
+              <span style={{ color: "#0A1628" }}>
                 {[contractorProfile.city, contractorProfile.state].filter(Boolean).join(", ") || "—"}
               </span>
             </div>
             <div>
-              <span style={{ color: "#7A9CC4" }}>Listed: </span>
-              <span style={{ color: "#F0F4FF" }}>{contractorProfile.is_listed ? "Yes" : "No"}</span>
+              <span style={{ color: "#1B4F8A" }}>Listed: </span>
+              <span style={{ color: "#0A1628" }}>{contractorProfile.is_listed ? "Yes" : "No"}</span>
             </div>
             {contractorProfile.veteran_verified && (
               <div style={{
@@ -247,15 +247,15 @@ export default async function AdminUserProfilePage({
                 fontWeight: 600,
                 padding: "4px 12px",
                 borderRadius: "20px",
-                background: "#1e1a00",
-                color: "#FBBF24",
-                border: "1px solid #92400E",
+                background: "#FFF7ED",
+                color: "#B45309",
+                border: "1px solid #D97706",
                 marginTop: "4px",
                 width: "fit-content",
               }}>
                 ★ Veteran Owned — Verified
                 {contractorProfile.veteran_verified_at && (
-                  <span style={{ fontWeight: 400, color: "#92400E" }}>
+                  <span style={{ fontWeight: 400, color: "#D97706" }}>
                     ({new Date(contractorProfile.veteran_verified_at).toLocaleDateString()})
                   </span>
                 )}
@@ -263,8 +263,8 @@ export default async function AdminUserProfilePage({
             )}
             {contractorProfile.description && (
               <div style={{ marginTop: "8px" }}>
-                <div style={{ color: "#7A9CC4", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Description</div>
-                <div style={{ color: "#F0F4FF", lineHeight: 1.6 }}>{contractorProfile.description}</div>
+                <div style={{ color: "#1B4F8A", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Description</div>
+                <div style={{ color: "#0A1628", lineHeight: 1.6 }}>{contractorProfile.description}</div>
               </div>
             )}
           </div>
@@ -274,8 +274,8 @@ export default async function AdminUserProfilePage({
       {/* Client projects */}
       {profile.role === "CLIENT" && (projects ?? []).length > 0 && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "16px",
@@ -285,7 +285,7 @@ export default async function AdminUserProfilePage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}>
@@ -298,11 +298,11 @@ export default async function AdminUserProfilePage({
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "10px 0",
-                borderBottom: "1px solid #1B4F8A",
+                borderBottom: "1px solid #B8D0E8",
               }}>
                 <div>
-                  <div style={{ fontSize: "14px", color: "#fff", fontWeight: 500 }}>{p.title ?? "Untitled"}</div>
-                  <div style={{ fontSize: "11px", color: "#3A5A7A" }}>{new Date(p.created_at).toLocaleDateString()}</div>
+                  <div style={{ fontSize: "14px", color: "#0A1628", fontWeight: 500 }}>{p.title ?? "Untitled"}</div>
+                  <div style={{ fontSize: "11px", color: "#4A7FB5" }}>{new Date(p.created_at).toLocaleDateString()}</div>
                 </div>
                 <span style={stateBadge(p.state)}>{p.state}</span>
               </div>
@@ -314,8 +314,8 @@ export default async function AdminUserProfilePage({
       {/* Contractor bids */}
       {profile.role === "CONTRACTOR" && (bids ?? []).length > 0 && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
         }}>
@@ -324,7 +324,7 @@ export default async function AdminUserProfilePage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}>
@@ -337,9 +337,9 @@ export default async function AdminUserProfilePage({
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "10px 0",
-                borderBottom: "1px solid #1B4F8A",
+                borderBottom: "1px solid #B8D0E8",
               }}>
-                <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
                   {new Date(b.created_at).toLocaleDateString()}
                 </div>
                 <span style={stateBadge(b.status ?? "DRAFT")}>{b.status ?? "—"}</span>

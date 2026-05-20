@@ -14,11 +14,11 @@ type SupportRequest = {
 
 function statusStyle(status: string) {
   switch (status) {
-    case "OPEN": return { background: "#3D0A0A", color: "#F87171", border: "1px solid #991B1B" };
-    case "ASSIGNED": return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
-    case "WAITING_ON_USER": return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
-    case "CLOSED": return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
-    default: return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+    case "OPEN": return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
+    case "ASSIGNED": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
+    case "WAITING_ON_USER": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    case "CLOSED": return { background: "#EEF4FF", color: "#4A7FB5", border: "1px solid #B8D0E8" };
+    default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
   }
 }
 
@@ -47,12 +47,12 @@ export default async function AdminSupportPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Support Requests
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {open.length} open ticket{open.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -60,8 +60,8 @@ export default async function AdminSupportPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -80,7 +80,7 @@ export default async function AdminSupportPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: open.length > 0 ? "#F87171" : "#fff",
+          color: open.length > 0 ? "#991B1B" : "#0A1628",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -88,7 +88,7 @@ export default async function AdminSupportPage() {
         </h2>
 
         {open.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No open requests.
           </div>
         ) : (
@@ -101,13 +101,13 @@ export default async function AdminSupportPage() {
       {/* Other tickets */}
       {others.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#7A9CC4",
+            color: "#1B4F8A",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -125,18 +125,18 @@ export default async function AdminSupportPage() {
 function SupportCard({ r }: { r: SupportRequest }) {
   return (
     <div style={{
-      background: "#0F2040",
-      border: "1px solid #1B4F8A",
+      background: "#EEF4FF",
+      border: "1px solid #B8D0E8",
       borderRadius: "10px",
       padding: "18px",
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
             {r.subject ?? "No subject"}
           </div>
           {r.type && (
-            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
               {r.type}
             </div>
           )}
@@ -153,7 +153,7 @@ function SupportCard({ r }: { r: SupportRequest }) {
               {r.description}
             </div>
           )}
-          <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+          <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
             Submitted: {new Date(r.created_at).toLocaleString()}
           </div>
         </div>

@@ -43,12 +43,12 @@ export default async function ContractorSubscribePage({
 
   function statusColor(status: string | null) {
     switch (status) {
-      case "ACTIVE": return { color: "#4ADE80", bg: "#0D3320", border: "#166534" };
-      case "TRIALING": return { color: "#60A5FA", bg: "#0D1F40", border: "#1B4F8A" };
-      case "PAST_DUE": return { color: "#FBBF24", bg: "#2D2000", border: "#92400E" };
-      case "CANCELED": return { color: "#F87171", bg: "#2D0A0A", border: "#7F1D1D" };
-      case "EXPIRED": return { color: "#9CA3AF", bg: "#111827", border: "#374151" };
-      default: return { color: "#7A9CC4", bg: "#0F2040", border: "#1B4F8A" };
+      case "ACTIVE": return { color: "#15803D", bg: "#F0FDF4", border: "#166534" };
+      case "TRIALING": return { color: "#1B4F8A", bg: "#EEF4FF", border: "#B8D0E8" };
+      case "PAST_DUE": return { color: "#92400E", bg: "#FFFBEB", border: "#FCD34D" };
+      case "CANCELED": return { color: "#991B1B", bg: "#FEF2F2", border: "#FCA5A5" };
+      case "EXPIRED": return { color: "#4A7FB5", bg: "#EEF4FF", border: "#B8D0E8" };
+      default: return { color: "#1B4F8A", bg: "#EEF4FF", border: "#B8D0E8" };
     }
   }
 
@@ -64,19 +64,19 @@ export default async function ContractorSubscribePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Subscription
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             Manage your ONP bidding platform access
           </p>
         </div>
         <Link href="/dashboard/contractor" style={{
           background: "transparent",
-          color: "#7A9CC4",
-          border: "1px solid #1B4F8A",
+          color: "#1B4F8A",
+          border: "1px solid #B8D0E8",
           padding: "8px 16px",
           borderRadius: "6px",
           fontFamily: "'Barlow', sans-serif",
@@ -90,9 +90,9 @@ export default async function ContractorSubscribePage({
       {/* Success banner */}
       {sp.success === "1" && (
         <div style={{
-          background: "#0D3320",
+          background: "#F0FDF4",
           border: "1px solid #166534",
-          color: "#4ADE80",
+          color: "#15803D",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -105,9 +105,9 @@ export default async function ContractorSubscribePage({
       {/* Checkout canceled banner */}
       {sp.canceled === "1" && (
         <div style={{
-          background: "#2D2000",
-          border: "1px solid #92400E",
-          color: "#FBBF24",
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+          color: "#92400E",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -120,9 +120,9 @@ export default async function ContractorSubscribePage({
       {/* Subscription canceled banner */}
       {sp.canceled_sub === "1" && (
         <div style={{
-          background: "#2D0A0A",
-          border: "1px solid #7F1D1D",
-          color: "#F87171",
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          color: "#991B1B",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -158,12 +158,12 @@ export default async function ContractorSubscribePage({
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "28px",
-                color: "#fff",
+                color: "#0A1628",
                 marginBottom: "4px",
               }}>
                 {planLabel(subscription.plan_type)} Plan
               </div>
-              <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+              <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
                 {subscription.price_cents
                   ? `$${(subscription.price_cents / 100).toFixed(0)}/month`
                   : "—"}
@@ -185,9 +185,9 @@ export default async function ContractorSubscribePage({
                 {subscription.status}
               </div>
               {subscription.current_period_end && (
-                <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                   {subscription.status === "CANCELED" ? "Expires" : "Renews"}:{" "}
-                  <span style={{ color: "#fff" }}>
+                  <span style={{ color: "#0A1628" }}>
                     {fmtDate(subscription.current_period_end)}
                   </span>
                 </div>
@@ -197,14 +197,14 @@ export default async function ContractorSubscribePage({
 
           {/* Cancel button — only show if active and not already pending cancellation */}
           {hasActiveSub && !subscription.cancel_at_period_end && (
-            <div style={{ marginTop: "20px", borderTop: "1px solid #1B4F8A", paddingTop: "16px" }}>
+            <div style={{ marginTop: "20px", borderTop: "1px solid #B8D0E8", paddingTop: "16px" }}>
               <form action={cancelSubscription}>
                 <button
                   type="submit"
                   style={{
                     background: "transparent",
-                    color: "#F87171",
-                    border: "1px solid #7F1D1D",
+                    color: "#991B1B",
+                    border: "1px solid #FCA5A5",
                     padding: "8px 18px",
                     borderRadius: "6px",
                     fontFamily: "'Barlow', sans-serif",
@@ -216,7 +216,7 @@ export default async function ContractorSubscribePage({
                   Cancel Subscription
                 </button>
               </form>
-              <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "8px" }}>
+              <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "8px" }}>
                 You'll keep access until {fmtDate(subscription.current_period_end)}. No refunds for partial months.
               </div>
             </div>
@@ -224,14 +224,14 @@ export default async function ContractorSubscribePage({
 
           {/* Pending cancellation notice */}
           {hasActiveSub && subscription.cancel_at_period_end && (
-            <div style={{ marginTop: "20px", borderTop: "1px solid #1B4F8A", paddingTop: "16px" }}>
+            <div style={{ marginTop: "20px", borderTop: "1px solid #B8D0E8", paddingTop: "16px" }}>
               <div style={{
                 padding: "12px 14px",
-                background: "#2D2000",
-                border: "1px solid #92400E",
+                background: "#FFFBEB",
+                border: "1px solid #FCD34D",
                 borderRadius: "8px",
                 fontSize: "13px",
-                color: "#FBBF24",
+                color: "#92400E",
               }}>
                 ⚠ Cancellation scheduled — you'll keep full access until{" "}
                 <strong>{fmtDate(subscription.current_period_end)}</strong>.
@@ -244,11 +244,11 @@ export default async function ContractorSubscribePage({
             <div style={{
               marginTop: "14px",
               padding: "12px 14px",
-              background: "#1A1000",
-              border: "1px solid #92400E",
+              background: "#FFFBEB",
+              border: "1px solid #FCD34D",
               borderRadius: "8px",
               fontSize: "13px",
-              color: "#FBBF24",
+              color: "#92400E",
             }}>
               ⚠ Your last payment failed. Please update your payment method in Stripe to restore access.
             </div>
@@ -259,11 +259,11 @@ export default async function ContractorSubscribePage({
             <div style={{
               marginTop: "14px",
               padding: "12px 14px",
-              background: "#1A0000",
-              border: "1px solid #7F1D1D",
+              background: "#FEF2F2",
+              border: "1px solid #FCA5A5",
               borderRadius: "8px",
               fontSize: "13px",
-              color: "#F87171",
+              color: "#991B1B",
             }}>
               ✖ Your subscription has been canceled. Subscribe below to restore access.
             </div>
@@ -277,8 +277,8 @@ export default async function ContractorSubscribePage({
 
           {/* Standard plan */}
           <div style={{
-            background: "#0F2040",
-            border: "1px solid #1B4F8A",
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
             borderRadius: "12px",
             padding: "24px",
           }}>
@@ -289,12 +289,12 @@ export default async function ContractorSubscribePage({
                   fontWeight: 700,
                   fontSize: "24px",
                   letterSpacing: "1px",
-                  color: "#fff",
+                  color: "#0A1628",
                   margin: 0,
                 }}>
                   Standard
                 </h2>
-                <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+                <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
                   Full access to ONP bidding platform
                 </p>
               </div>
@@ -303,12 +303,12 @@ export default async function ContractorSubscribePage({
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "36px",
-                  color: "#fff",
+                  color: "#0A1628",
                   lineHeight: 1,
                 }}>
                   $200
                 </div>
-                <div style={{ fontSize: "12px", color: "#7A9CC4" }}>per month</div>
+                <div style={{ fontSize: "12px", color: "#1B4F8A" }}>per month</div>
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
@@ -319,7 +319,7 @@ export default async function ContractorSubscribePage({
                 "File downloads",
                 "Bid history tracking",
               ].map((feature) => (
-                <div key={feature} style={{ fontSize: "13px", color: "#B0C4DE" }}>
+                <div key={feature} style={{ fontSize: "13px", color: "#1B4F8A" }}>
                   ✅ {feature}
                 </div>
               ))}
@@ -346,8 +346,8 @@ export default async function ContractorSubscribePage({
           {/* Veteran plan */}
           {isVeteran ? (
             <div style={{
-              background: "#1e1a00",
-              border: "2px solid #92400E",
+              background: "#FFF7ED",
+              border: "2px solid #D97706",
               borderRadius: "12px",
               padding: "24px",
             }}>
@@ -359,7 +359,7 @@ export default async function ContractorSubscribePage({
                       fontWeight: 700,
                       fontSize: "24px",
                       letterSpacing: "1px",
-                      color: "#FBBF24",
+                      color: "#B45309",
                       margin: 0,
                     }}>
                       Veteran
@@ -369,13 +369,13 @@ export default async function ContractorSubscribePage({
                       fontWeight: 700,
                       padding: "3px 8px",
                       borderRadius: "20px",
-                      background: "#92400E",
-                      color: "#FBBF24",
+                      background: "#D97706",
+                      color: "#FFFFFF",
                     }}>
                       ★ EXCLUSIVE
                     </span>
                   </div>
-                  <p style={{ fontSize: "13px", color: "#92400E", marginTop: "4px" }}>
+                  <p style={{ fontSize: "13px", color: "#D97706", marginTop: "4px" }}>
                     Everything in Standard — veteran discount applied
                   </p>
                 </div>
@@ -384,12 +384,12 @@ export default async function ContractorSubscribePage({
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontWeight: 700,
                     fontSize: "36px",
-                    color: "#FBBF24",
+                    color: "#B45309",
                     lineHeight: 1,
                   }}>
                     $150
                   </div>
-                  <div style={{ fontSize: "12px", color: "#92400E" }}>per month</div>
+                  <div style={{ fontSize: "12px", color: "#D97706" }}>per month</div>
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
@@ -399,7 +399,7 @@ export default async function ContractorSubscribePage({
                   "★ Featured in contractor directory",
                   "25% discount vs Standard plan",
                 ].map((feature) => (
-                  <div key={feature} style={{ fontSize: "13px", color: "#FBBF24" }}>
+                  <div key={feature} style={{ fontSize: "13px", color: "#B45309" }}>
                     ✅ {feature}
                   </div>
                 ))}
@@ -407,9 +407,9 @@ export default async function ContractorSubscribePage({
               <form action={createCheckoutSession.bind(null, "veteran")}>
                 <button type="submit" style={{
                   width: "100%",
-                  background: "#92400E",
-                  color: "#FBBF24",
-                  border: "2px solid #FBBF24",
+                  background: "#D97706",
+                  color: "#FFFFFF",
+                  border: "2px solid #B45309",
                   padding: "12px",
                   borderRadius: "6px",
                   fontFamily: "'Barlow', sans-serif",
@@ -424,8 +424,8 @@ export default async function ContractorSubscribePage({
             </div>
           ) : (
             <div style={{
-              background: "#0F2040",
-              border: "1px solid #1B4F8A",
+              background: "#EEF4FF",
+              border: "1px solid #B8D0E8",
               borderRadius: "12px",
               padding: "20px",
               opacity: 0.6,
@@ -435,18 +435,18 @@ export default async function ContractorSubscribePage({
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "24px",
-                  color: "#7A9CC4",
+                  color: "#1B4F8A",
                   margin: 0,
                 }}>
                   Veteran Plan — $150/month
                 </h2>
               </div>
-              <p style={{ fontSize: "13px", color: "#3A5A7A", marginBottom: "12px" }}>
+              <p style={{ fontSize: "13px", color: "#4A7FB5", marginBottom: "12px" }}>
                 This plan is exclusively for verified veteran-owned businesses.
               </p>
               <Link href="/dashboard/contractor/profile" style={{
                 fontSize: "13px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textDecoration: "underline",
               }}>
                 Apply for Veteran Owned Certification →
@@ -458,17 +458,17 @@ export default async function ContractorSubscribePage({
 
       {/* Beta notice */}
       <div style={{
-        background: "#0A1628",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "8px",
         padding: "14px 16px",
         marginTop: "20px",
         fontSize: "12px",
-        color: "#3A5A7A",
+        color: "#4A7FB5",
         lineHeight: 1.6,
       }}>
         ⚠ Subscriptions are currently in test mode. No real charges will be made during beta testing. Use Stripe test card{" "}
-        <strong style={{ color: "#7A9CC4" }}>4242 4242 4242 4242</strong> to test.
+        <strong style={{ color: "#1B4F8A" }}>4242 4242 4242 4242</strong> to test.
       </div>
     </div>
   );

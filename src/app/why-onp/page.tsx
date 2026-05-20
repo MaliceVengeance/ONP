@@ -11,8 +11,8 @@ export default async function WhyOnpPage({
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0A1628",
-      color: "#F0F4FF",
+      background: "#FFFFFF",
+      color: "#0A1628",
       fontFamily: "'Barlow', sans-serif",
     }}>
       {/* Header */}
@@ -40,7 +40,7 @@ export default async function WhyOnpPage({
           <div style={{
             fontSize: "11px",
             letterSpacing: "3px",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             textTransform: "uppercase",
           }}>
             Our Next Project
@@ -49,7 +49,7 @@ export default async function WhyOnpPage({
         <div style={{ display: "flex", gap: "10px" }}>
           <Link href="/contractors" style={{
             background: "transparent",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             border: "1px solid #1B4F8A",
             padding: "8px 16px",
             borderRadius: "6px",
@@ -60,7 +60,7 @@ export default async function WhyOnpPage({
           </Link>
           <Link href="/about" style={{
             background: "transparent",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             border: "1px solid #1B4F8A",
             padding: "8px 16px",
             borderRadius: "6px",
@@ -89,8 +89,8 @@ export default async function WhyOnpPage({
         {/* Welcome banner — only shown after successful subscription */}
         {isWelcome && (
           <div style={{
-            background: "#2D1B69",
-            border: "2px solid #5B21B6",
+            background: "#EEF4FF",
+            border: "2px solid #1B4F8A",
             borderRadius: "12px",
             padding: "28px",
             marginBottom: "40px",
@@ -102,12 +102,12 @@ export default async function WhyOnpPage({
               fontWeight: 700,
               fontSize: "32px",
               letterSpacing: "1px",
-              color: "#A78BFA",
+              color: "#0A1628",
               marginBottom: "8px",
             }}>
               Welcome to ONP!
             </h2>
-            <p style={{ fontSize: "15px", color: "#B0C4DE", marginBottom: "20px", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "15px", color: "#1B4F8A", marginBottom: "20px", lineHeight: 1.6 }}>
               Your subscription is active. You now have full access to the ONP bidding platform. Here's everything you need to know to get started.
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -124,8 +124,8 @@ export default async function WhyOnpPage({
               </Link>
               <Link href="/dashboard/contractor/profile" style={{
                 background: "transparent",
-                color: "#A78BFA",
-                border: "1px solid #5B21B6",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "12px 24px",
                 borderRadius: "6px",
                 textDecoration: "none",
@@ -144,14 +144,14 @@ export default async function WhyOnpPage({
             fontWeight: 700,
             fontSize: "56px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
             lineHeight: 1.1,
           }}>
             Why Choose ONP?
           </h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", margin: "16px auto" }} />
-          <p style={{ fontSize: "18px", color: "#7A9CC4", lineHeight: 1.7, maxWidth: "600px", margin: "0 auto" }}>
+          <p style={{ fontSize: "18px", color: "#1B4F8A", lineHeight: 1.7, maxWidth: "600px", margin: "0 auto" }}>
             The traditional way of finding contracting work is broken. ONP fixes it.
           </p>
         </div>
@@ -163,7 +163,7 @@ export default async function WhyOnpPage({
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "8px",
           }}>
@@ -174,21 +174,21 @@ export default async function WhyOnpPage({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0" }}>
             {/* Headers */}
             <div style={{
-              background: "#3D0A0A",
-              border: "1px solid #991B1B",
+              background: "#FEF2F2",
+              border: "1px solid #FCA5A5",
               borderRadius: "10px 0 0 0",
               padding: "14px 20px",
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
-              color: "#F87171",
+              color: "#991B1B",
               textTransform: "uppercase",
               letterSpacing: "1px",
             }}>
               ✗ Traditional Way
             </div>
             <div style={{
-              background: "#0D3320",
+              background: "#F0FDF4",
               border: "1px solid #166534",
               borderLeft: "none",
               borderRadius: "0 10px 0 0",
@@ -196,7 +196,7 @@ export default async function WhyOnpPage({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
-              color: "#4ADE80",
+              color: "#15803D",
               textTransform: "uppercase",
               letterSpacing: "1px",
             }}>
@@ -240,26 +240,26 @@ export default async function WhyOnpPage({
             ].map((row, idx) => (
               <>
                 <div key={`trad-${idx}`} style={{
-                  background: idx % 2 === 0 ? "#1A0808" : "#140606",
-                  border: "1px solid #991B1B",
+                  background: idx % 2 === 0 ? "#FFF5F5" : "#FEF2F2",
+                  border: "1px solid #FCA5A5",
                   borderTop: "none",
                   borderRadius: idx === 7 ? "0 0 0 10px" : "0",
                   padding: "14px 20px",
                   fontSize: "14px",
-                  color: "#FCA5A5",
+                  color: "#991B1B",
                   lineHeight: 1.5,
                 }}>
                   {row.traditional}
                 </div>
                 <div key={`onp-${idx}`} style={{
-                  background: idx % 2 === 0 ? "#071A10" : "#051408",
+                  background: idx % 2 === 0 ? "#F0FDF4" : "#ECFDF5",
                   border: "1px solid #166534",
                   borderTop: "none",
                   borderLeft: "none",
                   borderRadius: idx === 7 ? "0 0 10px 0" : "0",
                   padding: "14px 20px",
                   fontSize: "14px",
-                  color: "#86EFAC",
+                  color: "#15803D",
                   lineHeight: 1.5,
                 }}>
                   {row.onp}
@@ -276,7 +276,7 @@ export default async function WhyOnpPage({
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "8px",
           }}>
@@ -313,8 +313,8 @@ export default async function WhyOnpPage({
               },
             ].map((s) => (
               <div key={s.step} style={{
-                background: "#0F2040",
-                border: "1px solid #1B4F8A",
+                background: "#EEF4FF",
+                border: "1px solid #B8D0E8",
                 borderRadius: "12px",
                 padding: "20px 24px",
                 display: "flex",
@@ -337,13 +337,13 @@ export default async function WhyOnpPage({
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontWeight: 700,
                     fontSize: "20px",
-                    color: "#fff",
+                    color: "#0A1628",
                     marginBottom: "6px",
                     letterSpacing: "0.5px",
                   }}>
                     {s.title}
                   </div>
-                  <div style={{ fontSize: "14px", color: "#B0C4DE", lineHeight: 1.7 }}>
+                  <div style={{ fontSize: "14px", color: "#1B4F8A", lineHeight: 1.7 }}>
                     {s.desc}
                   </div>
                 </div>
@@ -359,7 +359,7 @@ export default async function WhyOnpPage({
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "8px",
           }}>
@@ -370,8 +370,8 @@ export default async function WhyOnpPage({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
             {/* Standard */}
             <div style={{
-              background: "#0F2040",
-              border: "1px solid #1B4F8A",
+              background: "#EEF4FF",
+              border: "1px solid #B8D0E8",
               borderRadius: "12px",
               padding: "28px",
             }}>
@@ -379,7 +379,7 @@ export default async function WhyOnpPage({
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "24px",
-                color: "#fff",
+                color: "#0A1628",
                 marginBottom: "4px",
               }}>
                 Standard
@@ -388,13 +388,13 @@ export default async function WhyOnpPage({
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "48px",
-                color: "#fff",
+                color: "#0A1628",
                 lineHeight: 1,
                 marginBottom: "4px",
               }}>
                 $200
               </div>
-              <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "20px" }}>per month</div>
+              <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "20px" }}>per month</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
                 {[
                   "Access to all open projects",
@@ -404,7 +404,7 @@ export default async function WhyOnpPage({
                   "Bid history tracking",
                   "ONP Verified badge",
                 ].map((f) => (
-                  <div key={f} style={{ fontSize: "13px", color: "#B0C4DE" }}>✅ {f}</div>
+                  <div key={f} style={{ fontSize: "13px", color: "#1B4F8A" }}>✅ {f}</div>
                 ))}
               </div>
               <Link href="/signup/contractor" style={{
@@ -424,8 +424,8 @@ export default async function WhyOnpPage({
 
             {/* Veteran */}
             <div style={{
-              background: "#1e1a00",
-              border: "2px solid #92400E",
+              background: "#FFF7ED",
+              border: "2px solid #D97706",
               borderRadius: "12px",
               padding: "28px",
             }}>
@@ -434,7 +434,7 @@ export default async function WhyOnpPage({
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "24px",
-                  color: "#FBBF24",
+                  color: "#B45309",
                   margin: 0,
                 }}>
                   Veteran
@@ -444,8 +444,8 @@ export default async function WhyOnpPage({
                   fontWeight: 700,
                   padding: "3px 8px",
                   borderRadius: "20px",
-                  background: "#92400E",
-                  color: "#FBBF24",
+                  background: "#D97706",
+                  color: "#FFFFFF",
                 }}>
                   ★ EXCLUSIVE
                 </span>
@@ -454,13 +454,13 @@ export default async function WhyOnpPage({
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "48px",
-                color: "#FBBF24",
+                color: "#B45309",
                 lineHeight: 1,
                 marginBottom: "4px",
               }}>
                 $150
               </div>
-              <div style={{ fontSize: "13px", color: "#92400E", marginBottom: "20px" }}>per month — verified veterans only</div>
+              <div style={{ fontSize: "13px", color: "#D97706", marginBottom: "20px" }}>per month — verified veterans only</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
                 {[
                   "Everything in Standard",
@@ -469,14 +469,14 @@ export default async function WhyOnpPage({
                   "25% discount vs Standard",
                   "Priority recognition from clients",
                 ].map((f) => (
-                  <div key={f} style={{ fontSize: "13px", color: "#FBBF24" }}>✅ {f}</div>
+                  <div key={f} style={{ fontSize: "13px", color: "#B45309" }}>✅ {f}</div>
                 ))}
               </div>
               <Link href="/signup/contractor" style={{
                 display: "block",
-                background: "#92400E",
-                color: "#FBBF24",
-                border: "2px solid #FBBF24",
+                background: "#D97706",
+                color: "#FFFFFF",
+                border: "2px solid #B45309",
                 padding: "12px",
                 borderRadius: "6px",
                 textDecoration: "none",
@@ -489,15 +489,15 @@ export default async function WhyOnpPage({
             </div>
           </div>
 
-          <p style={{ fontSize: "12px", color: "#3A5A7A", textAlign: "center", marginTop: "16px" }}>
+          <p style={{ fontSize: "12px", color: "#4A7FB5", textAlign: "center", marginTop: "16px" }}>
             No setup fees. No long-term contracts. Cancel anytime.
           </p>
         </div>
 
         {/* CTA */}
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "40px",
           textAlign: "center",
@@ -508,12 +508,12 @@ export default async function WhyOnpPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             marginBottom: "12px",
           }}>
             Ready to Work Smarter?
           </h2>
-          <p style={{ fontSize: "15px", color: "#7A9CC4", marginBottom: "24px", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "15px", color: "#1B4F8A", marginBottom: "24px", lineHeight: 1.6 }}>
             Join ONP and start bidding on real projects from serious clients today.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -530,8 +530,8 @@ export default async function WhyOnpPage({
             </Link>
             <Link href="/contractors" style={{
               background: "transparent",
-              color: "#7A9CC4",
-              border: "1px solid #1B4F8A",
+              color: "#1B4F8A",
+              border: "1px solid #B8D0E8",
               padding: "14px 32px",
               borderRadius: "6px",
               textDecoration: "none",
@@ -546,11 +546,11 @@ export default async function WhyOnpPage({
 
       {/* Footer */}
       <footer style={{
-        borderTop: "1px solid #1B4F8A",
+        borderTop: "1px solid #B8D0E8",
         padding: "20px 28px",
         textAlign: "center",
         fontSize: "12px",
-        color: "#3A5A7A",
+        color: "#4A7FB5",
         letterSpacing: "1px",
         textTransform: "uppercase",
       }}>

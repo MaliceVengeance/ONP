@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#0A1628" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF" }}>
       <header style={{
         background: "#0A1628",
         borderBottom: "2px solid #C8102E",
@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             fontWeight: 400,
             fontSize: "10px",
             letterSpacing: "2px",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             textTransform: "uppercase",
           }}>
             Our Next Project
@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <button style={{
             background: "transparent",
             border: "1px solid #1B4F8A",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             padding: "6px 12px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -55,17 +55,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Beta banner */}
       <div style={{
-        background: "#3D0A0A",
-        borderBottom: "1px solid #991B1B",
+        background: "#FEF2F2",
+        borderBottom: "1px solid #FCA5A5",
         padding: "6px 16px",
         textAlign: "center",
         fontSize: "11px",
-        color: "#FCA5A5",
+        color: "#991B1B",
         lineHeight: 1.5,
       }}>
         <span style={{
           fontWeight: 700,
-          color: "#F87171",
+          color: "#991B1B",
           textTransform: "uppercase",
           letterSpacing: "1px",
           marginRight: "6px",

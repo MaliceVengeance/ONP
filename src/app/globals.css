@@ -2,16 +2,16 @@
 
 :root {
   --navy: #0A1628;
-  --navy-light: #0F2040;
+  --navy-light: #EEF4FF;
   --navy-mid: #1B4F8A;
   --red: #C8102E;
   --red-dark: #9B0C22;
-  --blue-muted: #7A9CC4;
+  --blue-muted: #1B4F8A;
   --blue-mid: #4A7FB5;
-  --white: #F0F4FF;
-  --text-muted: #7A9CC4;
-  --border: #1B4F8A;
-  --gold: #FBBF24;
+  --white: #FFFFFF;
+  --text-muted: #1B4F8A;
+  --border: #B8D0E8;
+  --gold: #B45309;
 }
 
 * {
@@ -21,8 +21,8 @@
 }
 
 html, body {
-  background: var(--navy);
-  color: var(--white);
+  background: #FFFFFF;
+  color: #0A1628;
   font-family: 'Barlow', sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -33,22 +33,22 @@ h1, h2, h3, h4 {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--white);
+  color: #0A1628;
 }
 
 a {
-  color: var(--blue-muted);
+  color: #1B4F8A;
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--white);
+  color: #0A1628;
 }
 
 input, textarea, select {
-  background: #0A1628;
-  border: 1px solid var(--border);
-  color: var(--white);
+  background: #FFFFFF;
+  border: 1px solid #B8D0E8;
+  color: #0A1628;
   border-radius: 6px;
   padding: 8px 12px;
   font-family: 'Barlow', sans-serif;
@@ -62,12 +62,12 @@ input:focus, textarea:focus, select:focus {
 }
 
 input::placeholder, textarea::placeholder {
-  color: #3A5A7A;
+  color: #4A7FB5;
 }
 
 select option {
-  background: var(--navy);
-  color: var(--white);
+  background: #FFFFFF;
+  color: #0A1628;
 }
 
 button {
@@ -78,7 +78,7 @@ button {
 label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: #1B4F8A;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

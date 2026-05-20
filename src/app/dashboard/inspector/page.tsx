@@ -25,12 +25,12 @@ export default async function InspectorDashboard() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Inspector Dashboard
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
@@ -61,8 +61,8 @@ export default async function InspectorDashboard() {
           { label: "Completed", count: completed.length, accent: false },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#0F2040",
-            border: `1px solid ${s.accent ? "#C8102E" : "#1B4F8A"}`,
+            background: "#EEF4FF",
+            border: `1px solid ${s.accent ? "#C8102E" : "#B8D0E8"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -71,11 +71,11 @@ export default async function InspectorDashboard() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#fff",
+              color: s.accent ? "#C8102E" : "#0A1628",
             }}>
               {s.count}
             </div>
-            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
             </div>
           </div>
@@ -89,7 +89,7 @@ export default async function InspectorDashboard() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -97,11 +97,11 @@ export default async function InspectorDashboard() {
         </h2>
 
         {error ? (
-          <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px" }}>
+          <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B", padding: "14px", borderRadius: "8px", fontSize: "13px" }}>
             Failed to load assignments.
           </div>
         ) : active.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No active assignments.
           </div>
         ) : (
@@ -119,8 +119,8 @@ export default async function InspectorDashboard() {
                   style={{ textDecoration: "none" }}
                 >
                   <div style={{
-                    background: "#0F2040",
-                    border: "1px solid #1B4F8A",
+                    background: "#EEF4FF",
+                    border: "1px solid #B8D0E8",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -129,14 +129,14 @@ export default async function InspectorDashboard() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                         {p.title ?? "Untitled"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                         {p.category ?? "—"} • {p.city ?? "—"}
                       </div>
                       {deadline && (
-                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5" }}>
+                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5" }}>
                           {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
                         </div>
                       )}

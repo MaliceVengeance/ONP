@@ -89,11 +89,12 @@ export async function cancelSubscription() {
     cancel_at_period_end: true,
   });
 
-  // Update Supabase to reflect pending cancellation
+  // Mark as pending cancellation — keep ACTIVE so bidding still works
+  // Stripe webhook will flip to CANCELED when it actually expires
   await supabase
     .from("contractor_subscriptions")
     .update({
-      status: "CANCELED",
+      cancel_at_period_end: true,
       updated_at: new Date().toISOString(),
     })
     .eq("contractor_id", user.id);

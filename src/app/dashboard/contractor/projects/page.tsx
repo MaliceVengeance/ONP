@@ -88,12 +88,12 @@ export default async function ContractorOpenProjectsPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Open Projects
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {projects.length} of {allProjects.length} project{allProjects.length !== 1 ? "s" : ""} shown • Client identities hidden until award
           </p>
         </div>
@@ -109,7 +109,7 @@ export default async function ContractorOpenProjectsPage({
               href={buildUrl({ sort: s.value })}
               style={{
                 background: sort === s.value ? "#1B4F8A" : "transparent",
-                color: sort === s.value ? "#fff" : "#7A9CC4",
+                color: sort === s.value ? "#fff" : "#1B4F8A",
                 border: "1px solid #1B4F8A",
                 padding: "8px 16px",
                 borderRadius: "6px",
@@ -127,8 +127,8 @@ export default async function ContractorOpenProjectsPage({
 
       {/* Filters */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "10px",
         padding: "16px 20px",
         marginBottom: "20px",
@@ -141,7 +141,7 @@ export default async function ContractorOpenProjectsPage({
             <label style={{
               display: "block",
               fontSize: "11px",
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "4px",
@@ -152,9 +152,9 @@ export default async function ContractorOpenProjectsPage({
               name="category"
               defaultValue={categoryFilter}
               style={{
-                background: "#0A1628",
-                border: "1px solid #1B4F8A",
-                color: "#F0F4FF",
+                background: "#FFFFFF",
+                border: "1px solid #B8D0E8",
+                color: "#0A1628",
                 borderRadius: "6px",
                 padding: "8px 12px",
                 fontFamily: "'Barlow', sans-serif",
@@ -174,7 +174,7 @@ export default async function ContractorOpenProjectsPage({
             <label style={{
               display: "block",
               fontSize: "11px",
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "4px",
@@ -185,9 +185,9 @@ export default async function ContractorOpenProjectsPage({
               name="location"
               defaultValue={locationFilter}
               style={{
-                background: "#0A1628",
-                border: "1px solid #1B4F8A",
-                color: "#F0F4FF",
+                background: "#FFFFFF",
+                border: "1px solid #B8D0E8",
+                color: "#0A1628",
                 borderRadius: "6px",
                 padding: "8px 12px",
                 fontFamily: "'Barlow', sans-serif",
@@ -225,8 +225,8 @@ export default async function ContractorOpenProjectsPage({
               href={buildUrl({ category: "", location: "" })}
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "8px 16px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -247,9 +247,9 @@ export default async function ContractorOpenProjectsPage({
                 fontSize: "11px",
                 padding: "3px 10px",
                 borderRadius: "20px",
-                background: "#0A1628",
-                color: "#60A5FA",
-                border: "1px solid #1B4F8A",
+                background: "#FFFFFF",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
               }}>
                 Category: {categoryFilter.replaceAll("_", " ")}
               </span>
@@ -259,9 +259,9 @@ export default async function ContractorOpenProjectsPage({
                 fontSize: "11px",
                 padding: "3px 10px",
                 borderRadius: "20px",
-                background: "#0A1628",
-                color: "#60A5FA",
-                border: "1px solid #1B4F8A",
+                background: "#FFFFFF",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
               }}>
                 State: {locationFilter}
               </span>
@@ -273,12 +273,12 @@ export default async function ContractorOpenProjectsPage({
       {/* Project list */}
       {projects.length === 0 ? (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "10px",
           padding: "48px",
           textAlign: "center",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           fontSize: "14px",
         }}>
           {categoryFilter || locationFilter
@@ -298,8 +298,8 @@ export default async function ContractorOpenProjectsPage({
                 style={{ textDecoration: "none" }}
               >
                 <HoverCard style={{
-                  background: "#0F2040",
-                  border: "1px solid #1B4F8A",
+                  background: "#EEF4FF",
+                  border: "1px solid #B8D0E8",
                   borderRadius: "10px",
                   padding: "20px",
                   cursor: "pointer",
@@ -307,7 +307,7 @@ export default async function ContractorOpenProjectsPage({
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-                        <div style={{ fontWeight: 600, fontSize: "16px", color: "#fff" }}>
+                        <div style={{ fontWeight: 600, fontSize: "16px", color: "#0A1628" }}>
                           {p.title ?? "Untitled Project"}
                         </div>
                         {isUrgent && (
@@ -316,24 +316,24 @@ export default async function ContractorOpenProjectsPage({
                             fontWeight: 600,
                             padding: "2px 8px",
                             borderRadius: "20px",
-                            background: "#3D0A0A",
-                            color: "#F87171",
-                            border: "1px solid #991B1B",
+                            background: "#FEF2F2",
+                            color: "#991B1B",
+                            border: "1px solid #FCA5A5",
                             letterSpacing: "0.5px",
                           }}>
                             CLOSING SOON
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "8px" }}>
+                      <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "8px" }}>
                         <span style={{
-                          background: "#0A1628",
-                          border: "1px solid #1B4F8A",
+                          background: "#FFFFFF",
+                          border: "1px solid #B8D0E8",
                           borderRadius: "4px",
                           padding: "2px 8px",
                           fontSize: "11px",
                           marginRight: "8px",
-                          color: "#60A5FA",
+                          color: "#1B4F8A",
                         }}>
                           {p.category?.replaceAll("_", " ") ?? "—"}
                         </span>
@@ -356,7 +356,7 @@ export default async function ContractorOpenProjectsPage({
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{
                         fontSize: "11px",
-                        color: "#7A9CC4",
+                        color: "#1B4F8A",
                         textTransform: "uppercase",
                         letterSpacing: "1px",
                         marginBottom: "4px",
@@ -365,7 +365,7 @@ export default async function ContractorOpenProjectsPage({
                       </div>
                       <div style={{
                         fontSize: "13px",
-                        color: isUrgent ? "#F87171" : "#fff",
+                        color: isUrgent ? "#991B1B" : "#0A1628",
                         fontWeight: 500,
                         marginBottom: "4px",
                       }}>
@@ -374,7 +374,7 @@ export default async function ContractorOpenProjectsPage({
                       {remaining && (
                         <div style={{
                           fontSize: "12px",
-                          color: isUrgent ? "#F87171" : "#4ADE80",
+                          color: isUrgent ? "#991B1B" : "#15803D",
                           fontWeight: 600,
                         }}>
                           {remaining}
@@ -382,7 +382,7 @@ export default async function ContractorOpenProjectsPage({
                       )}
                       <div style={{
                         fontSize: "11px",
-                        color: "#3A5A7A",
+                        color: "#4A7FB5",
                         marginTop: "8px",
                       }}>
                         Published {p.published_at ? new Date(p.published_at).toLocaleDateString() : "—"}

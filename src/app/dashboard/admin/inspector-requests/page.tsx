@@ -42,12 +42,12 @@ export default async function AdminInspectorRequestsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Inspector Requests
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {pending.length} pending • {assigned.length} assigned • {completed.length} completed
           </p>
         </div>
@@ -55,8 +55,8 @@ export default async function AdminInspectorRequestsPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -75,14 +75,14 @@ export default async function AdminInspectorRequestsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: pending.length > 0 ? "#FBBF24" : "#fff",
+          color: pending.length > 0 ? "#92400E" : "#0A1628",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Needs Assignment ({pending.length})
         </h2>
         {pending.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No pending requests.
           </div>
         ) : (
@@ -91,45 +91,45 @@ export default async function AdminInspectorRequestsPage() {
               const p = projectMap.get(r.project_id);
               return (
                 <div key={r.id} style={{
-                  background: "#0F2040",
-                  border: "1px solid #92400E",
+                  background: "#EEF4FF",
+                  border: "1px solid #FCD34D",
                   borderRadius: "10px",
                   padding: "18px",
                 }}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
-  {p?.title ?? "Untitled Project"}
-</div>
-<div style={{ fontSize: "12px", color: "#7A9CC4" }}>
-  {p?.category ?? "—"} • {p?.city ?? "—"}
-</div>
-{r.requested_at && (
-  <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "3px" }}>
-    Requested: {new Date(r.requested_at).toLocaleDateString()}
-  </div>
-)}
-<Link
-  href={`/dashboard/admin/projects/${r.project_id}`}
-  style={{
-    fontSize: "11px",
-    color: "#4A7FB5",
-    textDecoration: "underline",
-    display: "inline-block",
-    marginTop: "6px",
-  }}
->
-  View project details →
-</Link>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                        {p?.title ?? "Untitled Project"}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
+                        {p?.category ?? "—"} • {p?.city ?? "—"}
+                      </div>
+                      {r.requested_at && (
+                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "3px" }}>
+                          Requested: {new Date(r.requested_at).toLocaleDateString()}
+                        </div>
+                      )}
+                      <Link
+                        href={`/dashboard/admin/projects/${r.project_id}`}
+                        style={{
+                          fontSize: "11px",
+                          color: "#4A7FB5",
+                          textDecoration: "underline",
+                          display: "inline-block",
+                          marginTop: "6px",
+                        }}
+                      >
+                        View project details →
+                      </Link>
                     </div>
                     <span style={{
                       fontSize: "11px",
                       fontWeight: 600,
                       padding: "4px 10px",
                       borderRadius: "20px",
-                      background: "#2D2000",
-                      color: "#FBBF24",
-                      border: "1px solid #92400E",
+                      background: "#FFFBEB",
+                      color: "#92400E",
+                      border: "1px solid #FCD34D",
                       flexShrink: 0,
                     }}>
                       PENDING
@@ -141,9 +141,9 @@ export default async function AdminInspectorRequestsPage() {
                       <select
                         name="inspector_id"
                         style={{
-                          background: "#0A1628",
-                          border: "1px solid #1B4F8A",
-                          color: "#F0F4FF",
+                          background: "#FFFFFF",
+                          border: "1px solid #B8D0E8",
+                          color: "#0A1628",
                           borderRadius: "6px",
                           padding: "8px 12px",
                           fontFamily: "'Barlow', sans-serif",
@@ -187,13 +187,13 @@ export default async function AdminInspectorRequestsPage() {
       {/* Assigned */}
       {assigned.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
-          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -204,8 +204,8 @@ export default async function AdminInspectorRequestsPage() {
               const p = projectMap.get(r.project_id);
               return (
                 <div key={r.id} style={{
-                  background: "#0F2040",
-                  border: "1px solid #1B4F8A",
+                  background: "#EEF4FF",
+                  border: "1px solid #B8D0E8",
                   borderRadius: "10px",
                   padding: "18px",
                   display: "flex",
@@ -213,10 +213,10 @@ export default async function AdminInspectorRequestsPage() {
                   justifyContent: "space-between",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                       {p?.title ?? "Untitled"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                    <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                       {p?.category ?? "—"} • {p?.city ?? "—"}
                     </div>
                     {r.assigned_at && (
@@ -230,9 +230,9 @@ export default async function AdminInspectorRequestsPage() {
                     fontWeight: 600,
                     padding: "4px 10px",
                     borderRadius: "20px",
-                    background: "#0D2040",
-                    color: "#60A5FA",
-                    border: "1px solid #1D4ED8",
+                    background: "#EEF4FF",
+                    color: "#1B4F8A",
+                    border: "1px solid #B8D0E8",
                   }}>
                     ASSIGNED
                   </span>
@@ -246,13 +246,13 @@ export default async function AdminInspectorRequestsPage() {
       {/* Completed */}
       {completed.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#7A9CC4",
+            color: "#1B4F8A",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -263,8 +263,8 @@ export default async function AdminInspectorRequestsPage() {
               const p = projectMap.get(r.project_id);
               return (
                 <div key={r.id} style={{
-                  background: "#0F2040",
-                  border: "1px solid #1B4F8A",
+                  background: "#EEF4FF",
+                  border: "1px solid #B8D0E8",
                   borderRadius: "10px",
                   padding: "18px",
                   display: "flex",
@@ -273,10 +273,10 @@ export default async function AdminInspectorRequestsPage() {
                   opacity: 0.7,
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                       {p?.title ?? "Untitled"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                    <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                       {p?.category ?? "—"} • {p?.city ?? "—"}
                     </div>
                   </div>
@@ -285,8 +285,8 @@ export default async function AdminInspectorRequestsPage() {
                     fontWeight: 600,
                     padding: "4px 10px",
                     borderRadius: "20px",
-                    background: "#0D3320",
-                    color: "#4ADE80",
+                    background: "#F0FDF4",
+                    color: "#15803D",
                     border: "1px solid #166534",
                   }}>
                     COMPLETED

@@ -75,8 +75,8 @@ export default async function VetCertificationPage({
     textDecoration: "none",
     display: "inline-block",
     background: active ? "#C8102E" : "transparent",
-    color: active ? "#fff" : "#7A9CC4",
-    border: active ? "none" : "1px solid #1B4F8A",
+    color: active ? "#fff" : "#1B4F8A",
+    border: active ? "none" : "1px solid #B8D0E8",
   } as React.CSSProperties);
 
   return (
@@ -89,12 +89,12 @@ export default async function VetCertificationPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Contractor Verification
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {dirPending.length} directory pending • {vetPending.length} veteran pending
           </p>
         </div>
@@ -102,8 +102,8 @@ export default async function VetCertificationPage({
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -158,7 +158,7 @@ export default async function VetCertificationPage({
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: dirPending.length > 0 ? "#60A5FA" : "#fff",
+              color: dirPending.length > 0 ? "#1B4F8A" : "#0A1628",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}>
@@ -166,7 +166,7 @@ export default async function VetCertificationPage({
             </h2>
 
             {dirPending.length === 0 ? (
-              <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+              <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
                 No pending directory verification requests.
               </div>
             ) : (
@@ -176,25 +176,25 @@ export default async function VetCertificationPage({
                   const coiExpired = isExpired(p.coi_expiry);
                   return (
                     <div key={p.contractor_id} style={{
-                      background: "#0F2040",
-                      border: "1px solid #1D4ED8",
+                      background: "#EEF4FF",
+                      border: "1px solid #1B4F8A",
                       borderRadius: "10px",
                       padding: "18px",
                     }}>
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
                         <div>
-                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                             {p.business_name ?? "No business name set"}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                          <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                             {[p.city, p.state].filter(Boolean).join(", ") || "No location set"}
                           </div>
                         </div>
                         <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
                           <form action={approveDirectoryVerification.bind(null, p.contractor_id)}>
                             <button style={{
-                              background: "#0D3320",
-                              color: "#4ADE80",
+                              background: "#F0FDF4",
+                              color: "#15803D",
                               border: "1px solid #166534",
                               padding: "8px 16px",
                               borderRadius: "6px",
@@ -208,9 +208,9 @@ export default async function VetCertificationPage({
                           </form>
                           <form action={rejectDirectoryVerification.bind(null, p.contractor_id)}>
                             <button style={{
-                              background: "#3D0A0A",
-                              color: "#F87171",
-                              border: "1px solid #991B1B",
+                              background: "#FEF2F2",
+                              color: "#991B1B",
+                              border: "1px solid #FCA5A5",
                               padding: "8px 16px",
                               borderRadius: "6px",
                               fontFamily: "'Barlow', sans-serif",
@@ -226,41 +226,41 @@ export default async function VetCertificationPage({
 
                       {/* License & COI details */}
                       <div style={{
-                        background: "#0A1628",
-                        border: "1px solid #1B4F8A",
+                        background: "#FFFFFF",
+                        border: "1px solid #B8D0E8",
                         borderRadius: "8px",
                         padding: "12px 14px",
                       }}>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>License #</div>
-                            <div style={{ color: "#F0F4FF" }}>{p.license_number ?? "—"}</div>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License #</div>
+                            <div style={{ color: "#0A1628" }}>{p.license_number ?? "—"}</div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>License Expires</div>
-                            <div style={{ color: licenseExpired ? "#F87171" : "#F0F4FF" }}>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License Expires</div>
+                            <div style={{ color: licenseExpired ? "#991B1B" : "#0A1628" }}>
                               {formatDate(p.license_expiry)}
                               {licenseExpired && " ⚠ EXPIRED"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Insurance Provider</div>
-                            <div style={{ color: "#F0F4FF" }}>{p.coi_provider ?? "—"}</div>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Insurance Provider</div>
+                            <div style={{ color: "#0A1628" }}>{p.coi_provider ?? "—"}</div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Policy #</div>
-                            <div style={{ color: "#F0F4FF" }}>{p.coi_policy_number ?? "—"}</div>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Policy #</div>
+                            <div style={{ color: "#0A1628" }}>{p.coi_policy_number ?? "—"}</div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>COI Expires</div>
-                            <div style={{ color: coiExpired ? "#F87171" : "#F0F4FF" }}>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>COI Expires</div>
+                            <div style={{ color: coiExpired ? "#991B1B" : "#0A1628" }}>
                               {formatDate(p.coi_expiry)}
                               {coiExpired && " ⚠ EXPIRED"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#7A9CC4", marginBottom: "2px" }}>Coverage Amount</div>
-                            <div style={{ color: "#F0F4FF" }}>{fmtMoney(p.coi_amount)}</div>
+                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Coverage Amount</div>
+                            <div style={{ color: "#0A1628" }}>{fmtMoney(p.coi_amount)}</div>
                           </div>
                         </div>
                       </div>
@@ -274,13 +274,13 @@ export default async function VetCertificationPage({
           {/* Approved */}
           {dirApproved.length > 0 && (
             <div>
-              <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+              <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
               <h2 style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "18px",
                 letterSpacing: "1px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
@@ -289,8 +289,8 @@ export default async function VetCertificationPage({
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {dirApproved.map((p) => (
                   <div key={p.contractor_id} style={{
-                    background: "#0F2040",
-                    border: "1px solid #1B4F8A",
+                    background: "#EEF4FF",
+                    border: "1px solid #B8D0E8",
                     borderRadius: "10px",
                     padding: "16px 18px",
                     display: "flex",
@@ -299,14 +299,14 @@ export default async function VetCertificationPage({
                     opacity: 0.8,
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                         {p.business_name ?? "No name"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                      <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                         {[p.city, p.state].filter(Boolean).join(", ") || "—"}
                       </div>
                       {p.directory_verified_at && (
-                        <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "2px" }}>
+                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>
                           Verified: {formatDate(p.directory_verified_at)}
                         </div>
                       )}
@@ -316,8 +316,8 @@ export default async function VetCertificationPage({
                       fontWeight: 600,
                       padding: "4px 10px",
                       borderRadius: "20px",
-                      background: "#0D3320",
-                      color: "#4ADE80",
+                      background: "#F0FDF4",
+                      color: "#15803D",
                       border: "1px solid #166534",
                     }}>
                       ✅ Verified
@@ -339,7 +339,7 @@ export default async function VetCertificationPage({
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: vetPending.length > 0 ? "#FBBF24" : "#fff",
+              color: vetPending.length > 0 ? "#92400E" : "#0A1628",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}>
@@ -347,36 +347,36 @@ export default async function VetCertificationPage({
             </h2>
 
             {vetPending.length === 0 ? (
-              <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+              <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
                 No pending veteran applications.
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {vetPending.map((a) => (
                   <div key={a.contractor_id} style={{
-                    background: "#0F2040",
-                    border: "1px solid #92400E",
+                    background: "#EEF4FF",
+                    border: "1px solid #FCD34D",
                     borderRadius: "10px",
                     padding: "18px",
                   }}>
                     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                        <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                           {a.business_name ?? "No business name set"}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                        <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                           {[a.city, a.state].filter(Boolean).join(", ") || "No location set"}
                         </div>
-                        <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                        <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
                           Applied: {formatDate(a.veteran_applied_at)}
                         </div>
                       </div>
                       <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
                         <form action={approveVetCert.bind(null, a.contractor_id)}>
                           <button style={{
-                            background: "#1e1a00",
-                            color: "#FBBF24",
-                            border: "1px solid #92400E",
+                            background: "#FFF7ED",
+                            color: "#B45309",
+                            border: "1px solid #D97706",
                             padding: "8px 16px",
                             borderRadius: "6px",
                             fontFamily: "'Barlow', sans-serif",
@@ -389,9 +389,9 @@ export default async function VetCertificationPage({
                         </form>
                         <form action={rejectVetCert.bind(null, a.contractor_id)}>
                           <button style={{
-                            background: "#3D0A0A",
-                            color: "#F87171",
-                            border: "1px solid #991B1B",
+                            background: "#FEF2F2",
+                            color: "#991B1B",
+                            border: "1px solid #FCA5A5",
                             padding: "8px 16px",
                             borderRadius: "6px",
                             fontFamily: "'Barlow', sans-serif",
@@ -413,13 +413,13 @@ export default async function VetCertificationPage({
           {/* Approved veterans */}
           {vetApproved.length > 0 && (
             <div>
-              <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+              <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
               <h2 style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "18px",
                 letterSpacing: "1px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
@@ -428,8 +428,8 @@ export default async function VetCertificationPage({
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {vetApproved.map((a) => (
                   <div key={a.contractor_id} style={{
-                    background: "#0F2040",
-                    border: "1px solid #1B4F8A",
+                    background: "#EEF4FF",
+                    border: "1px solid #B8D0E8",
                     borderRadius: "10px",
                     padding: "16px 18px",
                     display: "flex",
@@ -438,10 +438,10 @@ export default async function VetCertificationPage({
                     opacity: 0.8,
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                         {a.business_name ?? "No name"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                      <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                         {[a.city, a.state].filter(Boolean).join(", ") || "—"}
                       </div>
                     </div>
@@ -450,9 +450,9 @@ export default async function VetCertificationPage({
                       fontWeight: 600,
                       padding: "4px 10px",
                       borderRadius: "20px",
-                      background: "#1e1a00",
-                      color: "#FBBF24",
-                      border: "1px solid #92400E",
+                      background: "#FFF7ED",
+                      color: "#B45309",
+                      border: "1px solid #D97706",
                     }}>
                       ★ Certified
                     </span>

@@ -12,7 +12,7 @@ export default async function LoginPage({
   return (
     <main style={{
       minHeight: "100vh",
-      background: "#0A1628",
+      background: "#FFFFFF",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -26,23 +26,23 @@ export default async function LoginPage({
           fontWeight: 800,
           fontSize: "56px",
           letterSpacing: "6px",
-          color: "#fff",
+          color: "#0A1628",
           lineHeight: 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           gap: "12px",
         }}>
-          <span style={{ color: "#C8102E" }}>★</span>
+          <span style={{ color: "#1B4F8A" }}>★</span>
           ONP
-          <span style={{ color: "#C8102E" }}>★</span>
+          <span style={{ color: "#1B4F8A" }}>★</span>
         </div>
         <div style={{
           fontFamily: "'Barlow', sans-serif",
           fontWeight: 400,
           fontSize: "11px",
           letterSpacing: "4px",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           textTransform: "uppercase",
           marginTop: "8px",
         }}>
@@ -58,8 +58,8 @@ export default async function LoginPage({
 
 {/* Beta banner */}
 <div style={{
-  background: "#3D0A0A",
-  border: "1px solid #991B1B",
+  background: "#FEF2F2",
+  border: "1px solid #FCA5A5",
   borderRadius: "8px",
   padding: "12px 20px",
   marginBottom: "20px",
@@ -70,14 +70,14 @@ export default async function LoginPage({
   <div style={{
     fontSize: "11px",
     fontWeight: 700,
-    color: "#F87171",
+    color: "#991B1B",
     textTransform: "uppercase",
     letterSpacing: "1px",
     marginBottom: "4px",
   }}>
     ⚠ Experimental Beta
   </div>
-  <div style={{ fontSize: "12px", color: "#FCA5A5", lineHeight: 1.5 }}>
+  <div style={{ fontSize: "12px", color: "#991B1B", lineHeight: 1.5 }}>
     This platform is currently in beta testing. All projects, bids, and contractor profiles are for testing purposes only and should not be considered legitimate business transactions.
   </div>
 </div>
@@ -86,8 +86,8 @@ export default async function LoginPage({
       <div style={{
         width: "100%",
         maxWidth: "380px",
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "32px",
       }}>
@@ -96,7 +96,7 @@ export default async function LoginPage({
           fontWeight: 700,
           fontSize: "24px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           marginBottom: "24px",
           textAlign: "center",
         }}>
@@ -105,9 +105,9 @@ export default async function LoginPage({
 
         {error && (
           <div style={{
-            background: "#3D0A0A",
-            border: "1px solid #991B1B",
-            color: "#F87171",
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
             padding: "10px 14px",
             borderRadius: "6px",
             fontSize: "13px",
@@ -125,7 +125,7 @@ export default async function LoginPage({
               display: "block",
               fontSize: "11px",
               fontWeight: 500,
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "6px",
@@ -138,9 +138,9 @@ export default async function LoginPage({
               required
               style={{
                 width: "100%",
-                background: "#0A1628",
-                border: "1px solid #1B4F8A",
-                color: "#F0F4FF",
+                background: "#FFFFFF",
+                border: "1px solid #B8D0E8",
+                color: "#0A1628",
                 borderRadius: "6px",
                 padding: "10px 14px",
                 fontFamily: "'Barlow', sans-serif",
@@ -155,7 +155,7 @@ export default async function LoginPage({
               display: "block",
               fontSize: "11px",
               fontWeight: 500,
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "6px",
@@ -168,9 +168,9 @@ export default async function LoginPage({
               required
               style={{
                 width: "100%",
-                background: "#0A1628",
-                border: "1px solid #1B4F8A",
-                color: "#F0F4FF",
+                background: "#FFFFFF",
+                border: "1px solid #B8D0E8",
+                color: "#0A1628",
                 borderRadius: "6px",
                 padding: "10px 14px",
                 fontFamily: "'Barlow', sans-serif",
@@ -203,26 +203,26 @@ export default async function LoginPage({
         </form>
 
         <div style={{
-          borderTop: "1px solid #1B4F8A",
+          borderTop: "1px solid #B8D0E8",
           marginTop: "24px",
           paddingTop: "20px",
           display: "flex",
           flexDirection: "column",
           gap: "10px",
         }}>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
             Need a client account?{" "}
-            <Link href="/signup" style={{ color: "#F0F4FF", textDecoration: "underline" }}>
+            <Link href="/signup" style={{ color: "#0A1628", textDecoration: "underline" }}>
               Sign up
             </Link>
           </p>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
             Contractor?{" "}
-            <Link href="/signup/contractor" style={{ color: "#F0F4FF", textDecoration: "underline" }}>
+            <Link href="/signup/contractor" style={{ color: "#0A1628", textDecoration: "underline" }}>
               Sign up here
             </Link>
-            <p style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center" }}>
-  <Link href="/forgot-password" style={{ color: "#F0F4FF", textDecoration: "underline" }}>
+            <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
+  <Link href="/forgot-password" style={{ color: "#0A1628", textDecoration: "underline" }}>
     Forgot your password?
   </Link>
 </p>
@@ -234,7 +234,7 @@ export default async function LoginPage({
       <div style={{
         marginTop: "32px",
         fontSize: "11px",
-        color: "#3A5A7A",
+        color: "#4A7FB5",
         textAlign: "center",
         letterSpacing: "1px",
         textTransform: "uppercase",
@@ -245,30 +245,30 @@ export default async function LoginPage({
       <div style={{
   marginTop: "20px",
   fontSize: "12px",
-  color: "#3A5A7A",
+  color: "#4A7FB5",
   textAlign: "center",
 }}>
-  <Link href="/about" style={{ color: "#7A9CC4", textDecoration: "underline" }}>
+  <Link href="/about" style={{ color: "#1B4F8A", textDecoration: "underline" }}>
     About ONP
   </Link>
 </div>
 <div style={{
   marginTop: "10px",
   fontSize: "12px",
-  color: "#3A5A7A",
+  color: "#4A7FB5",
   textAlign: "center",
 }}>
-  <Link href="/why-onp" style={{ color: "#7A9CC4", textDecoration: "underline" }}>
+  <Link href="/why-onp" style={{ color: "#1B4F8A", textDecoration: "underline" }}>
     Why ONP?
   </Link>
 </div>
 <div style={{
   marginTop: "10px",
   fontSize: "12px",
-  color: "#3A5A7A",
+  color: "#4A7FB5",
   textAlign: "center",
 }}>
-  <Link href="/contractors" style={{ color: "#7A9CC4", textDecoration: "underline" }}>
+  <Link href="/contractors" style={{ color: "#1B4F8A", textDecoration: "underline" }}>
     Contractor Directory
   </Link>
 </div>

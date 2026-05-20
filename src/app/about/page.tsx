@@ -4,8 +4,8 @@ export default function AboutPage() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0A1628",
-      color: "#F0F4FF",
+      background: "#FFFFFF",
+      color: "#0A1628",
       fontFamily: "'Barlow', sans-serif",
     }}>
       {/* Header */}
@@ -33,7 +33,7 @@ export default function AboutPage() {
           <div style={{
             fontSize: "11px",
             letterSpacing: "3px",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             textTransform: "uppercase",
           }}>
             Our Next Project
@@ -44,7 +44,7 @@ export default function AboutPage() {
           href="/login"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
+            color: "#FFFFFF",
             border: "1px solid #1B4F8A",
             padding: "8px 20px",
             borderRadius: "6px",
@@ -59,16 +59,16 @@ export default function AboutPage() {
 
       {/* Beta banner */}
       <div style={{
-        background: "#3D0A0A",
-        borderBottom: "1px solid #991B1B",
+        background: "#FEF2F2",
+        borderBottom: "1px solid #FCA5A5",
         padding: "10px 28px",
         textAlign: "center",
         fontSize: "12px",
-        color: "#FCA5A5",
+        color: "#991B1B",
       }}>
         <span style={{
           fontWeight: 700,
-          color: "#F87171",
+          color: "#991B1B",
           textTransform: "uppercase",
           letterSpacing: "1px",
           marginRight: "8px",
@@ -88,7 +88,7 @@ export default function AboutPage() {
             fontWeight: 700,
             fontSize: "52px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             marginBottom: "8px",
             lineHeight: 1.1,
           }}>
@@ -102,7 +102,7 @@ export default function AboutPage() {
           }} />
           <p style={{
             fontSize: "20px",
-            color: "#7A9CC4",
+            color: "#1B4F8A",
             lineHeight: 1.7,
             fontStyle: "italic",
           }}>
@@ -110,7 +110,7 @@ export default function AboutPage() {
           </p>
           <p style={{
             fontSize: "22px",
-            color: "#fff",
+            color: "#0A1628",
             lineHeight: 1.7,
             fontWeight: 600,
             marginTop: "12px",
@@ -121,13 +121,13 @@ export default function AboutPage() {
 
         {/* Intro */}
         <div style={{ marginBottom: "48px" }}>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             For most people, hiring contractors is stressful, unclear, and heavily dependent on trust alone. Pricing can vary wildly, communication can break down, and many clients are left wondering whether they are truly getting fair competition or accurate information.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             ONP was created to change that.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9 }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9 }}>
             We are an online bid depository designed to bring structure, transparency, and accountability to the project bidding process for homeowners, property owners, and small businesses.
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function AboutPage() {
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             marginBottom: "8px",
             textTransform: "uppercase",
           }}>
@@ -147,24 +147,24 @@ export default function AboutPage() {
           </h2>
           <div style={{ width: "40px", height: "2px", background: "#C8102E", marginBottom: "24px" }} />
 
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             Traditional contractor searches often rely on phone calls, referrals, or rushed estimates. ONP introduces a more organized and transparent process designed to protect both clients and contractors.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             Projects are submitted through our platform and opened to competitive bidding within controlled timeframes. Contractors submit blind bids, meaning pricing remains hidden until the bidding period closes. This helps reduce price manipulation and encourages honest competition.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             To improve project clarity, ONP also allows for independent project inspections and take-offs when needed. This gives contractors more accurate information before bidding and helps clients receive more realistic proposals.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9 }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9 }}>
             Our platform also limits unnecessary back-and-forth communication that often leads to confusion or off-platform negotiations. Instead, contractors can submit structured RFIs (Requests for Information) directly through the system to keep communication organized and documented.
           </p>
         </div>
 
         {/* Built for Contractors Too */}
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "32px",
           marginBottom: "48px",
@@ -174,7 +174,7 @@ export default function AboutPage() {
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             marginBottom: "8px",
             textTransform: "uppercase",
           }}>
@@ -182,16 +182,16 @@ export default function AboutPage() {
           </h2>
           <div style={{ width: "40px", height: "2px", background: "#C8102E", marginBottom: "24px" }} />
 
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             ONP is not designed to race contractors to the bottom.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             We believe skilled contractors deserve access to legitimate opportunities without wasting time chasing incomplete scopes, unclear expectations, or leads that were never serious to begin with.
           </p>
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "16px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "16px" }}>
             By creating standardized project information, structured bidding windows, and monitored communication, we aim to create a system where professionalism and quality work stand out.
           </p>
-          <p style={{ fontSize: "16px", color: "#4ADE80", lineHeight: 1.9, fontWeight: 500 }}>
+          <p style={{ fontSize: "16px", color: "#15803D", lineHeight: 1.9, fontWeight: 500 }}>
             We are especially proud to support veteran-owned businesses and contractors who take pride in craftsmanship, accountability, and service.
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function AboutPage() {
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             marginBottom: "8px",
             textTransform: "uppercase",
           }}>
@@ -211,7 +211,7 @@ export default function AboutPage() {
           </h2>
           <div style={{ width: "40px", height: "2px", background: "#C8102E", marginBottom: "24px" }} />
 
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "20px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "20px" }}>
             Our mission is to create a fairer, more transparent project marketplace where:
           </p>
 
@@ -224,23 +224,23 @@ export default function AboutPage() {
             ].map((item) => (
               <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
                 <span style={{ color: "#C8102E", fontSize: "18px", flexShrink: 0, marginTop: "2px" }}>★</span>
-                <span style={{ fontSize: "16px", color: "#F0F4FF", lineHeight: 1.7 }}>{item}</span>
+                <span style={{ fontSize: "16px", color: "#0A1628", lineHeight: 1.7 }}>{item}</span>
               </div>
             ))}
           </div>
 
-          <p style={{ fontSize: "16px", color: "#B0C4DE", lineHeight: 1.9, marginBottom: "8px" }}>
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "8px" }}>
             We believe better projects start with better processes.
           </p>
-          <p style={{ fontSize: "18px", color: "#fff", fontWeight: 600, lineHeight: 1.7 }}>
+          <p style={{ fontSize: "18px", color: "#0A1628", fontWeight: 600, lineHeight: 1.7 }}>
             And this is only the beginning.
           </p>
         </div>
 
         {/* Founder */}
         <div style={{
-          background: "#1e1a00",
-          border: "1px solid #92400E",
+          background: "#FFF7ED",
+          border: "1px solid #D97706",
           borderRadius: "12px",
           padding: "32px",
           marginBottom: "48px",
@@ -250,21 +250,21 @@ export default function AboutPage() {
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#FBBF24",
+            color: "#B45309",
             marginBottom: "8px",
             textTransform: "uppercase",
           }}>
             ★ Our Founder
           </h2>
-          <div style={{ width: "40px", height: "2px", background: "#92400E", marginBottom: "24px" }} />
-          <p style={{ fontSize: "16px", color: "#FDE68A", lineHeight: 1.9 }}>
+          <div style={{ width: "40px", height: "2px", background: "#D97706", marginBottom: "24px" }} />
+          <p style={{ fontSize: "16px", color: "#92400E", lineHeight: 1.9 }}>
             ONP was founded by Samuel Bravo, a CAD and infrastructure design professional with years of experience coordinating real-world project documentation, revisions, and contractor workflows. His firsthand experience with unclear scopes, field discrepancies, and communication breakdowns gave ONP its foundation — and its purpose.
           </p>
         </div>
 
         {/* CTA */}
         <div style={{ textAlign: "center", paddingTop: "20px", paddingBottom: "40px" }}>
-          <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "1px" }}>
+          <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "1px" }}>
             Ready to get started?
           </div>
           <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -290,8 +290,8 @@ export default function AboutPage() {
               href="/signup/contractor"
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "14px 32px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -307,8 +307,8 @@ export default function AboutPage() {
               href="/login"
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "14px 32px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -327,11 +327,11 @@ export default function AboutPage() {
 
       {/* Footer */}
       <footer style={{
-        borderTop: "1px solid #1B4F8A",
+        borderTop: "1px solid #B8D0E8",
         padding: "20px 28px",
         textAlign: "center",
         fontSize: "12px",
-        color: "#3A5A7A",
+        color: "#4A7FB5",
         letterSpacing: "1px",
         textTransform: "uppercase",
       }}>

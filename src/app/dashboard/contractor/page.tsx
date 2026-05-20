@@ -92,7 +92,7 @@ export default async function ContractorDashboard({
       {/* Welcome banner */}
       {showWelcome && (
         <div style={{
-          background: "linear-gradient(135deg, #0D3320 0%, #0F2040 100%)",
+          background: "#F0FDF4",
           border: "1px solid #166534",
           borderRadius: "12px",
           padding: "24px 28px",
@@ -108,12 +108,12 @@ export default async function ContractorDashboard({
               fontWeight: 700,
               fontSize: "26px",
               letterSpacing: "1px",
-              color: "#4ADE80",
+              color: "#15803D",
               marginBottom: "6px",
             }}>
               Welcome to ONP!
             </div>
-            <div style={{ fontSize: "14px", color: "#86EFAC", marginBottom: "12px" }}>
+            <div style={{ fontSize: "14px", color: "#166534", marginBottom: "12px" }}>
               Your subscription is active. You now have full access to the ONP bidding platform.
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
@@ -131,7 +131,7 @@ export default async function ContractorDashboard({
               </Link>
               <Link href="/dashboard/contractor/profile" style={{
                 background: "transparent",
-                color: "#4ADE80",
+                color: "#15803D",
                 border: "1px solid #166534",
                 padding: "8px 18px",
                 borderRadius: "6px",
@@ -155,12 +155,12 @@ export default async function ContractorDashboard({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Contractor Dashboard
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
@@ -180,8 +180,8 @@ export default async function ContractorDashboard({
           Browse Projects
         </Link>
         <Link href="/dashboard/contractor/subscribe" style={{
-          background: "#0D3320",
-          color: "#4ADE80",
+          background: "#F0FDF4",
+          color: "#15803D",
           border: "1px solid #166534",
           padding: "10px 20px",
           borderRadius: "6px",
@@ -200,8 +200,8 @@ export default async function ContractorDashboard({
         const branch = getBranchInfo(militaryBranch);
         return (
           <div style={{
-            background: "#1e1a00",
-            border: "1px solid #92400E",
+            background: "#FFF7ED",
+            border: "1px solid #D97706",
             borderRadius: "12px",
             padding: "20px 24px",
             marginBottom: "28px",
@@ -218,12 +218,12 @@ export default async function ContractorDashboard({
                 fontWeight: 700,
                 fontSize: "22px",
                 letterSpacing: "1px",
-                color: "#FBBF24",
+                color: "#B45309",
                 marginBottom: "4px",
               }}>
                 Thank You For Your Service
               </div>
-              <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+              <div style={{ fontSize: "13px", color: "#92400E" }}>
                 {branch.label} • Certified Veteran Owned Business
               </div>
             </div>
@@ -233,9 +233,9 @@ export default async function ContractorDashboard({
               fontWeight: 600,
               padding: "6px 14px",
               borderRadius: "20px",
-              background: "#1e1a00",
-              color: "#FBBF24",
-              border: "1px solid #92400E",
+              background: "#FFF7ED",
+              color: "#B45309",
+              border: "1px solid #D97706",
               flexShrink: 0,
             }}>
               ★ VERIFIED
@@ -253,8 +253,8 @@ export default async function ContractorDashboard({
           { label: "New Projects", count: unbidProjects.length, accent: unbidProjects.length > 0 },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#0F2040",
-            border: `1px solid ${s.accent ? "#C8102E" : "#1B4F8A"}`,
+            background: "#EEF4FF",
+            border: `1px solid ${s.accent ? "#C8102E" : "#B8D0E8"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -263,11 +263,11 @@ export default async function ContractorDashboard({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#fff",
+              color: s.accent ? "#C8102E" : "#0A1628",
             }}>
               {s.count}
             </div>
-            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
             </div>
           </div>
@@ -282,8 +282,8 @@ export default async function ContractorDashboard({
         ].map((l) => (
           <Link key={l.href} href={l.href} style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 18px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -314,8 +314,8 @@ export default async function ContractorDashboard({
             {unbidProjects.slice(0, 3).map((p) => (
               <Link key={p.id} href={`/dashboard/contractor/projects/${p.id}`} style={{ textDecoration: "none" }}>
                 <HoverCard style={{
-                  background: "#0F2040",
-                  border: "1px solid #1B4F8A",
+                  background: "#EEF4FF",
+                  border: "1px solid #B8D0E8",
                   borderRadius: "10px",
                   padding: "16px 18px",
                   display: "flex",
@@ -324,10 +324,10 @@ export default async function ContractorDashboard({
                   cursor: "pointer",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                       {p.title ?? "Untitled Project"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
+                    <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                       {p.category ?? "—"} • {p.location_general ?? "—"}
                     </div>
                   </div>
@@ -348,7 +348,7 @@ export default async function ContractorDashboard({
               <Link href="/dashboard/contractor/projects" style={{
                 textAlign: "center",
                 fontSize: "13px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textDecoration: "underline",
                 display: "block",
                 padding: "8px",
@@ -367,16 +367,16 @@ export default async function ContractorDashboard({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Pending Bids
         </h2>
         {openBids.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No pending bids.{" "}
-            <Link href="/dashboard/contractor/projects" style={{ color: "#fff", textDecoration: "underline" }}>
+            <Link href="/dashboard/contractor/projects" style={{ color: "#0A1628", textDecoration: "underline" }}>
               Browse open projects
             </Link>
           </div>
@@ -385,8 +385,8 @@ export default async function ContractorDashboard({
             {openBids.map((b) => (
               <Link key={b.bid_id} href={`/dashboard/contractor/projects/${b.project_id}`} style={{ textDecoration: "none" }}>
                 <HoverCard style={{
-                  background: "#0F2040",
-                  border: "1px solid #1B4F8A",
+                  background: "#EEF4FF",
+                  border: "1px solid #B8D0E8",
                   borderRadius: "10px",
                   padding: "18px",
                   display: "flex",
@@ -395,10 +395,10 @@ export default async function ContractorDashboard({
                   cursor: "pointer",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                       {b.project_title ?? "Untitled Project"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                       {b.category ?? "—"} • {b.location_general ?? "—"}
                     </div>
                     {b.deadline_at && (
@@ -408,10 +408,10 @@ export default async function ContractorDashboard({
                     )}
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#fff" }}>
+                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#0A1628" }}>
                       {fmtMoney(b.latest_amount_cents)}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#7A9CC4" }}>v{b.version_number}</div>
+                    <div style={{ fontSize: "11px", color: "#1B4F8A" }}>v{b.version_number}</div>
                     <div style={{ marginTop: "6px" }}>
                       <span style={stateBadge(b.project_state)}>
                         {b.project_state}
@@ -428,13 +428,13 @@ export default async function ContractorDashboard({
       {/* Won Projects */}
       {awarded.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -444,8 +444,8 @@ export default async function ContractorDashboard({
             {awarded.map((p) => (
               <Link key={p.project_id} href={`/dashboard/contractor/projects/${p.project_id}`} style={{ textDecoration: "none" }}>
                 <HoverCard style={{
-                  background: "#0F2040",
-                  border: "1px solid #1B4F8A",
+                  background: "#EEF4FF",
+                  border: "1px solid #B8D0E8",
                   borderRadius: "10px",
                   padding: "18px",
                   display: "flex",
@@ -454,10 +454,10 @@ export default async function ContractorDashboard({
                   cursor: "pointer",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                       {p.project_title ?? "Untitled Project"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
                       {p.category ?? "—"} • {p.location_general ?? "—"}
                     </div>
                     <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
@@ -470,9 +470,9 @@ export default async function ContractorDashboard({
                     padding: "4px 10px",
                     borderRadius: "20px",
                     letterSpacing: "0.5px",
-                    background: "#2D1B69",
-                    color: "#A78BFA",
-                    border: "1px solid #5B21B6",
+                    background: "#EEF4FF",
+                    color: "#1B4F8A",
+                    border: "1px solid #B8D0E8",
                   }}>
                     ★ WON
                   </span>

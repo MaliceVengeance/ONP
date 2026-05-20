@@ -65,12 +65,12 @@ export default async function ContractorMyBidsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Bid History
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             All bids you have submitted across all projects
           </p>
         </div>
@@ -103,8 +103,8 @@ export default async function ContractorMyBidsPage() {
           { label: "Total Bid Value", count: null, value: fmtMoney(totalBidValue), accent: false },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#0F2040",
-            border: `1px solid ${s.accent ? "#C8102E" : "#1B4F8A"}`,
+            background: "#EEF4FF",
+            border: `1px solid ${s.accent ? "#C8102E" : "#B8D0E8"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -113,11 +113,11 @@ export default async function ContractorMyBidsPage() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: s.value ? "22px" : "32px",
-              color: s.accent ? "#C8102E" : "#fff",
+              color: s.accent ? "#C8102E" : "#0A1628",
             }}>
               {s.value ?? s.count}
             </div>
-            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
             </div>
           </div>
@@ -126,16 +126,16 @@ export default async function ContractorMyBidsPage() {
 
       {bids.length === 0 && awarded.length === 0 ? (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "10px",
           padding: "48px",
           textAlign: "center",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           fontSize: "14px",
         }}>
           You haven't placed any bids yet.{" "}
-          <Link href="/dashboard/contractor/projects" style={{ color: "#fff", textDecoration: "underline" }}>
+          <Link href="/dashboard/contractor/projects" style={{ color: "#0A1628", textDecoration: "underline" }}>
             Browse open projects
           </Link>
         </div>
@@ -149,7 +149,7 @@ export default async function ContractorMyBidsPage() {
                 fontWeight: 700,
                 fontSize: "18px",
                 letterSpacing: "1px",
-                color: "#A78BFA",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
@@ -163,22 +163,22 @@ export default async function ContractorMyBidsPage() {
                     style={{ textDecoration: "none" }}
                   >
                     <HoverCard style={{
-                      background: "#2D1B69",
-                      border: "1px solid #5B21B6",
+                      background: "#EEF4FF",
+                      border: "1px solid #1B4F8A",
                       borderRadius: "10px",
                       padding: "18px",
                       cursor: "pointer",
                     }}>
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
                             {a.project_title ?? "Untitled Project"}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#A78BFA", marginBottom: "6px" }}>
+                          <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "6px" }}>
                             {a.category ?? "—"} • {a.location_general ?? "—"}
                           </div>
                           {a.awarded_at && (
-                            <div style={{ fontSize: "11px", color: "#7A9CC4" }}>
+                            <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
                               Awarded: {new Date(a.awarded_at).toLocaleDateString()}
                             </div>
                           )}
@@ -188,7 +188,7 @@ export default async function ContractorMyBidsPage() {
                             fontFamily: "'Barlow Condensed', sans-serif",
                             fontWeight: 700,
                             fontSize: "28px",
-                            color: "#fff",
+                            color: "#0A1628",
                             lineHeight: 1,
                           }}>
                             {fmtMoney(a.latest_amount_cents)}
@@ -198,9 +198,9 @@ export default async function ContractorMyBidsPage() {
                             fontWeight: 600,
                             padding: "3px 10px",
                             borderRadius: "20px",
-                            background: "#1B0D4A",
-                            color: "#A78BFA",
-                            border: "1px solid #5B21B6",
+                            background: "#EEF4FF",
+                            color: "#1B4F8A",
+                            border: "1px solid #B8D0E8",
                             marginTop: "6px",
                             display: "inline-block",
                           }}>
@@ -223,7 +223,7 @@ export default async function ContractorMyBidsPage() {
                 fontWeight: 700,
                 fontSize: "18px",
                 letterSpacing: "1px",
-                color: "#fff",
+                color: "#0A1628",
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
@@ -240,13 +240,13 @@ export default async function ContractorMyBidsPage() {
           {/* Closed bids */}
           {closedBids.length > 0 && (
             <div>
-              <hr style={{ border: "none", borderTop: "1px solid #1B4F8A", margin: "0 0 20px" }} />
+              <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
               <h2 style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "18px",
                 letterSpacing: "1px",
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
@@ -273,8 +273,8 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
   return (
     <Link href={`/dashboard/contractor/projects/${b.project_id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
-        background: "#0F2040",
-        border: `1px solid ${isWon ? "#5B21B6" : "#1B4F8A"}`,
+        background: "#EEF4FF",
+        border: `1px solid ${isWon ? "#1B4F8A" : "#B8D0E8"}`,
         borderRadius: "10px",
         padding: "18px",
         cursor: "pointer",
@@ -282,21 +282,21 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
       }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+            <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
               {b.project_title ?? "Untitled Project"}
             </div>
-            <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "8px" }}>
+            <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
               {b.category ?? "—"} • {b.location_general ?? "—"}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
               <span style={stateBadge(b.project_state)}>{b.project_state}</span>
               {deadline && (
-                <span style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5" }}>
+                <span style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5" }}>
                   {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
                 </span>
               )}
               {b.bid_updated_at && (
-                <span style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                <span style={{ fontSize: "11px", color: "#4A7FB5" }}>
                   Updated: {new Date(b.bid_updated_at).toLocaleDateString()}
                 </span>
               )}
@@ -308,19 +308,19 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "28px",
-              color: "#fff",
+              color: "#0A1628",
               lineHeight: 1,
             }}>
               {fmtMoney(b.latest_amount_cents)}
             </div>
-            <div style={{ fontSize: "11px", color: "#7A9CC4", marginTop: "4px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", marginTop: "4px" }}>
               v{b.version_number}
             </div>
             <div style={{
               fontSize: "11px",
               marginTop: "4px",
               fontWeight: 600,
-              color: isWon ? "#A78BFA" : isOpen ? "#4ADE80" : "#3A5A7A",
+              color: isWon ? "#1B4F8A" : isOpen ? "#15803D" : "#4A7FB5",
             }}>
               {isWon ? "★ WON" : isOpen ? "● OPEN" : "● CLOSED"}
             </div>

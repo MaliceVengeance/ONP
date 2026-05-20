@@ -34,10 +34,10 @@ export default async function ClientDashboard() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#fff", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#0A1628", margin: 0 }}>
             Client Dashboard
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
@@ -67,8 +67,8 @@ export default async function ClientDashboard() {
           { label: "Awarded", count: awarded.length, accent: false },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#0F2040",
-            border: `1px solid ${s.accent ? "#C8102E" : "#1B4F8A"}`,
+            background: "#EEF4FF",
+            border: `1px solid ${s.accent ? "#C8102E" : "#B8D0E8"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -77,11 +77,11 @@ export default async function ClientDashboard() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#fff",
+              color: s.accent ? "#C8102E" : "#0A1628",
             }}>
               {s.count}
             </div>
-            <div style={{ fontSize: "11px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
             </div>
           </div>
@@ -96,8 +96,8 @@ export default async function ClientDashboard() {
         ].map((l) => (
           <Link key={l.href} href={l.href} style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 18px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -127,22 +127,22 @@ export default async function ClientDashboard() {
       {/* Recent Projects */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#fff", textTransform: "uppercase", margin: 0 }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#0A1628", textTransform: "uppercase", margin: 0 }}>
             Recent Projects
           </h2>
-          <Link href="/dashboard/client/projects" style={{ fontSize: "13px", color: "#7A9CC4", textDecoration: "underline" }}>
+          <Link href="/dashboard/client/projects" style={{ fontSize: "13px", color: "#1B4F8A", textDecoration: "underline" }}>
             View all
           </Link>
         </div>
 
         {error ? (
-          <div style={{ background: "#3D0A0A", border: "1px solid #991B1B", color: "#F87171", padding: "14px", borderRadius: "8px", fontSize: "13px" }}>
+          <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B", padding: "14px", borderRadius: "8px", fontSize: "13px" }}>
             Failed to load projects.
           </div>
         ) : projects.length === 0 ? (
-          <div style={{ background: "#0F2040", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#7A9CC4", fontSize: "14px" }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No projects yet.{" "}
-            <Link href="/dashboard/client/projects/new" style={{ color: "#fff", textDecoration: "underline" }}>
+            <Link href="/dashboard/client/projects/new" style={{ color: "#0A1628", textDecoration: "underline" }}>
               Create your first project
             </Link>
           </div>
@@ -167,8 +167,8 @@ function ProjectCard({ p }: { p: Project }) {
   return (
     <Link href={`/dashboard/client/projects/${p.id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "10px",
         padding: "18px",
         display: "flex",
@@ -177,14 +177,14 @@ function ProjectCard({ p }: { p: Project }) {
         cursor: "pointer",
       }}>
         <div>
-          <div style={{ fontWeight: 600, fontSize: "15px", color: "#fff", marginBottom: "3px" }}>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
             {p.title ?? "Untitled"}
           </div>
-          <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "3px" }}>
+          <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
             {p.category ?? "—"} • {p.city ?? "—"}
           </div>
           {deadline && (
-            <div style={{ fontSize: "11px", color: deadlinePassed ? "#F87171" : "#4A7FB5" }}>
+            <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5" }}>
               {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
             </div>
           )}
@@ -192,7 +192,7 @@ function ProjectCard({ p }: { p: Project }) {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
           <span style={stateBadge(p.state)}>{p.state}</span>
           {bidsUnlocked && p.state !== "DRAFT" && (
-            <span style={{ fontSize: "11px", color: "#4ADE80" }}>✓ Bids unlocked</span>
+            <span style={{ fontSize: "11px", color: "#15803D" }}>✓ Bids unlocked</span>
           )}
         </div>
       </HoverCard>

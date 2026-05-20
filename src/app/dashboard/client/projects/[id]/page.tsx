@@ -59,13 +59,13 @@ export default async function EditProjectPage({
   function inspectorButtonStyle() {
     switch (inspectorStatus) {
       case "COMPLETED":
-        return { background: "#0D3320", color: "#4ADE80", border: "1px solid #166534" };
+        return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
       case "ASSIGNED":
-        return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
+        return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
       case "PENDING":
-        return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
+        return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
       default:
-        return { background: "transparent", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+        return { background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8" };
     }
   }
 
@@ -80,9 +80,9 @@ export default async function EditProjectPage({
 
   const inputStyle = {
     width: "100%",
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -95,7 +95,7 @@ export default async function EditProjectPage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#7A9CC4",
+    color: "#1B4F8A",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -111,7 +111,7 @@ export default async function EditProjectPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             {isDraft ? "Edit Draft" : project.title ?? "Project"}
@@ -119,7 +119,7 @@ export default async function EditProjectPage({
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
             <span style={stateBadge(project.state)}>{project.state}</span>
             {isPublished && project.deadline_at && (
-              <span style={{ fontSize: "13px", color: "#7A9CC4" }}>
+              <span style={{ fontSize: "13px", color: "#1B4F8A" }}>
                 Deadline: {new Date(project.deadline_at).toLocaleDateString()}
               </span>
             )}
@@ -132,8 +132,8 @@ export default async function EditProjectPage({
               type="submit"
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "8px 16px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -150,8 +150,8 @@ export default async function EditProjectPage({
             href="/dashboard/client/projects"
             style={{
               background: "transparent",
-              color: "#7A9CC4",
-              border: "1px solid #1B4F8A",
+              color: "#1B4F8A",
+              border: "1px solid #B8D0E8",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -178,9 +178,9 @@ export default async function EditProjectPage({
           <Link
             href={`/dashboard/client/projects/${id}/bids`}
             style={{
-              background: bidsUnlocked ? "#C8102E" : "#0F2040",
-              color: "#fff",
-              border: `1px solid ${bidsUnlocked ? "#C8102E" : "#1B4F8A"}`,
+              background: bidsUnlocked ? "#C8102E" : "#EEF4FF",
+              color: bidsUnlocked ? "#fff" : "#1B4F8A",
+              border: `1px solid ${bidsUnlocked ? "#C8102E" : "#B8D0E8"}`,
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -196,9 +196,9 @@ export default async function EditProjectPage({
           <Link
             href={`/dashboard/client/projects/${id}/rfis`}
             style={{
-              background: hasUnansweredRfis ? "#2D2000" : "transparent",
-              color: hasUnansweredRfis ? "#FBBF24" : "#7A9CC4",
-              border: `1px solid ${hasUnansweredRfis ? "#92400E" : "#1B4F8A"}`,
+              background: hasUnansweredRfis ? "#FFFBEB" : "transparent",
+              color: hasUnansweredRfis ? "#92400E" : "#1B4F8A",
+              border: `1px solid ${hasUnansweredRfis ? "#FCD34D" : "#B8D0E8"}`,
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -216,8 +216,8 @@ export default async function EditProjectPage({
             href={`/dashboard/client/projects/${id}/files`}
             style={{
               background: "transparent",
-              color: "#7A9CC4",
-              border: "1px solid #1B4F8A",
+              color: "#1B4F8A",
+              border: "1px solid #B8D0E8",
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -249,8 +249,8 @@ export default async function EditProjectPage({
               href={`/dashboard/client/projects/${id}/override`}
               style={{
                 background: "transparent",
-                color: "#7A9CC4",
-                border: "1px solid #1B4F8A",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
                 padding: "10px 20px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -266,15 +266,15 @@ export default async function EditProjectPage({
       )}
 
       {!bidsUnlocked && isPublished && (
-        <p style={{ fontSize: "12px", color: "#3A5A7A", marginBottom: "20px" }}>
+        <p style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "20px" }}>
           Bids are sealed until the deadline passes.
         </p>
       )}
 
       {/* Edit form */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "24px",
         marginBottom: "20px",
@@ -284,13 +284,13 @@ export default async function EditProjectPage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           Project Details
         </h2>
-        <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "16px" }}>
+        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px" }}>
           {isDraft ? "Edit your project before publishing." : "Published projects cannot be edited."}
         </p>
 
@@ -355,8 +355,8 @@ export default async function EditProjectPage({
                 style={{
                   marginTop: "20px",
                   background: "transparent",
-                  color: "#7A9CC4",
-                  border: "1px solid #1B4F8A",
+                  color: "#1B4F8A",
+                  border: "1px solid #B8D0E8",
                   padding: "10px 20px",
                   borderRadius: "6px",
                   fontFamily: "'Barlow', sans-serif",
@@ -375,8 +375,8 @@ export default async function EditProjectPage({
       {/* Publish controls */}
       {isDraft ? (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "24px",
         }}>
@@ -385,13 +385,13 @@ export default async function EditProjectPage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             Publish to Contractors
           </h2>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "20px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "20px" }}>
             Choose how long bidding stays open. Minimum 5 days, maximum 10 days.
           </p>
 
@@ -400,7 +400,7 @@ export default async function EditProjectPage({
               <label style={{
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 flexShrink: 0,
@@ -411,9 +411,9 @@ export default async function EditProjectPage({
                 name="bid_days"
                 defaultValue="7"
                 style={{
-                  background: "#0A1628",
-                  border: "1px solid #1B4F8A",
-                  color: "#F0F4FF",
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  color: "#0A1628",
                   borderRadius: "6px",
                   padding: "8px 12px",
                   fontFamily: "'Barlow', sans-serif",
@@ -449,12 +449,12 @@ export default async function EditProjectPage({
         </div>
       ) : (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
           fontSize: "13px",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
         }}>
           This project is published. Edits will trigger a revision workflow in a future update.
         </div>

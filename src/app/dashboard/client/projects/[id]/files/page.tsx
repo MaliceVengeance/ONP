@@ -33,12 +33,12 @@ export default async function ProjectFilesPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Project Files
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {project?.title ?? "Untitled"} — visible to all bidding contractors
           </p>
         </div>
@@ -46,15 +46,15 @@ export default async function ProjectFilesPage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
             fontSize: "13px",
             textDecoration: "none",
           }}
-          
+
         >
           Back
         </Link>

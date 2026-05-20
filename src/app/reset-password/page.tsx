@@ -70,9 +70,9 @@ export default function ResetPasswordPage() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
   return (
     <main style={{
       minHeight: "100vh",
-      background: "#0A1628",
+      background: "#FFFFFF",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -97,23 +97,23 @@ export default function ResetPasswordPage() {
           fontWeight: 800,
           fontSize: "56px",
           letterSpacing: "6px",
-          color: "#fff",
+          color: "#0A1628",
           lineHeight: 1,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           gap: "12px",
         }}>
-          <span style={{ color: "#C8102E" }}>★</span>
+          <span style={{ color: "#1B4F8A" }}>★</span>
           ONP
-          <span style={{ color: "#C8102E" }}>★</span>
+          <span style={{ color: "#1B4F8A" }}>★</span>
         </div>
         <div style={{
           fontFamily: "'Barlow', sans-serif",
           fontWeight: 400,
           fontSize: "11px",
           letterSpacing: "4px",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           textTransform: "uppercase",
           marginTop: "8px",
         }}>
@@ -131,8 +131,8 @@ export default function ResetPasswordPage() {
       <div style={{
         width: "100%",
         maxWidth: "380px",
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "32px",
       }}>
@@ -141,7 +141,7 @@ export default function ResetPasswordPage() {
           fontWeight: 700,
           fontSize: "24px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           marginBottom: "8px",
           textAlign: "center",
         }}>
@@ -149,7 +149,7 @@ export default function ResetPasswordPage() {
         </h1>
         <p style={{
           fontSize: "13px",
-          color: "#7A9CC4",
+          color: "#1B4F8A",
           textAlign: "center",
           marginBottom: "24px",
         }}>
@@ -158,9 +158,9 @@ export default function ResetPasswordPage() {
 
         {success ? (
           <div style={{
-            background: "#0D3320",
+            background: "#F0FDF4",
             border: "1px solid #166534",
-            color: "#4ADE80",
+            color: "#15803D",
             padding: "14px 18px",
             borderRadius: "8px",
             fontSize: "13px",
@@ -173,7 +173,7 @@ export default function ResetPasswordPage() {
           <div style={{
             textAlign: "center",
             padding: "20px",
-            color: "#7A9CC4",
+            color: "#1B4F8A",
             fontSize: "13px",
           }}>
             Verifying reset link...
@@ -182,9 +182,9 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit}>
             {error && (
               <div style={{
-                background: "#3D0A0A",
-                border: "1px solid #991B1B",
-                color: "#F87171",
+                background: "#FEF2F2",
+                border: "1px solid #FCA5A5",
+                color: "#991B1B",
                 padding: "12px 16px",
                 borderRadius: "8px",
                 fontSize: "13px",
@@ -199,7 +199,7 @@ export default function ResetPasswordPage() {
                 display: "block",
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "6px",
@@ -221,7 +221,7 @@ export default function ResetPasswordPage() {
                 display: "block",
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "#7A9CC4",
+                color: "#1B4F8A",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "6px",
@@ -243,7 +243,7 @@ export default function ResetPasswordPage() {
               disabled={loading}
               style={{
                 width: "100%",
-                background: loading ? "#3A5A7A" : "#C8102E",
+                background: loading ? "#4A7FB5" : "#C8102E",
                 color: "#fff",
                 border: "none",
                 padding: "12px",
@@ -265,7 +265,7 @@ export default function ResetPasswordPage() {
       <div style={{
         marginTop: "32px",
         fontSize: "11px",
-        color: "#3A5A7A",
+        color: "#4A7FB5",
         textAlign: "center",
         letterSpacing: "1px",
         textTransform: "uppercase",

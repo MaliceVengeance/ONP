@@ -12,9 +12,9 @@ export default async function CreateUserPage({
 
   const inputStyle = {
     width: "100%",
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -27,7 +27,7 @@ export default async function CreateUserPage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#7A9CC4",
+    color: "#1B4F8A",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -43,12 +43,12 @@ export default async function CreateUserPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Create User
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             Create a new admin or inspector account.
           </p>
         </div>
@@ -56,8 +56,8 @@ export default async function CreateUserPage({
           href="/dashboard/admin/users"
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -72,9 +72,9 @@ export default async function CreateUserPage({
       {/* Success banner */}
       {sp.created === "1" && (
         <div style={{
-          background: "#0D3320",
+          background: "#F0FDF4",
           border: "1px solid #166534",
-          color: "#4ADE80",
+          color: "#15803D",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -87,9 +87,9 @@ export default async function CreateUserPage({
       {/* Error banner */}
       {sp.error && (
         <div style={{
-          background: "#3D0A0A",
-          border: "1px solid #991B1B",
-          color: "#F87171",
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          color: "#991B1B",
           padding: "14px 18px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -101,8 +101,8 @@ export default async function CreateUserPage({
 
       {/* Form */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "24px",
       }}>
@@ -145,15 +145,15 @@ export default async function CreateUserPage({
           </select>
 
           <div style={{
-            background: "#0A1628",
-            border: "1px solid #1B4F8A",
+            background: "#FFFFFF",
+            border: "1px solid #B8D0E8",
             borderRadius: "8px",
             padding: "14px",
             marginTop: "20px",
             fontSize: "12px",
-            color: "#7A9CC4",
+            color: "#4A7FB5",
           }}>
-            The user will be able to log in immediately with these credentials. 
+            The user will be able to log in immediately with these credentials.
             They should change their password after first login.
           </div>
 

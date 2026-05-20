@@ -35,10 +35,10 @@ export default async function ClientInspectorPage({
 
   function statusColor(status: string) {
     switch (status) {
-      case "PENDING": return { background: "#2D2000", color: "#FBBF24", border: "1px solid #92400E" };
-      case "ASSIGNED": return { background: "#0D2040", color: "#60A5FA", border: "1px solid #1D4ED8" };
-      case "COMPLETED": return { background: "#0D3320", color: "#4ADE80", border: "1px solid #166534" };
-      default: return { background: "#0F2040", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+      case "PENDING": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
+      case "ASSIGNED": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+      case "COMPLETED": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
+      default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
     }
   }
 
@@ -52,12 +52,12 @@ export default async function ClientInspectorPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Inspector Takeoff
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {project?.title ?? "Untitled"}
           </p>
         </div>
@@ -65,8 +65,8 @@ export default async function ClientInspectorPage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -80,8 +80,8 @@ export default async function ClientInspectorPage({
 
       {/* Info card */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "20px",
@@ -91,16 +91,16 @@ export default async function ClientInspectorPage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "10px",
         }}>
           What is a Takeoff?
         </h2>
-        <p style={{ fontSize: "13px", color: "#7A9CC4", lineHeight: 1.7, marginBottom: "8px" }}>
+        <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, marginBottom: "8px" }}>
           An ONP inspector will visit your property and create a detailed scope of work. This ensures contractors have accurate information to submit competitive bids.
         </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", color: "#4ADE80" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", color: "#15803D" }}>
           <div>✅ Unbiased third-party assessment</div>
           <div>✅ Detailed scope of work document</div>
           <div>✅ Better bids from contractors</div>
@@ -111,8 +111,8 @@ export default async function ClientInspectorPage({
       {/* Current status */}
       {assignment ? (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "20px",
@@ -123,7 +123,7 @@ export default async function ClientInspectorPage({
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#fff",
+              color: "#0A1628",
               textTransform: "uppercase",
               margin: 0,
             }}>
@@ -144,40 +144,40 @@ export default async function ClientInspectorPage({
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
             {assignment.requested_at && (
               <div>
-                <span style={{ color: "#7A9CC4" }}>Requested: </span>
-                <span style={{ color: "#F0F4FF" }}>{new Date(assignment.requested_at).toLocaleDateString()}</span>
+                <span style={{ color: "#1B4F8A" }}>Requested: </span>
+                <span style={{ color: "#0A1628" }}>{new Date(assignment.requested_at).toLocaleDateString()}</span>
               </div>
             )}
             {inspectorName && (
               <div>
-                <span style={{ color: "#7A9CC4" }}>Inspector: </span>
-                <span style={{ color: "#F0F4FF" }}>{inspectorName}</span>
+                <span style={{ color: "#1B4F8A" }}>Inspector: </span>
+                <span style={{ color: "#0A1628" }}>{inspectorName}</span>
               </div>
             )}
             {assignment.assigned_at && (
               <div>
-                <span style={{ color: "#7A9CC4" }}>Assigned: </span>
-                <span style={{ color: "#F0F4FF" }}>{new Date(assignment.assigned_at).toLocaleDateString()}</span>
+                <span style={{ color: "#1B4F8A" }}>Assigned: </span>
+                <span style={{ color: "#0A1628" }}>{new Date(assignment.assigned_at).toLocaleDateString()}</span>
               </div>
             )}
             {assignment.notes && (
               <div>
-                <span style={{ color: "#7A9CC4" }}>Notes: </span>
-                <span style={{ color: "#F0F4FF" }}>{assignment.notes}</span>
+                <span style={{ color: "#1B4F8A" }}>Notes: </span>
+                <span style={{ color: "#0A1628" }}>{assignment.notes}</span>
               </div>
             )}
           </div>
         </div>
       ) : (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "24px",
           marginBottom: "20px",
           textAlign: "center",
         }}>
-          <div style={{ fontSize: "13px", color: "#7A9CC4", marginBottom: "20px" }}>
+          <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "20px" }}>
             No inspector has been requested yet. Click below to request one.
           </div>
           <form action={requestInspector.bind(null, projectId)}>
@@ -199,7 +199,7 @@ export default async function ClientInspectorPage({
               Request Inspector Takeoff
             </button>
           </form>
-          <p style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "10px" }}>
+          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "10px" }}>
             An admin will assign an available inspector to your project.
           </p>
         </div>
@@ -208,7 +208,7 @@ export default async function ClientInspectorPage({
       {/* Takeoff report */}
       {assignment?.takeoff_report && (
         <div style={{
-          background: "#0F2040",
+          background: "#EEF4FF",
           border: "1px solid #166534",
           borderRadius: "12px",
           padding: "24px",
@@ -218,24 +218,24 @@ export default async function ClientInspectorPage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#4ADE80",
+            color: "#15803D",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}>
             ✅ Takeoff Report
           </h2>
           {assignment.takeoff_completed_at && (
-            <div style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "12px" }}>
+            <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px" }}>
               Completed: {new Date(assignment.takeoff_completed_at).toLocaleDateString()}
             </div>
           )}
           <div style={{
-            background: "#0A1628",
-            border: "1px solid #1B4F8A",
+            background: "#FFFFFF",
+            border: "1px solid #B8D0E8",
             borderRadius: "8px",
             padding: "16px",
             fontSize: "13px",
-            color: "#F0F4FF",
+            color: "#0A1628",
             lineHeight: 1.7,
             whiteSpace: "pre-wrap",
           }}>

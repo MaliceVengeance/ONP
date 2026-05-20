@@ -22,9 +22,9 @@ export default async function ClientOverridePage({
 
   const inputStyle = {
     width: "100%",
-    background: "#0A1628",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -43,12 +43,12 @@ export default async function ClientOverridePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             margin: 0,
           }}>
             Deadline Extension
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {project?.title ?? "Untitled"}
           </p>
         </div>
@@ -56,8 +56,8 @@ export default async function ClientOverridePage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -71,8 +71,8 @@ export default async function ClientOverridePage({
 
       {/* Current deadline */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "20px",
@@ -82,16 +82,16 @@ export default async function ClientOverridePage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Current Deadline
         </h2>
-        <div style={{ fontSize: "24px", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, color: "#fff" }}>
+        <div style={{ fontSize: "24px", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, color: "#0A1628" }}>
           {deadline ? deadline.toLocaleDateString() : "—"}
         </div>
-        <div style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+        <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
           Project state: {project?.state ?? "—"}
         </div>
       </div>
@@ -99,7 +99,7 @@ export default async function ClientOverridePage({
       {/* Override approved */}
       {isOverridden && (
         <div style={{
-          background: "#0D3320",
+          background: "#F0FDF4",
           border: "1px solid #166534",
           borderRadius: "12px",
           padding: "20px",
@@ -110,18 +110,18 @@ export default async function ClientOverridePage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#4ADE80",
+            color: "#15803D",
             textTransform: "uppercase",
             marginBottom: "8px",
           }}>
             ✅ Extension Approved
           </h2>
-          <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+          <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
             Your deadline extension has been approved by an admin.
           </div>
           {project?.urgent_reason && (
-            <div style={{ fontSize: "13px", color: "#F0F4FF", marginTop: "8px" }}>
-              <span style={{ color: "#7A9CC4" }}>Reason: </span>
+            <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "8px" }}>
+              <span style={{ color: "#1B4F8A" }}>Reason: </span>
               {project.urgent_reason}
             </div>
           )}
@@ -131,8 +131,8 @@ export default async function ClientOverridePage({
       {/* Already requested */}
       {hasRequested && !isOverridden && (
         <div style={{
-          background: "#2D2000",
-          border: "1px solid #92400E",
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "20px",
@@ -142,21 +142,21 @@ export default async function ClientOverridePage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#FBBF24",
+            color: "#92400E",
             textTransform: "uppercase",
             marginBottom: "8px",
           }}>
             ⏳ Request Pending
           </h2>
-          <div style={{ fontSize: "13px", color: "#7A9CC4" }}>
+          <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
             Your extension request is being reviewed by an admin.
           </div>
-          <div style={{ fontSize: "13px", color: "#F0F4FF", marginTop: "8px" }}>
-            <span style={{ color: "#7A9CC4" }}>Submitted: </span>
+          <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "8px" }}>
+            <span style={{ color: "#1B4F8A" }}>Submitted: </span>
             {new Date(project.override_requested_at!).toLocaleDateString()}
           </div>
-          <div style={{ fontSize: "13px", color: "#F0F4FF", marginTop: "4px" }}>
-            <span style={{ color: "#7A9CC4" }}>Reason: </span>
+          <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "4px" }}>
+            <span style={{ color: "#1B4F8A" }}>Reason: </span>
             {project.override_requested_reason}
           </div>
         </div>
@@ -165,8 +165,8 @@ export default async function ClientOverridePage({
       {/* Request form */}
       {!hasRequested && !isOverridden && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "24px",
         }}>
@@ -175,13 +175,13 @@ export default async function ClientOverridePage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#fff",
+            color: "#0A1628",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             Request Extension
           </h2>
-          <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "16px" }}>
+          <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px" }}>
             Explain why you need more time. An admin will review and may approve a new deadline.
           </p>
 
@@ -190,7 +190,7 @@ export default async function ClientOverridePage({
               display: "block",
               fontSize: "11px",
               fontWeight: 500,
-              color: "#7A9CC4",
+              color: "#1B4F8A",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "6px",

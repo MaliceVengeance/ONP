@@ -46,25 +46,71 @@ export default function SignupContractorPage() {
     }
   }
 
-  return (
-    <main className="min-h-screen flex items-center justify-center p-6">
-      <form onSubmit={onSubmit} className="w-full max-w-md rounded-xl border p-6 space-y-4">
-        <h1 className="text-2xl font-semibold">Contractor Sign Up</h1>
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    background: "#FFFFFF",
+    border: "1px solid #B8D0E8",
+    color: "#0A1628",
+    borderRadius: "6px",
+    padding: "10px 14px",
+    fontFamily: "'Barlow', sans-serif",
+    fontSize: "14px",
+    outline: "none",
+  };
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Display name</label>
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontSize: "11px",
+    fontWeight: 500,
+    color: "#1B4F8A",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+    marginBottom: "6px",
+  };
+
+  return (
+    <main style={{
+      minHeight: "100vh",
+      background: "#FFFFFF",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "24px",
+    }}>
+      <form onSubmit={onSubmit} style={{
+        width: "100%",
+        maxWidth: "440px",
+        background: "#EEF4FF",
+        border: "1px solid #B8D0E8",
+        borderRadius: "12px",
+        padding: "32px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}>
+        <h1 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: "28px",
+          color: "#0A1628",
+          letterSpacing: "1px",
+          marginBottom: "8px",
+        }}>Contractor Sign Up</h1>
+
+        <div>
+          <label style={labelStyle}>Display name</label>
           <input
-            className="w-full rounded-md border px-3 py-2"
+            style={inputStyle}
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="Company / Contact name"
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Email</label>
+        <div>
+          <label style={labelStyle}>Email</label>
           <input
-            className="w-full rounded-md border px-3 py-2"
+            style={inputStyle}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -72,10 +118,10 @@ export default function SignupContractorPage() {
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Password</label>
+        <div>
+          <label style={labelStyle}>Password</label>
           <input
-            className="w-full rounded-md border px-3 py-2"
+            style={inputStyle}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -84,22 +130,50 @@ export default function SignupContractorPage() {
           />
         </div>
 
-        {msg && <p className="text-sm text-red-600">{msg}</p>}
+        {msg && (
+          <div style={{
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            padding: "10px 14px",
+            borderRadius: "6px",
+            fontSize: "13px",
+          }}>
+            {msg}
+          </div>
+        )}
 
-        <button disabled={busy} className="w-full rounded-md bg-black text-white py-2 disabled:opacity-50">
+        <button
+          disabled={busy}
+          style={{
+            width: "100%",
+            background: busy ? "#4A7FB5" : "#C8102E",
+            color: "#fff",
+            border: "none",
+            padding: "12px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 600,
+            fontSize: "14px",
+            letterSpacing: "1px",
+            textTransform: "uppercase",
+            cursor: busy ? "not-allowed" : "pointer",
+            opacity: busy ? 0.7 : 1,
+          }}
+        >
           {busy ? "Creating..." : "Sign up"}
         </button>
 
-        <p className="text-sm">
+        <p style={{ fontSize: "13px", color: "#1B4F8A" }}>
           Client?{" "}
-          <a className="underline" href="/signup">
+          <a style={{ color: "#0A1628", textDecoration: "underline" }} href="/signup">
             Sign up here
           </a>
         </p>
 
-        <p className="text-sm">
+        <p style={{ fontSize: "13px", color: "#1B4F8A" }}>
           Already have an account?{" "}
-          <a className="underline" href="/login">
+          <a style={{ color: "#0A1628", textDecoration: "underline" }} href="/login">
             Log in
           </a>
         </p>
