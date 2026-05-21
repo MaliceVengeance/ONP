@@ -156,6 +156,57 @@ export async function publishProject(projectId: string, formData: FormData) {
 }
 
 /**
+ * Delete a project — only allowed if it's a DRAFT,
+ * or OPEN with zero bids submitted
+ */
+export async function deleteProject(projectId: string) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  // Confirm ownership and fetch state
+  const { data: project, error: readErr } = await supabase
+    .from("projects")
+    .select("id, state, client_id")
+    .eq("id", projectId)
+    .eq("client_id", user.id)
+    .single();
+
+  if (readErr || !project) {
+    throw new Error("Project not found or you do not have permission to delete it.");
+  }
+
+  if (!["DRAFT", "OPEN"].includes(project.state)) {
+    throw new Error("Only draft or open projects can be removed.");
+  }
+
+  // If OPEN, block deletion if any bids exist
+  if (project.state === "OPEN") {
+    const { count } = await supabase
+      .from("bids")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", projectId);
+
+    if ((count ?? 0) > 0) {
+      throw new Error("Cannot remove a project that already has bids submitted.");
+    }
+  }
+
+  const { error: delErr } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId)
+    .eq("client_id", user.id);
+
+  if (delErr) throw delErr;
+
+  redirect("/dashboard/client/projects");
+}
+
+/**
  * Repost / clone an existing project as a NEW draft
  * (new ID, clean bidding round)
  */

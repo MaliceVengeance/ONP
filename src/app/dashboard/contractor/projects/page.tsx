@@ -29,7 +29,7 @@ export default async function ContractorOpenProjectsPage({
 }: {
   searchParams: Promise<{ sort?: string; category?: string; location?: string }>;
 }) {
-  const { supabase } = await requireRole(["CONTRACTOR", "ADMIN"]);
+  const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
   const sp = await searchParams;
   const sort = sp.sort === "newest" ? "newest" : "deadline";
   const categoryFilter = sp.category ?? "";
@@ -43,7 +43,24 @@ export default async function ContractorOpenProjectsPage({
     throw new Error(`RPC list_open_projects failed: ${JSON.stringify(error)}`);
   }
 
-  const allProjects = (data ?? []) as OpenProject[];
+  // Fetch this contractor's bid project IDs so we can keep past-deadline
+  // projects they've already bid on
+  const { data: myBids } = await supabase
+    .from("bids")
+    .select("project_id")
+    .eq("contractor_id", user.id);
+
+  const biddedProjectIds = new Set((myBids ?? []).map((b) => b.project_id));
+
+  const now = Date.now();
+  const allProjects = ((data ?? []) as OpenProject[]).filter((p) => {
+    const deadlinePassed = p.deadline_at
+      ? new Date(p.deadline_at).getTime() <= now
+      : false;
+    // Hide past-deadline projects unless this contractor has bid on them
+    if (deadlinePassed && !biddedProjectIds.has(p.id)) return false;
+    return true;
+  });
 
   // Get unique categories and locations for filter dropdowns
   const allCategories = [...new Set(

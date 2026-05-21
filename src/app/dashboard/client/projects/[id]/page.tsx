@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
-import { updateDraftProject, publishProject, repostProject } from "../actions";
+import { updateDraftProject, publishProject, repostProject, deleteProject } from "../actions";
 import CountdownTimer from "@/components/CountdownTimer";
 import { stateBadge } from "@/lib/ui";
 
@@ -37,6 +37,12 @@ export default async function EditProjectPage({
     .eq("project_id", id)
     .maybeSingle();
 
+  // Check bid count (used to decide if deletion is allowed)
+  const { count: bidCount } = await supabase
+    .from("bids")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", id);
+
   const locParts = String(project.location_general ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -47,6 +53,9 @@ export default async function EditProjectPage({
 
   const isDraft = project.state === "DRAFT";
   const isPublished = !isDraft;
+  const canDelete =
+    project.state === "DRAFT" ||
+    (project.state === "OPEN" && (bidCount ?? 0) === 0);
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
@@ -145,6 +154,33 @@ export default async function EditProjectPage({
               Repost
             </button>
           </form>
+
+          {canDelete && (
+            <form
+              action={deleteProject.bind(null, id)}
+              onSubmit={(e) => {
+                if (!confirm("Are you sure you want to remove this project? This cannot be undone.")) {
+                  e.preventDefault();
+                }
+              }}
+            >
+              <button
+                type="submit"
+                style={{
+                  background: "#FEF2F2",
+                  color: "#991B1B",
+                  border: "1px solid #FCA5A5",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                }}
+              >
+                Remove
+              </button>
+            </form>
+          )}
 
           <Link
             href="/dashboard/client/projects"
