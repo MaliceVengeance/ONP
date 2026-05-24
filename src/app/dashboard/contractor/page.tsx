@@ -70,14 +70,24 @@ export default async function ContractorDashboard({
     supabase.rpc("list_open_projects", { p_sort: "deadline" }),
   ]);
 
-  const { data: contractorProfile } = await supabase
-    .from("contractor_profiles")
-    .select("veteran_verified, military_branch")
-    .eq("contractor_id", user.id)
-    .maybeSingle();
+  const [{ data: contractorProfile }, { data: subscriptionData }] = await Promise.all([
+    supabase
+      .from("contractor_profiles")
+      .select("veteran_verified, military_branch")
+      .eq("contractor_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("contractor_subscriptions")
+      .select("status")
+      .eq("contractor_id", user.id)
+      .maybeSingle(),
+  ]);
 
   const isVeteran = contractorProfile?.veteran_verified ?? false;
   const militaryBranch = contractorProfile?.military_branch ?? null;
+  const hasActiveSub =
+    subscriptionData?.status === "ACTIVE" || subscriptionData?.status === "TRIALING";
+  const showOnboarding = !hasActiveSub && !showWelcome;
 
   const awarded = (awardedData ?? []) as AwardedRow[];
   const activeBids = (bidsData ?? []) as MyBidRow[];
@@ -141,6 +151,67 @@ export default async function ContractorDashboard({
                 textDecoration: "none",
               }}>
                 Complete Your Profile
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Onboarding banner — shown to unsubscribed contractors */}
+      {showOnboarding && (
+        <div style={{
+          background: "#EEF4FF",
+          border: "1px solid #1B4F8A",
+          borderRadius: "12px",
+          padding: "24px 28px",
+          marginBottom: "28px",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "20px",
+        }}>
+          <div style={{ fontSize: "40px", flexShrink: 0 }}>🏗️</div>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "22px",
+              letterSpacing: "1px",
+              color: "#0A1628",
+              marginBottom: "6px",
+            }}>
+              Get Started — It's Free
+            </div>
+            <div style={{ fontSize: "14px", color: "#1B4F8A", marginBottom: "16px", lineHeight: 1.6 }}>
+              Complete your profile and apply for <strong>Certified Veteran Owned</strong> status at no cost.
+              Subscribe when you're ready to start bidding on projects.
+            </div>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <Link href="/dashboard/contractor/profile" style={{
+                background: "#1B4F8A",
+                color: "#fff",
+                padding: "9px 20px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}>
+                Complete Your Profile
+              </Link>
+              <Link href="/dashboard/contractor/subscribe" style={{
+                background: "transparent",
+                color: "#1B4F8A",
+                border: "1px solid #1B4F8A",
+                padding: "9px 20px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}>
+                View Subscription Plans →
               </Link>
             </div>
           </div>
