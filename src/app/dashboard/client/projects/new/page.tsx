@@ -121,6 +121,28 @@ export default async function NewDraftProjectPage() {
             rows={6}
           />
 
+          {/* Files tip */}
+          <div style={{
+            background: "#F0F6FF",
+            border: "1px solid #1B4F8A",
+            borderRadius: "8px",
+            padding: "14px 16px",
+            marginTop: "20px",
+            display: "flex",
+            gap: "12px",
+            alignItems: "flex-start",
+          }}>
+            <span style={{ fontSize: "20px", flexShrink: 0 }}>📁</span>
+            <div>
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "#0A1628", marginBottom: "3px" }}>
+                You can add photos and documents after creating your draft
+              </div>
+              <div style={{ fontSize: "12px", color: "#1B4F8A", lineHeight: 1.5 }}>
+                Once your draft is saved, you'll be able to upload blueprints, photos, measurements, or any other files to help contractors understand the full scope of work before bidding.
+              </div>
+            </div>
+          </div>
+
           {/* Platform rules */}
           <div style={{
             background: "#FFFFFF",

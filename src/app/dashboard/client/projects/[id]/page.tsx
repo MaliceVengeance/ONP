@@ -283,6 +283,57 @@ export default async function EditProjectPage({
         </p>
       )}
 
+      {/* Files callout — shown on draft and published projects */}
+      {(isDraft || isPublished) && (
+        <div style={{
+          background: "#F0F6FF",
+          border: "1px solid #1B4F8A",
+          borderRadius: "10px",
+          padding: "16px 20px",
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "16px",
+          flexWrap: "wrap",
+        }}>
+          <div>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "16px",
+              color: "#0A1628",
+              marginBottom: "4px",
+            }}>
+              📁 Project Files
+            </div>
+            <div style={{ fontSize: "12px", color: "#1B4F8A", lineHeight: 1.5 }}>
+              {isDraft
+                ? "Upload photos, blueprints, or documents so contractors understand the full scope of work."
+                : `${(bidCount ?? 0) > 0 ? "Contractors can view your uploaded files while preparing their bids." : "Adding photos or documents may help attract more bids and clarify scope."}`}
+            </div>
+          </div>
+          <a
+            href={`/dashboard/client/projects/${id}/files`}
+            style={{
+              background: "#1B4F8A",
+              color: "#fff",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            Add / View Files
+          </a>
+        </div>
+      )}
+
       {/* Edit form */}
       <div style={{
         background: "#EEF4FF",

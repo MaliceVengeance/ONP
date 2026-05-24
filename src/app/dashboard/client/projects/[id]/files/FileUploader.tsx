@@ -49,7 +49,6 @@ export default function FileUploader({
     setSuccess(null);
 
     for (const file of Array.from(selected)) {
-      // Limit file size to 10MB
       if (file.size > 10 * 1024 * 1024) {
         setError(`${file.name} is too large. Maximum file size is 10MB.`);
         setUploading(false);
@@ -122,29 +121,33 @@ export default function FileUploader({
   return (
     <div>
       {/* Upload area */}
-      <div style={{
-        background: "#0F2040",
-        border: "2px dashed #1B4F8A",
-        borderRadius: "12px",
-        padding: "32px",
-        textAlign: "center",
-        marginBottom: "20px",
-        cursor: "pointer",
-      }}
+      <div
+        style={{
+          background: "#EEF4FF",
+          border: "2px dashed #1B4F8A",
+          borderRadius: "12px",
+          padding: "32px",
+          textAlign: "center",
+          marginBottom: "20px",
+          cursor: "pointer",
+        }}
         onClick={() => fileInputRef.current?.click()}
       >
-        <div style={{ fontSize: "32px", marginBottom: "12px" }}>📁</div>
+        <div style={{ fontSize: "36px", marginBottom: "12px" }}>📁</div>
         <div style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
-          fontSize: "18px",
-          color: "#fff",
+          fontSize: "20px",
+          color: "#0A1628",
           marginBottom: "6px",
         }}>
-          {uploading ? "Uploading..." : "Click to upload files"}
+          {uploading ? "Uploading…" : "Click to upload files"}
         </div>
-        <div style={{ fontSize: "12px", color: "#7A9CC4" }}>
-          Photos, PDFs, documents — max 10MB per file
+        <div style={{ fontSize: "13px", color: "#4A7FB5", marginBottom: "4px" }}>
+          Photos, PDFs, plans, documents — max 10MB per file
+        </div>
+        <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
+          All files are visible to bidding contractors
         </div>
         <input
           ref={fileInputRef}
@@ -152,7 +155,7 @@ export default function FileUploader({
           multiple
           onChange={handleUpload}
           style={{ display: "none" }}
-          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
           disabled={uploading}
         />
         {!uploading && (
@@ -167,11 +170,11 @@ export default function FileUploader({
               background: "#C8102E",
               color: "#fff",
               border: "none",
-              padding: "10px 24px",
+              padding: "10px 28px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
               fontWeight: 600,
-              fontSize: "13px",
+              fontSize: "14px",
               cursor: "pointer",
             }}
           >
@@ -179,11 +182,7 @@ export default function FileUploader({
           </button>
         )}
         {uploading && (
-          <div style={{
-            marginTop: "16px",
-            fontSize: "13px",
-            color: "#7A9CC4",
-          }}>
+          <div style={{ marginTop: "16px", fontSize: "13px", color: "#1B4F8A" }}>
             Please wait…
           </div>
         )}
@@ -192,9 +191,9 @@ export default function FileUploader({
       {/* Success / error messages */}
       {success && (
         <div style={{
-          background: "#0D3320",
+          background: "#F0FDF4",
           border: "1px solid #166534",
-          color: "#4ADE80",
+          color: "#15803D",
           padding: "12px 16px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -205,9 +204,9 @@ export default function FileUploader({
       )}
       {error && (
         <div style={{
-          background: "#3D0A0A",
-          border: "1px solid #991B1B",
-          color: "#F87171",
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          color: "#991B1B",
           padding: "12px 16px",
           borderRadius: "8px",
           fontSize: "13px",
@@ -219,8 +218,8 @@ export default function FileUploader({
 
       {/* File list */}
       <div style={{
-        background: "#0F2040",
-        border: "1px solid #1B4F8A",
+        background: "#FFFFFF",
+        border: "1px solid #B8D0E8",
         borderRadius: "12px",
         padding: "20px",
       }}>
@@ -229,7 +228,7 @@ export default function FileUploader({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#fff",
+          color: "#0A1628",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
@@ -237,15 +236,24 @@ export default function FileUploader({
         </h2>
 
         {files.length === 0 ? (
-          <div style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center", padding: "20px 0" }}>
-            No files uploaded yet.
+          <div style={{
+            fontSize: "13px",
+            color: "#4A7FB5",
+            textAlign: "center",
+            padding: "24px 0",
+            lineHeight: 1.6,
+          }}>
+            No files uploaded yet.<br />
+            <span style={{ fontSize: "12px", color: "#1B4F8A" }}>
+              Add photos, blueprints, or documents to help contractors understand the scope of work.
+            </span>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {files.map((file) => (
               <div key={file.name} style={{
-                background: "#0A1628",
-                border: "1px solid #1B4F8A",
+                background: "#EEF4FF",
+                border: "1px solid #B8D0E8",
                 borderRadius: "8px",
                 padding: "12px 16px",
                 display: "flex",
@@ -254,13 +262,13 @@ export default function FileUploader({
                 gap: "12px",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
-                  <span style={{ fontSize: "20px", flexShrink: 0 }}>
+                  <span style={{ fontSize: "22px", flexShrink: 0 }}>
                     {getFileIcon(file.name)}
                   </span>
                   <div style={{ minWidth: 0 }}>
                     <div style={{
                       fontSize: "13px",
-                      color: "#F0F4FF",
+                      color: "#0A1628",
                       fontWeight: 500,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -268,7 +276,7 @@ export default function FileUploader({
                     }}>
                       {file.name.replace(/^\d+_/, "")}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+                    <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
                       {formatSize(file.metadata?.size)}
                     </div>
                   </div>
@@ -279,9 +287,9 @@ export default function FileUploader({
                     onClick={() => handleDownload(file.name)}
                     style={{
                       background: "transparent",
-                      color: "#7A9CC4",
-                      border: "1px solid #1B4F8A",
-                      padding: "5px 10px",
+                      color: "#1B4F8A",
+                      border: "1px solid #B8D0E8",
+                      padding: "5px 12px",
                       borderRadius: "6px",
                       fontFamily: "'Barlow', sans-serif",
                       fontSize: "12px",
@@ -294,17 +302,17 @@ export default function FileUploader({
                     onClick={() => handleDelete(file.name)}
                     disabled={deleting === file.name}
                     style={{
-                      background: "#3D0A0A",
-                      color: "#F87171",
-                      border: "1px solid #991B1B",
-                      padding: "5px 10px",
+                      background: "#FEF2F2",
+                      color: "#991B1B",
+                      border: "1px solid #FCA5A5",
+                      padding: "5px 12px",
                       borderRadius: "6px",
                       fontFamily: "'Barlow', sans-serif",
                       fontSize: "12px",
                       cursor: "pointer",
                     }}
                   >
-                    {deleting === file.name ? "..." : "Delete"}
+                    {deleting === file.name ? "…" : "Delete"}
                   </button>
                 </div>
               </div>
