@@ -115,7 +115,7 @@ export default async function ContractorOpenProjectsPage({
           </p>
         </div>
 
-        {/* Sort controls */}
+        {/* Sort controls + Back */}
         <div style={{ display: "flex", gap: "8px" }}>
           {[
             { label: "By Deadline", value: "deadline" },
@@ -139,6 +139,21 @@ export default async function ContractorOpenProjectsPage({
               {s.label}
             </Link>
           ))}
+          <Link
+            href="/dashboard/contractor"
+            style={{
+              background: "transparent",
+              color: "#1B4F8A",
+              border: "1px solid #B8D0E8",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
+          >
+            ← Back
+          </Link>
         </div>
       </div>
 

@@ -74,24 +74,42 @@ export default async function ContractorMyBidsPage() {
             All bids you have submitted across all projects
           </p>
         </div>
-        <Link
-          href="/dashboard/contractor/projects"
-          style={{
-            background: "#C8102E",
-            color: "#fff",
-            border: "none",
-            padding: "10px 20px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontWeight: 600,
-            fontSize: "13px",
-            letterSpacing: "0.5px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
-        >
-          Browse Projects
-        </Link>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Link
+            href="/dashboard/contractor/projects"
+            style={{
+              background: "#C8102E",
+              color: "#fff",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              letterSpacing: "0.5px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            Browse Projects
+          </Link>
+          <Link
+            href="/dashboard/contractor"
+            style={{
+              background: "transparent",
+              color: "#1B4F8A",
+              border: "1px solid #B8D0E8",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            ← Back
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
