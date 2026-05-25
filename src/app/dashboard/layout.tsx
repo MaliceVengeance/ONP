@@ -44,20 +44,44 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
         </Link>
 
-        <form action="/auth/signout" method="post">
-          <button style={{
-            background: "transparent",
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Link href="/terms" style={{
+            fontSize: "11px",
+            color: "#B8D0E8",
+            textDecoration: "none",
+            padding: "4px 8px",
+            borderRadius: "4px",
             border: "1px solid #1B4F8A",
-            color: "#FFFFFF",
-            padding: "6px 12px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontSize: "12px",
-            cursor: "pointer",
+            whiteSpace: "nowrap",
           }}>
-            Sign out
-          </button>
-        </form>
+            Terms
+          </Link>
+          <Link href="/privacy" style={{
+            fontSize: "11px",
+            color: "#B8D0E8",
+            textDecoration: "none",
+            padding: "4px 8px",
+            borderRadius: "4px",
+            border: "1px solid #1B4F8A",
+            whiteSpace: "nowrap",
+          }}>
+            Privacy
+          </Link>
+          <form action="/auth/signout" method="post">
+            <button style={{
+              background: "transparent",
+              border: "1px solid #1B4F8A",
+              color: "#FFFFFF",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "12px",
+              cursor: "pointer",
+            }}>
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
 
       {/* Beta banner */}
