@@ -82,6 +82,25 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       }}>
         {children}
       </main>
+
+      <footer style={{
+        borderTop: "1px solid #B8D0E8",
+        padding: "16px",
+        textAlign: "center",
+        fontSize: "11px",
+        color: "#4A7FB5",
+        marginTop: "40px",
+      }}>
+        <div style={{ marginBottom: "6px" }}>
+          © {new Date().getFullYear()} Our Next Project, LLC — Honoring American Veterans
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: "20px", flexWrap: "wrap" }}>
+          <Link href="/terms" style={{ color: "#4A7FB5", textDecoration: "underline" }}>Terms of Service</Link>
+          <Link href="/terms/legal" style={{ color: "#4A7FB5", textDecoration: "underline" }}>Terms (Legal)</Link>
+          <Link href="/privacy" style={{ color: "#4A7FB5", textDecoration: "underline" }}>Privacy Policy</Link>
+          <Link href="/privacy/legal" style={{ color: "#4A7FB5", textDecoration: "underline" }}>Privacy (Legal)</Link>
+        </div>
+      </footer>
     </div>
   );
 }
