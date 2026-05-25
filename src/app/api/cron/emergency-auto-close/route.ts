@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Vercel Cron — runs every 5 minutes.
- * Finds emergency projects whose 8-hour window has expired and closes them.
+ * Finds emergency projects whose 48-hour window has expired and closes them.
  *
  * Protect with CRON_SECRET env var. Vercel sets Authorization: Bearer <secret>
  * automatically when invoking cron routes.

@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
           }
 
           const now = new Date();
-          const autoCloseAt = new Date(now.getTime() + 8 * 60 * 60 * 1000); // +8 hours
+          const autoCloseAt = new Date(now.getTime() + 48 * 60 * 60 * 1000); // +48 hours
 
           // Activate the project
           const { error: projErr } = await supabaseAdmin

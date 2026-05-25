@@ -129,7 +129,7 @@ export default async function EmergencyPayPage({
           {[
             "Bids visible to you immediately as contractors submit them",
             "Project auto-notifies all eligible contractors right away",
-            "8-hour bidding window — fast response for urgent situations",
+            "48-hour bidding window — fast response for urgent situations",
             "Award a contractor and get contact info immediately",
           ].map((item) => (
             <li key={item} style={{ fontSize: "13px", color: "#FED7AA", lineHeight: 1.7, marginBottom: "4px" }}>

@@ -233,7 +233,7 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
                 </div>
                 <div style={{ fontSize: "12px", color: isEmergency ? "#FED7AA" : canUseEmergency ? "#991B1B" : "#4A7FB5", lineHeight: 1.5 }}>
                   {canUseEmergency
-                    ? "Bids visible immediately as contractors submit. Contractors notified right away. 8-hour window. For burst pipes, storm damage, and genuine emergencies only."
+                    ? "Bids visible immediately as contractors submit. Contractors notified right away. 48-hour window. For burst pipes, storm damage, and genuine emergencies only."
                     : `Emergency limit reached. Next slot available ${rateLimit.nextSlotAvailableAt
                         ? rateLimit.nextSlotAvailableAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
                         : "soon"}.`}

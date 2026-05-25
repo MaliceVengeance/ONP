@@ -17,7 +17,7 @@ By submitting an Emergency Bid Request, you understand and agree:
 
 • ONP does not verify the urgency of your request, does not guarantee that any contractor will bid, and is not responsible for the contractor's eventual pricing, performance, or availability.
 
-• The request auto-closes 8 hours after payment is received if no award is made.
+• The request auto-closes 48 hours after payment is received if no award is made.
 
 • If you abuse the emergency feature (e.g., chargebacks, repeated frivolous use), ONP may suspend or terminate your account.
 

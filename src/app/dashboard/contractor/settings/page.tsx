@@ -117,7 +117,7 @@ export default async function ContractorSettingsPage({
                 </div>
                 <div style={{ fontSize: "13px", color: "#4A7FB5", lineHeight: 1.6 }}>
                   When a client posts an emergency bid request in your category, we&apos;ll send you an immediate
-                  email notification so you can respond quickly. Emergency projects have an 8-hour bidding window
+                  email notification so you can respond quickly. Emergency projects have a 48-hour bidding window
                   and bids are visible as they come in.
                 </div>
               </div>

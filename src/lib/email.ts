@@ -221,7 +221,7 @@ export async function sendEmergencyProjectEmail({
   await resend.emails.send({
     from: FROM,
     to: contractorEmail,
-    subject: `🚨 Emergency Bid Request: "${projectTitle}" — Closes in 8 Hours`,
+    subject: `🚨 Emergency Bid Request: "${projectTitle}" — Closes in 48 Hours`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
