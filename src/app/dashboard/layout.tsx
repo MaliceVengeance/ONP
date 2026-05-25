@@ -3,7 +3,13 @@ import Link from "next/link";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "#FFFFFF",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      {/* Header */}
       <header style={{
         background: "#0A1628",
         borderBottom: "2px solid #C8102E",
@@ -11,6 +17,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        flexShrink: 0,
       }}>
         <Link href="/dashboard" style={{ textDecoration: "none" }}>
           <div style={{
@@ -62,6 +69,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         fontSize: "11px",
         color: "#991B1B",
         lineHeight: 1.5,
+        flexShrink: 0,
       }}>
         <span style={{
           fontWeight: 700,
@@ -75,25 +83,39 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         For testing only — not legitimate business transactions.
       </div>
 
+      {/* Page content */}
       <main style={{
         maxWidth: "900px",
+        width: "100%",
         margin: "0 auto",
-        padding: "20px 16px",
+        padding: "20px 16px 40px",
+        flex: "1 0 auto",
       }}>
         {children}
       </main>
 
-      <footer style={{
-        background: "#EEF4FF",
-        borderTop: "2px solid #B8D0E8",
-        padding: "20px 16px",
+      {/* Legal footer */}
+      <div style={{
+        background: "#0A1628",
+        borderTop: "2px solid #C8102E",
+        padding: "18px 16px",
         textAlign: "center",
-        marginTop: "48px",
+        flexShrink: 0,
       }}>
-        <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "10px", letterSpacing: "0.5px" }}>
+        <div style={{
+          fontSize: "11px",
+          color: "#B8D0E8",
+          marginBottom: "12px",
+          letterSpacing: "0.5px",
+        }}>
           © 2026 Our Next Project, LLC — Honoring American Veterans
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: "4px", flexWrap: "wrap" }}>
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "8px",
+          flexWrap: "wrap",
+        }}>
           {[
             { label: "Terms of Service", href: "/terms" },
             { label: "Terms (Legal)", href: "/terms/legal" },
@@ -102,16 +124,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           ].map((l) => (
             <Link key={l.href} href={l.href} style={{
               fontSize: "12px",
-              color: "#1B4F8A",
+              color: "#FFFFFF",
               textDecoration: "underline",
-              padding: "4px 10px",
+              padding: "4px 12px",
               borderRadius: "4px",
+              border: "1px solid #1B4F8A",
             }}>
               {l.label}
             </Link>
           ))}
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
