@@ -17,7 +17,7 @@ export default async function EditProjectPage({
   const { data: project, error } = await supabase
     .from("projects")
     .select(
-      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode"
+      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency"
     )
     .eq("id", id)
     .single();
@@ -53,16 +53,19 @@ export default async function EditProjectPage({
   const defaultState = locParts[1] ?? "";
 
   const isDraft = project.state === "DRAFT";
-  const isPublished = !isDraft;
+  const isPendingPayment = project.state === "PENDING_PAYMENT";
+  const isPublished = !isDraft && !isPendingPayment;
   const canDelete =
     project.state === "DRAFT" ||
+    project.state === "PENDING_PAYMENT" ||
     (project.state === "OPEN" && (bidCount ?? 0) === 0);
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
   const isEmergencyBidMode = !!(project as any).emergency_bid_mode;
-  const bidsUnlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode;
+  const isEmergencyPaid = !!(project as any).is_emergency;
+  const bidsUnlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode || isEmergencyPaid;
   const hasUnansweredRfis = (unansweredRfiCount ?? 0) > 0;
 
   const inspectorStatus = inspectorAssignment?.request_status ?? null;
@@ -178,6 +181,70 @@ export default async function EditProjectPage({
         </div>
       </div>
 
+      {/* Pending payment banner */}
+      {isPendingPayment && (
+        <div style={{
+          background: "#1A0D00",
+          border: "1px solid #C2410C",
+          borderRadius: "12px",
+          padding: "20px 24px",
+          marginBottom: "24px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "18px",
+            letterSpacing: "1px",
+            color: "#FDBA74",
+            textTransform: "uppercase",
+            marginBottom: "8px",
+          }}>
+            🚨 Payment Required to Activate
+          </div>
+          <p style={{ fontSize: "13px", color: "#FED7AA", lineHeight: 1.6, marginBottom: "16px" }}>
+            Your emergency bid request is saved but not yet live. Pay $10 to activate it — contractors will be notified immediately and bids will be visible as they come in.
+          </p>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <a
+              href={`/dashboard/client/projects/${id}/emergency-pay`}
+              style={{
+                background: "#C2410C",
+                color: "#FFFFFF",
+                border: "none",
+                padding: "12px 24px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 700,
+                fontSize: "14px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              🚨 Pay $10 — Activate Now
+            </a>
+            <a
+              href={`/dashboard/client/projects/${id}/emergency-pay`}
+              style={{
+                background: "transparent",
+                color: "#FED7AA",
+                border: "1px solid #C2410C",
+                padding: "12px 20px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              Convert to Standard (Free)
+            </a>
+          </div>
+          <p style={{ fontSize: "11px", color: "#9A6840", marginTop: "10px" }}>
+            The "Convert to Standard" option is available on the payment page.
+          </p>
+        </div>
+      )}
+
       {/* Countdown timer */}
       {isPublished && project.deadline_at && project.state === "OPEN" && (
         <div style={{ marginBottom: "20px" }}>
@@ -204,7 +271,7 @@ export default async function EditProjectPage({
             }}
           >
             {bidsUnlocked
-            ? isEmergencyBidMode && !deadlinePassed
+            ? (isEmergencyBidMode || isEmergencyPaid) && !deadlinePassed
               ? "🚨 View Bids (Emergency — Live)"
               : "✅ View Bids (Unlocked)"
             : "🔒 View Bids (Locked)"}
@@ -359,7 +426,11 @@ export default async function EditProjectPage({
           Project Details
         </h2>
         <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px" }}>
-          {isDraft ? "Edit your project before publishing." : "Published projects cannot be edited."}
+          {isDraft
+            ? "Edit your project before publishing."
+            : isPendingPayment
+            ? "Complete payment to activate this emergency request."
+            : "Published projects cannot be edited."}
         </p>
 
         <form action={updateDraftProject.bind(null, id)}>
@@ -451,7 +522,7 @@ export default async function EditProjectPage({
       </div>
 
       {/* Publish controls */}
-      {isDraft ? (
+      {isPendingPayment ? null : isDraft ? (
         <div style={{
           background: "#EEF4FF",
           border: "1px solid #B8D0E8",

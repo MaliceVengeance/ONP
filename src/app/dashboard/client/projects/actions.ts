@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { ProjectCategory } from "@/lib/projects/categories";
 
 function clean(v: FormDataEntryValue | null) {
@@ -183,8 +184,22 @@ export async function deleteProject(projectId: string) {
     throw new Error("Project not found or you do not have permission to delete it.");
   }
 
-  if (!["DRAFT", "OPEN"].includes(project.state)) {
+  if (!["DRAFT", "OPEN", "PENDING_PAYMENT"].includes(project.state)) {
     throw new Error("Only draft or open projects can be removed.");
+  }
+
+  // If PENDING_PAYMENT, cancel the emergency log row first (avoids FK constraint)
+  if (project.state === "PENDING_PAYMENT") {
+    await supabaseAdmin
+      .from("emergency_request_log")
+      .update({
+        payment_status: "FAILED",
+        counts_against_limit: false,
+        closed_at: new Date().toISOString(),
+        close_reason: "DELETED",
+      })
+      .eq("project_id", projectId)
+      .eq("payment_status", "PENDING");
   }
 
   // If OPEN, block deletion if any bids exist

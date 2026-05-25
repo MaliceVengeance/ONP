@@ -69,7 +69,7 @@ export default async function ClientProjectBidsPage({
 
   const { data: project, error: pErr } = await supabase
     .from("projects")
-    .select("id,title,state,deadline_at,emergency_bid_mode")
+    .select("id,title,state,deadline_at,emergency_bid_mode,is_emergency")
     .eq("id", projectId)
     .single();
 
@@ -89,8 +89,9 @@ export default async function ClientProjectBidsPage({
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
   const isEmergencyBidMode = !!(project as any).emergency_bid_mode;
+  const isEmergencyPaid = !!(project as any).is_emergency;
   const deadlinePassed = !!(deadline && deadline.getTime() <= now.getTime());
-  const unlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode;
+  const unlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode || isEmergencyPaid;
   const sort = sp.sort === "amount_desc" ? "amount_desc" : "amount_asc";
   const minCents = moneyToCents(sp.min);
   const maxCents = moneyToCents(sp.max);
@@ -228,8 +229,8 @@ export default async function ClientProjectBidsPage({
           </div>
           <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {unlocked
-              ? isEmergencyBidMode && !deadlinePassed
-                ? "Emergency bid mode — bids are visible as contractors submit them."
+              ? (isEmergencyBidMode || isEmergencyPaid) && !deadlinePassed
+                ? "Emergency bid request — bids are visible as contractors submit them."
                 : award
                   ? "Project has been awarded."
                   : "Bids are visible and ready to award."
@@ -247,7 +248,7 @@ export default async function ClientProjectBidsPage({
       </div>
 
       {/* Emergency bid mode disclaimer */}
-      {isEmergencyBidMode && !deadlinePassed && (
+      {(isEmergencyBidMode || isEmergencyPaid) && !deadlinePassed && (
         <div style={{
           background: "#0A1628",
           border: "1px solid #C8102E",
