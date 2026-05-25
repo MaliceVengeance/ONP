@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CONTRACTOR_EMERGENCY_BID_SUBMIT } from "@/lib/disclaimers/contractorEmergencyBidSubmit";
@@ -186,5 +185,5 @@ export async function submitBid(projectId: string, formData: FormData) {
     }
   }
 
-  redirect(`/dashboard/contractor/projects/${projectId}?bid=ok`);
+  return { ok: true, projectId };
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { submitBid } from "@/app/dashboard/contractor/bids/actions";
 
 const DISCLAIMER_VERSION = "v1.0-2026-05-25";
@@ -25,6 +26,7 @@ export default function BidForm({
   coiExpiresSoon?: string | null;
   isEmergency?: boolean;
 }) {
+  const router = useRouter();
   const [step, setStep] = useState<"form" | "confirm">("form");
   const [amount, setAmount] = useState(
     existingBid ? (existingBid.amount_cents / 100).toFixed(2) : ""
@@ -52,12 +54,9 @@ export default function BidForm({
       fd.set("emergency_acknowledged", "true");
     }
     try {
-      await submitBid(projectId, fd);
+      const result = await submitBid(projectId, fd);
+      router.push(`/dashboard/contractor/projects/${result.projectId}?bid=ok`);
     } catch (e: any) {
-      // Next.js redirect() throws a NEXT_REDIRECT internally — not a real error
-      if (e?.digest?.startsWith("NEXT_REDIRECT") || e?.message === "NEXT_REDIRECT") {
-        return;
-      }
       setError(e?.message ?? "Something went wrong. Please try again.");
       setSubmitting(false);
     }
