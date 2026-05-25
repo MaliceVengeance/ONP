@@ -11,6 +11,7 @@ export default async function AdminDashboard() {
     { count: vetCount },
     { count: inspectorCount },
     { count: overrideCount },
+    { count: emergencyActiveCount },
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("projects").select("id", { count: "exact", head: true }),
@@ -18,6 +19,7 @@ export default async function AdminDashboard() {
     supabase.from("contractor_profiles").select("id", { count: "exact", head: true }).eq("veteran_verified", false).not("veteran_applied_at", "is", null),
     supabase.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
     supabase.from("projects").select("id", { count: "exact", head: true }).not("override_requested_at", "is", null).eq("urgent_override", false),
+    supabase.from("emergency_request_log").select("id", { count: "exact", head: true }).eq("payment_status", "PAID").is("closed_at", null),
   ]);
 
   const cards = [
@@ -68,6 +70,14 @@ export default async function AdminDashboard() {
       stat: overrideCount ?? 0,
       statLabel: "pending",
       accent: (overrideCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+    },
+    {
+      title: "Emergency Requests",
+      description: "Monitor paid emergency bids, grant bonus slots, unsuspend disputed clients.",
+      href: "/dashboard/admin/emergency-requests",
+      stat: emergencyActiveCount ?? 0,
+      statLabel: "active now",
+      accent: (emergencyActiveCount ?? 0) > 0 ? "#C2410C" : "#1B4F8A",
     },
     {
       title: "Analytics",
