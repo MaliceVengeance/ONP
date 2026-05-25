@@ -27,24 +27,29 @@ export async function submitRfi(projectId: string, formData: FormData) {
     throw new Error("Project is not open for RFIs.");
   }
 
-  // Check this question type hasn't been asked yet on this project
-  const { data: existing } = await supabase
-    .from("rfis")
-    .select("id")
-    .eq("project_id", projectId)
-    .eq("catalog_id", catalog_id)
-    .maybeSingle();
-
-  if (existing) {
-    throw new Error("This question type has already been asked on this project.");
-  }
-
-  // Fetch catalog item for the prompt text
+  // Fetch catalog item to check prompt and for the email notification
   const { data: catalogItem } = await supabase
     .from("rfi_catalog")
     .select("prompt")
     .eq("id", catalog_id)
     .maybeSingle();
+
+  const isOpenEnded =
+    catalogItem?.prompt === "I have a specific question not covered above.";
+
+  // For all question types except the open-ended one, only one per project is allowed
+  if (!isOpenEnded) {
+    const { data: existing } = await supabase
+      .from("rfis")
+      .select("id")
+      .eq("project_id", projectId)
+      .eq("catalog_id", catalog_id)
+      .maybeSingle();
+
+    if (existing) {
+      throw new Error("This question type has already been asked on this project.");
+    }
+  }
 
   const { error } = await supabase.from("rfis").insert({
     project_id: projectId,

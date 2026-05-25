@@ -63,7 +63,16 @@ export default async function ContractorRfiPage({
 
   const rfiRows = (rfis ?? []) as unknown as RfiRow[];
   const askedCatalogIds = rfiRows.map((r) => r.catalog_id);
-  const availableCatalog = catalogItems.filter((c) => !askedCatalogIds.includes(c.id));
+
+  // "I have a specific question not covered above." is always available and always last
+  const OPEN_ENDED = "I have a specific question not covered above.";
+  const openEndedItem = catalogItems.find((c) => c.prompt === OPEN_ENDED);
+  const standardItems = catalogItems.filter((c) => c.prompt !== OPEN_ENDED);
+  const availableStandard = standardItems.filter((c) => !askedCatalogIds.includes(c.id));
+  const availableCatalog = openEndedItem
+    ? [...availableStandard, openEndedItem]
+    : availableStandard;
+
   const canSubmit = project.state === "OPEN";
 
   const answered = rfiRows.filter((r) => r.response);
