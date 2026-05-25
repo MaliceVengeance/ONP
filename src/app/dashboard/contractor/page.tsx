@@ -99,6 +99,34 @@ export default async function ContractorDashboard({
 
   return (
     <div>
+      {/* Legal links bar */}
+      <div style={{
+        display: "flex",
+        gap: "8px",
+        justifyContent: "flex-end",
+        marginBottom: "16px",
+        flexWrap: "wrap",
+      }}>
+        {[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Terms (Legal)", href: "/terms/legal" },
+          { label: "Privacy Policy", href: "/privacy" },
+          { label: "Privacy (Legal)", href: "/privacy/legal" },
+        ].map((l) => (
+          <Link key={l.href} href={l.href} style={{
+            fontSize: "11px",
+            color: "#1B4F8A",
+            textDecoration: "underline",
+            padding: "3px 8px",
+            border: "1px solid #B8D0E8",
+            borderRadius: "4px",
+            whiteSpace: "nowrap",
+          }}>
+            {l.label}
+          </Link>
+        ))}
+      </div>
+
       {/* Welcome banner */}
       {showWelcome && (
         <div style={{
