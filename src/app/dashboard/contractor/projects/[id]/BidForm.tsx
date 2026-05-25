@@ -54,6 +54,10 @@ export default function BidForm({
     try {
       await submitBid(projectId, fd);
     } catch (e: any) {
+      // Next.js redirect() throws a NEXT_REDIRECT internally — not a real error
+      if (e?.digest?.startsWith("NEXT_REDIRECT") || e?.message === "NEXT_REDIRECT") {
+        return;
+      }
       setError(e?.message ?? "Something went wrong. Please try again.");
       setSubmitting(false);
     }
