@@ -93,6 +93,8 @@ export default async function ClientDashboard() {
         {[
           { label: "All Projects", href: "/dashboard/client/projects" },
           { label: "My Profile", href: "/dashboard/client/profile" },
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
         ].map((l) => (
           <Link key={l.href} href={l.href} style={{
             background: "transparent",

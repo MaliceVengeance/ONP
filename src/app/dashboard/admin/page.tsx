@@ -97,6 +97,29 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
+      <div style={{ display: "flex", gap: "10px", marginBottom: "28px", flexWrap: "wrap" }}>
+        {[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Terms (Legal)", href: "/terms/legal" },
+          { label: "Privacy Policy", href: "/privacy" },
+          { label: "Privacy (Legal)", href: "/privacy/legal" },
+        ].map((l) => (
+          <Link key={l.href} href={l.href} style={{
+            background: "transparent",
+            color: "#1B4F8A",
+            border: "1px solid #B8D0E8",
+            padding: "8px 18px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 500,
+            fontSize: "13px",
+            textDecoration: "none",
+          }}>
+            {l.label}
+          </Link>
+        ))}
+      </div>
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
         {cards.map((card) => (
           <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
