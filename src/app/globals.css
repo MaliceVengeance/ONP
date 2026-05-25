@@ -57,6 +57,17 @@ input, textarea, select {
   outline: none;
 }
 
+/* Radio and checkbox inputs should never stretch full-width */
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
 input:focus, textarea:focus, select:focus {
   border-color: var(--red);
 }
@@ -79,6 +90,4 @@ label {
   font-size: 13px;
   font-weight: 500;
   color: #1B4F8A;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
