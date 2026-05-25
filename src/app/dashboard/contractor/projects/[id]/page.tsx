@@ -49,12 +49,13 @@ export default async function ContractorProjectDetail({
 
   const isSubscribed = subData?.status === "ACTIVE" || subData?.status === "TRIALING";
 
-  const { data: rows, error: pErr } = await supabase.rpc(
-    "get_open_project_detail",
-    { p_project_id: projectId }
-  );
+  const [{ data: rows, error: pErr }, { data: zipRow }] = await Promise.all([
+    supabase.rpc("get_open_project_detail", { p_project_id: projectId }),
+    supabase.from("projects").select("zip_code").eq("id", projectId).maybeSingle(),
+  ]);
 
   const project = (rows as ProjectDetail[] | null)?.[0];
+  const zipCode: string | null = (zipRow as { zip_code?: string | null } | null)?.zip_code ?? null;
 
   if (pErr || !project) {
     return (
@@ -172,7 +173,7 @@ export default async function ContractorProjectDetail({
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
             <span style={{ fontSize: "13px", color: "#1B4F8A" }}>
-              {project.category ?? "—"} • {project.location_general ?? "—"}
+              {project.category ?? "—"} • {project.location_general ?? "—"}{zipCode ? ` ${zipCode}` : ""}
             </span>
             <span style={stateBadge(project.state)}>{project.state}</span>
           </div>
@@ -247,6 +248,12 @@ export default async function ContractorProjectDetail({
           <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Category</div>
           <div style={{ fontSize: "14px", color: "#0A1628", marginTop: "2px" }}>
             {project.category ?? "—"}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Location</div>
+          <div style={{ fontSize: "14px", color: "#0A1628", marginTop: "2px" }}>
+            {project.location_general ?? "—"}{zipCode ? ` ${zipCode}` : ""}
           </div>
         </div>
       </div>

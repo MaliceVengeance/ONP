@@ -37,10 +37,10 @@ export default async function AdminOverrideRequestsPage() {
             color: "#0A1628",
             margin: 0,
           }}>
-            Override Requests
+            Deadline Requests
           </h1>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
-            {requests.length} pending deadline extension request{requests.length !== 1 ? "s" : ""}
+            {requests.length} pending deadline modification request{requests.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Link
@@ -69,18 +69,36 @@ export default async function AdminOverrideRequestsPage() {
           {requests.map((r) => {
             const deadline = r.deadline_at ? new Date(r.deadline_at) : null;
             const deadlinePassed = !!deadline && deadline.getTime() <= Date.now();
+            const isEmergency = (r.override_requested_reason ?? "").includes("[EMERGENCY");
 
             return (
               <div key={r.id} style={{
-                background: "#EEF4FF",
-                border: "1px solid #FCD34D",
+                background: isEmergency ? "#FEF2F2" : "#EEF4FF",
+                border: `1px solid ${isEmergency ? "#FCA5A5" : "#FCD34D"}`,
                 borderRadius: "12px",
                 padding: "20px",
               }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "16px", color: "#0A1628", marginBottom: "4px" }}>
-                      {r.title ?? "Untitled Project"}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "16px", color: "#0A1628" }}>
+                        {r.title ?? "Untitled Project"}
+                      </div>
+                      {isEmergency && (
+                        <span style={{
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          padding: "2px 8px",
+                          borderRadius: "20px",
+                          background: "#FEF2F2",
+                          color: "#991B1B",
+                          border: "1px solid #FCA5A5",
+                          letterSpacing: "0.5px",
+                          flexShrink: 0,
+                        }}>
+                          🚨 EMERGENCY
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
                       Current deadline: {deadline ? deadline.toLocaleDateString() : "—"}

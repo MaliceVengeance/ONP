@@ -10,15 +10,23 @@ function clean(v: FormDataEntryValue | null) {
 export async function requestDeadlineOverride(projectId: string, formData: FormData) {
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
 
+  const requestType = clean(formData.get("request_type")); // "extend" | "shorten"
   const reason = clean(formData.get("reason"));
 
-  if (!reason) throw new Error("Please provide a reason for the extension request.");
+  if (!reason) throw new Error("Please provide a reason for the request.");
+
+  const typeLabel =
+    requestType === "shorten"
+      ? "[EMERGENCY — SHORTEN DEADLINE]"
+      : "[EXTEND DEADLINE]";
+
+  const fullReason = `${typeLabel} ${reason}`;
 
   const { error } = await supabase
     .from("projects")
     .update({
       override_requested_at: new Date().toISOString(),
-      override_requested_reason: reason,
+      override_requested_reason: fullReason,
       override_requested_by: user.id,
     })
     .eq("id", projectId)

@@ -92,7 +92,7 @@ export default async function NewDraftProjectPage() {
             ))}
           </select>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
             <div>
               <label style={labelStyle}>City</label>
               <input
@@ -109,6 +109,15 @@ export default async function NewDraftProjectPage() {
                 style={inputStyle}
                 placeholder="e.g. TX"
                 required
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Zip Code</label>
+              <input
+                name="zip_code"
+                style={inputStyle}
+                placeholder="e.g. 85001"
+                maxLength={10}
               />
             </div>
           </div>

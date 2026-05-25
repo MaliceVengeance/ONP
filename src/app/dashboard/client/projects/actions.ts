@@ -29,6 +29,7 @@ export async function createDraftProject(formData: FormData) {
   const category = clean(formData.get("category")) as ProjectCategory;
   const city = clean(formData.get("city"));
   const usState = clean(formData.get("us_state"));
+  const zip_code = clean(formData.get("zip_code")) || null;
 
   if (!title || !category || !city || !usState) {
     throw new Error("Missing required fields.");
@@ -46,6 +47,7 @@ export async function createDraftProject(formData: FormData) {
       description,
       city,
       location_general,
+      zip_code,
     })
     .select("id")
     .single();
@@ -72,6 +74,7 @@ export async function updateDraftProject(projectId: string, formData: FormData) 
   const category = clean(formData.get("category")) as ProjectCategory;
   const city = clean(formData.get("city"));
   const usState = clean(formData.get("us_state"));
+  const zip_code = clean(formData.get("zip_code")) || null;
 
   if (!title || !category || !city || !usState) {
     throw new Error("Missing required fields.");
@@ -87,6 +90,7 @@ export async function updateDraftProject(projectId: string, formData: FormData) 
       description,
       city,
       location_general,
+      zip_code,
       updated_at: new Date().toISOString(),
     })
     .eq("id", projectId)

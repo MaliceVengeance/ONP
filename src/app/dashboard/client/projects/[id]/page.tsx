@@ -17,7 +17,7 @@ export default async function EditProjectPage({
   const { data: project, error } = await supabase
     .from("projects")
     .select(
-      "id,title,description,category,city,location_general,state,deadline_at,published_at,max_open_days"
+      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days"
     )
     .eq("id", id)
     .single();
@@ -271,7 +271,7 @@ export default async function EditProjectPage({
                 display: "inline-block",
               }}
             >
-              ⏰ Request Extension
+              ⏰ Modify Deadline
             </Link>
           )}
         </div>
@@ -382,7 +382,7 @@ export default async function EditProjectPage({
               ))}
             </select>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
               <div>
                 <label style={labelStyle}>City</label>
                 <input
@@ -400,6 +400,16 @@ export default async function EditProjectPage({
                   style={inputStyle}
                   required
                   placeholder="TX"
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Zip Code</label>
+                <input
+                  name="zip_code"
+                  defaultValue={project.zip_code ?? ""}
+                  style={inputStyle}
+                  placeholder="e.g. 85001"
+                  maxLength={10}
                 />
               </div>
             </div>
