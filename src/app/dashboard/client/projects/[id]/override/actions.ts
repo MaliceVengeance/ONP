@@ -16,8 +16,8 @@ export async function requestDeadlineOverride(projectId: string, formData: FormD
   if (!reason) throw new Error("Please provide a reason for the request.");
 
   const typeLabel =
-    requestType === "shorten"
-      ? "[EMERGENCY — SHORTEN DEADLINE]"
+    requestType === "emergency_bid"
+      ? "[EMERGENCY BID REQUEST]"
       : "[EXTEND DEADLINE]";
 
   const fullReason = `${typeLabel} ${reason}`;

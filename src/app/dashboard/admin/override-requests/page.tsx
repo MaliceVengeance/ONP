@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { approveOverride, denyOverride } from "./actions";
+import { approveOverride, approveEmergencyBidMode, denyOverride } from "./actions";
 
 type OverrideProject = {
   id: string;
@@ -69,42 +69,57 @@ export default async function AdminOverrideRequestsPage() {
           {requests.map((r) => {
             const deadline = r.deadline_at ? new Date(r.deadline_at) : null;
             const deadlinePassed = !!deadline && deadline.getTime() <= Date.now();
-            const isEmergency = (r.override_requested_reason ?? "").includes("[EMERGENCY");
+            const isEmergencyBid = (r.override_requested_reason ?? "").includes("[EMERGENCY BID REQUEST]");
+            const isEmergency = isEmergencyBid;
 
             return (
               <div key={r.id} style={{
-                background: isEmergency ? "#FEF2F2" : "#EEF4FF",
-                border: `1px solid ${isEmergency ? "#FCA5A5" : "#FCD34D"}`,
+                background: isEmergencyBid ? "#0A1628" : "#EEF4FF",
+                border: `1px solid ${isEmergencyBid ? "#C8102E" : "#FCD34D"}`,
                 borderRadius: "12px",
                 padding: "20px",
               }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                      <div style={{ fontWeight: 600, fontSize: "16px", color: "#0A1628" }}>
+                      <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergencyBid ? "#FFFFFF" : "#0A1628" }}>
                         {r.title ?? "Untitled Project"}
                       </div>
-                      {isEmergency && (
+                      {isEmergencyBid ? (
                         <span style={{
                           fontSize: "10px",
                           fontWeight: 700,
                           padding: "2px 8px",
                           borderRadius: "20px",
-                          background: "#FEF2F2",
-                          color: "#991B1B",
-                          border: "1px solid #FCA5A5",
+                          background: "#C8102E",
+                          color: "#FFFFFF",
+                          border: "1px solid #C8102E",
                           letterSpacing: "0.5px",
                           flexShrink: 0,
                         }}>
-                          🚨 EMERGENCY
+                          🚨 EMERGENCY BID
+                        </span>
+                      ) : (
+                        <span style={{
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          padding: "2px 8px",
+                          borderRadius: "20px",
+                          background: "#EEF4FF",
+                          color: "#1B4F8A",
+                          border: "1px solid #B8D0E8",
+                          letterSpacing: "0.5px",
+                          flexShrink: 0,
+                        }}>
+                          ⏰ EXTEND DEADLINE
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "12px", color: isEmergencyBid ? "#B8D0E8" : "#1B4F8A", marginBottom: "4px" }}>
                       Current deadline: {deadline ? deadline.toLocaleDateString() : "—"}
-                      {deadlinePassed && <span style={{ color: "#991B1B", marginLeft: "8px" }}>⚠ Passed</span>}
+                      {deadlinePassed && <span style={{ color: "#C8102E", marginLeft: "8px" }}>⚠ Passed</span>}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
+                    <div style={{ fontSize: "12px", color: isEmergencyBid ? "#B8D0E8" : "#4A7FB5" }}>
                       Requested: {r.override_requested_at ? new Date(r.override_requested_at).toLocaleDateString() : "—"}
                     </div>
                   </div>
@@ -112,7 +127,7 @@ export default async function AdminOverrideRequestsPage() {
                     href={`/dashboard/admin/projects/${r.id}`}
                     style={{
                       fontSize: "12px",
-                      color: "#4A7FB5",
+                      color: isEmergencyBid ? "#B8D0E8" : "#4A7FB5",
                       textDecoration: "underline",
                       flexShrink: 0,
                     }}
@@ -123,74 +138,109 @@ export default async function AdminOverrideRequestsPage() {
 
                 {r.override_requested_reason && (
                   <div style={{
-                    background: "#FFFFFF",
-                    border: "1px solid #B8D0E8",
+                    background: isEmergencyBid ? "#1B4F8A" : "#FFFFFF",
+                    border: `1px solid ${isEmergencyBid ? "#1B4F8A" : "#B8D0E8"}`,
                     borderRadius: "8px",
                     padding: "12px",
                     marginBottom: "14px",
                     fontSize: "13px",
-                    color: "#0A1628",
+                    color: isEmergencyBid ? "#FFFFFF" : "#0A1628",
                     lineHeight: 1.6,
                   }}>
-                    <span style={{ color: "#1B4F8A", fontWeight: 600 }}>Reason: </span>
+                    <span style={{ color: isEmergencyBid ? "#B8D0E8" : "#1B4F8A", fontWeight: 600 }}>Reason: </span>
                     {r.override_requested_reason}
                   </div>
                 )}
 
-                {/* Approve form */}
-                <form action={approveOverride.bind(null, r.id)} style={{ display: "flex", gap: "8px", alignItems: "flex-end", flexWrap: "wrap" }}>
-                  <div>
-                    <label style={{
-                      display: "block",
-                      fontSize: "11px",
-                      color: "#1B4F8A",
-                      textTransform: "uppercase",
-                      letterSpacing: "1px",
-                      marginBottom: "4px",
+                {isEmergencyBid ? (
+                  /* Emergency Bid Mode approval — no date picker, just unlocks bids */
+                  <>
+                    <div style={{
+                      background: "#1B4F8A",
+                      borderRadius: "8px",
+                      padding: "12px 14px",
+                      marginBottom: "12px",
+                      fontSize: "12px",
+                      color: "#FFFFFF",
+                      lineHeight: 1.65,
                     }}>
-                      New Deadline
-                    </label>
-                    <input
-                      type="date"
-                      name="new_deadline"
+                      <strong style={{ color: "#FFFFFF" }}>Approving this request</strong> will immediately unlock bids on this project as contractors submit them. The deadline itself does not change. Both the client and contractors will see an emergency disclaimer. This cannot be undone.
+                    </div>
+                    <form action={approveEmergencyBidMode.bind(null, r.id)}>
+                      <button
+                        type="submit"
+                        style={{
+                          background: "#C8102E",
+                          color: "#FFFFFF",
+                          border: "none",
+                          padding: "8px 20px",
+                          borderRadius: "6px",
+                          fontFamily: "'Barlow', sans-serif",
+                          fontWeight: 600,
+                          fontSize: "13px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        🚨 Approve Emergency Bid Mode
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  /* Standard deadline extension approval */
+                  <form action={approveOverride.bind(null, r.id)} style={{ display: "flex", gap: "8px", alignItems: "flex-end", flexWrap: "wrap" }}>
+                    <div>
+                      <label style={{
+                        display: "block",
+                        fontSize: "11px",
+                        color: "#1B4F8A",
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        marginBottom: "4px",
+                      }}>
+                        New Deadline
+                      </label>
+                      <input
+                        type="date"
+                        name="new_deadline"
+                        style={{
+                          background: "#FFFFFF",
+                          border: "1px solid #B8D0E8",
+                          color: "#0A1628",
+                          borderRadius: "6px",
+                          padding: "8px 12px",
+                          fontFamily: "'Barlow', sans-serif",
+                          fontSize: "13px",
+                          outline: "none",
+                        }}
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
                       style={{
-                        background: "#FFFFFF",
-                        border: "1px solid #B8D0E8",
-                        color: "#0A1628",
+                        background: "#F0FDF4",
+                        color: "#15803D",
+                        border: "1px solid #166534",
+                        padding: "8px 20px",
                         borderRadius: "6px",
-                        padding: "8px 12px",
                         fontFamily: "'Barlow', sans-serif",
+                        fontWeight: 600,
                         fontSize: "13px",
-                        outline: "none",
+                        cursor: "pointer",
                       }}
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    style={{
-                      background: "#F0FDF4",
-                      color: "#15803D",
-                      border: "1px solid #166534",
-                      padding: "8px 20px",
-                      borderRadius: "6px",
-                      fontFamily: "'Barlow', sans-serif",
-                      fontWeight: 600,
-                      fontSize: "13px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Approve & Set Date
-                  </button>
-                </form>
+                    >
+                      Approve & Set Date
+                    </button>
+                  </form>
+                )}
 
                 <form action={denyOverride.bind(null, r.id)} style={{ marginTop: "8px" }}>
                   <button
                     type="submit"
                     style={{
                       background: "transparent",
-                      color: "#991B1B",
-                      border: "1px solid #FCA5A5",
+                      color: isEmergencyBid ? "#B8D0E8" : "#991B1B",
+                      border: `1px solid ${isEmergencyBid ? "#1B4F8A" : "#FCA5A5"}`,
                       padding: "6px 16px",
                       borderRadius: "6px",
                       fontFamily: "'Barlow', sans-serif",

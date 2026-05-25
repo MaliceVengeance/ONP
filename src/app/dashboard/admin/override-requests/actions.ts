@@ -31,6 +31,24 @@ export async function approveOverride(projectId: string, formData: FormData) {
   revalidatePath("/dashboard/admin/override-requests");
 }
 
+export async function approveEmergencyBidMode(projectId: string) {
+  const { supabase } = await requireRole(["ADMIN"]);
+
+  const { error } = await supabase
+    .from("projects")
+    .update({
+      emergency_bid_mode: true,
+      urgent_override: true,
+      urgent_reason: "[EMERGENCY BID MODE APPROVED] Admin approved emergency bid mode — bids are now visible as submitted.",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", projectId);
+
+  if (error) throw wrapErr("approveEmergencyBidMode", error);
+
+  revalidatePath("/dashboard/admin/override-requests");
+}
+
 export async function denyOverride(projectId: string) {
   const { supabase } = await requireRole(["ADMIN"]);
 

@@ -69,7 +69,7 @@ export default async function ClientProjectBidsPage({
 
   const { data: project, error: pErr } = await supabase
     .from("projects")
-    .select("id,title,state,deadline_at")
+    .select("id,title,state,deadline_at,emergency_bid_mode")
     .eq("id", projectId)
     .single();
 
@@ -88,7 +88,9 @@ export default async function ClientProjectBidsPage({
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
-  const unlocked = (deadline && deadline.getTime() <= now.getTime()) || project.state !== "OPEN";
+  const isEmergencyBidMode = !!(project as any).emergency_bid_mode;
+  const deadlinePassed = !!(deadline && deadline.getTime() <= now.getTime());
+  const unlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode;
   const sort = sp.sort === "amount_desc" ? "amount_desc" : "amount_asc";
   const minCents = moneyToCents(sp.min);
   const maxCents = moneyToCents(sp.max);
@@ -226,9 +228,11 @@ export default async function ClientProjectBidsPage({
           </div>
           <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
             {unlocked
-              ? award
-                ? "Project has been awarded."
-                : "Bids are visible and ready to award."
+              ? isEmergencyBidMode && !deadlinePassed
+                ? "Emergency bid mode — bids are visible as contractors submit them."
+                : award
+                  ? "Project has been awarded."
+                  : "Bids are visible and ready to award."
               : "Bids are sealed until the deadline passes."}
           </div>
         </div>
@@ -241,6 +245,38 @@ export default async function ClientProjectBidsPage({
           </div>
         </div>
       </div>
+
+      {/* Emergency bid mode disclaimer */}
+      {isEmergencyBidMode && !deadlinePassed && (
+        <div style={{
+          background: "#0A1628",
+          border: "1px solid #C8102E",
+          borderRadius: "10px",
+          padding: "18px 20px",
+          marginBottom: "20px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "14px",
+            letterSpacing: "1px",
+            color: "#C8102E",
+            textTransform: "uppercase",
+            marginBottom: "10px",
+          }}>
+            🚨 Emergency Bid Mode Active
+          </div>
+          <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "8px" }}>
+            This project is operating in Emergency Bid Mode. Bids are being revealed as contractors submit them — the standard sealed bidding process is not in effect for this project.
+          </p>
+          <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "8px" }}>
+            <strong style={{ color: "#C8102E" }}>These bids are preliminary and incomplete.</strong> Because no site visit has been conducted and contractors are responding to an urgent request, bids may reflect significant contingency padding, missing scope items, or worst-case pricing assumptions. They are not accurate final estimates.
+          </p>
+          <p style={{ fontSize: "13px", color: "#B8D0E8", lineHeight: 1.75 }}>
+            ONP is not responsible for pricing differences, disputes, or outcomes arising from bids submitted under emergency conditions. Award any contractor at your own risk and expect to negotiate final scope and pricing after a proper site visit.
+          </p>
+        </div>
+      )}
 
       {/* Award saved banner */}
       {sp.award === "ok" && (

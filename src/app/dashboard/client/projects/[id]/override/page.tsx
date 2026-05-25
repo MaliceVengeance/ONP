@@ -185,7 +185,7 @@ export default async function ClientOverridePage({
             Request Deadline Change
           </h2>
           <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "20px" }}>
-            Choose the type of change you need and explain why. An admin will review and set the new deadline.
+            Choose the type of change you need and explain why. An admin will review your request.
           </p>
 
           <form action={requestDeadlineOverride.bind(null, projectId)}>
@@ -243,18 +243,62 @@ export default async function ClientOverridePage({
                 <input
                   type="radio"
                   name="request_type"
-                  value="shorten"
+                  value="emergency_bid"
                   style={{ marginTop: "2px", accentColor: "#C8102E" }}
                 />
                 <div>
                   <div style={{ fontWeight: 600, fontSize: "14px", color: "#991B1B", marginBottom: "2px" }}>
-                    🚨 Emergency — Shorten Deadline
+                    🚨 Emergency Bid Request
                   </div>
                   <div style={{ fontSize: "12px", color: "#991B1B" }}>
-                    This is an urgent situation and the project needs to be filled as soon as possible.
+                    Urgent situation — open bids immediately as contractors submit them instead of waiting for the deadline.
                   </div>
                 </div>
               </label>
+            </div>
+
+            {/* Emergency bid disclaimer */}
+            <div style={{
+              background: "#0A1628",
+              border: "1px solid #C8102E",
+              borderRadius: "10px",
+              padding: "18px 20px",
+              marginBottom: "20px",
+            }}>
+              <div style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "14px",
+                letterSpacing: "1px",
+                color: "#C8102E",
+                textTransform: "uppercase",
+                marginBottom: "10px",
+              }}>
+                ⚠ Emergency Bid Mode — Read Before Proceeding
+              </div>
+              <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "10px" }}>
+                If approved, bids on this project will be <strong style={{ color: "#FFFFFF" }}>visible to you as contractors submit them</strong>, rather than remaining sealed until the deadline. The deadline itself does not change — contractors still bid within the original window.
+              </p>
+              <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "10px" }}>
+                <strong style={{ color: "#C8102E" }}>Important trade-offs you are accepting:</strong>
+              </p>
+              <ul style={{ paddingLeft: "20px", marginBottom: "10px" }}>
+                <li style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "6px" }}>
+                  Contractors bidding on this project will be notified that bids are open and visible. This may cause contractors to <strong style={{ color: "#FFFFFF" }}>anchor to or undercut each other&apos;s numbers</strong>, undermining the independence that sealed bidding is designed to protect.
+                </li>
+                <li style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "6px" }}>
+                  Bids submitted under emergency conditions are <strong style={{ color: "#FFFFFF" }}>generally incomplete and preliminary</strong>. Because no site visit has been conducted and contractors are responding urgently, pricing may reflect worst-case assumptions, missing scope, or significant contingency padding.
+                </li>
+                <li style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "6px" }}>
+                  The blind bidding process exists to protect you from inflated pricing and to give contractors equal footing. Bypassing it carries real financial risk — <strong style={{ color: "#FFFFFF" }}>the lowest emergency bid is not necessarily the best value</strong>, and final costs after site visits may differ materially.
+                </li>
+                <li style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75 }}>
+                  ONP is not responsible for pricing differences, disputes, or outcomes that arise from bids submitted under emergency conditions. Awarding a contractor based on an emergency bid is done entirely at your own risk.
+                </li>
+              </ul>
+              <p style={{ fontSize: "12px", color: "#B8D0E8", lineHeight: 1.6, fontStyle: "italic" }}>
+                Only select this option if your situation genuinely cannot wait for the standard bidding process to run its course.
+              </p>
             </div>
 
             <label style={{
@@ -271,7 +315,7 @@ export default async function ClientOverridePage({
             <textarea
               name="reason"
               style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }}
-              placeholder="Describe the situation and any specific timing needs (e.g. 'need this completed by end of month', 'want to extend by 3 days so more contractors can review')…"
+              placeholder="Describe the situation. For a deadline extension: how many extra days are needed and why. For an Emergency Bid Request: what makes this a genuine emergency (e.g. 'storm damage, need repair estimates immediately')…"
               required
             />
 

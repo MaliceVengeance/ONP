@@ -17,7 +17,7 @@ export default async function EditProjectPage({
   const { data: project, error } = await supabase
     .from("projects")
     .select(
-      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days"
+      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode"
     )
     .eq("id", id)
     .single();
@@ -61,7 +61,8 @@ export default async function EditProjectPage({
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
-  const bidsUnlocked = deadlinePassed || project.state !== "OPEN";
+  const isEmergencyBidMode = !!(project as any).emergency_bid_mode;
+  const bidsUnlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode;
   const hasUnansweredRfis = (unansweredRfiCount ?? 0) > 0;
 
   const inspectorStatus = inspectorAssignment?.request_status ?? null;
@@ -202,7 +203,11 @@ export default async function EditProjectPage({
               display: "inline-block",
             }}
           >
-            {bidsUnlocked ? "✅ View Bids (Unlocked)" : "🔒 View Bids (Locked)"}
+            {bidsUnlocked
+            ? isEmergencyBidMode && !deadlinePassed
+              ? "🚨 View Bids (Emergency — Live)"
+              : "✅ View Bids (Unlocked)"
+            : "🔒 View Bids (Locked)"}
           </Link>
 
           <Link

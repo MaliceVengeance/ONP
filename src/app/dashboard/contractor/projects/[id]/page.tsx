@@ -75,11 +75,12 @@ export default async function ContractorProjectDetail({
 
   const [{ data: rows, error: pErr }, { data: zipRow }] = await Promise.all([
     supabase.rpc("get_open_project_detail", { p_project_id: projectId }),
-    supabase.from("projects").select("zip_code").eq("id", projectId).maybeSingle(),
+    supabase.from("projects").select("zip_code, emergency_bid_mode").eq("id", projectId).maybeSingle(),
   ]);
 
   const project = (rows as ProjectDetail[] | null)?.[0];
   const zipCode: string | null = (zipRow as { zip_code?: string | null } | null)?.zip_code ?? null;
+  const isEmergencyBidMode = !!(zipRow as any)?.emergency_bid_mode;
 
   if (pErr || !project) {
     return (
@@ -475,6 +476,38 @@ export default async function ContractorProjectDetail({
         </div>
       )}
 
+      {/* Emergency bid mode disclaimer for contractor */}
+      {isEmergencyBidMode && isOpen && beforeDeadline && (
+        <div style={{
+          background: "#0A1628",
+          border: "1px solid #C8102E",
+          borderRadius: "10px",
+          padding: "18px 20px",
+          marginBottom: "16px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "14px",
+            letterSpacing: "1px",
+            color: "#C8102E",
+            textTransform: "uppercase",
+            marginBottom: "10px",
+          }}>
+            🚨 Emergency Bid Project
+          </div>
+          <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "8px" }}>
+            This project has been designated an <strong style={{ color: "#FFFFFF" }}>Emergency Bid</strong>. Bids are visible to the client as they are submitted — the standard sealed bidding process is <strong style={{ color: "#FFFFFF" }}>not in effect</strong>. Other contractors&apos; bids may already be visible.
+          </p>
+          <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "8px" }}>
+            <strong style={{ color: "#C8102E" }}>Your bid will be treated as preliminary and incomplete.</strong> Because no site visit has been conducted and you are responding under urgent conditions, you are not expected to have a complete picture of the scope. Do your best with the information available, but understand that your bid is a good-faith estimate only — not a firm commitment to a final price.
+          </p>
+          <p style={{ fontSize: "13px", color: "#B8D0E8", lineHeight: 1.75 }}>
+            You are encouraged to note all assumptions and uncertainties clearly in your bid notes. Scope, materials, and conditions should be confirmed in a site visit before any final agreement is made with the client. ONP is not responsible for disputes or losses arising from emergency bid pricing.
+          </p>
+        </div>
+      )}
+
       {/* Bid form or subscription gate */}
       {canBid ? (
         <BidForm
@@ -482,6 +515,7 @@ export default async function ContractorProjectDetail({
           existingBid={existingBid}
           licenseExpiresSoon={licenseExpiresSoon}
           coiExpiresSoon={coiExpiresSoon}
+          isEmergency={isEmergencyBidMode}
         />
       ) : isOpen && beforeDeadline && !isSubscribed ? (
         /* Subscription gate */

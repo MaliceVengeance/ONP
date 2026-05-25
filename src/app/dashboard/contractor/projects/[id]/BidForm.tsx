@@ -17,11 +17,13 @@ export default function BidForm({
   existingBid,
   licenseExpiresSoon,
   coiExpiresSoon,
+  isEmergency,
 }: {
   projectId: string;
   existingBid: ExistingBid | null;
   licenseExpiresSoon?: string | null;
   coiExpiresSoon?: string | null;
+  isEmergency?: boolean;
 }) {
   const [step, setStep] = useState<"form" | "confirm">("form");
   const [amount, setAmount] = useState(
@@ -30,10 +32,11 @@ export default function BidForm({
   const [notes, setNotes] = useState(existingBid?.notes ?? "");
   const [termsChecked, setTermsChecked] = useState(false);
   const [credentialsChecked, setCredentialsChecked] = useState(false);
+  const [emergencyChecked, setEmergencyChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const bothChecked = termsChecked && credentialsChecked;
+  const bothChecked = termsChecked && credentialsChecked && (!isEmergency || emergencyChecked);
 
   async function handleConfirm() {
     if (!bothChecked) return;
@@ -96,8 +99,10 @@ export default function BidForm({
         }}>
           {existingBid ? "Revise Your Bid" : "Submit a Bid"}
         </h2>
-        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
-          Bids are sealed until the deadline. You can revise anytime before it closes.
+        <p style={{ fontSize: "12px", color: isEmergency ? "#C8102E" : "#1B4F8A", marginBottom: "4px" }}>
+          {isEmergency
+            ? "🚨 Emergency bid — your bid is visible to the client immediately upon submission."
+            : "Bids are sealed until the deadline. You can revise anytime before it closes."}
         </p>
 
         {/* Verification warnings */}
@@ -279,7 +284,7 @@ export default function BidForm({
         alignItems: "flex-start",
         gap: "10px",
         cursor: "pointer",
-        marginBottom: "16px",
+        marginBottom: isEmergency ? "10px" : "16px",
         padding: "10px 12px",
         background: credentialsChecked ? "#F0FDF4" : "#FFFFFF",
         border: `1px solid ${credentialsChecked ? "#166534" : "#B8D0E8"}`,
@@ -295,6 +300,31 @@ export default function BidForm({
           I confirm my license, insurance, and business information on file are current and accurate.
         </span>
       </label>
+
+      {/* Checkbox 3 — Emergency acknowledgment */}
+      {isEmergency && (
+        <label style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          cursor: "pointer",
+          marginBottom: "16px",
+          padding: "10px 12px",
+          background: emergencyChecked ? "#1B4F8A" : "#0A1628",
+          border: `1px solid ${emergencyChecked ? "#1B4F8A" : "#C8102E"}`,
+          borderRadius: "8px",
+        }}>
+          <input
+            type="checkbox"
+            checked={emergencyChecked}
+            onChange={(e) => setEmergencyChecked(e.target.checked)}
+            style={{ marginTop: "2px", accentColor: "#C8102E", flexShrink: 0 }}
+          />
+          <span style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.5 }}>
+            I understand this is an emergency bid. My bid is <strong style={{ color: "#FFFFFF" }}>preliminary and incomplete</strong> — no site visit has been conducted. This bid will be immediately visible to the client. I am not held to a final price until scope and conditions are confirmed in person.
+          </span>
+        </label>
+      )}
 
       {error && (
         <div style={{
@@ -333,7 +363,7 @@ export default function BidForm({
         </button>
         <button
           type="button"
-          onClick={() => { setStep("form"); setTermsChecked(false); setCredentialsChecked(false); }}
+          onClick={() => { setStep("form"); setTermsChecked(false); setCredentialsChecked(false); setEmergencyChecked(false); }}
           style={{
             background: "transparent",
             color: "#1B4F8A",
