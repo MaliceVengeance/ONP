@@ -48,6 +48,9 @@ export default function BidForm({
     fd.set("terms_acknowledged", "true");
     fd.set("credentials_acknowledged", "true");
     fd.set("disclaimer_version", DISCLAIMER_VERSION);
+    if (isEmergency && emergencyChecked) {
+      fd.set("emergency_acknowledged", "true");
+    }
     try {
       await submitBid(projectId, fd);
     } catch (e: any) {

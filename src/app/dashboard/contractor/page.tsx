@@ -378,6 +378,7 @@ export default async function ContractorDashboard({
         {[
           { label: "My Pending Bids", href: "/dashboard/contractor/bids" },
           { label: "My Profile", href: "/dashboard/contractor/profile" },
+          { label: "⚙ Notification Settings", href: "/dashboard/contractor/settings" },
           { label: "Terms of Service", href: "/terms" },
           { label: "Privacy Policy", href: "/privacy" },
         ].map((l) => (

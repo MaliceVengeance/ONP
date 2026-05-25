@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { CONTRACTOR_EMERGENCY_BID_SUBMIT } from "@/lib/disclaimers/contractorEmergencyBidSubmit";
 
 function clean(v: FormDataEntryValue | null) {
   return String(v ?? "").trim();
@@ -154,6 +156,33 @@ export async function submitBid(projectId: string, formData: FormData) {
     });
     if (ackErr) {
       console.warn("bid_acknowledgments insert skipped:", ackErr.message);
+    }
+  }
+
+  // 7) If emergency project and emergency checkbox acknowledged, log disclaimer (first bid only)
+  if (formData.get("emergency_acknowledged") === "true" && nextVersion === 1) {
+    try {
+      const { data: isEmergencyRow } = await supabaseAdmin
+        .from("projects")
+        .select("is_emergency, emergency_bid_mode")
+        .eq("id", projectId)
+        .maybeSingle();
+
+      const isAnyEmergency =
+        (isEmergencyRow as any)?.is_emergency ||
+        (isEmergencyRow as any)?.emergency_bid_mode;
+
+      if (isAnyEmergency) {
+        await supabaseAdmin.from("disclaimer_acknowledgments").insert({
+          user_id: user.id,
+          disclaimer_type: CONTRACTOR_EMERGENCY_BID_SUBMIT.type,
+          disclaimer_version: CONTRACTOR_EMERGENCY_BID_SUBMIT.version,
+          project_id: projectId,
+          acknowledged_at: new Date().toISOString(),
+        });
+      }
+    } catch (e) {
+      console.warn("Emergency disclaimer log skipped:", e);
     }
   }
 
