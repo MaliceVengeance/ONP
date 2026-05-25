@@ -75,12 +75,14 @@ export default async function ContractorProjectDetail({
 
   const [{ data: rows, error: pErr }, { data: zipRow }] = await Promise.all([
     supabase.rpc("get_open_project_detail", { p_project_id: projectId }),
-    supabase.from("projects").select("zip_code, emergency_bid_mode").eq("id", projectId).maybeSingle(),
+    supabase.from("projects").select("zip_code, emergency_bid_mode, is_emergency").eq("id", projectId).maybeSingle(),
   ]);
 
   const project = (rows as ProjectDetail[] | null)?.[0];
   const zipCode: string | null = (zipRow as { zip_code?: string | null } | null)?.zip_code ?? null;
   const isEmergencyBidMode = !!(zipRow as any)?.emergency_bid_mode;
+  const isEmergencyPaid = !!(zipRow as any)?.is_emergency;
+  const isAnyEmergency = isEmergencyBidMode || isEmergencyPaid;
 
   if (pErr || !project) {
     return (
@@ -477,7 +479,7 @@ export default async function ContractorProjectDetail({
       )}
 
       {/* Emergency bid mode disclaimer for contractor */}
-      {isEmergencyBidMode && isOpen && beforeDeadline && (
+      {isAnyEmergency && isOpen && beforeDeadline && (
         <div style={{
           background: "#0A1628",
           border: "1px solid #C8102E",
@@ -515,7 +517,7 @@ export default async function ContractorProjectDetail({
           existingBid={existingBid}
           licenseExpiresSoon={licenseExpiresSoon}
           coiExpiresSoon={coiExpiresSoon}
-          isEmergency={isEmergencyBidMode}
+          isEmergency={isAnyEmergency}
         />
       ) : isOpen && beforeDeadline && !isSubscribed ? (
         /* Subscription gate */

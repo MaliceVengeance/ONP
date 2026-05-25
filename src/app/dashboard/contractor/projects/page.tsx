@@ -12,6 +12,7 @@ type OpenProject = {
   deadline_at: string | null;
   min_open_days: number | null;
   max_open_days: number | null;
+  is_emergency?: boolean;
 };
 
 function timeRemaining(deadline: string | null) {
@@ -43,6 +44,26 @@ export default async function ContractorOpenProjectsPage({
     throw new Error(`RPC list_open_projects failed: ${JSON.stringify(error)}`);
   }
 
+  const rpcProjects = (data ?? []) as OpenProject[];
+
+  // Fetch is_emergency for all returned projects in one query
+  let emergencyMap = new Map<string, boolean>();
+  if (rpcProjects.length > 0) {
+    const { data: emergencyRows } = await supabase
+      .from("projects")
+      .select("id, is_emergency")
+      .in("id", rpcProjects.map((p) => p.id));
+    (emergencyRows ?? []).forEach((r: any) => {
+      if (r.is_emergency) emergencyMap.set(r.id, true);
+    });
+  }
+
+  // Merge is_emergency into project objects
+  const mergedProjects = rpcProjects.map((p) => ({
+    ...p,
+    is_emergency: emergencyMap.get(p.id) ?? false,
+  }));
+
   // Fetch this contractor's bid project IDs so we can keep past-deadline
   // projects they've already bid on
   const { data: myBids } = await supabase
@@ -53,7 +74,7 @@ export default async function ContractorOpenProjectsPage({
   const biddedProjectIds = new Set((myBids ?? []).map((b) => b.project_id));
 
   const now = Date.now();
-  const allProjects = ((data ?? []) as OpenProject[]).filter((p) => {
+  const allProjects = mergedProjects.filter((p) => {
     const deadlinePassed = p.deadline_at
       ? new Date(p.deadline_at).getTime() <= now
       : false;
@@ -74,13 +95,19 @@ export default async function ContractorOpenProjectsPage({
   )].sort();
 
   // Apply filters
-  const projects = allProjects.filter((p) => {
+  const filtered = allProjects.filter((p) => {
     const matchesCategory = !categoryFilter ||
       p.category?.toLowerCase() === categoryFilter.toLowerCase();
     const matchesLocation = !locationFilter ||
       p.location_general?.toLowerCase().includes(locationFilter.toLowerCase());
     return matchesCategory && matchesLocation;
   });
+
+  // Sort emergency projects to the top (preserve existing sort order within each group)
+  const projects = [
+    ...filtered.filter((p) => p.is_emergency),
+    ...filtered.filter((p) => !p.is_emergency),
+  ];
 
   const buildUrl = (params: Record<string, string>) => {
     const base = new URLSearchParams();
@@ -322,6 +349,7 @@ export default async function ContractorOpenProjectsPage({
           {projects.map((p) => {
             const remaining = timeRemaining(p.deadline_at);
             const isUrgent = remaining && remaining.includes("h remaining") && !remaining.includes("d");
+            const isEmergency = !!p.is_emergency;
 
             return (
               <Link
@@ -330,8 +358,8 @@ export default async function ContractorOpenProjectsPage({
                 style={{ textDecoration: "none" }}
               >
                 <HoverCard style={{
-                  background: "#EEF4FF",
-                  border: "1px solid #B8D0E8",
+                  background: isEmergency ? "#180800" : "#EEF4FF",
+                  border: `1px solid ${isEmergency ? "#C2410C" : "#B8D0E8"}`,
                   borderRadius: "10px",
                   padding: "20px",
                   cursor: "pointer",
@@ -339,10 +367,23 @@ export default async function ContractorOpenProjectsPage({
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-                        <div style={{ fontWeight: 600, fontSize: "16px", color: "#0A1628" }}>
+                        <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergency ? "#FED7AA" : "#0A1628" }}>
                           {p.title ?? "Untitled Project"}
                         </div>
-                        {isUrgent && (
+                        {isEmergency && (
+                          <span style={{
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            padding: "2px 10px",
+                            borderRadius: "20px",
+                            background: "#C2410C",
+                            color: "#FFFFFF",
+                            letterSpacing: "0.5px",
+                          }}>
+                            🚨 EMERGENCY
+                          </span>
+                        )}
+                        {!isEmergency && isUrgent && (
                           <span style={{
                             fontSize: "10px",
                             fontWeight: 600,
@@ -357,15 +398,15 @@ export default async function ContractorOpenProjectsPage({
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "8px" }}>
+                      <div style={{ fontSize: "13px", color: isEmergency ? "#FDBA74" : "#1B4F8A", marginBottom: "8px" }}>
                         <span style={{
-                          background: "#FFFFFF",
-                          border: "1px solid #B8D0E8",
+                          background: isEmergency ? "#7C1A00" : "#FFFFFF",
+                          border: `1px solid ${isEmergency ? "#C2410C" : "#B8D0E8"}`,
                           borderRadius: "4px",
                           padding: "2px 8px",
                           fontSize: "11px",
                           marginRight: "8px",
-                          color: "#1B4F8A",
+                          color: isEmergency ? "#FED7AA" : "#1B4F8A",
                         }}>
                           {p.category?.replaceAll("_", " ") ?? "—"}
                         </span>
@@ -374,7 +415,7 @@ export default async function ContractorOpenProjectsPage({
                       {p.description && (
                         <div style={{
                           fontSize: "13px",
-                          color: "#4A7FB5",
+                          color: isEmergency ? "#FCA974" : "#4A7FB5",
                           display: "-webkit-box",
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: "vertical",
@@ -383,21 +424,26 @@ export default async function ContractorOpenProjectsPage({
                           {p.description}
                         </div>
                       )}
+                      {isEmergency && (
+                        <div style={{ fontSize: "12px", color: "#FCA5A5", marginTop: "6px", fontWeight: 600 }}>
+                          ⚡ Bids visible immediately — respond now
+                        </div>
+                      )}
                     </div>
 
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{
                         fontSize: "11px",
-                        color: "#1B4F8A",
+                        color: isEmergency ? "#FDBA74" : "#1B4F8A",
                         textTransform: "uppercase",
                         letterSpacing: "1px",
                         marginBottom: "4px",
                       }}>
-                        Deadline
+                        {isEmergency ? "Closes" : "Deadline"}
                       </div>
                       <div style={{
                         fontSize: "13px",
-                        color: isUrgent ? "#991B1B" : "#0A1628",
+                        color: isEmergency ? "#FDBA74" : isUrgent ? "#991B1B" : "#0A1628",
                         fontWeight: 500,
                         marginBottom: "4px",
                       }}>
@@ -406,7 +452,7 @@ export default async function ContractorOpenProjectsPage({
                       {remaining && (
                         <div style={{
                           fontSize: "12px",
-                          color: isUrgent ? "#991B1B" : "#15803D",
+                          color: isEmergency ? "#FCA5A5" : isUrgent ? "#991B1B" : "#15803D",
                           fontWeight: 600,
                         }}>
                           {remaining}
@@ -414,7 +460,7 @@ export default async function ContractorOpenProjectsPage({
                       )}
                       <div style={{
                         fontSize: "11px",
-                        color: "#4A7FB5",
+                        color: isEmergency ? "#9A5030" : "#4A7FB5",
                         marginTop: "8px",
                       }}>
                         Published {p.published_at ? new Date(p.published_at).toLocaleDateString() : "—"}
