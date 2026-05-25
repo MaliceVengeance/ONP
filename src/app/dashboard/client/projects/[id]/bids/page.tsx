@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { awardBid } from "./actions";
 import { stateBadge } from "@/lib/ui";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import AwardButton from "./AwardButton";
 
 type BidRow = {
   bid_id: string;
@@ -408,6 +408,28 @@ export default async function ClientProjectBidsPage({
             </p>
           </div>
 
+          {/* Inline bid estimate notice */}
+          <div style={{
+            background: "#FFFBEB",
+            border: "1px solid #FCD34D",
+            borderRadius: "10px",
+            padding: "14px 18px",
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "#92400E",
+            lineHeight: 1.6,
+          }}>
+            <strong>ℹ️ Bids are estimates</strong> based on the information you provided. Final pricing
+            may change after a site visit reveals conditions that weren't visible in your description,
+            photos, or files. Contractors may also include worst-case allowances to avoid underbidding.{" "}
+            <a href="/help/bids" target="_blank" style={{ color: "#92400E", fontWeight: 600 }}>
+              Learn more
+            </a>{" "}·{" "}
+            <a href="/dashboard/inspector" target="_blank" style={{ color: "#92400E", fontWeight: 600 }}>
+              Request an ONP Inspector for more accurate bids →
+            </a>
+          </div>
+
           {/* Bid cards */}
           {bids.length === 0 ? (
             <div style={{
@@ -589,28 +611,12 @@ export default async function ClientProjectBidsPage({
 
                     <div style={{ marginTop: "16px" }}>
                       {!award ? (
-                        <form action={awardBid.bind(null, projectId, b.bid_id)}>
-                          <button
-                            type="submit"
-                            style={{
-                              background: "#C8102E",
-                              color: "#fff",
-                              border: "none",
-                              padding: "10px 24px",
-                              borderRadius: "6px",
-                              fontFamily: "'Barlow', sans-serif",
-                              fontWeight: 600,
-                              fontSize: "13px",
-                              cursor: "pointer",
-                              letterSpacing: "0.5px",
-                            }}
-                          >
-                            Award This Bid
-                          </button>
+                        <>
+                          <AwardButton projectId={projectId} bidId={b.bid_id} />
                           <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "6px" }}>
                             Reveals contractor identity for this bid only.
                           </p>
-                        </form>
+                        </>
                       ) : isAwarded ? (
                         <div style={{
                           fontSize: "13px",
