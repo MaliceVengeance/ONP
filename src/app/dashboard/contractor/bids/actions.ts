@@ -141,5 +141,21 @@ export async function submitBid(projectId: string, formData: FormData) {
 
   if (vErr) throw wrapErr("bid_versions.insert(version)", vErr);
 
+  // 6) Record bid acknowledgment (non-fatal — table may not exist yet)
+  if (formData.get("terms_acknowledged") === "true") {
+    const disclaimerVersion = String(formData.get("disclaimer_version") ?? "v1.0-2026-05-25");
+    const { error: ackErr } = await supabase.from("bid_acknowledgments").insert({
+      contractor_id: user.id,
+      bid_id: bidId,
+      bid_version_number: nextVersion,
+      disclaimer_version: disclaimerVersion,
+      terms_checked: true,
+      credentials_checked: formData.get("credentials_acknowledged") === "true",
+    });
+    if (ackErr) {
+      console.warn("bid_acknowledgments insert skipped:", ackErr.message);
+    }
+  }
+
   redirect(`/dashboard/contractor/projects/${projectId}?bid=ok`);
 }

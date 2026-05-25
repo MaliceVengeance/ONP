@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { submitBid } from "@/app/dashboard/contractor/bids/actions";
 import CountdownTimer from "@/components/CountdownTimer";
 import { stateBadge } from "@/lib/ui";
 import ProjectFileLink from "./ProjectFileLink";
 import ProjectMap from "@/components/ProjectMap";
+import BidForm from "./BidForm";
 
 type ProjectDetail = {
   id: string;
@@ -48,6 +48,30 @@ export default async function ContractorProjectDetail({
     .maybeSingle();
 
   const isSubscribed = subData?.status === "ACTIVE" || subData?.status === "TRIALING";
+
+  // Fetch contractor's own credential expiry for warnings
+  const { data: contractorProfile } = await supabase
+    .from("contractor_profiles")
+    .select("license_expiry, coi_expiry")
+    .eq("contractor_id", user.id)
+    .maybeSingle();
+
+  function daysUntil(dateStr: string | null): number | null {
+    if (!dateStr) return null;
+    const diff = new Date(dateStr).getTime() - Date.now();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  function expiryWarning(dateStr: string | null, label: string): string | null {
+    const days = daysUntil(dateStr);
+    if (days === null) return null;
+    if (days < 0) return `${label} expired`;
+    if (days <= 30) return `${label}: ${new Date(dateStr!).toLocaleDateString()} (${days}d)`;
+    return null;
+  }
+
+  const licenseExpiresSoon = expiryWarning(contractorProfile?.license_expiry ?? null, "License");
+  const coiExpiresSoon = expiryWarning(contractorProfile?.coi_expiry ?? null, "Insurance");
 
   const [{ data: rows, error: pErr }, { data: zipRow }] = await Promise.all([
     supabase.rpc("get_open_project_detail", { p_project_id: projectId }),
@@ -132,29 +156,6 @@ export default async function ContractorProjectDetail({
   function fmtMoney(cents: number) {
     return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
   }
-
-  const inputStyle = {
-    width: "100%",
-    background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#0A1628",
-    borderRadius: "6px",
-    padding: "10px 14px",
-    fontFamily: "'Barlow', sans-serif",
-    fontSize: "14px",
-    outline: "none",
-    marginTop: "6px",
-  } as React.CSSProperties;
-
-  const labelStyle = {
-    display: "block",
-    fontSize: "11px",
-    fontWeight: 500,
-    color: "#1B4F8A",
-    textTransform: "uppercase" as const,
-    letterSpacing: "1px",
-    marginTop: "16px",
-  };
 
   return (
     <div style={{ maxWidth: "700px" }}>
@@ -476,62 +477,12 @@ export default async function ContractorProjectDetail({
 
       {/* Bid form or subscription gate */}
       {canBid ? (
-        <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
-          borderRadius: "12px",
-          padding: "24px",
-        }}>
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "20px",
-            letterSpacing: "1px",
-            color: "#0A1628",
-            textTransform: "uppercase",
-            marginBottom: "4px",
-          }}>
-            {existingBid ? "Revise Your Bid" : "Submit a Bid"}
-          </h2>
-          <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
-            Bids are sealed until the deadline. You can revise anytime before it closes.
-          </p>
-          <form action={submitBid.bind(null, projectId)}>
-            <label style={{ ...labelStyle, marginTop: "16px" }}>Bid Amount (USD)</label>
-            <input
-              name="amount"
-              style={inputStyle}
-              placeholder="e.g. 25000"
-              defaultValue={existingBid ? (existingBid.amount_cents / 100).toFixed(2) : ""}
-              required
-            />
-            <label style={labelStyle}>Notes (optional)</label>
-            <textarea
-              name="notes"
-              style={{ ...inputStyle, minHeight: "90px", resize: "vertical" }}
-              placeholder="Clarifying assumptions, schedule notes, material preferences…"
-              defaultValue={existingBid?.notes ?? ""}
-            />
-            <button
-              type="submit"
-              style={{
-                marginTop: "20px",
-                background: "#C8102E",
-                color: "#fff",
-                border: "none",
-                padding: "12px 28px",
-                borderRadius: "6px",
-                fontFamily: "'Barlow', sans-serif",
-                fontWeight: 600,
-                fontSize: "14px",
-                letterSpacing: "0.5px",
-                cursor: "pointer",
-              }}
-            >
-              {existingBid ? "Revise Bid" : "Submit Bid"}
-            </button>
-          </form>
-        </div>
+        <BidForm
+          projectId={projectId}
+          existingBid={existingBid}
+          licenseExpiresSoon={licenseExpiresSoon}
+          coiExpiresSoon={coiExpiresSoon}
+        />
       ) : isOpen && beforeDeadline && !isSubscribed ? (
         /* Subscription gate */
         <div style={{
