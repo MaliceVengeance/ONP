@@ -105,7 +105,7 @@ export const ui = {
   } as React.CSSProperties,
 };
 
-export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "canceled" | "completed") {
+export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "canceled" | "completed" | "emergency" | "pending_payment") {
   const base: React.CSSProperties = {
     fontSize: "11px",
     fontWeight: 600,
@@ -122,6 +122,8 @@ export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "c
     case "vet": return { ...base, background: "#1e1a00", color: "#FBBF24", border: "1px solid #92400E" };
     case "canceled": return { ...base, background: "#3D0A0A", color: "#F87171", border: "1px solid #991B1B" };
     case "completed": return { ...base, background: "#0D2D1A", color: "#34D399", border: "1px solid #065F46" };
+    case "emergency": return { ...base, background: "#7C1A00", color: "#FDBA74", border: "1px solid #C2410C" };
+    case "pending_payment": return { ...base, background: "#1A1000", color: "#FBBF24", border: "1px solid #D97706" };
     default: return { ...base, background: "#1A2540", color: "#7A9CC4", border: "1px solid #1B4F8A" };
   }
 }
@@ -135,6 +137,22 @@ export function stateBadge(state: string) {
     case "BIDS_UNLOCKED": return badge("closed");
     case "CANCELED": return badge("canceled");
     case "COMPLETED": return badge("completed");
+    case "PENDING_PAYMENT": return badge("pending_payment");
+    case "EMERGENCY_EXPIRED": return badge("canceled");
     default: return badge("draft");
   }
 }
+
+/** Inline emergency badge — rendered next to a project title */
+export const emergencyBadgeStyle: React.CSSProperties = {
+  fontSize: "10px",
+  fontWeight: 700,
+  padding: "3px 9px",
+  borderRadius: "20px",
+  background: "#7C1A00",
+  color: "#FDBA74",
+  border: "1px solid #C2410C",
+  letterSpacing: "0.5px",
+  display: "inline-block",
+  whiteSpace: "nowrap" as const,
+};

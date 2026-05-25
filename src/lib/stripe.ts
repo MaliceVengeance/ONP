@@ -7,4 +7,8 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export const PRICES = {
   standard: process.env.STRIPE_STANDARD_PRICE_ID!,
   veteran: process.env.STRIPE_VETERAN_PRICE_ID!,
+  emergency: process.env.STRIPE_EMERGENCY_PRICE_ID!,
 };
+
+/** Fixed amount for emergency bid requests, in cents */
+export const EMERGENCY_FEE_CENTS = 1000; // $10.00

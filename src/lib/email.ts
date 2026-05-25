@@ -195,6 +195,69 @@ export async function sendNewProjectEmail({
   });
 }
 
+export async function sendEmergencyProjectEmail({
+  contractorEmail,
+  projectTitle,
+  projectCategory,
+  projectCity,
+  projectId,
+  autoCloseAt,
+}: {
+  contractorEmail: string;
+  projectTitle: string;
+  projectCategory: string;
+  projectCity: string;
+  projectId: string;
+  autoCloseAt: string;
+}) {
+  const closingTime = new Date(autoCloseAt).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `🚨 Emergency Bid Request: "${projectTitle}" — Closes in 8 Hours`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #7C1A00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FDBA74; margin-top: 0;">🚨 Emergency Bid Request</h2>
+          <p style="color: #FED7AA;">A client has posted an emergency project in your service area:</p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
+            <p style="color: #FDBA74; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
+            <p style="color: #FDBA74; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
+            <p style="color: #F87171; margin: 8px 0 0; font-size: 13px; font-weight: bold;">⏰ Auto-closes: ${closingTime}</p>
+          </div>
+          <p style="color: #FED7AA; font-size: 13px; line-height: 1.6;">
+            <strong style="color: #FDBA74;">Emergency bids are preliminary.</strong> No site visit is required — bid based on the information provided. Your bid will be visible to the client immediately upon submission. Both parties understand pricing will be refined after a site visit.
+          </p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #7A9CC4;">
+          Emergency projects pay faster but require quick response. Contractors who respond promptly have an edge. You can disable these alerts in your contractor settings.
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/contractor/projects/${projectId}`)}"
+             style="background: #C2410C; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 15px;">
+            🚨 View &amp; Bid Now
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendInspectorAssignedEmail({
   inspectorEmail,
   inspectorName,
