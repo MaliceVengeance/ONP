@@ -218,3 +218,123 @@ export async function submitReview(disputeId: string, formData: FormData) {
 
   redirect("/dashboard/inspector/disputes?resolved=1");
 }
+
+/**
+ * Admin-only: override a dispute resolution after it has been resolved.
+ * Records the override in admin_actions and re-runs financial adjustments.
+ */
+export async function adminOverrideResolution(disputeId: string, formData: FormData) {
+  const { user } = await requireRole(["ADMIN"]);
+
+  const decisionRaw = formData.get("decision") as string | null;
+  const reasoning = ((formData.get("reasoning") as string | null) ?? "").trim();
+
+  if (!decisionRaw || !VALID_DECISIONS.includes(decisionRaw as Decision)) {
+    throw new Error("Please select a valid override decision.");
+  }
+  const decision = decisionRaw as Decision;
+
+  if (reasoning.length < 20) {
+    throw new Error("Override reasoning must be at least 20 characters.");
+  }
+
+  const { data: dispute, error: disputeErr } = await supabaseAdmin
+    .from("inspector_upgrade_disputes")
+    .select(
+      "id, status, upgrade_charge_cents, client_id, original_inspector_id, inspector_request_id, project_id"
+    )
+    .eq("id", disputeId)
+    .single();
+
+  if (disputeErr || !dispute) throw new Error("Dispute not found.");
+
+  const upgradeChargeCents = (dispute as any).upgrade_charge_cents as number;
+  const clientId = (dispute as any).client_id as string;
+  const originalInspectorId = (dispute as any).original_inspector_id as string;
+  const assignmentId = (dispute as any).inspector_request_id as string;
+
+  const refundCents = decision === "RESOLVED_REFUND" ? upgradeChargeCents : 0;
+  const escrowStatus = decision === "RESOLVED_REFUND" ? "REFUNDED_TO_CLIENT" : "RELEASED_TO_INSPECTOR";
+  const now = new Date().toISOString();
+
+  // Update the dispute with the override decision
+  const { error: updateErr } = await supabaseAdmin
+    .from("inspector_upgrade_disputes")
+    .update({
+      status: decision,
+      resolution_decision: decision,
+      resolution_reasoning: `[ADMIN OVERRIDE] ${reasoning}`,
+      refund_cents: refundCents,
+      resolved_at: now,
+      escrow_status: escrowStatus,
+      updated_at: now,
+    })
+    .eq("id", disputeId);
+
+  if (updateErr) throw new Error(`Override update failed: ${JSON.stringify(updateErr)}`);
+
+  // Log the admin action
+  await supabaseAdmin.from("admin_actions").insert({
+    action_type: "OVERRIDE_DISPUTE_RESOLUTION",
+    target_id: disputeId,
+    notes: `Decision: ${decision} — ${reasoning}`,
+    performed_at: now,
+    performed_by: user.id,
+  });
+
+  // Financial adjustments for override
+  if (decision === "RESOLVED_REFUND") {
+    const { data: assignment } = await supabaseAdmin
+      .from("project_inspector_assignments")
+      .select("upgrade_stripe_payment_intent_id")
+      .eq("id", assignmentId)
+      .single();
+
+    const paymentIntentId = (assignment as any)?.upgrade_stripe_payment_intent_id as string | null;
+    if (paymentIntentId) {
+      try {
+        const refund = await stripe.refunds.create({ payment_intent: paymentIntentId });
+        await supabaseAdmin
+          .from("inspector_upgrade_disputes")
+          .update({ stripe_refund_id: refund.id })
+          .eq("id", disputeId);
+      } catch (e) {
+        console.error("Admin override Stripe refund failed (non-fatal):", e);
+      }
+    } else {
+      await restoreCredits(`upg_${assignmentId}`).catch((e: unknown) =>
+        console.error("Admin override credit restore failed (non-fatal):", e)
+      );
+    }
+
+    // Ensure the inspector is flagged
+    await supabaseAdmin
+      .from("inspector_flags")
+      .upsert(
+        { inspector_id: originalInspectorId, dispute_id: disputeId, flag_reason: "UPGRADE_NOT_JUSTIFIED" },
+        { onConflict: "dispute_id" }
+      )
+      .then(({ error }) => {
+        if (error) console.error("Override flag upsert failed:", error);
+      });
+
+    checkInspectorFlagStatus(originalInspectorId).catch((e: unknown) =>
+      console.error("Override checkInspectorFlagStatus failed (non-fatal):", e)
+    );
+  }
+
+  if (decision === "RESOLVED_PARTIAL_CREDIT") {
+    const creditCentsRaw = formData.get("credit_cents") as string | null;
+    const creditCents = parseInt(creditCentsRaw ?? "10000", 10);
+    if (!isNaN(creditCents) && creditCents > 0) {
+      await grantCredit({
+        clientId,
+        amountCents: creditCents,
+        source: "DISPUTE_RESOLUTION",
+        sourceReferenceId: `${disputeId}_override`,
+      }).catch((e: unknown) => console.error("Override credit grant failed (non-fatal):", e));
+    }
+  }
+
+  redirect(`/dashboard/inspector/disputes/${disputeId}?overridden=1`);
+}

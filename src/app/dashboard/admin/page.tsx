@@ -12,6 +12,9 @@ export default async function AdminDashboard() {
     { count: inspectorCount },
     { count: overrideCount },
     { count: emergencyActiveCount },
+    { count: openDisputeCount },
+    { count: masterInspectorCount },
+    { count: flaggedInspectorCount },
   ] = await Promise.all([
     supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase.from("projects").select("id", { count: "exact", head: true }),
@@ -20,6 +23,9 @@ export default async function AdminDashboard() {
     supabase.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
     supabase.from("projects").select("id", { count: "exact", head: true }).not("override_requested_at", "is", null).eq("urgent_override", false),
     supabase.from("emergency_request_log").select("id", { count: "exact", head: true }).eq("payment_status", "PAID").is("closed_at", null),
+    supabase.from("inspector_upgrade_disputes").select("id", { count: "exact", head: true }).in("status", ["SUBMITTED", "UNDER_REVIEW"]),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_master_inspector", true),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("upgrade_blocked", true).eq("role", "INSPECTOR"),
   ]);
 
   const cards = [
@@ -102,6 +108,30 @@ export default async function AdminDashboard() {
       stat: null,
       statLabel: "revenue & stats",
       accent: "#1B4F8A",
+    },
+    {
+      title: "Master Inspectors",
+      description: "Promote or demote inspectors to the Master Inspector role for dispute reviews.",
+      href: "/dashboard/admin/master-inspectors",
+      stat: masterInspectorCount ?? 0,
+      statLabel: "active MIs",
+      accent: "#1B4F8A",
+    },
+    {
+      title: "Dispute Oversight",
+      description: "Monitor all upgrade disputes, SLA status, and override resolved decisions.",
+      href: "/dashboard/admin/disputes",
+      stat: openDisputeCount ?? 0,
+      statLabel: "open disputes",
+      accent: (openDisputeCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+    },
+    {
+      title: "Inspector Flags",
+      description: "Rate-based flag dashboard. Block or clear inspectors with high dispute rates.",
+      href: "/dashboard/admin/inspector-flags",
+      stat: flaggedInspectorCount ?? 0,
+      statLabel: "blocked inspectors",
+      accent: (flaggedInspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
   ];
 

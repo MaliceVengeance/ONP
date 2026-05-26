@@ -3,15 +3,19 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import ReviewForm from "./ReviewForm";
-import { submitReview } from "./actions";
+import { submitReview, adminOverrideResolution } from "./actions";
 
 export default async function DisputeReviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ overridden?: string }>;
 }) {
   const { user, role } = await requireRole(["INSPECTOR", "ADMIN"]);
   const { id: disputeId } = await params;
+  const sp = searchParams ? await searchParams : {};
+  const wasOverridden = (sp as any)?.overridden === "1";
 
   // Check master inspector flag
   const { data: myProfile } = await supabaseAdmin
@@ -153,6 +157,13 @@ export default async function DisputeReviewPage({
           ← Back
         </Link>
       </div>
+
+      {/* Override success banner */}
+      {wasOverridden && (
+        <div style={{ background: "#FFF7ED", border: "1px solid #C2410C", borderRadius: "10px", padding: "12px 16px", marginBottom: "16px", fontSize: "13px", color: "#9A3412", fontWeight: 600 }}>
+          ✅ Admin override applied successfully.
+        </div>
+      )}
 
       {/* Already-resolved banner */}
       {isResolved && (
@@ -371,6 +382,109 @@ export default async function DisputeReviewPage({
           </div>
         )}
       </ReviewSection>
+
+      {/* ── Admin Override (resolved disputes, admin only) ────── */}
+      {isResolved && role === "ADMIN" && (
+        <div
+          style={{
+            background: "#FFF7ED",
+            border: "2px solid #C2410C",
+            borderRadius: "12px",
+            padding: "24px",
+            marginBottom: "16px",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "18px",
+              letterSpacing: "1px",
+              color: "#C2410C",
+              textTransform: "uppercase",
+              margin: "0 0 6px 0",
+            }}
+          >
+            Admin Override
+          </h2>
+          <p style={{ fontSize: "12px", color: "#9A3412", marginBottom: "16px", marginTop: 0 }}>
+            This dispute is already resolved. Use this form only to correct an error in the
+            original decision. The override will be logged in the admin audit trail.
+          </p>
+          <form action={adminOverrideResolution.bind(null, disputeId)}>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={{ fontSize: "12px", fontWeight: 600, color: "#9A3412", display: "block", marginBottom: "6px" }}>
+                Override Decision
+              </label>
+              {[
+                { value: "RESOLVED_UPGRADE_JUSTIFIED", label: "Upgrade Justified — Inspector was correct" },
+                { value: "RESOLVED_PARTIAL_CREDIT", label: "Partial Credit — Issue the client a store credit" },
+                { value: "RESOLVED_REFUND", label: "Full Refund — Client receives full upgrade refund" },
+              ].map((opt) => (
+                <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#0A1628", marginBottom: "6px", cursor: "pointer" }}>
+                  <input type="radio" name="decision" value={opt.value} required />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={{ fontSize: "12px", fontWeight: 600, color: "#9A3412", display: "block", marginBottom: "4px" }}>
+                Credit Amount (only for Partial Credit)
+              </label>
+              <input
+                type="number"
+                name="credit_cents"
+                min={5000}
+                max={20000}
+                step={100}
+                defaultValue={10000}
+                style={{ fontSize: "13px", border: "1px solid #FCA5A5", borderRadius: "6px", padding: "6px 10px", width: "160px" }}
+                placeholder="e.g. 10000 = $100"
+              />
+              <span style={{ fontSize: "11px", color: "#9A3412", marginLeft: "8px" }}>cents (5000–20000)</span>
+            </div>
+            <div style={{ marginBottom: "14px" }}>
+              <label style={{ fontSize: "12px", fontWeight: 600, color: "#9A3412", display: "block", marginBottom: "4px" }}>
+                Override Reasoning (required, min 20 chars)
+              </label>
+              <textarea
+                name="reasoning"
+                required
+                minLength={20}
+                maxLength={2000}
+                rows={4}
+                placeholder="Explain why this decision is being overridden..."
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  fontSize: "13px",
+                  border: "1px solid #FCA5A5",
+                  borderRadius: "6px",
+                  padding: "8px 10px",
+                  resize: "vertical",
+                  lineHeight: 1.5,
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              style={{
+                background: "#C2410C",
+                color: "#fff",
+                border: "none",
+                borderRadius: "6px",
+                padding: "10px 20px",
+                fontSize: "13px",
+                fontWeight: 700,
+                cursor: "pointer",
+                letterSpacing: "0.5px",
+              }}
+            >
+              Submit Override
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* ── Decision Form (only if not yet resolved) ──────────── */}
       {!isResolved && (
