@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
 import { updateDraftProject, publishProject, repostProject } from "../actions";
 import DeleteProjectButton from "./DeleteProjectButton";
@@ -11,35 +12,43 @@ export default async function EditProjectPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
+  const { user, role } = await requireRole(["CLIENT", "ADMIN"]);
   const { id } = await params;
 
-  const { data: project, error } = await supabase
+  const { data: project, error } = await supabaseAdmin
     .from("projects")
     .select(
-      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency"
+      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency,client_id"
     )
     .eq("id", id)
     .single();
 
-  if (error) throw error;
+  if (error || !project) throw new Error("Project not found");
+
+  // Enforce ownership: clients can only view their own projects
+  if (role !== "ADMIN" && project.client_id !== user.id) {
+    throw new Error("Not authorized");
+  }
 
   // Check for unanswered RFIs
-  const { count: unansweredRfiCount } = await supabase
+  const { count: unansweredRfiCount } = await supabaseAdmin
     .from("rfis")
     .select("id", { count: "exact", head: true })
     .eq("project_id", id)
     .is("response", null);
 
-  // Check inspector request status
-  const { data: inspectorAssignment } = await supabase
+  // Check inspector request status (exclude FAILED rows; pick most recent active one)
+  const { data: inspectorAssignment } = await supabaseAdmin
     .from("project_inspector_assignments")
-    .select("request_status")
+    .select("request_status, payment_status")
     .eq("project_id", id)
+    .neq("payment_status", "FAILED")
+    .order("requested_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   // Check bid count (used to decide if deletion is allowed)
-  const { count: bidCount } = await supabase
+  const { count: bidCount } = await supabaseAdmin
     .from("bids")
     .select("id", { count: "exact", head: true })
     .eq("project_id", id);
