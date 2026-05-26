@@ -58,6 +58,17 @@ export default async function WhyOnpPage({
           }}>
             Directory
           </Link>
+          <Link href="/trust" style={{
+            background: "transparent",
+            color: "#FFFFFF",
+            border: "1px solid #1B4F8A",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            textDecoration: "none",
+          }}>
+            Client Trust
+          </Link>
           <Link href="/about" style={{
             background: "transparent",
             color: "#FFFFFF",
@@ -237,13 +248,17 @@ export default async function WhyOnpPage({
                 traditional: "Your veteran status goes unrecognized",
                 onp: "Veteran Owned badge — clients notice and care",
               },
+              {
+                traditional: "On-site upgrade disputes go nowhere",
+                onp: "Independent Master Inspector review — free, within 5 business days",
+              },
             ].map((row, idx) => (
               <>
                 <div key={`trad-${idx}`} style={{
                   background: idx % 2 === 0 ? "#FFF5F5" : "#FEF2F2",
                   border: "1px solid #FCA5A5",
                   borderTop: "none",
-                  borderRadius: idx === 7 ? "0 0 0 10px" : "0",
+                  borderRadius: idx === 8 ? "0 0 0 10px" : "0",
                   padding: "14px 20px",
                   fontSize: "14px",
                   color: "#991B1B",
@@ -256,7 +271,7 @@ export default async function WhyOnpPage({
                   border: "1px solid #166534",
                   borderTop: "none",
                   borderLeft: "none",
-                  borderRadius: idx === 7 ? "0 0 10px 0" : "0",
+                  borderRadius: idx === 8 ? "0 0 10px 0" : "0",
                   padding: "14px 20px",
                   fontSize: "14px",
                   color: "#15803D",
@@ -492,6 +507,48 @@ export default async function WhyOnpPage({
           <p style={{ fontSize: "12px", color: "#4A7FB5", textAlign: "center", marginTop: "16px" }}>
             No setup fees. No long-term contracts. Cancel anytime.
           </p>
+        </div>
+
+        {/* Inspector Protection callout */}
+        <div style={{
+          background: "#EEF4FF",
+          border: "2px solid #1B4F8A",
+          borderRadius: "12px",
+          padding: "32px",
+          marginBottom: "48px",
+          display: "flex",
+          gap: "24px",
+          alignItems: "flex-start",
+        }}>
+          <div style={{ fontSize: "40px", flexShrink: 0, lineHeight: 1 }}>🛡️</div>
+          <div>
+            <h3 style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "22px",
+              letterSpacing: "0.5px",
+              color: "#0A1628",
+              margin: "0 0 10px 0",
+            }}>
+              Every On-Site Upgrade Is Reviewable
+            </h3>
+            <p style={{ fontSize: "15px", color: "#1B4F8A", lineHeight: 1.8, margin: "0 0 14px 0" }}>
+              If your inspector upgrades the scope of work on-site and you believe it wasn&apos;t justified,
+              you can file a dispute at no cost. An independent <strong style={{ color: "#0A1628" }}>Master Inspector</strong> — a
+              senior inspector with no connection to your original inspection — will review the full record
+              and issue a written decision within <strong style={{ color: "#0A1628" }}>5 business days</strong>.
+              If the upgrade wasn&apos;t warranted, you receive a full refund.
+            </p>
+            <a href="/trust" style={{
+              display: "inline-block",
+              fontSize: "13px",
+              color: "#1B4F8A",
+              fontWeight: 600,
+              textDecoration: "underline",
+            }}>
+              How our client protection works →
+            </a>
+          </div>
         </div>
 
         {/* CTA */}

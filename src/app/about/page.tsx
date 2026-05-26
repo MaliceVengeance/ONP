@@ -40,21 +40,14 @@ export default function AboutPage() {
           </div>
         </Link>
 
-        <Link
-          href="/login"
-          style={{
-            background: "transparent",
-            color: "#FFFFFF",
-            border: "1px solid #1B4F8A",
-            padding: "8px 20px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontSize: "13px",
-            textDecoration: "none",
-          }}
-        >
-          Sign In
-        </Link>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Link href="/trust" style={{ background: "transparent", color: "#FFFFFF", border: "1px solid #1B4F8A", padding: "8px 16px", borderRadius: "6px", fontSize: "13px", textDecoration: "none" }}>
+            Client Trust
+          </Link>
+          <Link href="/login" style={{ background: "#C8102E", color: "#fff", border: "none", padding: "8px 20px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none", fontWeight: 600 }}>
+            Sign In
+          </Link>
+        </div>
       </header>
 
       {/* Beta banner */}
@@ -159,6 +152,78 @@ export default function AboutPage() {
           <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9 }}>
             Our platform also limits unnecessary back-and-forth communication that often leads to confusion or off-platform negotiations. Instead, contractors can submit structured RFIs (Requests for Information) directly through the system to keep communication organized and documented.
           </p>
+        </div>
+
+        {/* Client Trust & Protection */}
+        <div style={{
+          background: "#EEF4FF",
+          border: "2px solid #1B4F8A",
+          borderRadius: "12px",
+          padding: "32px",
+          marginBottom: "48px",
+        }}>
+          <h2 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "32px",
+            letterSpacing: "1px",
+            color: "#0A1628",
+            marginBottom: "8px",
+            textTransform: "uppercase",
+          }}>
+            Built-In Client Protection
+          </h2>
+          <div style={{ width: "40px", height: "2px", background: "#C8102E", marginBottom: "24px" }} />
+
+          <p style={{ fontSize: "16px", color: "#1B4F8A", lineHeight: 1.9, marginBottom: "20px" }}>
+            When a project requires an on-site inspection, our inspectors sometimes need to upgrade the scope of work on the day of the visit — for example, if conditions turn out to be more complex than the initial description indicated. We call this an <strong style={{ color: "#0A1628" }}>on-site upgrade</strong>, and it carries an additional charge.
+          </p>
+
+          <div style={{
+            background: "#FFFFFF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "10px",
+            padding: "20px 24px",
+            marginBottom: "20px",
+            borderLeft: "4px solid #1B4F8A",
+          }}>
+            <p style={{ fontSize: "17px", color: "#0A1628", lineHeight: 1.8, margin: 0, fontStyle: "italic" }}>
+              &ldquo;Every on-site upgrade is reviewable. If you believe an upgrade was unjustified,
+              an independent Master Inspector will review your case within 5 business days —
+              at no cost to you. This is part of our commitment to client trust.&rdquo;
+            </p>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
+            {[
+              { icon: "🔍", text: "Your dispute is reviewed by an independent Master Inspector — a senior inspector with no connection to your original inspection." },
+              { icon: "⚖️", text: "The Master Inspector reviews all evidence: the project scope, the inspector's written justification, your statement, and the on-site report." },
+              { icon: "📋", text: "You receive a written explanation of the decision regardless of outcome. If the upgrade wasn't justified, you get a full refund." },
+              { icon: "🆓", text: "Filing a dispute is completely free and does not affect your account or ability to use ONP in the future." },
+            ].map((item) => (
+              <div key={item.text} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                <span style={{ fontSize: "18px", flexShrink: 0 }}>{item.icon}</span>
+                <span style={{ fontSize: "15px", color: "#1B4F8A", lineHeight: 1.7 }}>{item.text}</span>
+              </div>
+            ))}
+          </div>
+
+          <a
+            href="/trust"
+            style={{
+              display: "inline-block",
+              background: "transparent",
+              color: "#1B4F8A",
+              border: "1px solid #B8D0E8",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Learn more about how we protect clients →
+          </a>
         </div>
 
         {/* Built for Contractors Too */}
