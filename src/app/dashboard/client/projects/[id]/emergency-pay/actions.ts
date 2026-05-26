@@ -2,22 +2,79 @@
 
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
-import { stripe, PRICES, EMERGENCY_FEE_CENTS } from "@/lib/stripe";
+import { stripe, EMERGENCY_FEE_CENTS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getTotalAvailableCredits, applyCredits } from "@/lib/credits";
+import { sendEmergencyProjectEmail } from "@/lib/email";
 
 const BASE_URL = "https://www.ournextproject.us";
 
-export async function createEmergencyCheckout(projectId: string) {
-  const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
+/** Notify eligible contractors about an emergency project (mirrors webhook logic). */
+async function dispatchEmergencyNotifications(
+  projectId: string,
+  autoCloseAt: Date
+) {
+  try {
+    const { data: projectData } = await supabaseAdmin
+      .from("projects")
+      .select("title, category, city, location_general")
+      .eq("id", projectId)
+      .single();
+
+    if (!projectData) return;
+
+    const { data: contractorProfiles } = await supabaseAdmin
+      .from("contractor_profiles")
+      .select("contractor_id, categories")
+      .contains("categories", [(projectData as any).category]);
+
+    const contractorIds = (contractorProfiles ?? []).map((p: any) => p.contractor_id);
+    if (contractorIds.length === 0) return;
+
+    const { data: settings } = await supabaseAdmin
+      .from("contractor_settings")
+      .select("contractor_id, emergency_notifications_enabled")
+      .in("contractor_id", contractorIds);
+
+    const settingsMap = new Map(
+      (settings ?? []).map((s: any) => [s.contractor_id, s.emergency_notifications_enabled])
+    );
+    const notifyIds = contractorIds.filter(
+      (id: string) => settingsMap.get(id) !== false
+    );
+
+    for (const cId of notifyIds) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(cId);
+      const email = authUser?.user?.email;
+      if (email) {
+        sendEmergencyProjectEmail({
+          contractorEmail: email,
+          projectTitle: (projectData as any).title ?? "Emergency Project",
+          projectCategory: ((projectData as any).category ?? "").replaceAll("_", " "),
+          projectCity:
+            (projectData as any).city ?? (projectData as any).location_general ?? "",
+          projectId,
+          autoCloseAt: autoCloseAt.toISOString(),
+        }).catch((e: unknown) => console.error("Emergency email failed:", e));
+      }
+    }
+  } catch (e) {
+    console.error("Emergency contractor notifications (non-fatal):", e);
+  }
+}
+
+export async function createEmergencyCheckout(projectId: string, formData: FormData) {
+  const { user } = await requireRole(["CLIENT", "ADMIN"]);
+  const useCredits = formData?.get("apply_credits") === "1";
 
   // Verify ownership and state
-  const { data: project, error } = await supabase
+  const { data: project } = await supabaseAdmin
     .from("projects")
     .select("id, title, state, is_emergency, client_id")
     .eq("id", projectId)
     .single();
 
-  if (error || !project) throw new Error("Project not found.");
+  if (!project) throw new Error("Project not found.");
   if ((project as any).client_id !== user.id) throw new Error("Not your project.");
   if ((project as any).state !== "PENDING_PAYMENT") throw new Error("Project is not awaiting payment.");
   if (!(project as any).is_emergency) throw new Error("Not an emergency project.");
@@ -32,40 +89,81 @@ export async function createEmergencyCheckout(projectId: string) {
 
   if (!logRow) throw new Error("Emergency request log entry not found.");
 
-  // Get or create Stripe customer
-  const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(user.id);
-  const email = authUser?.user?.email;
+  const creditRef = `emg_${(logRow as any).id}`;
 
-  let customerId: string | undefined;
-  const { data: existingSub } = await supabase
-    .from("contractor_subscriptions")
-    .select("stripe_customer_id")
-    .eq("contractor_id", user.id)
-    .maybeSingle();
+  // ── Full-credit path (no Stripe) ─────────────────────────────
+  if (useCredits) {
+    const available = await getTotalAvailableCredits(user.id);
+    if (available >= EMERGENCY_FEE_CENTS) {
+      await applyCredits(user.id, EMERGENCY_FEE_CENTS, creditRef);
 
-  if (existingSub?.stripe_customer_id) {
-    customerId = existingSub.stripe_customer_id;
-  } else {
-    // Check if there's a Stripe customer for this client already (clients don't have subscriptions)
-    const customers = await stripe.customers.list({ email: email ?? undefined, limit: 1 });
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-    } else {
-      const customer = await stripe.customers.create({
-        email: email ?? undefined,
-        metadata: { user_id: user.id, role: "CLIENT" },
-      });
-      customerId = customer.id;
+      const now         = new Date();
+      const autoCloseAt = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+
+      // Activate the project
+      await supabaseAdmin
+        .from("projects")
+        .update({
+          state: "OPEN",
+          published_at: now.toISOString(),
+          deadline_at: autoCloseAt.toISOString(),
+          emergency_paid_at: now.toISOString(),
+          emergency_payment_id: null,
+          emergency_auto_close_at: autoCloseAt.toISOString(),
+          updated_at: now.toISOString(),
+        })
+        .eq("id", projectId)
+        .eq("state", "PENDING_PAYMENT");
+
+      // Update log to PAID
+      await supabaseAdmin
+        .from("emergency_request_log")
+        .update({ payment_status: "PAID", stripe_payment_intent_id: null })
+        .eq("id", (logRow as any).id);
+
+      // Notify contractors (fire-and-forget)
+      dispatchEmergencyNotifications(projectId, autoCloseAt);
+
+      redirect(`/dashboard/client/projects/${projectId}?emergency_paid=1`);
     }
   }
 
-  // Create one-time checkout session
+  // Get or create Stripe customer
+  const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(user.id);
+  const email = authUser?.user?.email;
+  let customerId: string | undefined;
+  const customers = await stripe.customers.list({ email: email ?? undefined, limit: 1 });
+  customerId =
+    customers.data.length > 0
+      ? customers.data[0].id
+      : (
+          await stripe.customers.create({
+            email: email ?? undefined,
+            metadata: { user_id: user.id, role: "CLIENT" },
+          })
+        ).id;
+
+  // Apply partial credits if requested
+  let chargedCents = EMERGENCY_FEE_CENTS;
+  if (useCredits) {
+    const creditsApplied = await applyCredits(user.id, EMERGENCY_FEE_CENTS, creditRef);
+    chargedCents = EMERGENCY_FEE_CENTS - creditsApplied;
+  }
+
+  // Create Stripe checkout session
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     payment_method_types: ["card"],
     line_items: [
       {
-        price: PRICES.emergency,
+        price_data: {
+          currency: "usd",
+          unit_amount: chargedCents,
+          product_data: {
+            name: "Emergency Bid Request",
+            description: "48-hour emergency bidding window. Bids visible immediately as submitted.",
+          },
+        },
         quantity: 1,
       },
     ],
@@ -76,20 +174,20 @@ export async function createEmergencyCheckout(projectId: string) {
       payment_type: "emergency",
       project_id: projectId,
       client_id: user.id,
-      log_id: logRow.id,
+      log_id: (logRow as any).id,
+      credit_ref: creditRef,
     },
   });
 
   if (!session.url) throw new Error("Failed to create checkout session.");
-
   redirect(session.url);
 }
 
 export async function downgradeToStandard(projectId: string) {
-  const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
+  const { user } = await requireRole(["CLIENT", "ADMIN"]);
 
   // Verify ownership and state
-  const { data: project } = await supabase
+  const { data: project } = await supabaseAdmin
     .from("projects")
     .select("id, state, is_emergency, client_id")
     .eq("id", projectId)
@@ -97,9 +195,10 @@ export async function downgradeToStandard(projectId: string) {
 
   if (!project) throw new Error("Project not found.");
   if ((project as any).client_id !== user.id) throw new Error("Not your project.");
-  if ((project as any).state !== "PENDING_PAYMENT") throw new Error("Can only downgrade PENDING_PAYMENT projects.");
+  if ((project as any).state !== "PENDING_PAYMENT")
+    throw new Error("Can only downgrade PENDING_PAYMENT projects.");
 
-  // Update the emergency_request_log row to DOWNGRADED (doesn't count against limit)
+  // Update the emergency_request_log row to FAILED/DOWNGRADED
   await supabaseAdmin
     .from("emergency_request_log")
     .update({

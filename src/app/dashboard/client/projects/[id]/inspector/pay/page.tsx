@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getTotalAvailableCredits } from "@/lib/credits";
 import { createInspectorCheckout } from "./actions";
 import { cancelInspectorRequest } from "../actions";
 
@@ -16,9 +17,7 @@ export default async function InspectorPayPage({
   // Fetch the pending assignment for this project + client
   const { data: assignment } = await supabaseAdmin
     .from("project_inspector_assignments")
-    .select(
-      "id, pricing_key, fee_charged_cents, requested_at, payment_status"
-    )
+    .select("id, pricing_key, fee_charged_cents, requested_at, payment_status")
     .eq("project_id", projectId)
     .eq("client_id", user.id)
     .eq("payment_status", "PENDING")
@@ -40,11 +39,18 @@ export default async function InspectorPayPage({
   const { data: priceRow } = await supabaseAdmin
     .from("inspector_price_list")
     .select("display_name, description")
-    .eq("pricing_key", assignment.pricing_key ?? "")
+    .eq("pricing_key", (assignment as any).pricing_key ?? "")
     .maybeSingle();
 
+  // Fetch available credits
+  const availableCredits = await getTotalAvailableCredits(user.id);
+  const feeCents = (assignment as any).fee_charged_cents as number;
+  const creditsToApply = Math.min(availableCredits, feeCents);
+  const afterCredits   = feeCents - creditsToApply;
+  const fullCover      = availableCredits >= feeCents;
+
   function formatFee(cents: number | null) {
-    if (!cents) return "—";
+    if (!cents && cents !== 0) return "—";
     return `$${(cents / 100).toFixed(0)}`;
   }
 
@@ -73,7 +79,7 @@ export default async function InspectorPayPage({
             Complete Payment
           </h1>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
-            {project?.title ?? "Untitled"}
+            {(project as any)?.title ?? "Untitled"}
           </p>
         </div>
         <Link
@@ -130,11 +136,13 @@ export default async function InspectorPayPage({
         >
           <div>
             <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "4px" }}>
-              {priceRow?.display_name ?? assignment.pricing_key?.replaceAll("_", " ") ?? "Inspection"}
+              {(priceRow as any)?.display_name ??
+                (assignment as any).pricing_key?.replaceAll("_", " ") ??
+                "Inspection"}
             </div>
-            {priceRow?.description && (
+            {(priceRow as any)?.description && (
               <div style={{ fontSize: "12px", color: "#4A7FB5", lineHeight: 1.5 }}>
-                {priceRow.description}
+                {(priceRow as any).description}
               </div>
             )}
           </div>
@@ -147,7 +155,7 @@ export default async function InspectorPayPage({
               whiteSpace: "nowrap",
             }}
           >
-            {formatFee(assignment.fee_charged_cents)}
+            {formatFee((assignment as any).fee_charged_cents)}
           </div>
         </div>
 
@@ -161,9 +169,57 @@ export default async function InspectorPayPage({
           }}
         >
           <span>Total due today</span>
-          <span>{formatFee(assignment.fee_charged_cents)}</span>
+          <span>{formatFee((assignment as any).fee_charged_cents)}</span>
         </div>
       </div>
+
+      {/* Credits section */}
+      {availableCredits > 0 && (
+        <div
+          style={{
+            background: "#F0FDF4",
+            border: "1px solid #86EFAC",
+            borderRadius: "10px",
+            padding: "18px 20px",
+            marginBottom: "16px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <span style={{ fontSize: "18px" }}>💳</span>
+            <span style={{ fontWeight: 700, fontSize: "14px", color: "#15803D" }}>
+              You have {formatFee(availableCredits)} in ONP Credits
+            </span>
+          </div>
+          <p style={{ fontSize: "13px", color: "#166534", lineHeight: 1.6, marginBottom: "12px" }}>
+            {fullCover
+              ? "Your credits cover the full inspection fee — no card required."
+              : `Applying your credits reduces the card charge to ${formatFee(afterCredits)}.`}
+          </p>
+          <form action={createInspectorCheckout.bind(null, projectId)}>
+            <input type="hidden" name="apply_credits" value="1" />
+            <button
+              type="submit"
+              style={{
+                width: "100%",
+                background: "#15803D",
+                color: "#fff",
+                border: "none",
+                padding: "13px 24px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                letterSpacing: "0.5px",
+              }}
+            >
+              {fullCover
+                ? `Pay with Credits — $0 Charged to Card`
+                : `Apply ${formatFee(creditsToApply)} Credits + Pay ${formatFee(afterCredits)} via Card`}
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Reminder */}
       <div
@@ -183,14 +239,19 @@ export default async function InspectorPayPage({
         report will be shared with contractors bidding on your project.
       </div>
 
-      {/* Pay button */}
+      {/* Pay full price button (always shown) */}
+      {availableCredits > 0 && (
+        <p style={{ fontSize: "12px", color: "#6B7280", textAlign: "center", marginBottom: "8px" }}>
+          — or pay the full amount without credits —
+        </p>
+      )}
       <form action={createInspectorCheckout.bind(null, projectId)}>
         <button
           type="submit"
           style={{
-            background: "#C8102E",
-            color: "#fff",
-            border: "none",
+            background: availableCredits > 0 ? "transparent" : "#C8102E",
+            color: availableCredits > 0 ? "#1B4F8A" : "#fff",
+            border: availableCredits > 0 ? "1px solid #B8D0E8" : "none",
             padding: "14px 28px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -202,7 +263,7 @@ export default async function InspectorPayPage({
             marginBottom: "12px",
           }}
         >
-          Pay {formatFee(assignment.fee_charged_cents)} — Secure Checkout
+          Pay {formatFee((assignment as any).fee_charged_cents)} — Secure Checkout
         </button>
       </form>
 

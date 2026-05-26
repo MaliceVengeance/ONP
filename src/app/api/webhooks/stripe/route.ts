@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, EMERGENCY_FEE_CENTS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { restoreCredits } from "@/lib/credits";
 import {
   sendEmergencyProjectEmail,
   sendInspectorRequestAvailableEmail,
@@ -521,29 +522,42 @@ export async function POST(req: NextRequest) {
 
       case "checkout.session.expired": {
         const expired = event.data.object as any;
-        const expiredAssignmentId = expired.metadata?.assignment_id;
-        if (!expiredAssignmentId) break;
+        const expiredType       = expired.metadata?.payment_type;
+        const expiredAssignId   = expired.metadata?.assignment_id;
+        const expiredCreditRef  = expired.metadata?.credit_ref;
+
+        // Restore any credits that were applied for this checkout
+        if (expiredCreditRef) {
+          await restoreCredits(expiredCreditRef).catch((e: unknown) =>
+            console.error("Credit restoration failed (non-fatal):", e)
+          );
+        }
 
         // Original inspector checkout abandoned → mark FAILED so client can restart
-        if (expired.metadata?.payment_type === "inspector") {
+        if (expiredType === "inspector" && expiredAssignId) {
           await supabaseAdmin
             .from("project_inspector_assignments")
             .update({ payment_status: "FAILED" })
-            .eq("id", expiredAssignmentId)
+            .eq("id", expiredAssignId)
             .eq("payment_status", "PENDING");
 
-          console.log(`Inspector assignment ${expiredAssignmentId} marked FAILED (checkout expired)`);
+          console.log(`Inspector assignment ${expiredAssignId} marked FAILED (checkout expired)`);
         }
 
         // Upgrade checkout abandoned → reset to NONE so client can retry
-        if (expired.metadata?.payment_type === "inspector_upgrade") {
+        if (expiredType === "inspector_upgrade" && expiredAssignId) {
           await supabaseAdmin
             .from("project_inspector_assignments")
             .update({ upgrade_payment_status: "NONE", upgrade_stripe_session_id: null })
-            .eq("id", expiredAssignmentId)
+            .eq("id", expiredAssignId)
             .eq("upgrade_payment_status", "PENDING");
 
-          console.log(`Inspector upgrade ${expiredAssignmentId} reset to NONE (checkout expired)`);
+          console.log(`Inspector upgrade ${expiredAssignId} reset to NONE (checkout expired)`);
+        }
+
+        // Emergency checkout abandoned — no project state change needed (stays PENDING_PAYMENT)
+        if (expiredType === "emergency") {
+          console.log(`Emergency checkout expired for project ${expired.metadata?.project_id} — credits restored`);
         }
 
         break;

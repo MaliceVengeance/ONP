@@ -123,6 +123,7 @@ export default async function ClientDashboard() {
       <div style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
         {[
           { label: "All Projects", href: "/dashboard/client/projects" },
+          { label: "My Credits", href: "/dashboard/client/credits" },
           { label: "My Profile", href: "/dashboard/client/profile" },
           { label: "Terms of Service", href: "/terms" },
           { label: "Privacy Policy", href: "/privacy" },
