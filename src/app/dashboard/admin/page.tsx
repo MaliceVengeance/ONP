@@ -95,6 +95,14 @@ export default async function AdminDashboard() {
       statLabel: "pricing tiers",
       accent: "#1B4F8A",
     },
+    {
+      title: "Inspector Revenue",
+      description: "Monthly revenue, ONP share, and per-inspector earnings summary.",
+      href: "/dashboard/admin/inspector-revenue",
+      stat: null,
+      statLabel: "revenue & stats",
+      accent: "#1B4F8A",
+    },
   ];
 
   return (
