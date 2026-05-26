@@ -87,6 +87,14 @@ export default async function AdminDashboard() {
       statLabel: "total projects",
       accent: "#1B4F8A",
     },
+    {
+      title: "Inspector Pricing",
+      description: "Edit inspection fees, inspector share %, and active tiers.",
+      href: "/dashboard/admin/inspector-pricing",
+      stat: null,
+      statLabel: "pricing tiers",
+      accent: "#1B4F8A",
+    },
   ];
 
   return (
@@ -193,7 +201,7 @@ export default async function AdminDashboard() {
                     color: card.accent === "#C8102E" ? "#C8102E" : "#0A1628",
                     lineHeight: 1,
                   }}>
-                    {card.stat}
+                    {card.stat ?? "—"}
                   </div>
                   <div style={{
                     fontSize: "11px",
