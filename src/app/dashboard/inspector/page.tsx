@@ -5,6 +5,14 @@ import { stateBadge } from "@/lib/ui";
 export default async function InspectorDashboard() {
   const { supabase, user } = await requireRole(["INSPECTOR", "ADMIN"]);
 
+  // Check master inspector status for nav link
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("is_master_inspector")
+    .eq("id", user.id)
+    .single();
+  const isMasterInspector = (myProfile as any)?.is_master_inspector === true;
+
   const { data, error } = await supabase
     .from("project_inspector_assignments")
     .select("id, project_id, request_status, assigned_at, takeoff_completed_at, projects(id, title, category, city, state, deadline_at)")
@@ -34,23 +42,44 @@ export default async function InspectorDashboard() {
             {user.email}
           </p>
         </div>
-        <Link
-          href="/dashboard/inspector/projects"
-          style={{
-            background: "#C8102E",
-            color: "#fff",
-            border: "none",
-            padding: "10px 20px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontWeight: 600,
-            fontSize: "13px",
-            textDecoration: "none",
-            display: "inline-block",
-          }}
-        >
-          View Assignments
-        </Link>
+        <div style={{ display: "flex", gap: "8px" }}>
+          {isMasterInspector && (
+            <Link
+              href="/dashboard/inspector/disputes"
+              style={{
+                background: "transparent",
+                color: "#1B4F8A",
+                border: "1px solid #B8D0E8",
+                padding: "10px 16px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              Dispute Reviews
+            </Link>
+          )}
+          <Link
+            href="/dashboard/inspector/projects"
+            style={{
+              background: "#C8102E",
+              color: "#fff",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            View Assignments
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}

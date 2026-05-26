@@ -782,3 +782,153 @@ export async function sendDisputeAdminEmail({
     `,
   });
 }
+
+export async function sendDisputeResolvedClientEmail({
+  clientEmail,
+  projectTitle,
+  projectId,
+  decision,
+  reasoning,
+  upgradeFeeCents,
+  refundCents,
+  creditCents,
+}: {
+  clientEmail: string;
+  projectTitle: string;
+  projectId: string;
+  decision: string;
+  reasoning: string;
+  upgradeFeeCents: number;
+  refundCents: number;
+  creditCents: number;
+}) {
+  const fmt = (c: number) => `$${(c / 100).toFixed(0)}`;
+  const isJustified = decision === "RESOLVED_UPGRADE_JUSTIFIED";
+  const isPartial   = decision === "RESOLVED_PARTIAL_CREDIT";
+  const isRefund    = decision === "RESOLVED_REFUND";
+
+  const outcomeTitle = isJustified
+    ? "Upgrade Justified — Charge Stands"
+    : isPartial
+    ? `Upgrade: Partial Credit of ${fmt(creditCents)} Applied`
+    : `Upgrade Not Justified — Full Refund of ${fmt(upgradeFeeCents)}`;
+
+  const outcomeColor  = isRefund ? "#15803D" : isPartial ? "#1B4F8A" : "#92400E";
+  const outcomeBg     = isRefund ? "#F0FDF4" : isPartial ? "#EEF4FF" : "#FFFBEB";
+  const outcomeBorder = isRefund ? "#166534" : isPartial ? "#B8D0E8" : "#FCD34D";
+
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `Dispute Resolved — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Dispute Resolution</p>
+        </div>
+        <div style="background: ${outcomeBg}; border: 1px solid ${outcomeBorder}; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: ${outcomeColor}; margin-top: 0; font-size: 18px;">${outcomeTitle}</h2>
+          <p style="color: #0A1628; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+            A Master Inspector has reviewed your dispute on <strong>"${projectTitle}"</strong>.
+          </p>
+        </div>
+        <div style="background: #122040; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <div style="font-size: 12px; color: #7A9CC4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Master Inspector's Reasoning</div>
+          <p style="color: #F0F4FF; font-size: 13px; line-height: 1.7; margin: 0; font-style: italic;">"${reasoning}"</p>
+        </div>
+        ${isRefund ? `
+        <div style="background: #F0FDF4; border: 1px solid #166534; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+          <p style="color: #166534; font-size: 13px; margin: 0;"><strong>✅ A refund of ${fmt(upgradeFeeCents)} has been processed to your original payment method.</strong> Please allow 5–10 business days for it to appear.</p>
+        </div>` : ""}
+        ${isPartial ? `
+        <div style="background: #EEF4FF; border: 1px solid #B8D0E8; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+          <p style="color: #1B4F8A; font-size: 13px; margin: 0;"><strong>✅ A credit of ${fmt(creditCents)} has been added to your ONP account.</strong> Use it toward any future inspection or emergency bid request.</p>
+        </div>` : ""}
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Project
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP · The Master Inspector's decision is final.
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendDisputeResolvedInspectorEmail({
+  inspectorEmail,
+  projectTitle,
+  assignmentId,
+  decision,
+  reasoning,
+  upgradeFeeCents,
+  flagAdded,
+}: {
+  inspectorEmail: string;
+  projectTitle: string;
+  assignmentId: string;
+  decision: string;
+  reasoning: string;
+  upgradeFeeCents: number;
+  flagAdded: boolean;
+}) {
+  const fmt = (c: number) => `$${(c / 100).toFixed(0)}`;
+  const isJustified = decision === "RESOLVED_UPGRADE_JUSTIFIED";
+  const isPartial   = decision === "RESOLVED_PARTIAL_CREDIT";
+  const isRefund    = decision === "RESOLVED_REFUND";
+
+  const outcomeTitle = isJustified
+    ? "✅ Upgrade Justified — Decision in Your Favor"
+    : isPartial
+    ? "ℹ Upgrade: Reasonable Judgment Call — No Flag"
+    : "⚠ Upgrade Not Justified — Refund Issued";
+
+  const outerBg     = isJustified ? "#F0FDF4" : isPartial ? "#FFFBEB" : "#2D1B00";
+  const outerBorder = isJustified ? "#166534" : isPartial ? "#FCD34D" : "#C2410C";
+  const titleColor  = isJustified ? "#15803D" : isPartial ? "#92400E" : "#FCA5A5";
+  const bodyColor   = isJustified ? "#166534" : isPartial ? "#78350F" : "#FDE68A";
+
+  await resend.emails.send({
+    from: FROM,
+    to: inspectorEmail,
+    subject: `Dispute Resolved — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notice</p>
+        </div>
+        <div style="background: ${outerBg}; border: 1px solid ${outerBorder}; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: ${titleColor}; margin-top: 0; font-size: 18px;">${outcomeTitle}</h2>
+          <p style="color: ${bodyColor}; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+            A Master Inspector has reviewed the dispute on your upgrade for <strong>"${projectTitle}"</strong>.
+          </p>
+        </div>
+        <div style="background: #122040; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <div style="font-size: 12px; color: #7A9CC4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Master Inspector's Reasoning</div>
+          <p style="color: #F0F4FF; font-size: 13px; line-height: 1.7; margin: 0; font-style: italic;">"${reasoning}"</p>
+        </div>
+        ${flagAdded ? `
+        <div style="background: #2D1B00; border: 1px solid #C2410C; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+          <p style="color: #FCA5A5; font-size: 13px; margin: 0 0 8px;"><strong>⚠ A flag has been added to your inspector record.</strong></p>
+          <p style="color: #FDE68A; font-size: 12px; margin: 0; line-height: 1.6;">
+            Flags are tracked on a rate basis relative to your total inspection volume. If you have concerns, contact <a href="mailto:support@ournextproject.us" style="color: #FBBF24;">support@ournextproject.us</a>.
+          </p>
+        </div>` : ""}
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/inspector/projects/${assignmentId}`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Assignment
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP Inspector Notice · The ${fmt(upgradeFeeCents)} upgrade fee has been ${isRefund ? "refunded to the client" : isPartial ? "partially credited to the client" : "released from escrow"}.
+        </p>
+      </div>
+    `,
+  });
+}

@@ -311,6 +311,7 @@ export async function POST(req: NextRequest) {
             .update({
               upgrade_payment_status: "PAID",
               upgrade_charged_at: now,
+              upgrade_stripe_payment_intent_id: paymentIntentId ?? null,
               pricing_key: "COMPREHENSIVE",
               fee_charged_cents: totalFeeCents,
               inspector_share_cents: inspShareCents,
