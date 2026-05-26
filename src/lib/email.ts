@@ -304,3 +304,55 @@ export async function sendInspectorAssignedEmail({
     `,
   });
 }
+
+export async function sendInspectorRequestAvailableEmail({
+  inspectorEmail,
+  projectTitle,
+  projectCity,
+  projectCategory,
+  inspectionType,
+  inspectorShareCents,
+}: {
+  inspectorEmail: string;
+  projectTitle: string;
+  projectCity: string;
+  projectCategory: string;
+  inspectionType: string;
+  inspectorShareCents: number;
+}) {
+  const shareFormatted = `$${(inspectorShareCents / 100).toFixed(0)}`;
+  await resend.emails.send({
+    from: FROM,
+    to: inspectorEmail,
+    subject: `New Paid Inspection Request: "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">🔍 New Inspection Request — Payment Confirmed</h2>
+          <p style="color: #B0C4DE;">A client has paid for a bid-accuracy inspection. An admin will assign this project shortly.</p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🔍 ${inspectionType}</p>
+            <p style="color: #4ADE80; margin: 8px 0 0; font-size: 13px; font-weight: bold;">💰 Inspector earnings for this assignment: ${shareFormatted}</p>
+          </div>
+          <p style="color: #B0C4DE;">Log in to view your assignments dashboard.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/inspector/projects`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View My Assignments
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}

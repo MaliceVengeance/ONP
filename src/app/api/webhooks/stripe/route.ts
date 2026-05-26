@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, EMERGENCY_FEE_CENTS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { sendEmergencyProjectEmail } from "@/lib/email";
+import {
+  sendEmergencyProjectEmail,
+  sendInspectorRequestAvailableEmail,
+} from "@/lib/email";
 
 function getPeriodEnd(sub: any): string {
   const raw =
@@ -142,6 +145,82 @@ export async function POST(req: NextRequest) {
           }
 
           console.log(`Emergency project ${projectId} activated`);
+          break;
+        }
+
+        // ── Inspector payment ─────────────────────────────────
+        if (session.metadata?.payment_type === "inspector") {
+          const assignmentId   = session.metadata?.assignment_id;
+          const inspProjectId  = session.metadata?.project_id;
+          const paymentIntentId = session.payment_intent;
+
+          if (!assignmentId || !inspProjectId) {
+            console.error("Inspector webhook missing metadata fields");
+            break;
+          }
+
+          // Mark assignment as PAID
+          const { error: updateErr } = await supabaseAdmin
+            .from("project_inspector_assignments")
+            .update({
+              payment_status: "PAID",
+              stripe_payment_intent_id: paymentIntentId ?? null,
+            })
+            .eq("id", assignmentId)
+            .eq("payment_status", "PENDING");
+
+          if (updateErr) {
+            console.error("Inspector assignment update failed:", updateErr);
+            break;
+          }
+
+          // Fetch assignment details for notifications
+          try {
+            const { data: asgn } = await supabaseAdmin
+              .from("project_inspector_assignments")
+              .select("pricing_key, inspector_share_cents")
+              .eq("id", assignmentId)
+              .single();
+
+            const { data: proj } = await supabaseAdmin
+              .from("projects")
+              .select("title, category, city, location_general")
+              .eq("id", inspProjectId)
+              .single();
+
+            const { data: priceRow } = await supabaseAdmin
+              .from("inspector_price_list")
+              .select("display_name")
+              .eq("pricing_key", asgn?.pricing_key ?? "")
+              .maybeSingle();
+
+            // Notify all active inspectors
+            const { data: inspectorProfiles } = await supabaseAdmin
+              .from("profiles")
+              .select("id")
+              .eq("role", "INSPECTOR");
+
+            const inspectorIds = (inspectorProfiles ?? []).map((p: any) => p.id);
+
+            for (const inspId of inspectorIds) {
+              const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(inspId);
+              const inspEmail = authUser?.user?.email;
+              if (inspEmail && proj && asgn) {
+                sendInspectorRequestAvailableEmail({
+                  inspectorEmail: inspEmail,
+                  projectTitle: (proj as any).title ?? "Project",
+                  projectCity: (proj as any).city ?? (proj as any).location_general ?? "",
+                  projectCategory: ((proj as any).category ?? "").replaceAll("_", " "),
+                  inspectionType: priceRow?.display_name ?? (asgn as any).pricing_key ?? "Inspection",
+                  inspectorShareCents: (asgn as any).inspector_share_cents ?? 0,
+                }).catch((e) => console.error("Inspector notification email failed:", e));
+              }
+            }
+          } catch (notifyErr) {
+            console.error("Inspector notification error (non-fatal):", notifyErr);
+          }
+
+          console.log(`Inspector assignment ${assignmentId} marked PAID`);
           break;
         }
 
