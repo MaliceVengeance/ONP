@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
   sendEmergencyProjectEmail,
   sendInspectorRequestAvailableEmail,
+  sendInspectorPaymentConfirmedEmail,
+  sendAdminInspectorRequestEmail,
 } from "@/lib/email";
 
 function getPeriodEnd(sub: any): string {
@@ -174,17 +176,17 @@ export async function POST(req: NextRequest) {
             break;
           }
 
-          // Fetch assignment details for notifications
+          // Fetch assignment + project details for notifications
           try {
             const { data: asgn } = await supabaseAdmin
               .from("project_inspector_assignments")
-              .select("pricing_key, inspector_share_cents")
+              .select("pricing_key, fee_charged_cents, inspector_share_cents, client_id")
               .eq("id", assignmentId)
               .single();
 
             const { data: proj } = await supabaseAdmin
               .from("projects")
-              .select("title, category, city, location_general")
+              .select("title, category, city, location_general, client_id")
               .eq("id", inspProjectId)
               .single();
 
@@ -194,25 +196,76 @@ export async function POST(req: NextRequest) {
               .eq("pricing_key", asgn?.pricing_key ?? "")
               .maybeSingle();
 
-            // Notify all active inspectors
+            const projTitle      = (proj as any)?.title ?? "Project";
+            const projCity       = (proj as any)?.city ?? (proj as any)?.location_general ?? "";
+            const projCategory   = ((proj as any)?.category ?? "").replaceAll("_", " ");
+            const inspectionType = priceRow?.display_name ?? (asgn as any)?.pricing_key ?? "Inspection";
+            const feeCents       = (asgn as any)?.fee_charged_cents ?? 0;
+            const shareCents     = (asgn as any)?.inspector_share_cents ?? 0;
+            const clientId       = (asgn as any)?.client_id ?? (proj as any)?.client_id;
+
+            // 1. Confirm payment to client
+            if (clientId) {
+              const { data: clientAuth } = await supabaseAdmin.auth.admin.getUserById(clientId);
+              const { data: clientProfile } = await supabaseAdmin
+                .from("profiles")
+                .select("display_name")
+                .eq("id", clientId)
+                .maybeSingle();
+              const clientEmail = clientAuth?.user?.email;
+              if (clientEmail) {
+                sendInspectorPaymentConfirmedEmail({
+                  clientEmail,
+                  clientName: (clientProfile as any)?.display_name ?? "Client",
+                  projectTitle: projTitle,
+                  inspectionType,
+                  feeCents,
+                  projectId: inspProjectId,
+                }).catch((e) => console.error("Client inspector confirmation email failed:", e));
+              }
+            }
+
+            // 2. Alert all admins to assign an inspector
+            const { data: adminProfiles } = await supabaseAdmin
+              .from("profiles")
+              .select("id")
+              .eq("role", "ADMIN");
+
+            for (const admin of adminProfiles ?? []) {
+              const { data: adminAuth } = await supabaseAdmin.auth.admin.getUserById(admin.id);
+              const adminEmail = adminAuth?.user?.email;
+              if (adminEmail) {
+                sendAdminInspectorRequestEmail({
+                  adminEmail,
+                  projectTitle: projTitle,
+                  projectCity: projCity,
+                  projectCategory: projCategory,
+                  inspectionType,
+                  feeCents,
+                  inspectorShareCents: shareCents,
+                  projectId: inspProjectId,
+                  assignmentId,
+                }).catch((e) => console.error("Admin inspector alert email failed:", e));
+              }
+            }
+
+            // 3. Notify all active inspectors
             const { data: inspectorProfiles } = await supabaseAdmin
               .from("profiles")
               .select("id")
               .eq("role", "INSPECTOR");
 
-            const inspectorIds = (inspectorProfiles ?? []).map((p: any) => p.id);
-
-            for (const inspId of inspectorIds) {
-              const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(inspId);
+            for (const insp of inspectorProfiles ?? []) {
+              const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(insp.id);
               const inspEmail = authUser?.user?.email;
-              if (inspEmail && proj && asgn) {
+              if (inspEmail) {
                 sendInspectorRequestAvailableEmail({
                   inspectorEmail: inspEmail,
-                  projectTitle: (proj as any).title ?? "Project",
-                  projectCity: (proj as any).city ?? (proj as any).location_general ?? "",
-                  projectCategory: ((proj as any).category ?? "").replaceAll("_", " "),
-                  inspectionType: priceRow?.display_name ?? (asgn as any).pricing_key ?? "Inspection",
-                  inspectorShareCents: (asgn as any).inspector_share_cents ?? 0,
+                  projectTitle: projTitle,
+                  projectCity: projCity,
+                  projectCategory: projCategory,
+                  inspectionType,
+                  inspectorShareCents: shareCents,
                 }).catch((e) => console.error("Inspector notification email failed:", e));
               }
             }
@@ -366,6 +419,25 @@ export async function POST(req: NextRequest) {
           .eq("stripe_customer_id", customerId);
 
         console.log(`Payment failed for customer ${customerId}`);
+        break;
+      }
+
+      case "checkout.session.expired": {
+        // If a client abandoned the inspector checkout, mark the PENDING
+        // assignment as FAILED so they can start a fresh selection.
+        const expired = event.data.object as any;
+        if (expired.metadata?.payment_type !== "inspector") break;
+
+        const expiredAssignmentId = expired.metadata?.assignment_id;
+        if (!expiredAssignmentId) break;
+
+        await supabaseAdmin
+          .from("project_inspector_assignments")
+          .update({ payment_status: "FAILED" })
+          .eq("id", expiredAssignmentId)
+          .eq("payment_status", "PENDING");
+
+        console.log(`Inspector assignment ${expiredAssignmentId} marked FAILED (checkout expired)`);
         break;
       }
     }

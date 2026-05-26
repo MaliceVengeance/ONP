@@ -356,3 +356,112 @@ export async function sendInspectorRequestAvailableEmail({
     `,
   });
 }
+
+export async function sendInspectorPaymentConfirmedEmail({
+  clientEmail,
+  clientName,
+  projectTitle,
+  inspectionType,
+  feeCents,
+  projectId,
+}: {
+  clientEmail: string;
+  clientName: string;
+  projectTitle: string;
+  inspectionType: string;
+  feeCents: number;
+  projectId: string;
+}) {
+  const feeFormatted = `$${(feeCents / 100).toFixed(0)}`;
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `Inspection Payment Confirmed — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #052E16; border: 1px solid #166534; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #4ADE80; margin-top: 0;">✅ Payment Confirmed</h2>
+          <p style="color: #B0C4DE;">Hello ${clientName},</p>
+          <p style="color: #B0C4DE;">Your inspection payment for <strong style="color: #fff;">"${projectTitle}"</strong> has been received.</p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🔍 Inspection type: <strong style="color: #fff;">${inspectionType}</strong></p>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">💰 Amount paid: <strong style="color: #4ADE80;">${feeFormatted}</strong></p>
+          </div>
+          <p style="color: #B0C4DE;">An ONP inspector will be assigned to your project within 1–2 business days. Most inspections take place within <strong style="color: #fff;">3–5 business days</strong> of payment.</p>
+          <p style="color: #B0C4DE;">You will receive another email once an inspector is assigned and a visit has been scheduled. You can track your inspection status in your project dashboard at any time.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}/inspector`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Inspection Status
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendAdminInspectorRequestEmail({
+  adminEmail,
+  projectTitle,
+  projectCity,
+  projectCategory,
+  inspectionType,
+  feeCents,
+  inspectorShareCents,
+  projectId,
+  assignmentId,
+}: {
+  adminEmail: string;
+  projectTitle: string;
+  projectCity: string;
+  projectCategory: string;
+  inspectionType: string;
+  feeCents: number;
+  inspectorShareCents: number;
+  projectId: string;
+  assignmentId: string;
+}) {
+  const feeFormatted = `$${(feeCents / 100).toFixed(0)}`;
+  const onpShareFormatted = `$${((feeCents - inspectorShareCents) / 100).toFixed(0)}`;
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[ACTION REQUIRED] New Paid Inspector Request — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">⚡ New Inspector Assignment Needed</h2>
+          <p style="color: #FDE68A;">A client has paid for an inspection. Please assign an available inspector.</p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🔍 ${inspectionType}</p>
+            <p style="color: #4ADE80; margin: 8px 0 0; font-size: 13px;">💰 Fee collected: <strong>${feeFormatted}</strong> · ONP share: <strong>${onpShareFormatted}</strong></p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/projects/${projectId}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Assign Inspector
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP Admin · Assignment ID: ${assignmentId}
+        </p>
+      </div>
+    `,
+  });
+}
