@@ -643,3 +643,142 @@ export async function sendAdminInspectorRequestEmail({
     `,
   });
 }
+
+// ── Dispute emails ────────────────────────────────────────────────────────────
+
+export async function sendDisputeSubmittedClientEmail({
+  clientEmail,
+  projectTitle,
+  projectId,
+  upgradeFeeCents,
+}: {
+  clientEmail: string;
+  projectTitle: string;
+  projectId: string;
+  upgradeFeeCents: number;
+}) {
+  const feeFormatted = `$${(upgradeFeeCents / 100).toFixed(0)}`;
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `Dispute Received — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #4ADE80; margin-top: 0;">✅ Dispute Received</h2>
+          <p style="color: #B0C4DE;">We've received your dispute of the ${feeFormatted} upgrade charge on <strong style="color: #fff;">"${projectTitle}"</strong>.</p>
+          <p style="color: #B0C4DE;">An independent Master Inspector will review your case. Here's what happens next:</p>
+          <ul style="color: #B0C4DE; padding-left: 20px; line-height: 2;">
+            <li>Your original inspector has <strong style="color: #fff;">3 business days</strong> to provide their statement.</li>
+            <li>A Master Inspector will be assigned to review both sides.</li>
+            <li>You will receive a written decision within <strong style="color: #fff;">5 business days</strong>.</li>
+            <li>The upgrade charge is held in escrow until the dispute is resolved.</li>
+          </ul>
+          <p style="color: #B0C4DE;">The review is free and will not affect your account.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}/inspector`)}"
+             style="background: #1B4F8A; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Dispute Status
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendDisputeFiledInspectorEmail({
+  inspectorEmail,
+  projectTitle,
+  projectId,
+  assignmentId,
+  disputeId,
+}: {
+  inspectorEmail: string;
+  projectTitle: string;
+  projectId: string;
+  assignmentId: string;
+  disputeId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: inspectorEmail,
+    subject: `[ACTION REQUIRED] Upgrade Dispute Filed — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notice</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">⚠ Dispute Filed Against Your Upgrade</h2>
+          <p style="color: #FDE68A;">A client has filed a dispute of the on-site upgrade you requested on <strong style="color: #fff;">"${projectTitle}"</strong>.</p>
+          <p style="color: #FDE68A;">An independent Master Inspector will review the upgrade decision. You are invited to provide your statement explaining why the upgrade was necessary.</p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <p style="color: #FBBF24; margin: 0; font-weight: bold;">Deadline: 3 business days</p>
+            <p style="color: #7A9CC4; margin: 8px 0 0; font-size: 13px;">If no response is received, the Master Inspector will still render a decision. Non-response is noted on your record.</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/inspector/projects/${assignmentId}`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Provide Your Statement
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP Inspector Notice · Dispute ID: ${disputeId}
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendDisputeAdminEmail({
+  adminEmail,
+  projectTitle,
+  projectId,
+  disputeId,
+  upgradeFeeCents,
+}: {
+  adminEmail: string;
+  projectTitle: string;
+  projectId: string;
+  disputeId: string;
+  upgradeFeeCents: number;
+}) {
+  const feeFormatted = `$${(upgradeFeeCents / 100).toFixed(0)}`;
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[DISPUTE] New Upgrade Dispute — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">⚠ New Upgrade Dispute Filed</h2>
+          <p style="color: #FDE68A;">A client has disputed a ${feeFormatted} on-site upgrade charge on <strong style="color: #fff;">"${projectTitle}"</strong>.</p>
+          <p style="color: #FDE68A;">A Master Inspector needs to be assigned. The 5-business-day SLA begins once assigned.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/disputes/${disputeId}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Dispute
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP Admin · Dispute ID: ${disputeId}
+        </p>
+      </div>
+    `,
+  });
+}

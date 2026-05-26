@@ -7,11 +7,14 @@ import { selectInspectorTier } from "./actions";
 
 export default async function ClientInspectorPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ paid?: string; upgrade_paid?: string; dispute_submitted?: string }>;
 }) {
   const { user, role } = await requireRole(["CLIENT", "ADMIN"]);
   const { id: projectId } = await params;
+  const sp = await searchParams;
 
   // Fetch project
   const { data: project } = await supabaseAdmin
@@ -60,6 +63,28 @@ export default async function ClientInspectorPage({
   }
 
   const options: PriceOption[] = priceRows ?? [];
+
+  // Fetch existing dispute (if any) for upgrade-paid assignments
+  let existingDispute: { id: string; status: string; created_at: string } | null = null;
+  if (assignment && (assignment as any).upgrade_payment_status === "PAID" && (assignment as any).upgrade_charged_at) {
+    const { data: dispRow } = await supabaseAdmin
+      .from("inspector_upgrade_disputes")
+      .select("id, status, created_at")
+      .eq("inspector_request_id", (assignment as any).id)
+      .maybeSingle();
+    existingDispute = (dispRow as any) ?? null;
+  }
+
+  // 14-day dispute window calculation
+  const upgradeChargedAt = (assignment as any)?.upgrade_charged_at as string | null;
+  const disputeWindowExpiresAt = upgradeChargedAt
+    ? new Date(new Date(upgradeChargedAt).getTime() + 14 * 24 * 60 * 60 * 1000)
+    : null;
+  const withinDisputeWindow =
+    disputeWindowExpiresAt != null && new Date() <= disputeWindowExpiresAt;
+  const disputeDaysRemaining = disputeWindowExpiresAt
+    ? Math.max(0, Math.ceil((disputeWindowExpiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   function statusColor(status: string) {
     switch (status) {
@@ -341,25 +366,76 @@ export default async function ClientInspectorPage({
             </div>
           )}
 
-          {/* Upgrade confirmed notice */}
+          {/* Dispute submitted banner */}
+          {sp.dispute_submitted === "1" && (
+            <div style={{ background: "#052E16", border: "1px solid #166534", borderRadius: "10px", padding: "14px 18px", marginBottom: "20px" }}>
+              <div style={{ fontSize: "13px", color: "#4ADE80", fontWeight: 700, marginBottom: "4px" }}>✅ Dispute Submitted</div>
+              <div style={{ fontSize: "12px", color: "#86EFAC" }}>Your dispute has been received. An independent Master Inspector will review your case within 5 business days.</div>
+            </div>
+          )}
+
+          {/* Upgrade confirmed notice + dispute CTA */}
           {(assignment as any).upgrade_payment_status === "PAID" && (
             <div style={{
               background: "#052E16",
               border: "1px solid #166534",
               borderRadius: "12px",
-              padding: "16px 20px",
+              padding: "20px",
               marginBottom: "20px",
             }}>
-              <div style={{ fontSize: "13px", color: "#4ADE80", fontWeight: 600, marginBottom: "4px" }}>
+              <div style={{ fontSize: "13px", color: "#4ADE80", fontWeight: 600, marginBottom: "6px" }}>
                 ✅ Upgraded to Comprehensive Inspection
               </div>
-              <div style={{ fontSize: "12px", color: "#86EFAC" }}>
-                Additional $200 charged
+              <div style={{ fontSize: "12px", color: "#86EFAC", marginBottom: "14px" }}>
+                Additional ${(((assignment as any).upgrade_fee_cents ?? 20000) / 100).toFixed(0)} charged
                 {(assignment as any).upgrade_charged_at && (
                   <> on {new Date((assignment as any).upgrade_charged_at).toLocaleDateString()}</>
-                )}
-                {" — "}14-day independent review window available if needed.
+                )}.
               </div>
+
+              {/* Dispute status or CTA */}
+              {existingDispute && (existingDispute as any).status !== "WITHDRAWN" ? (
+                <div style={{ background: "#0A1628", borderRadius: "8px", padding: "12px 16px" }}>
+                  <div style={{ fontSize: "12px", color: "#FBBF24", fontWeight: 700, marginBottom: "4px" }}>
+                    Dispute Status: {(existingDispute as any).status.replaceAll("_", " ")}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#7A9CC4" }}>
+                    Filed {new Date((existingDispute as any).created_at).toLocaleDateString()} · A Master Inspector will render a decision within 5 business days.
+                  </div>
+                  <a href={`/dashboard/client/projects/${projectId}/dispute-upgrade`} style={{ display: "inline-block", marginTop: "8px", fontSize: "11px", color: "#4ADE80", textDecoration: "underline" }}>
+                    View dispute details →
+                  </a>
+                </div>
+              ) : withinDisputeWindow ? (
+                <div style={{ background: "#0A1628", borderRadius: "8px", padding: "12px 16px" }}>
+                  <div style={{ fontSize: "12px", color: "#B8D0E8", lineHeight: 1.6, marginBottom: "10px" }}>
+                    If you believe this upgrade was not justified, you have{" "}
+                    <strong style={{ color: "#FBBF24" }}>{disputeDaysRemaining} day{disputeDaysRemaining !== 1 ? "s" : ""}</strong>{" "}
+                    remaining to request a free independent review.
+                  </div>
+                  <a
+                    href={`/dashboard/client/projects/${projectId}/dispute-upgrade`}
+                    style={{
+                      display: "inline-block",
+                      background: "transparent",
+                      color: "#FBBF24",
+                      border: "1px solid #FBBF24",
+                      padding: "8px 18px",
+                      borderRadius: "6px",
+                      fontFamily: "'Barlow', sans-serif",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                    }}
+                  >
+                    Request Master Inspector Review →
+                  </a>
+                </div>
+              ) : (
+                <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                  The 14-day independent review window has closed.
+                </div>
+              )}
             </div>
           )}
 
