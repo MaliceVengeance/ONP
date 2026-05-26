@@ -27,14 +27,16 @@ export default async function ClientInspectorPage({
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  // Fetch existing assignment (include new payment columns)
-  const { data: assignment } = await supabase
+  // Fetch existing assignment (include upgrade columns)
+  const { data: assignment } = await supabaseAdmin
     .from("project_inspector_assignments")
     .select(
-      "id, request_status, payment_status, pricing_key, fee_charged_cents, requested_at, assigned_at, inspector_id, takeoff_report, takeoff_completed_at, notes"
+      "id, request_status, payment_status, pricing_key, fee_charged_cents, requested_at, assigned_at, inspector_id, takeoff_report, takeoff_completed_at, notes, upgrade_payment_status, upgrade_justification, upgrade_requested_at, upgrade_fee_cents, upgrade_charged_at"
     )
     .eq("project_id", projectId)
     .neq("payment_status", "FAILED")
+    .order("requested_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   // If a PENDING (unpaid) row exists, send client straight to the pay page
@@ -268,6 +270,103 @@ export default async function ClientInspectorPage({
               )}
             </div>
           </div>
+
+          {/* Upgrade banner — shown when inspector has requested an upgrade */}
+          {(assignment as any).upgrade_payment_status === "PENDING" && (
+            <div style={{
+              background: "#2D1B00",
+              border: "1px solid #FBBF24",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom: "20px",
+            }}>
+              <h3 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "18px",
+                letterSpacing: "1px",
+                color: "#FBBF24",
+                textTransform: "uppercase",
+                marginBottom: "8px",
+              }}>
+                ⚠ Upgrade Requested by Inspector
+              </h3>
+              <p style={{ fontSize: "13px", color: "#FDE68A", lineHeight: 1.6, marginBottom: "10px" }}>
+                Your inspector has reviewed the project on-site and determined that a Comprehensive inspection
+                is needed. An additional{" "}
+                <strong>${(((assignment as any).upgrade_fee_cents ?? 20000) / 100).toFixed(0)}</strong> will be charged.
+              </p>
+              {(assignment as any).upgrade_justification && (
+                <div style={{
+                  background: "#0A1628",
+                  borderRadius: "6px",
+                  padding: "12px 16px",
+                  marginBottom: "14px",
+                  fontSize: "13px",
+                  color: "#F0F4FF",
+                  fontStyle: "italic",
+                }}>
+                  "{(assignment as any).upgrade_justification}"
+                </div>
+              )}
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <a
+                  href={`/dashboard/client/projects/${projectId}/inspector/upgrade-pay`}
+                  style={{
+                    background: "#C8102E",
+                    color: "#fff",
+                    padding: "10px 22px",
+                    borderRadius: "6px",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    textDecoration: "none",
+                    display: "inline-block",
+                  }}
+                >
+                  Pay $200 Upgrade Fee
+                </a>
+                <a
+                  href={`/dashboard/client/projects/${projectId}/inspector/upgrade-pay`}
+                  style={{
+                    background: "transparent",
+                    color: "#FDE68A",
+                    border: "1px solid #FBBF24",
+                    padding: "10px 20px",
+                    borderRadius: "6px",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontSize: "13px",
+                    textDecoration: "none",
+                    display: "inline-block",
+                  }}
+                >
+                  Review & Decline
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Upgrade confirmed notice */}
+          {(assignment as any).upgrade_payment_status === "PAID" && (
+            <div style={{
+              background: "#052E16",
+              border: "1px solid #166534",
+              borderRadius: "12px",
+              padding: "16px 20px",
+              marginBottom: "20px",
+            }}>
+              <div style={{ fontSize: "13px", color: "#4ADE80", fontWeight: 600, marginBottom: "4px" }}>
+                ✅ Upgraded to Comprehensive Inspection
+              </div>
+              <div style={{ fontSize: "12px", color: "#86EFAC" }}>
+                Additional $200 charged
+                {(assignment as any).upgrade_charged_at && (
+                  <> on {new Date((assignment as any).upgrade_charged_at).toLocaleDateString()}</>
+                )}
+                {" — "}14-day independent review window available if needed.
+              </div>
+            </div>
+          )}
 
           {/* Takeoff report */}
           {assignment.takeoff_report && (

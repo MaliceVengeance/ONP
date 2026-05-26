@@ -408,6 +408,184 @@ export async function sendInspectorPaymentConfirmedEmail({
   });
 }
 
+// ─── On-site upgrade emails ────────────────────────────────────────────────
+
+export async function sendInspectorUpgradeRequestedEmail({
+  clientEmail,
+  projectTitle,
+  projectId,
+  justification,
+  upgradeFeeCents,
+}: {
+  clientEmail: string;
+  projectTitle: string;
+  projectId: string;
+  justification: string;
+  upgradeFeeCents: number;
+}) {
+  const feeFormatted = `$${(upgradeFeeCents / 100).toFixed(0)}`;
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `Your inspector has requested an upgrade — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspection Update</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">⚠ Inspection Upgrade Requested</h2>
+          <p style="color: #FDE68A;">Your inspector has reviewed the project on-site and has requested an upgrade from Standard to Comprehensive Inspection for <strong>"${projectTitle}"</strong>.</p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <p style="color: #7A9CC4; margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Inspector's reason:</p>
+            <p style="color: #F0F4FF; margin: 0; font-style: italic;">"${justification}"</p>
+          </div>
+          <p style="color: #FDE68A; font-weight: bold;">Additional charge: ${feeFormatted}</p>
+          <p style="color: #FDE68A; font-size: 13px;">You may pay for the upgrade or decline it. If you decline, your inspector will proceed with the Standard inspection.</p>
+        </div>
+        <div style="text-align: center; margin-bottom: 16px;">
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}/inspector/upgrade-pay`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Review Upgrade Request
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendInspectorUpgradeChargedEmail({
+  clientEmail,
+  projectTitle,
+  projectId,
+  upgradeFeeCents,
+}: {
+  clientEmail: string;
+  projectTitle: string;
+  projectId: string;
+  upgradeFeeCents: number;
+}) {
+  const feeFormatted = `$${(upgradeFeeCents / 100).toFixed(0)}`;
+  const disputeDeadline = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString();
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `Upgrade confirmed — "${projectTitle}" upgraded to Comprehensive`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspection Update</p>
+        </div>
+        <div style="background: #052E16; border: 1px solid #166534; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #4ADE80; margin-top: 0;">✅ Upgrade Payment Confirmed</h2>
+          <p style="color: #BBF7D0;">Your inspection for <strong>"${projectTitle}"</strong> has been upgraded to Comprehensive. Your inspector will proceed with the extended scope.</p>
+          <p style="color: #4ADE80; font-weight: bold; font-size: 16px;">Additional charge: ${feeFormatted}</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <h3 style="color: #FBBF24; margin-top: 0; font-size: 14px;">Independent Review Available</h3>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6;">If you believe this upgrade was not justified, you have 14 days to request a free review by an independent Master Inspector. The deadline is <strong>${disputeDeadline}</strong>.</p>
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}/inspector`)}"
+             style="color: #FBBF24; font-size: 13px; text-decoration: underline;">
+            Request a review from your project page →
+          </a>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}/inspector`)}"
+             style="background: #1B4F8A; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Inspection Status
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendInspectorUpgradeConfirmedEmail({
+  inspectorEmail,
+  projectTitle,
+  projectId,
+  assignmentId,
+}: {
+  inspectorEmail: string;
+  projectTitle: string;
+  projectId: string;
+  assignmentId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: inspectorEmail,
+    subject: `Upgrade approved — proceed with Comprehensive on "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notification</p>
+        </div>
+        <div style="background: #052E16; border: 1px solid #166534; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #4ADE80; margin-top: 0;">✅ Client Approved the Upgrade</h2>
+          <p style="color: #BBF7D0;">The client has paid for the upgrade on <strong>"${projectTitle}"</strong>. Please proceed with the Comprehensive inspection scope.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/inspector/projects/${assignmentId}`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Assignment
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendInspectorUpgradeDeclinedEmail({
+  inspectorEmail,
+  projectTitle,
+  projectId,
+  assignmentId,
+}: {
+  inspectorEmail: string;
+  projectTitle: string;
+  projectId: string;
+  assignmentId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: inspectorEmail,
+    subject: `Upgrade declined — proceed with Standard on "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notification</p>
+        </div>
+        <div style="background: #1A0D00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FB923C; margin-top: 0;">ℹ Upgrade Declined by Client</h2>
+          <p style="color: #FED7AA;">The client has declined the upgrade on <strong>"${projectTitle}"</strong>. Please proceed with the original Standard inspection scope.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/inspector/projects/${assignmentId}`)}"
+             style="background: #1B4F8A; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Assignment
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendAdminInspectorRequestEmail({
   adminEmail,
   projectTitle,

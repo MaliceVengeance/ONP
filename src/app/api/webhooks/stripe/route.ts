@@ -6,6 +6,8 @@ import {
   sendInspectorRequestAvailableEmail,
   sendInspectorPaymentConfirmedEmail,
   sendAdminInspectorRequestEmail,
+  sendInspectorUpgradeChargedEmail,
+  sendInspectorUpgradeConfirmedEmail,
 } from "@/lib/email";
 
 function getPeriodEnd(sub: any): string {
@@ -277,6 +279,101 @@ export async function POST(req: NextRequest) {
           break;
         }
 
+        // ── Inspector on-site upgrade payment ────────────────
+        if (session.metadata?.payment_type === "inspector_upgrade") {
+          const assignmentId   = session.metadata?.assignment_id;
+          const inspProjectId  = session.metadata?.project_id;
+          const paymentIntentId = session.payment_intent;
+
+          if (!assignmentId || !inspProjectId) {
+            console.error("Inspector upgrade webhook missing metadata");
+            break;
+          }
+
+          const now = new Date().toISOString();
+
+          // Fetch Comprehensive tier to get current share percent
+          const { data: comprehensiveTier } = await supabaseAdmin
+            .from("inspector_price_list")
+            .select("fee_cents, inspector_share_percent")
+            .eq("pricing_key", "COMPREHENSIVE")
+            .maybeSingle();
+
+          const totalFeeCents   = comprehensiveTier?.fee_cents ?? 39900;
+          const sharePercent    = comprehensiveTier?.inspector_share_percent ?? 65;
+          const inspShareCents  = Math.round((totalFeeCents * sharePercent) / 100);
+          const onpShareCents   = totalFeeCents - inspShareCents;
+
+          // Mark upgrade PAID and update assignment to Comprehensive pricing
+          const { error: upgradeErr } = await supabaseAdmin
+            .from("project_inspector_assignments")
+            .update({
+              upgrade_payment_status: "PAID",
+              upgrade_charged_at: now,
+              pricing_key: "COMPREHENSIVE",
+              fee_charged_cents: totalFeeCents,
+              inspector_share_cents: inspShareCents,
+              onp_share_cents: onpShareCents,
+            })
+            .eq("id", assignmentId)
+            .eq("upgrade_payment_status", "PENDING");
+
+          if (upgradeErr) {
+            console.error("Inspector upgrade update failed:", upgradeErr);
+            break;
+          }
+
+          // Send notifications
+          try {
+            const { data: asgn } = await supabaseAdmin
+              .from("project_inspector_assignments")
+              .select("client_id, inspector_id, upgrade_fee_cents")
+              .eq("id", assignmentId)
+              .single();
+
+            const { data: proj } = await supabaseAdmin
+              .from("projects")
+              .select("title")
+              .eq("id", inspProjectId)
+              .single();
+
+            const projTitle = (proj as any)?.title ?? "Your Project";
+
+            // Notify client — upgrade charged + dispute window
+            if ((asgn as any)?.client_id) {
+              const { data: clientAuth } = await supabaseAdmin.auth.admin.getUserById((asgn as any).client_id);
+              const clientEmail = clientAuth?.user?.email;
+              if (clientEmail) {
+                sendInspectorUpgradeChargedEmail({
+                  clientEmail,
+                  projectTitle: projTitle,
+                  projectId: inspProjectId,
+                  upgradeFeeCents: (asgn as any)?.upgrade_fee_cents ?? 20000,
+                }).catch((e: unknown) => console.error("Upgrade charged email failed:", e));
+              }
+            }
+
+            // Notify inspector — proceed with Comprehensive
+            if ((asgn as any)?.inspector_id) {
+              const { data: inspAuth } = await supabaseAdmin.auth.admin.getUserById((asgn as any).inspector_id);
+              const inspEmail = inspAuth?.user?.email;
+              if (inspEmail) {
+                sendInspectorUpgradeConfirmedEmail({
+                  inspectorEmail: inspEmail,
+                  projectTitle: projTitle,
+                  projectId: inspProjectId,
+                  assignmentId,
+                }).catch((e: unknown) => console.error("Upgrade confirmed email failed:", e));
+              }
+            }
+          } catch (notifyErr) {
+            console.error("Inspector upgrade notification error (non-fatal):", notifyErr);
+          }
+
+          console.log(`Inspector upgrade for assignment ${assignmentId} marked PAID`);
+          break;
+        }
+
         // ── Contractor subscription ───────────────────────────
         const contractorId = session.metadata?.contractor_id;
         const planType = session.metadata?.plan_type;
@@ -423,21 +520,32 @@ export async function POST(req: NextRequest) {
       }
 
       case "checkout.session.expired": {
-        // If a client abandoned the inspector checkout, mark the PENDING
-        // assignment as FAILED so they can start a fresh selection.
         const expired = event.data.object as any;
-        if (expired.metadata?.payment_type !== "inspector") break;
-
         const expiredAssignmentId = expired.metadata?.assignment_id;
         if (!expiredAssignmentId) break;
 
-        await supabaseAdmin
-          .from("project_inspector_assignments")
-          .update({ payment_status: "FAILED" })
-          .eq("id", expiredAssignmentId)
-          .eq("payment_status", "PENDING");
+        // Original inspector checkout abandoned → mark FAILED so client can restart
+        if (expired.metadata?.payment_type === "inspector") {
+          await supabaseAdmin
+            .from("project_inspector_assignments")
+            .update({ payment_status: "FAILED" })
+            .eq("id", expiredAssignmentId)
+            .eq("payment_status", "PENDING");
 
-        console.log(`Inspector assignment ${expiredAssignmentId} marked FAILED (checkout expired)`);
+          console.log(`Inspector assignment ${expiredAssignmentId} marked FAILED (checkout expired)`);
+        }
+
+        // Upgrade checkout abandoned → reset to NONE so client can retry
+        if (expired.metadata?.payment_type === "inspector_upgrade") {
+          await supabaseAdmin
+            .from("project_inspector_assignments")
+            .update({ upgrade_payment_status: "NONE", upgrade_stripe_session_id: null })
+            .eq("id", expiredAssignmentId)
+            .eq("upgrade_payment_status", "PENDING");
+
+          console.log(`Inspector upgrade ${expiredAssignmentId} reset to NONE (checkout expired)`);
+        }
+
         break;
       }
     }
