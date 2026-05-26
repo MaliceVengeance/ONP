@@ -979,6 +979,121 @@ export async function sendDisputeAssignedMasterInspectorEmail({
   });
 }
 
+export async function sendInspectorFlagThresholdEmail({
+  inspectorEmail,
+  status,
+  flags12mo,
+  inspections12mo,
+  flagRatePct,
+}: {
+  inspectorEmail: string;
+  status: "MANDATORY_REVIEW" | "SUSPENSION_RECOMMENDED";
+  flags12mo: number;
+  inspections12mo: number;
+  flagRatePct: string;
+}) {
+  const isSuspension = status === "SUSPENSION_RECOMMENDED";
+  await resend.emails.send({
+    from: FROM,
+    to: inspectorEmail,
+    subject: isSuspension
+      ? "[URGENT] Your Inspector Account Is Under Suspension Review"
+      : "[ACTION REQUIRED] Your Inspector Account Is Under Mandatory Review",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notice</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FCA5A5; margin-top: 0; font-size: 18px;">
+            ${isSuspension ? "⛔ Suspension Review Triggered" : "⚠ Mandatory Account Review"}
+          </h2>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+            Based on your upgrade dispute history over the last 12 months, your account has been flagged
+            for ${isSuspension ? "suspension review" : "mandatory review"} by the ONP compliance system.
+          </p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 14px; font-size: 12px; color: #B8D0E8;">
+            <div style="margin-bottom: 4px;">Disputed upgrades (12 mo): <strong style="color: #fff;">${flags12mo}</strong></div>
+            <div style="margin-bottom: 4px;">Total inspections (12 mo): <strong style="color: #fff;">${inspections12mo}</strong></div>
+            <div>Dispute rate: <strong style="color: #FCA5A5;">${flagRatePct}%</strong></div>
+          </div>
+        </div>
+        <div style="background: #122040; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #B8D0E8; line-height: 1.6;">
+          <strong style="color: #fff;">What this means:</strong><br/>
+          Your ability to request on-site upgrade charges has been paused pending review.
+          An ONP administrator will contact you within 2 business days.
+          ${isSuspension ? "Platform suspension may follow if the review confirms a pattern of unjustified upgrades." : ""}
+        </div>
+        <p style="color: #7A9CC4; font-size: 12px; text-align: center;">
+          Questions? Contact <a href="mailto:support@ournextproject.us" style="color: #4A9EF5;">support@ournextproject.us</a>
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendAdminInspectorFlagThresholdEmail({
+  adminEmail,
+  inspectorId,
+  status,
+  flags12mo,
+  inspections12mo,
+  flagRatePct,
+}: {
+  adminEmail: string;
+  inspectorId: string;
+  status: "MANDATORY_REVIEW" | "SUSPENSION_RECOMMENDED";
+  flags12mo: number;
+  inspections12mo: number;
+  flagRatePct: string;
+}) {
+  const isSuspension = status === "SUSPENSION_RECOMMENDED";
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: isSuspension
+      ? `[URGENT] Inspector Suspension Threshold Reached`
+      : `[ACTION REQUIRED] Inspector Mandatory Review Threshold Reached`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Alert</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FCA5A5; margin-top: 0; font-size: 18px;">
+            ${isSuspension ? "⛔ Inspector Reached Suspension Threshold" : "⚠ Inspector Reached Mandatory Review Threshold"}
+          </h2>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+            An inspector's upgrade dispute rate has crossed the
+            ${isSuspension ? "suspension recommendation threshold (≥15%)" : "mandatory review threshold (≥10%)"}
+            based on the last 12 months of activity.
+          </p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 14px; font-size: 12px; color: #B8D0E8;">
+            <div style="margin-bottom: 4px;">Inspector ID: <strong style="color: #fff; font-family: monospace;">${inspectorId}</strong></div>
+            <div style="margin-bottom: 4px;">Disputed upgrades (12 mo): <strong style="color: #fff;">${flags12mo}</strong></div>
+            <div style="margin-bottom: 4px;">Total inspections (12 mo): <strong style="color: #fff;">${inspections12mo}</strong></div>
+            <div>Dispute rate: <strong style="color: #FCA5A5;">${flagRatePct}%</strong></div>
+          </div>
+        </div>
+        <div style="background: #122040; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #B8D0E8; line-height: 1.6;">
+          <strong style="color: #fff;">Automatic actions taken:</strong><br/>
+          • Upgrade request capability has been blocked on this inspector's account<br/>
+          • Inspector has been notified by email<br/>
+          ${isSuspension ? "• <strong style='color: #FCA5A5;'>Strong recommendation: suspend this inspector from the platform</strong>" : "• Admin review and decision required within 2 business days"}
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/users/${inspectorId}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Inspector Profile
+          </a>
+        </div>
+      </div>
+    `,
+  });
+}
+
 export async function sendNoMasterInspectorAvailableAdminEmail({
   adminEmail,
   projectTitle,

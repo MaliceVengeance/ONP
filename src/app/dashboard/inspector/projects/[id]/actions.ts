@@ -32,6 +32,19 @@ export async function requestUpgrade(assignmentId: string, formData: FormData) {
   if (assignment.pricing_key !== "STANDARD") {
     throw new Error("Upgrades are only available for Standard inspections.");
   }
+
+  // Check if this inspector has been blocked from requesting upgrades
+  const { data: inspProfile } = await supabaseAdmin
+    .from("profiles")
+    .select("upgrade_blocked")
+    .eq("id", user.id)
+    .single();
+  if ((inspProfile as any)?.upgrade_blocked) {
+    throw new Error(
+      "Your account is currently under compliance review and upgrade requests have been paused. " +
+      "Please contact support@ournextproject.us."
+    );
+  }
   const currentUpgradeStatus = (assignment as any).upgrade_payment_status ?? "NONE";
   if (currentUpgradeStatus !== "NONE") {
     throw new Error("An upgrade request has already been submitted for this assignment.");

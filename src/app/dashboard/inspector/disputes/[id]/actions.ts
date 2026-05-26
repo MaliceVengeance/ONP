@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 import { grantCredit, restoreCredits } from "@/lib/credits";
 import { redirect } from "next/navigation";
+import { checkInspectorFlagStatus } from "@/lib/checkInspectorFlagStatus";
 import {
   sendDisputeResolvedClientEmail,
   sendDisputeResolvedInspectorEmail,
@@ -157,6 +158,11 @@ export async function submitReview(disputeId: string, formData: FormData) {
       .then(({ error }) => {
         if (error) console.error("Inspector flag insert failed:", error);
       });
+
+    // Recompute rate-based flag status — may block upgrades and notify admin
+    checkInspectorFlagStatus(originalInspectorId).catch((e: unknown) =>
+      console.error("checkInspectorFlagStatus failed (non-fatal):", e)
+    );
   }
 
   // ── RESOLVED_PARTIAL_CREDIT ───────────────────────────────────────
