@@ -73,8 +73,6 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
         <tbody>
           {rows.map((row, i) => {
             const isEditing = editingKey === row.pricing_key;
-            const isMultiTrade =
-              row.pricing_key === "MULTI_TRADE" || row.pricing_key === "WHOLE_PROPERTY";
             const rowBg = isEditing
               ? "#FFFBEB"
               : i % 2 === 0
@@ -98,9 +96,9 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                       fontWeight: 700,
                       padding: "3px 8px",
                       borderRadius: "4px",
-                      background: isMultiTrade ? "#EDE9FE" : "#EEF4FF",
-                      color: isMultiTrade ? "#5B21B6" : "#1B4F8A",
-                      border: `1px solid ${isMultiTrade ? "#C4B5FD" : "#B8D0E8"}`,
+                      background: "#EEF4FF",
+                      color: "#1B4F8A",
+                      border: "1px solid #B8D0E8",
                       letterSpacing: "0.3px",
                     }}
                   >

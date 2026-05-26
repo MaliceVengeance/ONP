@@ -10,15 +10,19 @@ export default async function ClientInspectorPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
+  const { user, role } = await requireRole(["CLIENT", "ADMIN"]);
   const { id: projectId } = await params;
 
-  // Fetch project — need category for recommended pricing key
-  const { data: project } = await supabase
+  // Fetch project
+  const { data: project } = await supabaseAdmin
     .from("projects")
-    .select("id, title, state, category")
+    .select("id, title, state, category, client_id")
     .eq("id", projectId)
     .single();
+
+  if (!project || (role !== "ADMIN" && (project as any).client_id !== user.id)) {
+    redirect(`/dashboard/client/projects`);
+  }
 
   // Fetch active price list
   const { data: priceRows } = await supabaseAdmin
@@ -55,16 +59,7 @@ export default async function ClientInspectorPage({
     inspectorName = inspector?.display_name ?? null;
   }
 
-  // Split price list into single-trade and multi-trade options
-  const multiTradeKeys = new Set(["MULTI_TRADE", "WHOLE_PROPERTY"]);
-  const singleTradeOptions: PriceOption[] = (priceRows ?? []).filter(
-    (r) => !multiTradeKeys.has(r.pricing_key)
-  );
-  const multiTradeOptions: PriceOption[] = (priceRows ?? []).filter(
-    (r) => multiTradeKeys.has(r.pricing_key)
-  );
-
-  const recommendedKey = (project as any)?.category ?? singleTradeOptions[0]?.pricing_key ?? "";
+  const options: PriceOption[] = priceRows ?? [];
 
   function statusColor(status: string) {
     switch (status) {
@@ -438,9 +433,7 @@ export default async function ClientInspectorPage({
             Request an Inspector
           </h2>
           <InspectorPricingForm
-            recommendedKey={recommendedKey}
-            singleTradeOptions={singleTradeOptions}
-            multiTradeOptions={multiTradeOptions}
+            options={options}
             formAction={selectInspectorTier.bind(null, projectId)}
           />
         </div>

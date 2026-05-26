@@ -10,9 +10,7 @@ export type PriceOption = {
 };
 
 type Props = {
-  recommendedKey: string;
-  singleTradeOptions: PriceOption[];
-  multiTradeOptions: PriceOption[];
+  options: PriceOption[];
   formAction: (formData: FormData) => Promise<void>;
 };
 
@@ -20,111 +18,15 @@ function formatFee(cents: number) {
   return `$${(cents / 100).toFixed(0)}`;
 }
 
-export default function InspectorPricingForm({
-  recommendedKey,
-  singleTradeOptions,
-  multiTradeOptions,
-  formAction,
-}: Props) {
-  const defaultKey =
-    singleTradeOptions.find((o) => o.pricing_key === recommendedKey)?.pricing_key ??
-    singleTradeOptions[0]?.pricing_key ??
-    "";
+export default function InspectorPricingForm({ options, formAction }: Props) {
+  const defaultKey = options.find((o) => o.pricing_key === "STANDARD")?.pricing_key
+    ?? options[0]?.pricing_key
+    ?? "";
 
   const [selectedKey, setSelectedKey] = useState(defaultKey);
-  const [showMultiTrade, setShowMultiTrade] = useState(false);
   const [disclaimerChecked, setDisclaimerChecked] = useState(false);
 
-  const allOptions = [...singleTradeOptions, ...multiTradeOptions];
-  const selectedOption = allOptions.find((o) => o.pricing_key === selectedKey);
-
-  function handleMultiTradeToggle() {
-    if (!showMultiTrade) {
-      setShowMultiTrade(true);
-      if (multiTradeOptions.length > 0) {
-        setSelectedKey(multiTradeOptions[0].pricing_key);
-      }
-    } else {
-      setShowMultiTrade(false);
-      setSelectedKey(defaultKey);
-    }
-  }
-
-  function renderOption(opt: PriceOption, isRecommended: boolean) {
-    const isSelected = selectedKey === opt.pricing_key;
-    return (
-      <div
-        key={opt.pricing_key}
-        onClick={() => setSelectedKey(opt.pricing_key)}
-        style={{
-          background: isSelected ? "#1B4F8A" : "#FFFFFF",
-          border: `2px solid ${isSelected ? "#1B4F8A" : "#B8D0E8"}`,
-          borderRadius: "8px",
-          padding: "14px 16px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-            <span
-              style={{
-                fontWeight: 600,
-                fontSize: "14px",
-                color: isSelected ? "#fff" : "#0A1628",
-              }}
-            >
-              {opt.display_name}
-            </span>
-            {isRecommended && (
-              <span
-                style={{
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  padding: "2px 8px",
-                  borderRadius: "20px",
-                  background: isSelected ? "rgba(255,255,255,0.18)" : "#EEF4FF",
-                  color: isSelected ? "#fff" : "#1B4F8A",
-                  border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#B8D0E8"}`,
-                  letterSpacing: "0.5px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                RECOMMENDED
-              </span>
-            )}
-          </div>
-          {opt.description && (
-            <div
-              style={{
-                fontSize: "12px",
-                color: isSelected ? "rgba(255,255,255,0.75)" : "#4A7FB5",
-                marginTop: "4px",
-                lineHeight: 1.5,
-              }}
-            >
-              {opt.description}
-            </div>
-          )}
-        </div>
-        <div
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "18px",
-            color: isSelected ? "#fff" : "#0A1628",
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-          }}
-        >
-          {formatFee(opt.fee_cents)}
-        </div>
-      </div>
-    );
-  }
+  const selectedOption = options.find((o) => o.pricing_key === selectedKey);
 
   return (
     <form action={formAction}>
@@ -145,52 +47,101 @@ export default function InspectorPricingForm({
         Select Inspection Type
       </div>
 
-      {/* Single-trade options */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
-        {singleTradeOptions.map((opt) =>
-          renderOption(opt, opt.pricing_key === recommendedKey)
-        )}
+      {/* Options */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
+        {options.map((opt) => {
+          const isSelected = selectedKey === opt.pricing_key;
+          return (
+            <div
+              key={opt.pricing_key}
+              onClick={() => setSelectedKey(opt.pricing_key)}
+              style={{
+                background: isSelected ? "#1B4F8A" : "#FFFFFF",
+                border: `2px solid ${isSelected ? "#1B4F8A" : "#B8D0E8"}`,
+                borderRadius: "8px",
+                padding: "14px 16px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      color: isSelected ? "#fff" : "#0A1628",
+                    }}
+                  >
+                    {opt.display_name}
+                  </span>
+                  {opt.pricing_key === "STANDARD" && (
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        padding: "2px 8px",
+                        borderRadius: "20px",
+                        background: isSelected ? "rgba(255,255,255,0.18)" : "#EEF4FF",
+                        color: isSelected ? "#fff" : "#1B4F8A",
+                        border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#B8D0E8"}`,
+                        letterSpacing: "0.5px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      MOST POPULAR
+                    </span>
+                  )}
+                  {opt.pricing_key === "COMPREHENSIVE" && (
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        padding: "2px 8px",
+                        borderRadius: "20px",
+                        background: isSelected ? "rgba(255,255,255,0.18)" : "#FEF2F2",
+                        color: isSelected ? "#fff" : "#C8102E",
+                        border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#FECACA"}`,
+                        letterSpacing: "0.5px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      FULL SCOPE
+                    </span>
+                  )}
+                </div>
+                {opt.description && (
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: isSelected ? "rgba(255,255,255,0.75)" : "#4A7FB5",
+                      marginTop: "4px",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {opt.description}
+                  </div>
+                )}
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "18px",
+                  color: isSelected ? "#fff" : "#0A1628",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                {formatFee(opt.fee_cents)}
+              </div>
+            </div>
+          );
+        })}
       </div>
-
-      {/* Multi-trade toggle */}
-      <button
-        type="button"
-        onClick={handleMultiTradeToggle}
-        style={{
-          background: showMultiTrade ? "#EEF4FF" : "transparent",
-          border: `1px ${showMultiTrade ? "solid" : "dashed"} #B8D0E8`,
-          borderRadius: "8px",
-          padding: "12px 16px",
-          width: "100%",
-          cursor: "pointer",
-          fontSize: "13px",
-          color: "#1B4F8A",
-          fontFamily: "'Barlow', sans-serif",
-          marginBottom: showMultiTrade ? "0" : "20px",
-          textAlign: "left",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <span>My project spans multiple trades</span>
-        <span style={{ fontSize: "11px" }}>{showMultiTrade ? "▲ collapse" : "▼ show options"}</span>
-      </button>
-
-      {/* Multi-trade options (expanded) */}
-      {showMultiTrade && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginBottom: "20px",
-            paddingTop: "8px",
-          }}
-        >
-          {multiTradeOptions.map((opt) => renderOption(opt, false))}
-        </div>
-      )}
 
       {/* Fee summary */}
       {selectedOption && (
