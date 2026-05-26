@@ -1,0 +1,307 @@
+"use client";
+
+import { useState } from "react";
+
+export type PriceOption = {
+  pricing_key: string;
+  display_name: string;
+  description: string | null;
+  fee_cents: number;
+};
+
+type Props = {
+  recommendedKey: string;
+  singleTradeOptions: PriceOption[];
+  multiTradeOptions: PriceOption[];
+  formAction: (formData: FormData) => Promise<void>;
+};
+
+function formatFee(cents: number) {
+  return `$${(cents / 100).toFixed(0)}`;
+}
+
+export default function InspectorPricingForm({
+  recommendedKey,
+  singleTradeOptions,
+  multiTradeOptions,
+  formAction,
+}: Props) {
+  const defaultKey =
+    singleTradeOptions.find((o) => o.pricing_key === recommendedKey)?.pricing_key ??
+    singleTradeOptions[0]?.pricing_key ??
+    "";
+
+  const [selectedKey, setSelectedKey] = useState(defaultKey);
+  const [showMultiTrade, setShowMultiTrade] = useState(false);
+  const [disclaimerChecked, setDisclaimerChecked] = useState(false);
+
+  const allOptions = [...singleTradeOptions, ...multiTradeOptions];
+  const selectedOption = allOptions.find((o) => o.pricing_key === selectedKey);
+
+  function handleMultiTradeToggle() {
+    if (!showMultiTrade) {
+      setShowMultiTrade(true);
+      if (multiTradeOptions.length > 0) {
+        setSelectedKey(multiTradeOptions[0].pricing_key);
+      }
+    } else {
+      setShowMultiTrade(false);
+      setSelectedKey(defaultKey);
+    }
+  }
+
+  function renderOption(opt: PriceOption, isRecommended: boolean) {
+    const isSelected = selectedKey === opt.pricing_key;
+    return (
+      <div
+        key={opt.pricing_key}
+        onClick={() => setSelectedKey(opt.pricing_key)}
+        style={{
+          background: isSelected ? "#1B4F8A" : "#FFFFFF",
+          border: `2px solid ${isSelected ? "#1B4F8A" : "#B8D0E8"}`,
+          borderRadius: "8px",
+          padding: "14px 16px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+            <span
+              style={{
+                fontWeight: 600,
+                fontSize: "14px",
+                color: isSelected ? "#fff" : "#0A1628",
+              }}
+            >
+              {opt.display_name}
+            </span>
+            {isRecommended && (
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  padding: "2px 8px",
+                  borderRadius: "20px",
+                  background: isSelected ? "rgba(255,255,255,0.18)" : "#EEF4FF",
+                  color: isSelected ? "#fff" : "#1B4F8A",
+                  border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#B8D0E8"}`,
+                  letterSpacing: "0.5px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                RECOMMENDED
+              </span>
+            )}
+          </div>
+          {opt.description && (
+            <div
+              style={{
+                fontSize: "12px",
+                color: isSelected ? "rgba(255,255,255,0.75)" : "#4A7FB5",
+                marginTop: "4px",
+                lineHeight: 1.5,
+              }}
+            >
+              {opt.description}
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "18px",
+            color: isSelected ? "#fff" : "#0A1628",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          {formatFee(opt.fee_cents)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form action={formAction}>
+      {/* Hidden input carries the selected key to the server */}
+      <input type="hidden" name="pricing_key" value={selectedKey} />
+
+      {/* Section label */}
+      <div
+        style={{
+          fontSize: "11px",
+          color: "#1B4F8A",
+          textTransform: "uppercase",
+          letterSpacing: "1px",
+          marginBottom: "10px",
+          fontWeight: 600,
+        }}
+      >
+        Select Inspection Type
+      </div>
+
+      {/* Single-trade options */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
+        {singleTradeOptions.map((opt) =>
+          renderOption(opt, opt.pricing_key === recommendedKey)
+        )}
+      </div>
+
+      {/* Multi-trade toggle */}
+      <button
+        type="button"
+        onClick={handleMultiTradeToggle}
+        style={{
+          background: showMultiTrade ? "#EEF4FF" : "transparent",
+          border: `1px ${showMultiTrade ? "solid" : "dashed"} #B8D0E8`,
+          borderRadius: "8px",
+          padding: "12px 16px",
+          width: "100%",
+          cursor: "pointer",
+          fontSize: "13px",
+          color: "#1B4F8A",
+          fontFamily: "'Barlow', sans-serif",
+          marginBottom: showMultiTrade ? "0" : "20px",
+          textAlign: "left",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span>My project spans multiple trades</span>
+        <span style={{ fontSize: "11px" }}>{showMultiTrade ? "▲ collapse" : "▼ show options"}</span>
+      </button>
+
+      {/* Multi-trade options (expanded) */}
+      {showMultiTrade && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            marginBottom: "20px",
+            paddingTop: "8px",
+          }}
+        >
+          {multiTradeOptions.map((opt) => renderOption(opt, false))}
+        </div>
+      )}
+
+      {/* Fee summary */}
+      {selectedOption && (
+        <div
+          style={{
+            background: "#F0FDF4",
+            border: "1px solid #BBF7D0",
+            borderRadius: "8px",
+            padding: "14px 16px",
+            marginBottom: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#15803D",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                marginBottom: "2px",
+              }}
+            >
+              Total — one-time, non-refundable
+            </div>
+            <div
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "28px",
+                fontWeight: 700,
+                color: "#0A1628",
+              }}
+            >
+              {formatFee(selectedOption.fee_cents)}
+            </div>
+          </div>
+          <div style={{ fontSize: "12px", color: "#15803D", textAlign: "right", lineHeight: 1.6 }}>
+            {selectedOption.display_name}
+            <br />
+            <span style={{ color: "#4A7FB5" }}>Typically scheduled within 3–5 business days</span>
+          </div>
+        </div>
+      )}
+
+      {/* Disclaimer notice */}
+      <div
+        style={{
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+          borderRadius: "8px",
+          padding: "14px 16px",
+          marginBottom: "16px",
+          fontSize: "12px",
+          color: "#92400E",
+          lineHeight: 1.7,
+        }}
+      >
+        <strong>Before you continue:</strong> ONP Inspectors provide targeted bid-accuracy
+        inspections — not full real estate or pre-purchase inspections. Your fee is non-refundable
+        once an inspection is scheduled. The inspector&apos;s report will be shared with contractors
+        bidding on your project.
+      </div>
+
+      {/* Disclaimer checkbox */}
+      <label
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          marginBottom: "20px",
+          cursor: "pointer",
+        }}
+      >
+        <input
+          type="checkbox"
+          name="disclaimer_accepted"
+          checked={disclaimerChecked}
+          onChange={(e) => setDisclaimerChecked(e.target.checked)}
+          style={{ marginTop: "3px", flexShrink: 0, accentColor: "#1B4F8A" }}
+        />
+        <span style={{ fontSize: "13px", color: "#0A1628", lineHeight: 1.6 }}>
+          I have read and agree to the <strong>Inspector Request terms</strong>. I understand
+          my inspection fee is non-refundable and the report will be shared with bidding
+          contractors.
+        </span>
+      </label>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={!disclaimerChecked || !selectedKey}
+        style={{
+          background: disclaimerChecked && selectedKey ? "#C8102E" : "#E5E7EB",
+          color: disclaimerChecked && selectedKey ? "#fff" : "#9CA3AF",
+          border: "none",
+          padding: "14px 28px",
+          borderRadius: "6px",
+          fontFamily: "'Barlow', sans-serif",
+          fontWeight: 700,
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+          cursor: disclaimerChecked && selectedKey ? "pointer" : "not-allowed",
+          width: "100%",
+          transition: "background 0.15s",
+        }}
+      >
+        Continue to Payment
+        {selectedOption ? ` — ${formatFee(selectedOption.fee_cents)}` : ""}
+      </button>
+    </form>
+  );
+}

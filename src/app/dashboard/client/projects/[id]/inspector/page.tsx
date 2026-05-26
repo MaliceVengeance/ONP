@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
-import { requestInspector } from "./actions";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import InspectorPricingForm, { PriceOption } from "./InspectorPricingForm";
+import { selectInspectorTier } from "./actions";
 
 export default async function ClientInspectorPage({
   params,
@@ -10,51 +13,97 @@ export default async function ClientInspectorPage({
   const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
   const { id: projectId } = await params;
 
+  // Fetch project — need category for recommended pricing key
   const { data: project } = await supabase
     .from("projects")
-    .select("id, title, state")
+    .select("id, title, state, category")
     .eq("id", projectId)
     .single();
 
+  // Fetch active price list
+  const { data: priceRows } = await supabaseAdmin
+    .from("inspector_price_list")
+    .select("pricing_key, display_name, description, fee_cents")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  // Fetch existing assignment (include new payment columns)
   const { data: assignment } = await supabase
     .from("project_inspector_assignments")
-    .select("id, request_status, requested_at, assigned_at, inspector_id, takeoff_report, takeoff_completed_at, notes")
+    .select(
+      "id, request_status, payment_status, pricing_key, fee_charged_cents, requested_at, assigned_at, inspector_id, takeoff_report, takeoff_completed_at, notes"
+    )
     .eq("project_id", projectId)
+    .neq("payment_status", "FAILED")
     .maybeSingle();
 
+  // If a PENDING (unpaid) row exists, send client straight to the pay page
+  if (assignment && assignment.payment_status === "PENDING") {
+    redirect(`/dashboard/client/projects/${projectId}/inspector/pay`);
+  }
+
   // Fetch inspector name if assigned
-  let inspectorName = null;
+  let inspectorName: string | null = null;
   if (assignment?.inspector_id) {
-    const { data: inspector } = await supabase
+    const { data: inspector } = await supabaseAdmin
       .from("profiles")
       .select("display_name")
       .eq("id", assignment.inspector_id)
       .single();
-    inspectorName = inspector?.display_name;
+    inspectorName = inspector?.display_name ?? null;
   }
+
+  // Split price list into single-trade and multi-trade options
+  const multiTradeKeys = new Set(["MULTI_TRADE", "WHOLE_PROPERTY"]);
+  const singleTradeOptions: PriceOption[] = (priceRows ?? []).filter(
+    (r) => !multiTradeKeys.has(r.pricing_key)
+  );
+  const multiTradeOptions: PriceOption[] = (priceRows ?? []).filter(
+    (r) => multiTradeKeys.has(r.pricing_key)
+  );
+
+  const recommendedKey = (project as any)?.category ?? singleTradeOptions[0]?.pricing_key ?? "";
 
   function statusColor(status: string) {
     switch (status) {
-      case "PENDING": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
-      case "ASSIGNED": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
-      case "COMPLETED": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
-      default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+      case "PENDING":
+        return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
+      case "ASSIGNED":
+        return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+      case "COMPLETED":
+        return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
+      default:
+        return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
     }
   }
 
+  function formatFee(cents: number | null) {
+    if (!cents) return null;
+    return `$${(cents / 100).toFixed(0)}`;
+  }
+
   return (
-    <div style={{ maxWidth: "600px" }}>
+    <div style={{ maxWidth: "620px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "28px",
+        }}
+      >
         <div>
-          <h1 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "36px",
-            letterSpacing: "1px",
-            color: "#0A1628",
-            margin: 0,
-          }}>
+          <h1
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "36px",
+              letterSpacing: "1px",
+              color: "#0A1628",
+              margin: 0,
+            }}
+          >
             Inspector Takeoff
           </h1>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
@@ -74,173 +123,227 @@ export default async function ClientInspectorPage({
             textDecoration: "none",
           }}
         >
-          Back
+          ← Back
         </Link>
       </div>
 
-      {/* Info card */}
-      <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
-        borderRadius: "12px",
-        padding: "20px",
-        marginBottom: "20px",
-      }}>
-        <h2 style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 700,
-          fontSize: "18px",
-          letterSpacing: "1px",
-          color: "#0A1628",
-          textTransform: "uppercase",
-          marginBottom: "10px",
-        }}>
-          What is a Takeoff?
-        </h2>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, marginBottom: "8px" }}>
-          An ONP inspector will visit your property and create a detailed scope of work. This ensures contractors have accurate information to submit competitive bids.
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "13px", color: "#15803D" }}>
-          <div>✅ Unbiased third-party assessment</div>
-          <div>✅ Detailed scope of work document</div>
-          <div>✅ Better bids from contractors</div>
-          <div>✅ Reduces disputes and surprises</div>
-        </div>
-      </div>
-
-      {/* Current status */}
-      {assignment ? (
-        <div style={{
+      {/* What is a Takeoff */}
+      <div
+        style={{
           background: "#EEF4FF",
           border: "1px solid #B8D0E8",
           borderRadius: "12px",
           padding: "20px",
-          marginBottom: "20px",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
-            <h2 style={{
+          marginBottom: "24px",
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "16px",
+            letterSpacing: "1px",
+            color: "#0A1628",
+            textTransform: "uppercase",
+            marginBottom: "10px",
+          }}
+        >
+          What is a Bid-Accuracy Inspection?
+        </h2>
+        <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, marginBottom: "10px" }}>
+          An ONP Inspector visits your property and produces a focused scope document — measurements,
+          photos, condition notes, and access observations — targeted to your project trade. This
+          gives bidding contractors the information they need to price accurately.
+        </p>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            fontSize: "13px",
+            color: "#15803D",
+          }}
+        >
+          <div>✅ Targeted to your specific trade(s)</div>
+          <div>✅ Typical visit: 1–2 hours on-site</div>
+          <div>✅ Report shared with all bidding contractors</div>
+          <div>✅ Results in tighter, more competitive bids</div>
+        </div>
+      </div>
+
+      {/* PAID / active assignment — show status view */}
+      {assignment && assignment.payment_status === "PAID" ? (
+        <div>
+          {/* Status card */}
+          <div
+            style={{
+              background: "#EEF4FF",
+              border: "1px solid #B8D0E8",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom: "20px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "14px",
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "18px",
+                  letterSpacing: "1px",
+                  color: "#0A1628",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                Inspection Status
+              </h2>
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  letterSpacing: "0.5px",
+                  ...statusColor(assignment.request_status ?? "PENDING"),
+                }}
+              >
+                {assignment.request_status ?? "PENDING"}
+              </span>
+            </div>
+
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}
+            >
+              {assignment.pricing_key && (
+                <div>
+                  <span style={{ color: "#1B4F8A" }}>Inspection type: </span>
+                  <span style={{ color: "#0A1628" }}>
+                    {assignment.pricing_key.replaceAll("_", " ")}
+                  </span>
+                </div>
+              )}
+              {assignment.fee_charged_cents && (
+                <div>
+                  <span style={{ color: "#1B4F8A" }}>Fee paid: </span>
+                  <span style={{ color: "#0A1628", fontWeight: 600 }}>
+                    {formatFee(assignment.fee_charged_cents)}
+                  </span>
+                </div>
+              )}
+              {assignment.requested_at && (
+                <div>
+                  <span style={{ color: "#1B4F8A" }}>Requested: </span>
+                  <span style={{ color: "#0A1628" }}>
+                    {new Date(assignment.requested_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+              {inspectorName && (
+                <div>
+                  <span style={{ color: "#1B4F8A" }}>Inspector: </span>
+                  <span style={{ color: "#0A1628" }}>{inspectorName}</span>
+                </div>
+              )}
+              {assignment.assigned_at && (
+                <div>
+                  <span style={{ color: "#1B4F8A" }}>Assigned: </span>
+                  <span style={{ color: "#0A1628" }}>
+                    {new Date(assignment.assigned_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+              {assignment.notes && (
+                <div>
+                  <span style={{ color: "#1B4F8A" }}>Notes: </span>
+                  <span style={{ color: "#0A1628" }}>{assignment.notes}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Takeoff report */}
+          {assignment.takeoff_report && (
+            <div
+              style={{
+                background: "#EEF4FF",
+                border: "1px solid #166534",
+                borderRadius: "12px",
+                padding: "24px",
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "18px",
+                  letterSpacing: "1px",
+                  color: "#15803D",
+                  textTransform: "uppercase",
+                  marginBottom: "14px",
+                }}
+              >
+                ✅ Takeoff Report
+              </h2>
+              {assignment.takeoff_completed_at && (
+                <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px" }}>
+                  Completed:{" "}
+                  {new Date(assignment.takeoff_completed_at).toLocaleDateString()}
+                </div>
+              )}
+              <div
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  borderRadius: "8px",
+                  padding: "16px",
+                  fontSize: "13px",
+                  color: "#0A1628",
+                  lineHeight: 1.7,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {assignment.takeoff_report}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* No assignment (or all FAILED) — show pricing form */
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "12px",
+            padding: "24px",
+          }}
+        >
+          <h2
+            style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
               color: "#0A1628",
               textTransform: "uppercase",
-              margin: 0,
-            }}>
-              Request Status
-            </h2>
-            <span style={{
-              fontSize: "11px",
-              fontWeight: 600,
-              padding: "4px 10px",
-              borderRadius: "20px",
-              letterSpacing: "0.5px",
-              ...statusColor(assignment.request_status ?? "PENDING"),
-            }}>
-              {assignment.request_status ?? "PENDING"}
-            </span>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
-            {assignment.requested_at && (
-              <div>
-                <span style={{ color: "#1B4F8A" }}>Requested: </span>
-                <span style={{ color: "#0A1628" }}>{new Date(assignment.requested_at).toLocaleDateString()}</span>
-              </div>
-            )}
-            {inspectorName && (
-              <div>
-                <span style={{ color: "#1B4F8A" }}>Inspector: </span>
-                <span style={{ color: "#0A1628" }}>{inspectorName}</span>
-              </div>
-            )}
-            {assignment.assigned_at && (
-              <div>
-                <span style={{ color: "#1B4F8A" }}>Assigned: </span>
-                <span style={{ color: "#0A1628" }}>{new Date(assignment.assigned_at).toLocaleDateString()}</span>
-              </div>
-            )}
-            {assignment.notes && (
-              <div>
-                <span style={{ color: "#1B4F8A" }}>Notes: </span>
-                <span style={{ color: "#0A1628" }}>{assignment.notes}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
-          borderRadius: "12px",
-          padding: "24px",
-          marginBottom: "20px",
-          textAlign: "center",
-        }}>
-          <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "20px" }}>
-            No inspector has been requested yet. Click below to request one.
-          </div>
-          <form action={requestInspector.bind(null, projectId)}>
-            <button
-              type="submit"
-              style={{
-                background: "#C8102E",
-                color: "#fff",
-                border: "none",
-                padding: "12px 28px",
-                borderRadius: "6px",
-                fontFamily: "'Barlow', sans-serif",
-                fontWeight: 600,
-                fontSize: "14px",
-                letterSpacing: "0.5px",
-                cursor: "pointer",
-              }}
-            >
-              Request Inspector Takeoff
-            </button>
-          </form>
-          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "10px" }}>
-            An admin will assign an available inspector to your project.
-          </p>
-        </div>
-      )}
-
-      {/* Takeoff report */}
-      {assignment?.takeoff_report && (
-        <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #166534",
-          borderRadius: "12px",
-          padding: "24px",
-        }}>
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "18px",
-            letterSpacing: "1px",
-            color: "#15803D",
-            textTransform: "uppercase",
-            marginBottom: "14px",
-          }}>
-            ✅ Takeoff Report
+              marginBottom: "20px",
+            }}
+          >
+            Request an Inspector
           </h2>
-          {assignment.takeoff_completed_at && (
-            <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px" }}>
-              Completed: {new Date(assignment.takeoff_completed_at).toLocaleDateString()}
-            </div>
-          )}
-          <div style={{
-            background: "#FFFFFF",
-            border: "1px solid #B8D0E8",
-            borderRadius: "8px",
-            padding: "16px",
-            fontSize: "13px",
-            color: "#0A1628",
-            lineHeight: 1.7,
-            whiteSpace: "pre-wrap",
-          }}>
-            {assignment.takeoff_report}
-          </div>
+          <InspectorPricingForm
+            recommendedKey={recommendedKey}
+            singleTradeOptions={singleTradeOptions}
+            multiTradeOptions={multiTradeOptions}
+            formAction={selectInspectorTier.bind(null, projectId)}
+          />
         </div>
       )}
     </div>
