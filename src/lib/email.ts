@@ -1094,6 +1094,184 @@ export async function sendAdminInspectorFlagThresholdEmail({
   });
 }
 
+export async function sendDisputeSlaReminderEmail({
+  masterInspectorEmail,
+  projectTitle,
+  disputeId,
+  daysAssigned,
+  daysRemaining,
+}: {
+  masterInspectorEmail: string;
+  projectTitle: string;
+  disputeId: string;
+  daysAssigned: number;
+  daysRemaining: number;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: masterInspectorEmail,
+    subject: `[REMINDER] Dispute Review Due in ${daysRemaining} Day${daysRemaining === 1 ? "" : "s"} — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Master Inspector</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FCD34D; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0; font-size: 18px;">⏰ Dispute Review Reminder</h2>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6;">
+            You were assigned a dispute review on <strong style="color: #fff;">"${projectTitle}"</strong>
+            ${daysAssigned} day${daysAssigned === 1 ? "" : "s"} ago. A decision is due within <strong style="color: #fff;">${daysRemaining} more day${daysRemaining === 1 ? "" : "s"}</strong>.
+          </p>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+            If the dispute is not resolved by the 5-business-day deadline, it may be reassigned or escalated to admin.
+          </p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/inspector/disputes/${disputeId}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Review Now
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP · Dispute ID: ${disputeId}
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendDisputeSlaEscalationEmail({
+  masterInspectorEmail,
+  adminEmail,
+  projectTitle,
+  disputeId,
+}: {
+  masterInspectorEmail: string | null;
+  adminEmail: string;
+  projectTitle: string;
+  disputeId: string;
+}) {
+  const promises: Promise<void>[] = [];
+
+  if (masterInspectorEmail) {
+    promises.push(
+      resend.emails.send({
+        from: FROM,
+        to: masterInspectorEmail,
+        subject: `[URGENT] Dispute Review SLA Breached — "${projectTitle}"`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+              <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Master Inspector</p>
+            </div>
+            <div style="background: #2D1B00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+              <h2 style="color: #FCA5A5; margin-top: 0; font-size: 18px;">⛔ SLA Deadline Breached</h2>
+              <p style="color: #FDE68A; font-size: 13px; line-height: 1.6;">
+                The 5-business-day review window for <strong style="color: #fff;">"${projectTitle}"</strong> has elapsed without a decision.
+                An administrator has been notified and may reassign this dispute.
+              </p>
+              <p style="color: #FDE68A; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+                Please submit your decision immediately if you intend to retain this case.
+              </p>
+            </div>
+            <div style="text-align: center;">
+              <a href="${BASE}/dashboard/inspector/disputes/${disputeId}"
+                 style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+                Submit Decision Now
+              </a>
+            </div>
+            <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+              ONP · Dispute ID: ${disputeId}
+            </p>
+          </div>
+        `,
+      }).then(() => {})
+    );
+  }
+
+  promises.push(
+    resend.emails.send({
+      from: FROM,
+      to: adminEmail,
+      subject: `[URGENT] Master Inspector SLA Breached — "${projectTitle}"`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+          <div style="text-align: center; margin-bottom: 32px;">
+            <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+            <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Alert</p>
+          </div>
+          <div style="background: #2D1B00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+            <h2 style="color: #FCA5A5; margin-top: 0; font-size: 18px;">⛔ Master Inspector SLA Breached</h2>
+            <p style="color: #FDE68A; font-size: 13px; line-height: 1.6;">
+              The dispute on <strong style="color: #fff;">"${projectTitle}"</strong> has not been resolved within the 5-business-day SLA.
+              The assigned Master Inspector has been notified. Admin action may be required.
+            </p>
+          </div>
+          <div style="text-align: center;">
+            <a href="${BASE}/dashboard/admin/disputes/${disputeId}"
+               style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+              View Dispute
+            </a>
+          </div>
+          <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+            ONP Admin · Dispute ID: ${disputeId}
+          </p>
+        </div>
+      `,
+    }).then(() => {})
+  );
+
+  await Promise.allSettled(promises);
+}
+
+export async function sendCreditExpiryReminderEmail({
+  clientEmail,
+  amountCents,
+  expiresAt,
+}: {
+  clientEmail: string;
+  amountCents: number;
+  expiresAt: string;
+}) {
+  const fmt = (c: number) => `$${(c / 100).toFixed(0)}`;
+  const expiryDate = new Date(expiresAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `Your ${fmt(amountCents)} ONP Credit Expires Soon`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Account Credit</p>
+        </div>
+        <div style="background: #122040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #fff; margin-top: 0; font-size: 20px;">Your ${fmt(amountCents)} credit expires in 30 days</h2>
+          <p style="color: #B8D0E8; font-size: 13px; line-height: 1.6;">
+            A credit of <strong style="color: #fff;">${fmt(amountCents)}</strong> on your ONP account will expire on
+            <strong style="color: #fff;">${expiryDate}</strong>. Use it toward your next inspection or emergency bid request before it expires.
+          </p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/client/credits"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View My Credits
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP · Credits can be applied at checkout for any inspection or emergency bid.
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendNoMasterInspectorAvailableAdminEmail({
   adminEmail,
   projectTitle,
