@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 
@@ -16,12 +17,14 @@ type Project = {
 export default async function ClientDashboard() {
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("projects")
     .select("id, title, category, state, city, deadline_at, created_at")
     .eq("client_id", user.id)
     .order("created_at", { ascending: false })
     .limit(10);
+
+  if (error) console.error("Client dashboard projects error:", JSON.stringify(error));
 
   const projects = (data ?? []) as Project[];
   const drafts = projects.filter((p) => p.state === "DRAFT");
