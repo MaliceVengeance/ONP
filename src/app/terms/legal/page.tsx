@@ -137,10 +137,11 @@ export default function TermsLegalPage() {
           <p style={pStyle}><strong>5.1 Contractor Subscription Fees.</strong> Subscriptions auto-renew on a recurring basis until cancelled. Payment is processed by Stripe, Inc. and is subject to Stripe&apos;s terms.</p>
           <p style={pStyle}><strong>5.2 Inspector Request Fees.</strong> Inspection fees are charged at the time the Inspection is requested by the Client.</p>
           <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: "8px", padding: "14px 18px", marginBottom: "12px" }}>
-            <p style={{ ...capsStyle, marginBottom: "8px", color: "#991B1B" }}>5.3 No Refunds. ALL FEES PAID TO ONP ARE FINAL AND NON-REFUNDABLE.</p>
+            <p style={{ ...capsStyle, marginBottom: "8px", color: "#991B1B" }}>5.3 No Refunds. ALL FEES PAID TO ONP ARE FINAL AND NON-REFUNDABLE, EXCEPT AS PROVIDED IN SUBSECTION (c) BELOW.</p>
             <ul style={{ paddingLeft: "20px" }}>
               <li style={{ ...liStyle, color: "#991B1B" }}>(a) Contractor Subscription fees are non-refundable for any reason including account closure, suspension, or non-use.</li>
               <li style={{ ...liStyle, color: "#991B1B" }}>(b) Inspection fees are deemed earned upon the Client&apos;s request and are non-refundable regardless of outcome.</li>
+              <li style={{ ...liStyle, color: "#7F1D1D" }}>(c) <strong>Upgrade Dispute Exception.</strong> Notwithstanding subclause (b), if a Client files a timely dispute of an on-site inspection upgrade through the ONP Upgrade Dispute process and an independent Master Inspector determines the upgrade was not justified, ONP will refund the upgrade differential fee only (the amount charged above the original base inspection fee). The base inspection fee and all other fees remain non-refundable. A credit in lieu of a full refund may be issued at the Master Inspector&apos;s discretion. Disputes must be filed within 14 days of the upgrade charge. This exception applies solely to on-site upgrade charges and to no other fee.</li>
             </ul>
           </div>
           <p style={pStyle}><strong>5.4 Cancellation.</strong> Upon cancellation, the Contractor retains access through the end of the current billing period and will not be charged again.</p>

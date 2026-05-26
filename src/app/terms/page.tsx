@@ -118,7 +118,7 @@ export default function TermsPage() {
           <p style={pStyle}>Inspection fee charged at the time of request.</p>
           <p style={subheadStyle}>No refunds</p>
           <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: "8px", padding: "14px 18px", fontSize: "14px", color: "#991B1B", lineHeight: 1.75, marginBottom: "12px" }}>
-            <strong>All fees are non-refundable</strong> — including subscription fees (unused time is forfeited) and inspection fees (earned upon request).
+            <strong>All fees are non-refundable</strong> — including subscription fees (unused time is forfeited) and inspection fees (earned upon request). <strong>Exception:</strong> on-site inspection upgrade fees may be refunded if a dispute is successfully resolved through the ONP Upgrade Dispute process (see Legal Terms §5.3(c)).
           </div>
           <p style={subheadStyle}>Payments between clients and contractors</p>
           <p style={pStyle}><strong>We do not handle payments between clients and contractors.</strong> Those happen directly between you, outside ONP. We are not responsible for those payments or disputes.</p>
