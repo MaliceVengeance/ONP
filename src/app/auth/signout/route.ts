@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
 
-  // Redirect to login after clearing cookies
-  return NextResponse.redirect(new URL("/login", process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"), {
-    status: 303,
-  });
+  // Build the redirect URL from the incoming request's origin so this
+  // works correctly on both localhost and production without an env var.
+  const origin = req.nextUrl.origin;
+  return NextResponse.redirect(new URL("/login", origin), { status: 303 });
 }
