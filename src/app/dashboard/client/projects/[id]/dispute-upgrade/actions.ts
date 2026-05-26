@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CLIENT_UPGRADE_DISPUTE } from "@/lib/disclaimers/clientUpgradeDispute";
+import { assignMasterInspector } from "@/lib/assignMasterInspector";
 import {
   sendDisputeSubmittedClientEmail,
   sendDisputeFiledInspectorEmail,
@@ -114,6 +115,15 @@ export async function submitDispute(projectId: string, formData: FormData) {
   }
 
   const disputeId = (dispute as any).id as string;
+
+  // Auto-assign a Master Inspector (fire-and-forget — dispute is already saved)
+  assignMasterInspector({
+    disputeId,
+    projectId,
+    originalInspectorId: (assignment as any).inspector_id,
+  }).catch((e: unknown) =>
+    console.error("Master inspector auto-assignment failed (non-fatal):", e)
+  );
 
   // Log disclaimer acknowledgment
   await supabaseAdmin.from("disclaimer_acknowledgments").insert({

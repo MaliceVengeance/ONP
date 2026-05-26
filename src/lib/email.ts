@@ -932,3 +932,93 @@ export async function sendDisputeResolvedInspectorEmail({
     `,
   });
 }
+
+export async function sendDisputeAssignedMasterInspectorEmail({
+  masterInspectorEmail,
+  projectTitle,
+  disputeId,
+}: {
+  masterInspectorEmail: string;
+  projectTitle: string;
+  disputeId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: masterInspectorEmail,
+    subject: `[ACTION REQUIRED] New Dispute Assigned — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Master Inspector</p>
+        </div>
+        <div style="background: #122040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #fff; margin-top: 0; font-size: 18px;">New Dispute Assigned to You</h2>
+          <p style="color: #B8D0E8; font-size: 13px; line-height: 1.6;">
+            A client has disputed an on-site upgrade charge on <strong style="color: #fff;">"${projectTitle}"</strong>.
+            As the assigned Master Inspector, please review all case evidence and render a decision.
+          </p>
+          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin-top: 16px;">
+            <p style="color: #FBBF24; margin: 0; font-weight: bold;">⏰ SLA: 5 business days from today</p>
+            <p style="color: #7A9CC4; font-size: 12px; margin: 8px 0 0;">
+              A reminder will be sent at day 3. If unresolved by day 5, the case may be reassigned.
+            </p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/inspector/disputes/${disputeId}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Review Dispute
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP · Dispute ID: ${disputeId}
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendNoMasterInspectorAvailableAdminEmail({
+  adminEmail,
+  projectTitle,
+  disputeId,
+}: {
+  adminEmail: string;
+  projectTitle: string;
+  disputeId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[URGENT] No Master Inspector Available — Manual Assignment Required`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Alert</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FCA5A5; margin-top: 0;">⚠ No Master Inspector Available</h2>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6;">
+            A dispute was filed on <strong style="color: #fff;">"${projectTitle}"</strong> but the system
+            could not automatically assign a Master Inspector. Manual assignment is required immediately.
+          </p>
+          <p style="color: #FDE68A; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+            This may occur when the original inspector is the only available Master Inspector, or when the
+            Master Inspector pool is empty.
+          </p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/disputes/${disputeId}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Assign Manually
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP Admin · Dispute ID: ${disputeId}
+        </p>
+      </div>
+    `,
+  });
+}
