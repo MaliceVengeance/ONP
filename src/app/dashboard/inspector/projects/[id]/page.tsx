@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { submitTakeoffReport, requestUpgrade } from "./actions";
+import { submitTakeoffReport, requestUpgrade, submitDisputeResponse } from "./actions";
 import { stateBadge } from "@/lib/ui";
 
 export default async function InspectorProjectDetailPage({
@@ -57,6 +57,22 @@ export default async function InspectorProjectDetailPage({
   const isCompleted = assignment.request_status === "COMPLETED";
   const isStandard  = assignment.pricing_key === "STANDARD";
   const upgradeStatus = (assignment as any).upgrade_payment_status ?? "NONE";
+
+  // Fetch open dispute for this assignment (if any)
+  const { data: openDispute } = await supabaseAdmin
+    .from("inspector_upgrade_disputes")
+    .select("id, status, created_at, client_statement, original_inspector_statement, original_inspector_responded_at, inspector_showed_reasons_on_site")
+    .eq("inspector_request_id", assignmentId)
+    .in("status", ["SUBMITTED", "UNDER_REVIEW"])
+    .maybeSingle();
+
+  const disputeDeadlineAt = openDispute?.created_at
+    ? new Date(new Date(openDispute.created_at).getTime() + 3 * 24 * 60 * 60 * 1000)
+    : null;
+  const disputeDeadlinePassed = disputeDeadlineAt != null && new Date() > disputeDeadlineAt;
+  const disputeDaysRemaining = disputeDeadlineAt
+    ? Math.max(0, Math.ceil((disputeDeadlineAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
 
   const inputStyle = {
     width: "100%",
@@ -312,6 +328,150 @@ export default async function InspectorProjectDetailPage({
               </h2>
               <p style={{ fontSize: "13px", color: "#9A3412", lineHeight: 1.6 }}>
                 The client has declined the upgrade. Please proceed with the original Standard inspection scope.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Dispute response section ── */}
+      {openDispute && (
+        <div style={{ marginBottom: "16px" }}>
+          {!(openDispute as any).original_inspector_statement ? (
+            <div style={{
+              background: "#FFFBEB",
+              border: "1px solid #FCD34D",
+              borderRadius: "12px",
+              padding: "24px",
+            }}>
+              <h2 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "18px",
+                letterSpacing: "1px",
+                color: "#92400E",
+                textTransform: "uppercase",
+                marginBottom: "8px",
+              }}>
+                ⚠ Dispute Filed — Response Required
+              </h2>
+              <p style={{ fontSize: "13px", color: "#78350F", marginBottom: "16px", lineHeight: 1.6 }}>
+                The client has disputed the upgrade charge on this inspection. A Master Inspector will
+                review the case. Please provide your account of why the upgrade was necessary.
+                {!disputeDeadlinePassed && disputeDaysRemaining <= 3 && (
+                  <strong> Response required within {disputeDaysRemaining === 1 ? "1 day" : `${disputeDaysRemaining} days`}.</strong>
+                )}
+              </p>
+
+              {/* Client's dispute statement */}
+              <div style={{
+                background: "#FEF9C3",
+                border: "1px solid #FCD34D",
+                borderRadius: "8px",
+                padding: "14px 16px",
+                marginBottom: "16px",
+              }}>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "#92400E", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+                  Client&apos;s Dispute Statement
+                </div>
+                <p style={{ fontSize: "13px", color: "#78350F", lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap" }}>
+                  &ldquo;{(openDispute as any).client_statement}&rdquo;
+                </p>
+              </div>
+
+              <form action={submitDisputeResponse.bind(null, assignmentId)}>
+                <label style={{
+                  display: "block",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#92400E",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: "6px",
+                }}>
+                  Your Response
+                </label>
+                <p style={{ fontSize: "12px", color: "#78350F", marginBottom: "8px", marginTop: 0 }}>
+                  Explain why the upgrade was warranted. Be specific about what you observed on-site
+                  that made the Standard scope insufficient.
+                </p>
+                <textarea
+                  name="statement"
+                  required
+                  minLength={20}
+                  maxLength={2000}
+                  rows={7}
+                  style={{ ...inputStyle, minHeight: "140px", resize: "vertical", border: "1px solid #FCD34D" }}
+                  placeholder="Describe the on-site conditions that required a Comprehensive inspection — specific findings, measurements, systems involved, any conditions the client was informed of…"
+                />
+                <button
+                  type="submit"
+                  style={{
+                    marginTop: "14px",
+                    background: "#92400E",
+                    color: "#fff",
+                    border: "none",
+                    padding: "10px 24px",
+                    borderRadius: "6px",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Submit Response
+                </button>
+              </form>
+
+              {disputeDeadlineAt && (
+                <div style={{
+                  marginTop: "14px",
+                  fontSize: "12px",
+                  color: disputeDeadlinePassed ? "#C2410C" : "#92400E",
+                }}>
+                  {disputeDeadlinePassed
+                    ? "⚠ Response window has passed. The Master Inspector may proceed without your statement."
+                    : `⏰ Respond by ${disputeDeadlineAt.toLocaleDateString()} (${disputeDaysRemaining === 1 ? "1 day" : `${disputeDaysRemaining} days`} remaining)`}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{
+              background: "#F0FDF4",
+              border: "1px solid #166534",
+              borderRadius: "12px",
+              padding: "20px",
+            }}>
+              <h2 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "16px",
+                letterSpacing: "1px",
+                color: "#15803D",
+                textTransform: "uppercase",
+                marginBottom: "8px",
+              }}>
+                ✅ Dispute Response Submitted
+              </h2>
+              {(openDispute as any).original_inspector_responded_at && (
+                <div style={{ fontSize: "12px", color: "#15803D", marginBottom: "10px" }}>
+                  Submitted: {new Date((openDispute as any).original_inspector_responded_at).toLocaleDateString()}
+                </div>
+              )}
+              <div style={{
+                background: "#FFFFFF",
+                border: "1px solid #B8D0E8",
+                borderRadius: "8px",
+                padding: "14px 16px",
+                fontSize: "13px",
+                color: "#0A1628",
+                lineHeight: 1.7,
+                whiteSpace: "pre-wrap",
+              }}>
+                {(openDispute as any).original_inspector_statement}
+              </div>
+              <p style={{ fontSize: "12px", color: "#15803D", marginTop: "10px", marginBottom: 0 }}>
+                A Master Inspector is reviewing the dispute. You will be notified of the decision.
               </p>
             </div>
           )}

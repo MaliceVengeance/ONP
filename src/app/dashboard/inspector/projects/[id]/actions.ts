@@ -7,6 +7,7 @@ import {
   sendInspectorUpgradeRequestedEmail,
 } from "@/lib/email";
 
+
 function clean(v: FormDataEntryValue | null) {
   return String(v ?? "").trim();
 }
@@ -72,6 +73,55 @@ export async function requestUpgrade(assignmentId: string, formData: FormData) {
     }
   } catch (e) {
     console.error("Upgrade notification error (non-fatal):", e);
+  }
+
+  revalidatePath(`/dashboard/inspector/projects/${assignmentId}`);
+}
+
+export async function submitDisputeResponse(assignmentId: string, formData: FormData) {
+  const { user } = await requireRole(["INSPECTOR", "ADMIN"]);
+
+  const statement = (formData.get("statement") as string | null)?.trim() ?? "";
+  if (statement.length < 20) {
+    throw new Error("Please provide at least 20 characters in your statement.");
+  }
+  if (statement.length > 2000) {
+    throw new Error("Statement must be 2000 characters or fewer.");
+  }
+
+  // Verify assignment ownership
+  const { data: assignment, error } = await supabaseAdmin
+    .from("project_inspector_assignments")
+    .select("id, inspector_id")
+    .eq("id", assignmentId)
+    .single();
+
+  if (error || !assignment) throw new Error("Assignment not found.");
+  if (assignment.inspector_id !== user.id) throw new Error("Not authorized.");
+
+  // Find the open dispute for this assignment
+  const { data: dispute } = await supabaseAdmin
+    .from("inspector_upgrade_disputes")
+    .select("id, status, original_inspector_statement")
+    .eq("inspector_request_id", assignmentId)
+    .in("status", ["SUBMITTED", "UNDER_REVIEW"])
+    .maybeSingle();
+
+  if (!dispute) throw new Error("No open dispute found for this assignment.");
+  if ((dispute as any).original_inspector_statement) {
+    throw new Error("You have already submitted a response to this dispute.");
+  }
+
+  const { error: updateErr } = await supabaseAdmin
+    .from("inspector_upgrade_disputes")
+    .update({
+      original_inspector_statement: statement,
+      original_inspector_responded_at: new Date().toISOString(),
+    })
+    .eq("id", (dispute as any).id);
+
+  if (updateErr) {
+    throw new Error(`submitDisputeResponse failed: ${JSON.stringify(updateErr)}`);
   }
 
   revalidatePath(`/dashboard/inspector/projects/${assignmentId}`);
