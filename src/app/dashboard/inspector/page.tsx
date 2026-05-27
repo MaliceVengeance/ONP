@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 
 export default async function InspectorDashboard() {
@@ -13,16 +14,31 @@ export default async function InspectorDashboard() {
     .single();
   const isMasterInspector = (myProfile as any)?.is_master_inspector === true;
 
+  // Fetch assignments with user-scoped client (inspector owns these rows)
   const { data, error } = await supabase
     .from("project_inspector_assignments")
-    .select("id, project_id, request_status, assigned_at, takeoff_completed_at, projects(id, title, category, city, state, deadline_at)")
+    .select("id, project_id, request_status, assigned_at, takeoff_completed_at")
     .eq("inspector_id", user.id)
     .limit(20);
 
   const assignments = (data ?? []) as any[];
-  const active = assignments.filter((a) => a.request_status === "ASSIGNED");
-  const completed = assignments.filter((a) => a.request_status === "COMPLETED");
-  const pending = assignments.filter((a) => a.request_status === "PENDING");
+
+  // Fetch project details with admin client — inspector doesn't own project rows
+  const projectIds = assignments.map((a: any) => a.project_id).filter(Boolean);
+  const { data: projectRows } = projectIds.length > 0
+    ? await supabaseAdmin
+        .from("projects")
+        .select("id, title, category, city, state, deadline_at")
+        .in("id", projectIds)
+    : { data: [] };
+  const projectMap = new Map((projectRows ?? []).map((p: any) => [p.id, p]));
+
+  // Enrich assignments with project data
+  const enriched = assignments.map((a: any) => ({ ...a, projects: projectMap.get(a.project_id) ?? null }));
+
+  const active = enriched.filter((a) => a.request_status === "ASSIGNED");
+  const completed = enriched.filter((a) => a.request_status === "COMPLETED");
+  const pending = enriched.filter((a) => a.request_status === "PENDING");
 
   return (
     <div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 
 export default async function InspectorProjectsPage() {
@@ -13,10 +14,10 @@ export default async function InspectorProjectsPage() {
 
   const assignmentList = assignments ?? [];
 
-  // Fetch project details separately using admin-level access
+  // Fetch project details with admin client — inspector doesn't own these rows
   const projectIds = assignmentList.map((a) => a.project_id).filter(Boolean);
 
-  const { data: projects } = await supabase
+  const { data: projects } = await supabaseAdmin
     .from("projects")
     .select("id, title, category, city, state, deadline_at, location_general")
     .in("id", projectIds.length > 0 ? projectIds : ["none"]);
