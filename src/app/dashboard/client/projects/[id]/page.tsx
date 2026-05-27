@@ -6,6 +6,7 @@ import { updateDraftProject, publishProject, repostProject } from "../actions";
 import DeleteProjectButton from "./DeleteProjectButton";
 import CountdownTimer from "@/components/CountdownTimer";
 import { stateBadge } from "@/lib/ui";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 export default async function EditProjectPage({
   params,
@@ -78,6 +79,9 @@ export default async function EditProjectPage({
   const hasUnansweredRfis = (unansweredRfiCount ?? 0) > 0;
 
   const inspectorStatus = inspectorAssignment?.request_status ?? null;
+  const inspectorFeatureEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
+  // Show inspector button if: feature is ON, OR an assignment already exists (so client can track it)
+  const showInspectorButton = inspectorFeatureEnabled || !!inspectorAssignment;
 
   function inspectorButtonStyle() {
     switch (inspectorStatus) {
@@ -334,20 +338,22 @@ export default async function EditProjectPage({
             📁 Files
           </Link>
 
-          <Link
-            href={`/dashboard/client/projects/${id}/inspector`}
-            style={{
-              padding: "10px 20px",
-              borderRadius: "6px",
-              fontFamily: "'Barlow', sans-serif",
-              fontSize: "13px",
-              textDecoration: "none",
-              display: "inline-block",
-              ...inspectorButtonStyle(),
-            }}
-          >
-            {inspectorButtonLabel()}
-          </Link>
+          {showInspectorButton && (
+            <Link
+              href={`/dashboard/client/projects/${id}/inspector`}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+                ...inspectorButtonStyle(),
+              }}
+            >
+              {inspectorButtonLabel()}
+            </Link>
+          )}
 
           {project.state === "OPEN" && (
             <Link

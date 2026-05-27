@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 export default async function AdminDashboard() {
   const { supabase, user } = await requireRole(["ADMIN"]);
@@ -27,6 +28,8 @@ export default async function AdminDashboard() {
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_master_inspector", true),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("upgrade_blocked", true).eq("role", "INSPECTOR"),
   ]);
+
+  const inspectorFeatureEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
 
   const cards = [
     {
@@ -132,6 +135,14 @@ export default async function AdminDashboard() {
       stat: flaggedInspectorCount ?? 0,
       statLabel: "blocked inspectors",
       accent: (flaggedInspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+    },
+    {
+      title: "Platform Settings",
+      description: `Feature flags & toggles. Inspector feature is currently ${inspectorFeatureEnabled ? "ON" : "OFF"}.`,
+      href: "/dashboard/admin/settings",
+      stat: null,
+      statLabel: inspectorFeatureEnabled ? "inspector ON" : "inspector OFF",
+      accent: inspectorFeatureEnabled ? "#1B4F8A" : "#C8102E",
     },
   ];
 

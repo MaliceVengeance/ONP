@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import InspectorPricingForm, { PriceOption } from "./InspectorPricingForm";
 import { selectInspectorTier } from "./actions";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 export default async function ClientInspectorPage({
   params,
@@ -25,6 +26,25 @@ export default async function ClientInspectorPage({
 
   if (!project || (role !== "ADMIN" && (project as any).client_id !== user.id)) {
     redirect(`/dashboard/client/projects`);
+  }
+
+  // Gate: if the inspector feature is disabled and there's no existing assignment,
+  // redirect back to the project page (nothing to show yet)
+  if (role !== "ADMIN") {
+    const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
+    if (!inspectorEnabled) {
+      // Check for an existing assignment before redirecting
+      const { data: existingAsgn } = await supabaseAdmin
+        .from("project_inspector_assignments")
+        .select("id")
+        .eq("project_id", projectId)
+        .neq("payment_status", "FAILED")
+        .maybeSingle();
+
+      if (!existingAsgn) {
+        redirect(`/dashboard/client/projects/${projectId}`);
+      }
+    }
   }
 
   // Fetch active price list

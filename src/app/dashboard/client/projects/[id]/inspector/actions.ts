@@ -4,13 +4,22 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CLIENT_INSPECTOR_REQUEST } from "@/lib/disclaimers/clientInspectorRequest";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
 }
 
 export async function selectInspectorTier(projectId: string, formData: FormData) {
-  const { user } = await requireRole(["CLIENT", "ADMIN"]);
+  const { user, role } = await requireRole(["CLIENT", "ADMIN"]);
+
+  // Block new requests when the feature is disabled (admins bypass for testing)
+  if (role !== "ADMIN") {
+    const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
+    if (!inspectorEnabled) {
+      throw new Error("Inspector requests are not available at this time. Please check back soon.");
+    }
+  }
 
   const pricingKey = (formData.get("pricing_key") as string)?.trim();
   if (!pricingKey) throw new Error("Please select an inspection type.");
