@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
@@ -24,7 +25,7 @@ export default async function EditProjectPage({
     .eq("id", id)
     .single();
 
-  if (error || !project) throw new Error("Project not found");
+  if (error || !project) redirect("/dashboard/client/projects");
 
   // Enforce ownership: clients can only view their own projects
   if (role !== "ADMIN" && project.client_id !== user.id) {
