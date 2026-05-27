@@ -75,7 +75,7 @@ export default async function ContractorProjectDetail({
 
   const [{ data: rows, error: pErr }, { data: zipRow }] = await Promise.all([
     supabase.rpc("get_open_project_detail", { p_project_id: projectId }),
-    supabase.from("projects").select("zip_code, emergency_bid_mode, is_emergency").eq("id", projectId).maybeSingle(),
+    supabase.from("projects").select("zip_code, emergency_bid_mode, is_emergency, inspector_hold_started_at").eq("id", projectId).maybeSingle(),
   ]);
 
   const project = (rows as ProjectDetail[] | null)?.[0];
@@ -83,6 +83,7 @@ export default async function ContractorProjectDetail({
   const isEmergencyBidMode = !!(zipRow as any)?.emergency_bid_mode;
   const isEmergencyPaid = !!(zipRow as any)?.is_emergency;
   const isAnyEmergency = isEmergencyBidMode || isEmergencyPaid;
+  const inspectorHoldActive = !!(zipRow as any)?.inspector_hold_started_at;
 
   if (pErr || !project) {
     return (
@@ -218,10 +219,34 @@ export default async function ContractorProjectDetail({
         </div>
       </div>
 
-      {/* Countdown timer */}
+      {/* Countdown timer / inspection hold indicator */}
       {isOpen && project.deadline_at && (
         <div style={{ marginBottom: "20px" }}>
-          <CountdownTimer deadline={project.deadline_at} />
+          {inspectorHoldActive ? (
+            <div style={{
+              background: "#FEF3C7",
+              border: "1px solid #FCD34D",
+              borderRadius: "10px",
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}>
+              <span style={{ fontSize: "20px" }}>⏸</span>
+              <div>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "#92400E" }}>
+                  Bidding timer paused
+                </div>
+                <div style={{ fontSize: "12px", color: "#78350F", marginTop: "2px" }}>
+                  An inspector is preparing a takeoff report for this project. The deadline
+                  will be extended by the time the inspection takes, so you will have the
+                  full original window to bid once the report is available.
+                </div>
+              </div>
+            </div>
+          ) : (
+            <CountdownTimer deadline={project.deadline_at} />
+          )}
         </div>
       )}
 

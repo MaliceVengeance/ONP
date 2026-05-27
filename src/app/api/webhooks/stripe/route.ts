@@ -276,6 +276,13 @@ export async function POST(req: NextRequest) {
             console.error("Inspector notification error (non-fatal):", notifyErr);
           }
 
+          // Pause the project bidding timer while inspector works
+          await supabaseAdmin
+            .from("projects")
+            .update({ inspector_hold_started_at: new Date().toISOString() })
+            .eq("id", inspProjectId)
+            .is("inspector_hold_started_at", null); // only stamp once
+
           console.log(`Inspector assignment ${assignmentId} marked PAID`);
           break;
         }

@@ -18,7 +18,7 @@ export default async function EditProjectPage({
   const { data: project, error } = await supabaseAdmin
     .from("projects")
     .select(
-      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency,client_id"
+      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency,client_id,inspector_hold_started_at"
     )
     .eq("id", id)
     .single();
@@ -139,13 +139,25 @@ export default async function EditProjectPage({
           }}>
             {isDraft ? "Edit Draft" : project.title ?? "Project"}
           </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px", flexWrap: "wrap" }}>
             <span style={stateBadge(project.state)}>{project.state}</span>
-            {isPublished && project.deadline_at && (
+            {isPublished && (project as any).inspector_hold_started_at ? (
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 600,
+                color: "#92400E",
+                background: "#FEF3C7",
+                border: "1px solid #FCD34D",
+                borderRadius: "20px",
+                padding: "3px 10px",
+              }}>
+                ⏸ Timer paused · Awaiting inspector report
+              </span>
+            ) : isPublished && project.deadline_at ? (
               <span style={{ fontSize: "13px", color: "#1B4F8A" }}>
                 Deadline: {new Date(project.deadline_at).toLocaleDateString()}
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 

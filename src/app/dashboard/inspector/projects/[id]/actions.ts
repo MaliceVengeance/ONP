@@ -161,5 +161,38 @@ export async function submitTakeoffReport(assignmentId: string, formData: FormDa
 
   if (error) throw new Error(`submitTakeoffReport failed: ${JSON.stringify(error)}`);
 
+  // Extend the project deadline by however long the inspection hold lasted
+  try {
+    const { data: asgn } = await supabaseAdmin
+      .from("project_inspector_assignments")
+      .select("project_id")
+      .eq("id", assignmentId)
+      .single();
+
+    if (asgn?.project_id) {
+      const { data: proj } = await supabaseAdmin
+        .from("projects")
+        .select("inspector_hold_started_at, deadline_at")
+        .eq("id", asgn.project_id)
+        .single();
+
+      if ((proj as any)?.inspector_hold_started_at && (proj as any)?.deadline_at) {
+        const holdMs = Date.now() - new Date((proj as any).inspector_hold_started_at).getTime();
+        const extendedDeadline = new Date(
+          new Date((proj as any).deadline_at).getTime() + holdMs
+        );
+        await supabaseAdmin
+          .from("projects")
+          .update({
+            deadline_at: extendedDeadline.toISOString(),
+            inspector_hold_started_at: null,
+          })
+          .eq("id", asgn.project_id);
+      }
+    }
+  } catch (e) {
+    console.error("Deadline extension after takeoff failed (non-fatal):", e);
+  }
+
   revalidatePath(`/dashboard/inspector/projects/${assignmentId}`);
 }
