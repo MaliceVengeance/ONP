@@ -16,9 +16,69 @@ export default async function LoginPage({
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      justifyContent: "center",
-      padding: "24px",
+      padding: "0",
     }}>
+      {/* Top nav bar */}
+      <nav style={{
+        width: "100%",
+        background: "#0A1628",
+        borderBottom: "2px solid #C8102E",
+        padding: "10px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        boxSizing: "border-box",
+      }}>
+        <div style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 800,
+          fontSize: "20px",
+          letterSpacing: "2px",
+          color: "#fff",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}>
+          <span>★</span> ONP
+        </div>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <Link href="/about" style={{
+            background: "transparent",
+            color: "#FFFFFF",
+            border: "1px solid #1B4F8A",
+            padding: "6px 14px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            textDecoration: "none",
+            fontWeight: 500,
+          }}>
+            About ONP
+          </Link>
+          <Link href="/why-onp" style={{
+            background: "#C8102E",
+            color: "#FFFFFF",
+            border: "none",
+            padding: "6px 14px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            textDecoration: "none",
+            fontWeight: 600,
+          }}>
+            Why ONP?
+          </Link>
+        </div>
+      </nav>
+
+      {/* Centered content */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+        width: "100%",
+      }}>
       {/* Logo / Wordmark */}
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <div style={{
@@ -250,36 +310,16 @@ export default async function LoginPage({
         Honoring American Veterans
       </div>
 
-      <div style={{
-  marginTop: "20px",
-  fontSize: "12px",
-  color: "#4A7FB5",
-  textAlign: "center",
-}}>
-  <Link href="/about" style={{ color: "#1B4F8A", textDecoration: "underline" }}>
-    About ONP
-  </Link>
-</div>
-<div style={{
-  marginTop: "10px",
-  fontSize: "12px",
-  color: "#4A7FB5",
-  textAlign: "center",
-}}>
-  <Link href="/why-onp" style={{ color: "#1B4F8A", textDecoration: "underline" }}>
-    Why ONP?
-  </Link>
-</div>
-<div style={{
-  marginTop: "10px",
-  fontSize: "12px",
-  color: "#4A7FB5",
-  textAlign: "center",
-}}>
-  <Link href="/contractors" style={{ color: "#1B4F8A", textDecoration: "underline" }}>
-    Contractor Directory
-  </Link>
-</div>
+      <div style={{ marginTop: "16px", display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
+        <Link href="/contractors" style={{ fontSize: "12px", color: "#4A7FB5", textDecoration: "underline" }}>
+          Contractor Directory
+        </Link>
+        <Link href="/trust" style={{ fontSize: "12px", color: "#4A7FB5", textDecoration: "underline" }}>
+          Client Trust
+        </Link>
+      </div>
+
+      </div>{/* end centered content wrapper */}
     </main>
   );
 }

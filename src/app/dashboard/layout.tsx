@@ -45,6 +45,30 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Link href="/about" style={{
+            background: "transparent",
+            border: "1px solid #1B4F8A",
+            color: "#B8D0E8",
+            padding: "5px 10px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "11px",
+            textDecoration: "none",
+          }}>
+            About
+          </Link>
+          <Link href="/why-onp" style={{
+            background: "transparent",
+            border: "1px solid #1B4F8A",
+            color: "#B8D0E8",
+            padding: "5px 10px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: "11px",
+            textDecoration: "none",
+          }}>
+            Why ONP
+          </Link>
           <form action="/auth/signout" method="post">
             <button style={{
               background: "transparent",
