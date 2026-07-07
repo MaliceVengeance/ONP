@@ -25,14 +25,14 @@ export default async function ContractorSettingsPage({
   return (
     <div style={{ maxWidth: "560px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Notification Settings
@@ -112,7 +112,7 @@ export default async function ContractorSettingsPage({
                 style={{ marginTop: "3px", accentColor: "#C2410C", width: "16px", height: "16px", flexShrink: 0 }}
               />
               <div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#0A1628", marginBottom: "4px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#1E3A8A", marginBottom: "4px" }}>
                   🚨 Receive Emergency Bid Request emails
                 </div>
                 <div style={{ fontSize: "13px", color: "#4A7FB5", lineHeight: 1.6 }}>

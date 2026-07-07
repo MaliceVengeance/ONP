@@ -7,14 +7,14 @@ const h2Style: React.CSSProperties = {
   fontWeight: 700,
   fontSize: "24px",
   letterSpacing: "1px",
-  color: "#0A1628",
+  color: "#1E3A8A",
   textTransform: "uppercase",
   margin: "0 0 6px 0",
 };
 const h3Style: React.CSSProperties = {
   fontSize: "15px",
   fontWeight: 700,
-  color: "#0A1628",
+  color: "#1E3A8A",
   margin: "20px 0 8px 0",
 };
 const dividerStyle: React.CSSProperties = {
@@ -43,9 +43,9 @@ const liStyle: React.CSSProperties = {
 
 export default function PrivacyLegalPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF", color: "#0A1628", fontFamily: "'Barlow', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", color: "#1E3A8A", fontFamily: "'Barlow', sans-serif" }}>
       {/* Header */}
-      <header style={{ background: "#0A1628", borderBottom: "2px solid #C8102E", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <header style={{ background: "#1E3A8A", borderBottom: "2px solid #C8102E", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/login" style={{ textDecoration: "none" }}>
           <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "26px", letterSpacing: "2px", color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
             <span>★</span> ONP
@@ -58,14 +58,14 @@ export default function PrivacyLegalPage() {
       <main style={{ maxWidth: "820px", margin: "0 auto", padding: "60px 24px 80px" }}>
         {/* Title */}
         <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "44px", color: "#0A1628", marginBottom: "8px", lineHeight: 1.1 }}>Privacy Policy</h1>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "44px", color: "#1E3A8A", marginBottom: "8px", lineHeight: 1.1 }}>Privacy Policy</h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", marginBottom: "20px" }} />
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}><strong>Our Next Project, LLC</strong></p>
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}>Effective Date: [EFFECTIVE DATE]</p>
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Last Updated: [LAST UPDATED DATE]</p>
           <p style={pStyle}>This Privacy Policy (the &ldquo;<strong>Policy</strong>&rdquo;) describes how <strong>Our Next Project, LLC</strong> (&ldquo;<strong>ONP</strong>&rdquo;) collects, uses, discloses, and otherwise processes personal information about Users of the website located at ournextproject.us and any related subdomains, applications, features, content, and services (collectively, the &ldquo;<strong>Platform</strong>&rdquo; or &ldquo;<strong>Services</strong>&rdquo;).</p>
           <p style={pStyle}>A plain-English summary is available <Link href="/privacy" style={{ color: "#C8102E" }}>here</Link>. In the event of any conflict, <strong>this Policy controls</strong>. This Policy is incorporated into our <Link href="/terms/legal" style={{ color: "#C8102E" }}>Terms of Service</Link>.</p>
-          <div style={{ background: "#0A1628", borderRadius: "8px", padding: "16px 20px", fontSize: "13px", color: "#FFFFFF", fontWeight: 600, lineHeight: 1.7 }}>
+          <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "16px 20px", fontSize: "13px", color: "#FFFFFF", fontWeight: 600, lineHeight: 1.7 }}>
             BY ACCESSING OR USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD THIS POLICY.
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function PrivacyLegalPage() {
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px", marginBottom: "16px" }}>
               <thead>
-                <tr style={{ background: "#0A1628", color: "#fff" }}>
+                <tr style={{ background: "#1E3A8A", color: "#fff" }}>
                   {["Category", "Examples", "Sources", "Purposes"].map((h) => (
                     <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontWeight: 600 }}>{h}</th>
                   ))}
@@ -281,7 +281,7 @@ export default function PrivacyLegalPage() {
         <div style={{ marginBottom: "44px" }}>
           <h2 style={h2Style}>14. Contact</h2>
           <div style={dividerStyle} />
-          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#0A1628", lineHeight: 1.9 }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#1E3A8A", lineHeight: 1.9 }}>
             <strong>Our Next Project, LLC</strong><br />
             Attn: Privacy<br />
             [BUSINESS ADDRESS]<br />

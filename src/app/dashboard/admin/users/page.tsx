@@ -40,9 +40,9 @@ export default async function AdminUsersPage({
   const sp = await searchParams;
   const activeTab = sp.role?.toUpperCase() ?? null;
 
-  const { supabase, user: adminUser } = await requireRole(["ADMIN"]);
+  const { user: adminUser } = await requireRole(["ADMIN"]);
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("profiles")
     .select("id, role, display_name, company_name, created_at, deactivated")
     .order("created_at", { ascending: false });
@@ -76,14 +76,14 @@ export default async function AdminUsersPage({
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Users
@@ -92,7 +92,7 @@ export default async function AdminUsersPage({
             {totalActive} active • {profiles.filter((p) => p.deactivated).length} deactivated
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
           <Link
             href="/dashboard/admin/users/create"
             style={{
@@ -189,7 +189,7 @@ export default async function AdminUsersPage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -219,9 +219,9 @@ export default async function AdminUsersPage({
                   borderRadius: "10px",
                   padding: "18px",
                 }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                  <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                         {p.display_name ?? p.company_name ?? "No name set"}
                       </div>
                       <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "3px" }}>
@@ -230,7 +230,7 @@ export default async function AdminUsersPage({
                       <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
                         ID: {p.id}
                       </div>
-                      <div style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#4A7FB5" }}>
+                      <div className="mob-wrap" style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#4A7FB5" }}>
                         <span>Joined: {new Date(p.created_at).toLocaleDateString()}</span>
                         {auth?.last_sign_in_at && (
                           <span>Last login: {new Date(auth.last_sign_in_at).toLocaleDateString()}</span>
@@ -281,7 +281,7 @@ export default async function AdminUsersPage({
                                 style={{
                                   background: "#FFFFFF",
                                   border: "1px solid #B8D0E8",
-                                  color: "#0A1628",
+                                  color: "#1E3A8A",
                                   borderRadius: "6px",
                                   padding: "5px 8px",
                                   fontFamily: "'Barlow', sans-serif",
@@ -366,9 +366,9 @@ export default async function AdminUsersPage({
                   padding: "18px",
                   opacity: 0.8,
                 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+                  <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                         {p.display_name ?? p.company_name ?? "No name set"}
                       </div>
                       <div style={{ fontSize: "13px", color: "#991B1B", marginBottom: "2px" }}>
@@ -384,7 +384,7 @@ export default async function AdminUsersPage({
                         {p.role}
                       </span>
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
                       <Link
                         href={`/dashboard/admin/users/${p.id}`}
                         style={{

@@ -29,14 +29,14 @@ export default async function InspectorProjectsPage() {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             My Assignments
@@ -69,7 +69,7 @@ export default async function InspectorProjectsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -91,7 +91,7 @@ export default async function InspectorProjectsPage() {
                   href={`/dashboard/inspector/projects/${a.id}`}
                   style={{ textDecoration: "none" }}
                 >
-                  <div style={{
+                  <div className="mob-card-stack" style={{
                     background: "#EEF4FF",
                     border: "1px solid #B8D0E8",
                     borderRadius: "10px",
@@ -102,7 +102,7 @@ export default async function InspectorProjectsPage() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
                       <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
@@ -157,7 +157,7 @@ export default async function InspectorProjectsPage() {
                   href={`/dashboard/inspector/projects/${a.id}`}
                   style={{ textDecoration: "none" }}
                 >
-                  <div style={{
+                  <div className="mob-card-stack" style={{
                     background: "#EEF4FF",
                     border: "1px solid #B8D0E8",
                     borderRadius: "10px",
@@ -169,7 +169,7 @@ export default async function InspectorProjectsPage() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
                       <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>

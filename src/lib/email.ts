@@ -27,7 +27,7 @@ export async function sendRfiSubmittedEmail({
     to: clientEmail,
     subject: `New Question on "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -36,7 +36,7 @@ export async function sendRfiSubmittedEmail({
           <h2 style="color: #FBBF24; margin-top: 0;">⚠ New Question Submitted</h2>
           <p style="color: #B0C4DE;">Hello ${clientName},</p>
           <p style="color: #B0C4DE;">A contractor has submitted a question on your project <strong style="color: #fff;">"${projectTitle}"</strong>:</p>
-          <div style="background: #0A1628; border-left: 3px solid #C8102E; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+          <div style="background: #1E3A8A; border-left: 3px solid #C8102E; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
             <p style="color: #F0F4FF; margin: 0; font-style: italic;">"${question}"</p>
           </div>
           <p style="color: #B0C4DE;">Please log in to respond as soon as possible. Unanswered questions may delay contractor bids.</p>
@@ -73,7 +73,7 @@ export async function sendRfiAnsweredEmail({
     to: contractorEmail,
     subject: `Your Question on "${projectTitle}" Has Been Answered`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -81,11 +81,11 @@ export async function sendRfiAnsweredEmail({
         <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: #4ADE80; margin-top: 0;">✅ Question Answered</h2>
           <p style="color: #B0C4DE;">Your question on <strong style="color: #fff;">"${projectTitle}"</strong> has been answered:</p>
-          <div style="background: #0A1628; border-left: 3px solid #7A9CC4; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+          <div style="background: #1E3A8A; border-left: 3px solid #7A9CC4; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
             <p style="color: #7A9CC4; margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Question</p>
             <p style="color: #F0F4FF; margin: 0; font-style: italic;">"${question}"</p>
           </div>
-          <div style="background: #0A1628; border-left: 3px solid #4ADE80; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+          <div style="background: #1E3A8A; border-left: 3px solid #4ADE80; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
             <p style="color: #4ADE80; margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Answer</p>
             <p style="color: #F0F4FF; margin: 0;">"${response}"</p>
           </div>
@@ -120,7 +120,7 @@ export async function sendBidAwardedEmail({
     to: contractorEmail,
     subject: `Congratulations! You Won "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -165,7 +165,7 @@ export async function sendNewProjectEmail({
     to: contractorEmail,
     subject: `New Project Available: "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -173,7 +173,7 @@ export async function sendNewProjectEmail({
         <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: #60A5FA; margin-top: 0;">🔔 New Project Available</h2>
           <p style="color: #B0C4DE;">A new project matching your category has been posted:</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
@@ -223,7 +223,7 @@ export async function sendEmergencyProjectEmail({
     to: contractorEmail,
     subject: `🚨 Emergency Bid Request: "${projectTitle}" — Closes in 48 Hours`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -231,7 +231,7 @@ export async function sendEmergencyProjectEmail({
         <div style="background: #7C1A00; border: 1px solid #C2410C; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: #FDBA74; margin-top: 0;">🚨 Emergency Bid Request</h2>
           <p style="color: #FED7AA;">A client has posted an emergency project in your service area:</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
             <p style="color: #FDBA74; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
             <p style="color: #FDBA74; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
@@ -276,7 +276,7 @@ export async function sendInspectorAssignedEmail({
     to: inspectorEmail,
     subject: `New Takeoff Assignment: "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -285,7 +285,7 @@ export async function sendInspectorAssignedEmail({
           <h2 style="color: #FBBF24; margin-top: 0;">🔍 New Takeoff Assignment</h2>
           <p style="color: #B0C4DE;">Hello ${inspectorName},</p>
           <p style="color: #B0C4DE;">You have been assigned a new project takeoff:</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
           </div>
@@ -326,7 +326,7 @@ export async function sendInspectorRequestAvailableEmail({
     to: inspectorEmail,
     subject: `New Paid Inspection Request: "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -334,7 +334,7 @@ export async function sendInspectorRequestAvailableEmail({
         <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: #FBBF24; margin-top: 0;">🔍 New Inspection Request — Payment Confirmed</h2>
           <p style="color: #B0C4DE;">A client has paid for a bid-accuracy inspection. An admin will assign this project shortly.</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
@@ -378,7 +378,7 @@ export async function sendInspectorPaymentConfirmedEmail({
     to: clientEmail,
     subject: `Inspection Payment Confirmed — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -387,7 +387,7 @@ export async function sendInspectorPaymentConfirmedEmail({
           <h2 style="color: #4ADE80; margin-top: 0;">✅ Payment Confirmed</h2>
           <p style="color: #B0C4DE;">Hello ${clientName},</p>
           <p style="color: #B0C4DE;">Your inspection payment for <strong style="color: #fff;">"${projectTitle}"</strong> has been received.</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🔍 Inspection type: <strong style="color: #fff;">${inspectionType}</strong></p>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">💰 Amount paid: <strong style="color: #4ADE80;">${feeFormatted}</strong></p>
           </div>
@@ -429,7 +429,7 @@ export async function sendInspectorUpgradeRequestedEmail({
     to: clientEmail,
     subject: `Your inspector has requested an upgrade — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspection Update</p>
@@ -437,7 +437,7 @@ export async function sendInspectorUpgradeRequestedEmail({
         <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: #FBBF24; margin-top: 0;">⚠ Inspection Upgrade Requested</h2>
           <p style="color: #FDE68A;">Your inspector has reviewed the project on-site and has requested an upgrade from Standard to Comprehensive Inspection for <strong>"${projectTitle}"</strong>.</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <p style="color: #7A9CC4; margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Inspector's reason:</p>
             <p style="color: #F0F4FF; margin: 0; font-style: italic;">"${justification}"</p>
           </div>
@@ -476,7 +476,7 @@ export async function sendInspectorUpgradeChargedEmail({
     to: clientEmail,
     subject: `Upgrade confirmed — "${projectTitle}" upgraded to Comprehensive`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspection Update</p>
@@ -524,7 +524,7 @@ export async function sendInspectorUpgradeConfirmedEmail({
     to: inspectorEmail,
     subject: `Upgrade approved — proceed with Comprehensive on "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notification</p>
@@ -563,7 +563,7 @@ export async function sendInspectorUpgradeDeclinedEmail({
     to: inspectorEmail,
     subject: `Upgrade declined — proceed with Standard on "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notification</p>
@@ -614,7 +614,7 @@ export async function sendAdminInspectorRequestEmail({
     to: adminEmail,
     subject: `[ACTION REQUIRED] New Paid Inspector Request — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
@@ -622,7 +622,7 @@ export async function sendAdminInspectorRequestEmail({
         <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: #FBBF24; margin-top: 0;">⚡ New Inspector Assignment Needed</h2>
           <p style="color: #FDE68A;">A client has paid for an inspection. Please assign an available inspector.</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <h3 style="color: #fff; margin: 0 0 8px;">${projectTitle}</h3>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${projectCity}</p>
             <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🏗 ${projectCategory}</p>
@@ -663,7 +663,7 @@ export async function sendDisputeSubmittedClientEmail({
     to: clientEmail,
     subject: `Dispute Received — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
@@ -712,7 +712,7 @@ export async function sendDisputeFiledInspectorEmail({
     to: inspectorEmail,
     subject: `[ACTION REQUIRED] Upgrade Dispute Filed — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notice</p>
@@ -721,7 +721,7 @@ export async function sendDisputeFiledInspectorEmail({
           <h2 style="color: #FBBF24; margin-top: 0;">⚠ Dispute Filed Against Your Upgrade</h2>
           <p style="color: #FDE68A;">A client has filed a dispute of the on-site upgrade you requested on <strong style="color: #fff;">"${projectTitle}"</strong>.</p>
           <p style="color: #FDE68A;">An independent Master Inspector will review the upgrade decision. You are invited to provide your statement explaining why the upgrade was necessary.</p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
             <p style="color: #FBBF24; margin: 0; font-weight: bold;">Deadline: 3 business days</p>
             <p style="color: #7A9CC4; margin: 8px 0 0; font-size: 13px;">If no response is received, the Master Inspector will still render a decision. Non-response is noted on your record.</p>
           </div>
@@ -759,7 +759,7 @@ export async function sendDisputeAdminEmail({
     to: adminEmail,
     subject: `[DISPUTE] New Upgrade Dispute — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
@@ -822,14 +822,14 @@ export async function sendDisputeResolvedClientEmail({
     to: clientEmail,
     subject: `Dispute Resolved — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Dispute Resolution</p>
         </div>
         <div style="background: ${outcomeBg}; border: 1px solid ${outcomeBorder}; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
           <h2 style="color: ${outcomeColor}; margin-top: 0; font-size: 18px;">${outcomeTitle}</h2>
-          <p style="color: #0A1628; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
+          <p style="color: #1E3A8A; font-size: 13px; line-height: 1.6; margin-bottom: 0;">
             A Master Inspector has reviewed your dispute on <strong>"${projectTitle}"</strong>.
           </p>
         </div>
@@ -897,7 +897,7 @@ export async function sendDisputeResolvedInspectorEmail({
     to: inspectorEmail,
     subject: `Dispute Resolved — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notice</p>
@@ -947,7 +947,7 @@ export async function sendDisputeAssignedMasterInspectorEmail({
     to: masterInspectorEmail,
     subject: `[ACTION REQUIRED] New Dispute Assigned — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Master Inspector</p>
@@ -958,7 +958,7 @@ export async function sendDisputeAssignedMasterInspectorEmail({
             A client has disputed an on-site upgrade charge on <strong style="color: #fff;">"${projectTitle}"</strong>.
             As the assigned Master Inspector, please review all case evidence and render a decision.
           </p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 16px; margin-top: 16px;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin-top: 16px;">
             <p style="color: #FBBF24; margin: 0; font-weight: bold;">⏰ SLA: 5 business days from today</p>
             <p style="color: #7A9CC4; font-size: 12px; margin: 8px 0 0;">
               A reminder will be sent at day 3. If unresolved by day 5, the case may be reassigned.
@@ -1000,7 +1000,7 @@ export async function sendInspectorFlagThresholdEmail({
       ? "[URGENT] Your Inspector Account Is Under Suspension Review"
       : "[ACTION REQUIRED] Your Inspector Account Is Under Mandatory Review",
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Inspector Notice</p>
@@ -1013,7 +1013,7 @@ export async function sendInspectorFlagThresholdEmail({
             Based on your upgrade dispute history over the last 12 months, your account has been flagged
             for ${isSuspension ? "suspension review" : "mandatory review"} by the ONP compliance system.
           </p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 14px; font-size: 12px; color: #B8D0E8;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 14px; font-size: 12px; color: #B8D0E8;">
             <div style="margin-bottom: 4px;">Disputed upgrades (12 mo): <strong style="color: #fff;">${flags12mo}</strong></div>
             <div style="margin-bottom: 4px;">Total inspections (12 mo): <strong style="color: #fff;">${inspections12mo}</strong></div>
             <div>Dispute rate: <strong style="color: #FCA5A5;">${flagRatePct}%</strong></div>
@@ -1056,7 +1056,7 @@ export async function sendAdminInspectorFlagThresholdEmail({
       ? `[URGENT] Inspector Suspension Threshold Reached`
       : `[ACTION REQUIRED] Inspector Mandatory Review Threshold Reached`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Alert</p>
@@ -1070,7 +1070,7 @@ export async function sendAdminInspectorFlagThresholdEmail({
             ${isSuspension ? "suspension recommendation threshold (≥15%)" : "mandatory review threshold (≥10%)"}
             based on the last 12 months of activity.
           </p>
-          <div style="background: #0A1628; border-radius: 8px; padding: 14px; font-size: 12px; color: #B8D0E8;">
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 14px; font-size: 12px; color: #B8D0E8;">
             <div style="margin-bottom: 4px;">Inspector ID: <strong style="color: #fff; font-family: monospace;">${inspectorId}</strong></div>
             <div style="margin-bottom: 4px;">Disputed upgrades (12 mo): <strong style="color: #fff;">${flags12mo}</strong></div>
             <div style="margin-bottom: 4px;">Total inspections (12 mo): <strong style="color: #fff;">${inspections12mo}</strong></div>
@@ -1112,7 +1112,7 @@ export async function sendDisputeSlaReminderEmail({
     to: masterInspectorEmail,
     subject: `[REMINDER] Dispute Review Due in ${daysRemaining} Day${daysRemaining === 1 ? "" : "s"} — "${projectTitle}"`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Master Inspector</p>
@@ -1161,7 +1161,7 @@ export async function sendDisputeSlaEscalationEmail({
         to: masterInspectorEmail,
         subject: `[URGENT] Dispute Review SLA Breached — "${projectTitle}"`,
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
             <div style="text-align: center; margin-bottom: 32px;">
               <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
               <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Master Inspector</p>
@@ -1197,7 +1197,7 @@ export async function sendDisputeSlaEscalationEmail({
       to: adminEmail,
       subject: `[URGENT] Master Inspector SLA Breached — "${projectTitle}"`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
           <div style="text-align: center; margin-bottom: 32px;">
             <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
             <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Alert</p>
@@ -1246,7 +1246,7 @@ export async function sendCreditExpiryReminderEmail({
     to: clientEmail,
     subject: `Your ${fmt(amountCents)} ONP Credit Expires Soon`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Account Credit</p>
@@ -1286,7 +1286,7 @@ export async function sendNoMasterInspectorAvailableAdminEmail({
     to: adminEmail,
     subject: `[URGENT] No Master Inspector Available — Manual Assignment Required`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0A1628; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
           <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
           <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Alert</p>
@@ -1310,6 +1310,206 @@ export async function sendNoMasterInspectorAvailableAdminEmail({
         </div>
         <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
           ONP Admin · Dispute ID: ${disputeId}
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendCompletionRequestedEmail({
+  clientEmail,
+  clientName,
+  contractorName,
+  projectTitle,
+  projectId,
+}: {
+  clientEmail: string;
+  clientName: string;
+  contractorName: string;
+  projectTitle: string;
+  projectId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: clientEmail,
+    subject: `${contractorName} has marked work complete on "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #34D399; margin-top: 0;">✅ Work Completion Signaled</h2>
+          <p style="color: #B0C4DE;">Hello ${clientName},</p>
+          <p style="color: #B0C4DE;">
+            <strong style="color: #fff;">${contractorName}</strong> has signaled that work on your project
+            <strong style="color: #fff;">"${projectTitle}"</strong> is complete.
+          </p>
+          <p style="color: #B0C4DE;">
+            Please log in to review and confirm completion, or dismiss the request if the work is not yet finished.
+          </p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/client/projects/${projectId}`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Review &amp; Confirm
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendCompletionConfirmedEmail({
+  contractorEmail,
+  projectTitle,
+  projectId,
+}: {
+  contractorEmail: string;
+  projectTitle: string;
+  projectId: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `Project complete — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0D2D1A; border: 1px solid #065F46; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #34D399; margin-top: 0;">🎉 Project Confirmed Complete</h2>
+          <p style="color: #B0C4DE;">
+            The client has confirmed that project <strong style="color: #fff;">"${projectTitle}"</strong> is complete.
+          </p>
+          <p style="color: #B0C4DE;">Congratulations on completing the project through ONP. The project is now marked as COMPLETED.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/contractor/projects/${projectId}`)}"
+             style="background: #065F46; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Project
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendProjectMessageNotificationEmail({
+  recipientEmail,
+  recipientName,
+  senderName,
+  senderRole,
+  projectTitle,
+  projectId,
+  messageCount,
+  dashboardPath,
+}: {
+  recipientEmail: string;
+  recipientName: string;
+  senderName: string;
+  senderRole: "CLIENT" | "CONTRACTOR" | "ADMIN";
+  projectTitle: string;
+  projectId: string;
+  messageCount: number;
+  dashboardPath: string;
+}) {
+  const roleLabel =
+    senderRole === "CLIENT" ? "the project client" :
+    senderRole === "CONTRACTOR" ? "the awarded contractor" :
+    "ONP Support";
+
+  const subject =
+    messageCount === 1
+      ? `New message on "${projectTitle}" from ${senderName}`
+      : `${messageCount} new messages on "${projectTitle}"`;
+
+  await resend.emails.send({
+    from: FROM,
+    to: recipientEmail,
+    subject,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">💬 ${messageCount === 1 ? "New Message" : `${messageCount} New Messages`}</h2>
+          <p style="color: #B0C4DE;">Hello ${recipientName},</p>
+          <p style="color: #B0C4DE;">
+            You have ${messageCount === 1 ? "a new message" : `${messageCount} new messages`} on project
+            <strong style="color: #fff;">"${projectTitle}"</strong>
+            from <strong style="color: #fff;">${senderName}</strong> (${roleLabel}).
+          </p>
+          <p style="color: #B0C4DE;">Log in to read and reply — messages are private between you, the contractor, and ONP.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(dashboardPath + "#messages")}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View Messages
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendWaitlistExpansionEmail({
+  toEmail,
+  zip,
+  city,
+  state,
+  subject,
+  body,
+}: {
+  toEmail: string;
+  zip: string;
+  city: string | null;
+  state: string | null;
+  subject: string;
+  body: string;
+}) {
+  const locationLabel = city && state ? `${city}, ${state} ${zip}` : zip;
+
+  await resend.emails.send({
+    from: FROM,
+    to: toEmail,
+    subject,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">📍 ONP is Now in Your Area!</h2>
+          <p style="color: #B0C4DE;">Hello,</p>
+          <p style="color: #B0C4DE;">
+            Great news — ONP has expanded to <strong style="color: #fff;">${locationLabel}</strong>.
+          </p>
+          <div style="white-space: pre-line; color: #B0C4DE; line-height: 1.6; margin-top: 16px;">${body}</div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink("/dashboard")}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Get Started →
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
         </p>
       </div>
     `,

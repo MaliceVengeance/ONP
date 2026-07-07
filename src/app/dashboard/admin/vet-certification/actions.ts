@@ -2,73 +2,102 @@
 
 import { requireRole } from "@/lib/auth/requireRole";
 import { revalidatePath } from "next/cache";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
-export async function approveVetCert(contractorId: string) {
-  const { supabase, user } = await requireRole(["ADMIN"]);
+async function writeLog(
+  adminId: string,
+  adminEmail: string,
+  contractorId: string,
+  actionType: string,
+  note: string
+) {
+  const { error } = await supabaseAdmin.from("contractor_verification_log").insert({
+    contractor_id: contractorId,
+    admin_id: adminId,
+    admin_email: adminEmail,
+    action_type: actionType,
+    note,
+  });
+  if (error) console.error("Audit log write failed (non-fatal):", error);
+}
 
-  const { error } = await supabase
-    .from("contractor_profiles")
-    .update({
-      veteran_verified: true,
-      veteran_verified_at: new Date().toISOString(),
-    })
-    .eq("contractor_id", contractorId);
+// ── Veteran Certification ────────────────────────────────────────────────────
 
-  if (error) throw new Error(`approveVetCert failed: ${JSON.stringify(error)}`);
+export async function handleVetCertDecision(contractorId: string, formData: FormData) {
+  const { user } = await requireRole(["ADMIN"]);
+
+  const decision = formData.get("decision") as string;
+  const note = (formData.get("note") as string | null)?.trim() ?? "";
+
+  if (!note) throw new Error("A note is required before approving or rejecting.");
+  if (decision !== "approve" && decision !== "reject")
+    throw new Error("Invalid decision value.");
+
+  if (decision === "approve") {
+    const { error } = await supabaseAdmin
+      .from("contractor_profiles")
+      .update({
+        veteran_verified: true,
+        veteran_verified_at: new Date().toISOString(),
+        veteran_verified_by: user.id,
+      })
+      .eq("contractor_id", contractorId);
+    if (error) throw new Error(`approveVetCert failed: ${JSON.stringify(error)}`);
+
+    await writeLog(user.id, user.email ?? "", contractorId, "VET_APPROVED", note);
+  } else {
+    const { error } = await supabaseAdmin
+      .from("contractor_profiles")
+      .update({
+        veteran_applied_at: null,
+        veteran_verified: false,
+        veteran_verified_by: null,
+      })
+      .eq("contractor_id", contractorId);
+    if (error) throw new Error(`rejectVetCert failed: ${JSON.stringify(error)}`);
+
+    await writeLog(user.id, user.email ?? "", contractorId, "VET_REJECTED", note);
+  }
 
   revalidatePath("/dashboard/admin/vet-certification");
 }
 
-export async function rejectVetCert(contractorId: string) {
-  const { supabase } = await requireRole(["ADMIN"]);
+// ── Directory Verification (License & Insurance) ─────────────────────────────
 
-  const { error } = await supabase
-    .from("contractor_profiles")
-    .update({
-      veteran_applied_at: null,
-      veteran_verified: false,
-    })
-    .eq("contractor_id", contractorId);
+export async function handleDirectoryDecision(contractorId: string, formData: FormData) {
+  const { user } = await requireRole(["ADMIN"]);
 
-  if (error) throw new Error(`rejectVetCert failed: ${JSON.stringify(error)}`);
+  const decision = formData.get("decision") as string;
+  const note = (formData.get("note") as string | null)?.trim() ?? "";
 
-  revalidatePath("/dashboard/admin/vet-certification");
-}
+  if (!note) throw new Error("A note is required before approving or rejecting.");
+  if (decision !== "approve" && decision !== "reject")
+    throw new Error("Invalid decision value.");
 
-export async function approveDirectoryVerification(contractorId: string) {
-  const { supabase, user } = await requireRole(["ADMIN"]);
+  if (decision === "approve") {
+    const { error } = await supabaseAdmin
+      .from("contractor_profiles")
+      .update({
+        directory_verified: true,
+        directory_verified_at: new Date().toISOString(),
+        directory_verified_by: user.id,
+      })
+      .eq("contractor_id", contractorId);
+    if (error) throw new Error(`approveDirectory failed: ${JSON.stringify(error)}`);
 
-  const { error } = await supabase
-    .from("contractor_profiles")
-    .update({
-      directory_verified: true,
-      directory_verified_at: new Date().toISOString(),
-      directory_verified_by: user.id,
-    })
-    .eq("contractor_id", contractorId);
+    await writeLog(user.id, user.email ?? "", contractorId, "DIR_APPROVED", note);
+  } else {
+    const { error } = await supabaseAdmin
+      .from("contractor_profiles")
+      .update({
+        directory_verified: false,
+        directory_verified_by: null,
+      })
+      .eq("contractor_id", contractorId);
+    if (error) throw new Error(`rejectDirectory failed: ${JSON.stringify(error)}`);
 
-  if (error) throw new Error(`approveDirectoryVerification failed: ${JSON.stringify(error)}`);
-
-  revalidatePath("/dashboard/admin/vet-certification");
-}
-
-export async function rejectDirectoryVerification(contractorId: string) {
-  const { supabase } = await requireRole(["ADMIN"]);
-
-  const { error } = await supabase
-    .from("contractor_profiles")
-    .update({
-      directory_verified: false,
-      license_number: null,
-      license_expiry: null,
-      coi_provider: null,
-      coi_policy_number: null,
-      coi_expiry: null,
-      coi_amount: null,
-    })
-    .eq("contractor_id", contractorId);
-
-  if (error) throw new Error(`rejectDirectoryVerification failed: ${JSON.stringify(error)}`);
+    await writeLog(user.id, user.email ?? "", contractorId, "DIR_REJECTED", note);
+  }
 
   revalidatePath("/dashboard/admin/vet-certification");
 }

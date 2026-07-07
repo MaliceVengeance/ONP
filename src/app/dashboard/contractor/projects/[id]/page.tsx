@@ -5,6 +5,9 @@ import { stateBadge } from "@/lib/ui";
 import ProjectFileLink from "./ProjectFileLink";
 import ProjectMap from "@/components/ProjectMap";
 import BidForm from "./BidForm";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sendContractorMessage } from "./messages/actions";
+import { requestCompletion } from "./completion/actions";
 
 type ProjectDetail = {
   id: string;
@@ -33,12 +36,13 @@ export default async function ContractorProjectDetail({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ bid?: string }>;
+  searchParams: Promise<{ bid?: string; completion?: string }>;
 }) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
   const { id: projectId } = await params;
   const sp = await searchParams;
   const bidSubmitted = sp.bid === "ok";
+  const completionSignaled = sp.completion === "signaled";
 
   // Check subscription status
   const { data: subData } = await supabase
@@ -75,7 +79,7 @@ export default async function ContractorProjectDetail({
 
   const [{ data: rows, error: pErr }, { data: zipRow }] = await Promise.all([
     supabase.rpc("get_open_project_detail", { p_project_id: projectId }),
-    supabase.from("projects").select("zip_code, emergency_bid_mode, is_emergency, inspector_hold_started_at").eq("id", projectId).maybeSingle(),
+    supabase.from("projects").select("zip_code, emergency_bid_mode, is_emergency, inspector_hold_started_at, target_start_date, completion_requested_at").eq("id", projectId).maybeSingle(),
   ]);
 
   const project = (rows as ProjectDetail[] | null)?.[0];
@@ -84,11 +88,13 @@ export default async function ContractorProjectDetail({
   const isEmergencyPaid = !!(zipRow as any)?.is_emergency;
   const isAnyEmergency = isEmergencyBidMode || isEmergencyPaid;
   const inspectorHoldActive = !!(zipRow as any)?.inspector_hold_started_at;
+  const targetStartDate: string | null = (zipRow as any)?.target_start_date ?? null;
+  const completionRequestedAt: string | null = (zipRow as any)?.completion_requested_at ?? null;
 
   if (pErr || !project) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#0A1628" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>
           Project Not Found
         </h1>
         <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "20px", marginTop: "16px", fontSize: "14px", color: "#1B4F8A" }}>
@@ -122,13 +128,32 @@ export default async function ContractorProjectDetail({
     if (versionRow) existingBid = versionRow as ExistingBid;
   }
 
-  const { data: rfiData } = await supabase
-    .from("rfis")
-    .select("id, response")
-    .eq("project_id", projectId);
+  const [{ data: rfiData }, { data: catalogData }] = await Promise.all([
+    supabase.from("rfis").select("id, catalog_id, response").eq("project_id", projectId),
+    supabase.from("rfi_catalog").select("id, code, prompt").order("code"),
+  ]);
 
   const totalRfis = rfiData?.length ?? 0;
-  const answeredRfis = rfiData?.filter((r) => r.response)?.length ?? 0;
+  const answeredRfis = (rfiData ?? []).filter((r: any) => r.response)?.length ?? 0;
+
+  // Catalog items the client had the opportunity to pre-answer
+  const CLIENT_EXCLUDED_KEYWORDS = [
+    "specific question not covered above",
+    "additional photos of the area",
+    "clarify the scope of work for a specific area",
+  ];
+  type CatalogItem = { id: string; code: string; prompt: string };
+  const clientCatalog = ((catalogData ?? []) as CatalogItem[]).filter(
+    (c) => !CLIENT_EXCLUDED_KEYWORDS.some((kw) =>
+      c.prompt.toLowerCase().includes(kw.toLowerCase())
+    )
+  );
+
+  // Map catalog_id → client's response (null = not answered)
+  const rfiByCategory = new Map<string, string | null>();
+  (rfiData ?? []).forEach((r: any) => {
+    if (r.catalog_id) rfiByCategory.set(r.catalog_id, r.response ?? null);
+  });
 
   const { data: projectFiles } = await supabase.storage
     .from("project-files")
@@ -157,6 +182,82 @@ export default async function ContractorProjectDetail({
 
   const clientInfo = (clientInfoRows as any[])?.[0] ?? null;
 
+  type BidReviewResult = { review_rank: number | null; review_note: string | null; review_amount_cents: number | null };
+  type Top3BidRow = { review_rank: number; review_amount_cents: number | null };
+
+  // Bid results — only relevant once the project is awarded
+  let myBidReview: BidReviewResult | null = null;
+  let top3Bids: Top3BidRow[] = [];
+
+  if (project.state === "AWARDED" && bidRow?.id) {
+    // Contractor can read their own bid via RLS
+    const { data: ownReview } = await supabase
+      .from("bids")
+      .select("review_rank, review_note, review_amount_cents")
+      .eq("id", bidRow.id)
+      .maybeSingle();
+
+    if (ownReview) myBidReview = ownReview as unknown as BidReviewResult;
+
+    // Top 3 bids — fetched via admin (anonymised, amounts only)
+    const { data: top3Rows } = await supabaseAdmin
+      .from("bids")
+      .select("review_rank, review_amount_cents")
+      .eq("project_id", projectId)
+      .not("review_rank", "is", null)
+      .order("review_rank", { ascending: true })
+      .limit(3);
+
+    top3Bids = (top3Rows ?? []) as unknown as Top3BidRow[];
+  }
+
+  // Fetch messages if project is AWARDED and this contractor is the awarded contractor
+  type MessageRow = {
+    id: string;
+    sender_id: string;
+    sender_role: string;
+    body: string;
+    created_at: string;
+    sender_name: string;
+  };
+  let projectMessages: MessageRow[] = [];
+  // award is fetched via user-scoped supabase — RLS ensures only the awarded contractor sees it
+  const isAwardedContractor = !!award;
+
+  // Mark messages as read when contractor visits this page (AWARDED/COMPLETED + awarded contractor only)
+  if (["AWARDED", "COMPLETED"].includes(project.state) && isAwardedContractor) {
+    await supabaseAdmin
+      .from("project_message_reads")
+      .upsert(
+        { project_id: projectId, user_id: user.id, last_read_at: new Date().toISOString() },
+        { onConflict: "project_id,user_id" }
+      );
+  }
+
+  if (["AWARDED", "COMPLETED"].includes(project.state) && isAwardedContractor) {
+    const { data: rawMessages } = await supabaseAdmin
+      .from("project_messages")
+      .select("id, sender_id, sender_role, body, created_at")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: true });
+
+    if (rawMessages && rawMessages.length > 0) {
+      const senderIds = [...new Set((rawMessages as any[]).map((m) => m.sender_id))];
+      const { data: senderProfiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", senderIds);
+
+      const nameMap = new Map<string, string>();
+      (senderProfiles ?? []).forEach((p: any) => nameMap.set(p.id, p.display_name || "ONP User"));
+
+      projectMessages = (rawMessages as any[]).map((m) => ({
+        ...m,
+        sender_name: nameMap.get(m.sender_id) ?? "ONP User",
+      }));
+    }
+  }
+
   function fmtMoney(cents: number) {
     return `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`;
   }
@@ -164,14 +265,14 @@ export default async function ContractorProjectDetail({
   return (
     <div style={{ maxWidth: "700px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             {project.title ?? "Untitled Project"}
@@ -183,7 +284,7 @@ export default async function ContractorProjectDetail({
             <span style={stateBadge(project.state)}>{project.state}</span>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+        <div className="mob-wrap" style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
           <Link
             href={`/dashboard/contractor/projects/${projectId}/rfis`}
             style={{
@@ -263,28 +364,36 @@ export default async function ContractorProjectDetail({
       }}>
         <div>
           <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Published</div>
-          <div style={{ fontSize: "14px", color: "#0A1628", marginTop: "2px" }}>
+          <div style={{ fontSize: "14px", color: "#1E3A8A", marginTop: "2px" }}>
             {project.published_at ? new Date(project.published_at).toLocaleDateString() : "—"}
           </div>
         </div>
         <div>
           <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Deadline</div>
-          <div style={{ fontSize: "14px", color: "#0A1628", marginTop: "2px" }}>
+          <div style={{ fontSize: "14px", color: "#1E3A8A", marginTop: "2px" }}>
             {deadline ? deadline.toLocaleDateString() : "—"}
           </div>
         </div>
         <div>
           <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Category</div>
-          <div style={{ fontSize: "14px", color: "#0A1628", marginTop: "2px" }}>
+          <div style={{ fontSize: "14px", color: "#1E3A8A", marginTop: "2px" }}>
             {project.category ?? "—"}
           </div>
         </div>
         <div>
           <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Location</div>
-          <div style={{ fontSize: "14px", color: "#0A1628", marginTop: "2px" }}>
+          <div style={{ fontSize: "14px", color: "#1E3A8A", marginTop: "2px" }}>
             {project.location_general ?? "—"}{zipCode ? ` ${zipCode}` : ""}
           </div>
         </div>
+        {targetStartDate && (
+          <div>
+            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Target Start</div>
+            <div style={{ fontSize: "14px", color: "#1E3A8A", marginTop: "2px" }}>
+              {new Date(targetStartDate + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Description */}
@@ -296,13 +405,114 @@ export default async function ContractorProjectDetail({
           padding: "18px",
           marginBottom: "16px",
           fontSize: "14px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           lineHeight: 1.7,
           whiteSpace: "pre-wrap",
         }}>
           {project.description}
         </div>
       )}
+
+      {/* Client Q&A — all questions the client had the opportunity to answer */}
+      {clientCatalog.length > 0 && (() => {
+        const answeredCount = clientCatalog.filter((c) => rfiByCategory.has(c.id) && rfiByCategory.get(c.id)).length;
+        return (
+          <div style={{
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "10px",
+            marginBottom: "16px",
+            overflow: "hidden",
+          }}>
+            {/* Header */}
+            <div style={{
+              background: "#FFFFFF",
+              borderBottom: "1px solid #B8D0E8",
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+            }}>
+              <div>
+                <div style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  letterSpacing: "1px",
+                  color: "#1E3A8A",
+                  textTransform: "uppercase",
+                }}>
+                  Client Responses
+                </div>
+                <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>
+                  {answeredCount} of {clientCatalog.length} questions answered — unanswered items may affect your pricing
+                </div>
+              </div>
+              <span style={{
+                fontSize: "12px",
+                fontWeight: 700,
+                padding: "3px 12px",
+                borderRadius: "20px",
+                background: answeredCount === clientCatalog.length ? "#F0FDF4" : "#FFFBEB",
+                color: answeredCount === clientCatalog.length ? "#15803D" : "#92400E",
+                border: `1px solid ${answeredCount === clientCatalog.length ? "#166534" : "#FCD34D"}`,
+                flexShrink: 0,
+              }}>
+                {answeredCount}/{clientCatalog.length}
+              </span>
+            </div>
+
+            {/* Question rows */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+              {clientCatalog.map((item, idx) => {
+                const response = rfiByCategory.get(item.id) ?? null;
+                const isAnswered = !!response;
+                return (
+                  <div key={item.id} style={{
+                    padding: "14px 18px",
+                    borderBottom: idx < clientCatalog.length - 1 ? "1px solid #B8D0E8" : "none",
+                    background: isAnswered ? "#FAFEFF" : "#FFFDF0",
+                  }}>
+                    <div style={{
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#1E3A8A",
+                      marginBottom: isAnswered ? "8px" : "0",
+                      lineHeight: 1.4,
+                    }}>
+                      {item.prompt}
+                    </div>
+                    {isAnswered ? (
+                      <div style={{
+                        background: "#F0FDF4",
+                        border: "1px solid #86EFAC",
+                        borderRadius: "6px",
+                        padding: "10px 12px",
+                        fontSize: "13px",
+                        color: "#1E3A8A",
+                        lineHeight: 1.6,
+                        whiteSpace: "pre-wrap",
+                      }}>
+                        {response}
+                      </div>
+                    ) : (
+                      <div style={{
+                        fontSize: "12px",
+                        color: "#92400E",
+                        marginTop: "4px",
+                        fontStyle: "italic",
+                      }}>
+                        ⚠ Not answered by client
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* General area map */}
       {project.location_general && (
@@ -326,7 +536,7 @@ export default async function ContractorProjectDetail({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -362,6 +572,143 @@ export default async function ContractorProjectDetail({
           ✅ The contractor is responsible for all debris removal and disposal.
         </div>
       </div>
+
+      {/* Bid Results — shown after award if contractor submitted a bid */}
+      {project.state === "AWARDED" && bidRow?.id && (
+        <div style={{
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
+          borderRadius: "10px",
+          overflow: "hidden",
+          marginBottom: "16px",
+        }}>
+          {/* Header */}
+          <div style={{
+            background: "#FFFFFF",
+            borderBottom: "1px solid #B8D0E8",
+            padding: "14px 18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}>
+            <span style={{ fontSize: "20px" }}>📊</span>
+            <div>
+              <div style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "15px",
+                letterSpacing: "1px",
+                color: "#1E3A8A",
+                textTransform: "uppercase",
+              }}>
+                Bid Results
+              </div>
+              <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>
+                How your bid performed — amounts shown anonymously
+              </div>
+            </div>
+          </div>
+
+          <div style={{ padding: "16px 18px" }}>
+            {/* My placement */}
+            {myBidReview?.review_rank ? (
+              <div style={{
+                background: myBidReview.review_rank === 1 ? "#FEF9C3" : myBidReview.review_rank === 2 ? "#F1F5F9" : myBidReview.review_rank === 3 ? "#FFF7ED" : "#F8FAFF",
+                border: `1px solid ${myBidReview.review_rank === 1 ? "#FCD34D" : myBidReview.review_rank === 2 ? "#CBD5E1" : myBidReview.review_rank === 3 ? "#D97706" : "#B8D0E8"}`,
+                borderRadius: "8px",
+                padding: "14px 16px",
+                marginBottom: "16px",
+              }}>
+                <div style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "20px",
+                  color: "#1E3A8A",
+                  marginBottom: "4px",
+                }}>
+                  {myBidReview.review_rank === 1 ? "🥇 You were awarded this project!" : myBidReview.review_rank === 2 ? "🥈 Your bid ranked #2" : "🥉 Your bid ranked #3"}
+                </div>
+                {myBidReview.review_note && (
+                  <div style={{
+                    background: "#FFFFFF",
+                    border: "1px solid #B8D0E8",
+                    borderRadius: "6px",
+                    padding: "10px 12px",
+                    fontSize: "13px",
+                    color: "#1E3A8A",
+                    lineHeight: 1.6,
+                    marginTop: "8px",
+                  }}>
+                    <div style={{ fontSize: "10px", color: "#4A7FB5", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                      Client note
+                    </div>
+                    {myBidReview.review_note}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{
+                background: "#F8FAFF",
+                border: "1px solid #B8D0E8",
+                borderRadius: "8px",
+                padding: "14px 16px",
+                marginBottom: "16px",
+                fontSize: "13px",
+                color: "#4A7FB5",
+              }}>
+                The client did not rank this bid in the top 3.
+              </div>
+            )}
+
+            {/* Top 3 anonymous comparison */}
+            {top3Bids.length > 0 && (
+              <div>
+                <div style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: "#1B4F8A",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: "10px",
+                }}>
+                  Top {top3Bids.length} Bids (anonymous)
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {top3Bids.map((t) => {
+                    const isMe = myBidReview?.review_rank === t.review_rank;
+                    const emoji = t.review_rank === 1 ? "🥇" : t.review_rank === 2 ? "🥈" : "🥉";
+                    return (
+                      <div key={t.review_rank} style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: isMe ? "#EEF4FF" : "#FFFFFF",
+                        border: `1px solid ${isMe ? "#1B4F8A" : "#B8D0E8"}`,
+                        borderRadius: "6px",
+                        padding: "10px 14px",
+                      }}>
+                        <span style={{ fontSize: "14px" }}>
+                          {emoji} Rank #{t.review_rank}{isMe ? " — You" : ""}
+                        </span>
+                        <span style={{
+                          fontFamily: "'Barlow Condensed', sans-serif",
+                          fontWeight: 700,
+                          fontSize: "18px",
+                          color: "#1E3A8A",
+                        }}>
+                          {t.review_amount_cents
+                            ? `$${(t.review_amount_cents / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}`
+                            : "—"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Awarded banner */}
       {project.state === "AWARDED" && (
@@ -403,7 +750,7 @@ export default async function ContractorProjectDetail({
                 {clientInfo.client_name && (
                   <div>
                     <span style={{ color: "#1B4F8A" }}>Name: </span>
-                    <span style={{ color: "#0A1628" }}>{clientInfo.client_name}</span>
+                    <span style={{ color: "#1E3A8A" }}>{clientInfo.client_name}</span>
                   </div>
                 )}
                 {clientInfo.client_email && (
@@ -425,7 +772,7 @@ export default async function ContractorProjectDetail({
                 {clientInfo.client_address && clientInfo.client_address.trim() !== "" && (
                   <div>
                     <span style={{ color: "#1B4F8A" }}>Address: </span>
-                    <span style={{ color: "#0A1628" }}>{clientInfo.client_address}</span>
+                    <span style={{ color: "#1E3A8A" }}>{clientInfo.client_address}</span>
                   </div>
                 )}
               </div>
@@ -435,6 +782,95 @@ export default async function ContractorProjectDetail({
               Bidding is closed. You can no longer submit or revise bids.
             </div>
           )}
+        </div>
+      )}
+
+      {/* Completion signaled confirmation */}
+      {completionSignaled && (
+        <div style={{
+          background: "#F0FDF4",
+          border: "1px solid #166534",
+          color: "#15803D",
+          padding: "14px 18px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "16px",
+        }}>
+          ✅ Work completion signaled. The client has been notified and will confirm once they have reviewed the work.
+        </div>
+      )}
+
+      {/* Signal Work Complete — shown when AWARDED + awarded contractor + no pending request */}
+      {project.state === "AWARDED" && isAwardedContractor && !completionRequestedAt && (
+        <div style={{
+          background: "#F0FDF4",
+          border: "1px solid #166534",
+          borderRadius: "10px",
+          padding: "18px 20px",
+          marginBottom: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "16px",
+          flexWrap: "wrap",
+        }}>
+          <div>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "16px",
+              color: "#15803D",
+              marginBottom: "3px",
+            }}>
+              Ready to close this project?
+            </div>
+            <div style={{ fontSize: "12px", color: "#166534", lineHeight: 1.5 }}>
+              Signal that the work is complete. The client will be notified to confirm.
+            </div>
+          </div>
+          <form action={requestCompletion.bind(null, projectId)}>
+            <button
+              type="submit"
+              style={{
+                background: "#15803D",
+                color: "#FFFFFF",
+                border: "none",
+                padding: "10px 22px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              ✓ Signal Work Complete
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Pending completion confirmation */}
+      {project.state === "AWARDED" && isAwardedContractor && completionRequestedAt && (
+        <div style={{
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+          borderRadius: "10px",
+          padding: "14px 18px",
+          marginBottom: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+        }}>
+          <span style={{ fontSize: "20px" }}>⏳</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: "13px", color: "#92400E" }}>
+              Awaiting client confirmation
+            </div>
+            <div style={{ fontSize: "12px", color: "#92400E", marginTop: "2px" }}>
+              You signaled work complete on {new Date(completionRequestedAt).toLocaleDateString()}. The client will confirm once they have reviewed the work.
+            </div>
+          </div>
         </div>
       )}
 
@@ -478,7 +914,7 @@ export default async function ContractorProjectDetail({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: "#0A1628",
+              color: "#1E3A8A",
             }}>
               {fmtMoney(existingBid.amount_cents)}
             </span>
@@ -506,7 +942,7 @@ export default async function ContractorProjectDetail({
       {/* Emergency bid mode disclaimer for contractor */}
       {isAnyEmergency && isOpen && beforeDeadline && (
         <div style={{
-          background: "#0A1628",
+          background: "#1E3A8A",
           border: "1px solid #C8102E",
           borderRadius: "10px",
           padding: "18px 20px",
@@ -559,7 +995,7 @@ export default async function ContractorProjectDetail({
             fontWeight: 700,
             fontSize: "22px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             marginBottom: "8px",
           }}>
             Subscription Required to Bid
@@ -595,6 +1031,216 @@ export default async function ContractorProjectDetail({
           Bidding is closed — the deadline has passed.
         </div>
       ) : null}
+
+      {/* ── Post-Award Messages ── */}
+      {["AWARDED", "COMPLETED"].includes(project.state) && isAwardedContractor && (
+        <div
+          id="messages"
+          style={{
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "12px",
+            overflow: "hidden",
+            marginTop: "16px",
+          }}
+        >
+          {/* Section header */}
+          <div
+            style={{
+              background: "#1E3A8A",
+              padding: "14px 20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <span style={{ fontSize: "18px" }}>💬</span>
+            <div>
+              <div
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  letterSpacing: "1px",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                }}
+              >
+                Project Messages
+              </div>
+              <div style={{ fontSize: "11px", color: "#7A9CC4", marginTop: "1px" }}>
+                Private thread — visible only to you, the client, and ONP
+              </div>
+            </div>
+          </div>
+
+          {/* Message list */}
+          <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            {projectMessages.length === 0 ? (
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#4A7FB5",
+                  textAlign: "center",
+                  padding: "24px 0",
+                  fontStyle: "italic",
+                }}
+              >
+                No messages yet. Send the first message below.
+              </div>
+            ) : (
+              projectMessages.map((msg) => {
+                const isMe = msg.sender_id === user.id;
+                const roleBadgeColor =
+                  msg.sender_role === "CLIENT"
+                    ? { bg: "#EEF4FF", color: "#1B4F8A", border: "#B8D0E8" }
+                    : msg.sender_role === "ADMIN"
+                    ? { bg: "#FFF7ED", color: "#92400E", border: "#FCD34D" }
+                    : { bg: "#F0FDF4", color: "#15803D", border: "#86EFAC" };
+
+                return (
+                  <div
+                    key={msg.id}
+                    style={{
+                      display: "flex",
+                      flexDirection: isMe ? "row-reverse" : "row",
+                      gap: "10px",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxWidth: "80%",
+                        background: isMe ? "#1E3A8A" : "#FFFFFF",
+                        border: `1px solid ${isMe ? "#1B4F8A" : "#B8D0E8"}`,
+                        borderRadius: isMe ? "12px 2px 12px 12px" : "2px 12px 12px 12px",
+                        padding: "10px 14px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "6px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            color: isMe ? "#B8D0E8" : "#1E3A8A",
+                          }}
+                        >
+                          {isMe ? "You" : msg.sender_name}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            padding: "1px 7px",
+                            borderRadius: "20px",
+                            background: roleBadgeColor.bg,
+                            color: roleBadgeColor.color,
+                            border: `1px solid ${roleBadgeColor.border}`,
+                          }}
+                        >
+                          {msg.sender_role === "ADMIN" ? "ONP" : msg.sender_role}
+                        </span>
+                        <span style={{ fontSize: "10px", color: isMe ? "#7A9CC4" : "#9CA3AF" }}>
+                          {new Date(msg.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}{" "}
+                          {new Date(msg.created_at).toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: isMe ? "#F0F4FF" : "#1E3A8A",
+                          lineHeight: 1.6,
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {msg.body}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Send form */}
+          <div
+            style={{
+              borderTop: "1px solid #B8D0E8",
+              padding: "16px 20px",
+              background: "#F8FBFF",
+            }}
+          >
+            <form action={sendContractorMessage.bind(null, projectId)}>
+              <textarea
+                name="body"
+                required
+                maxLength={2000}
+                rows={3}
+                placeholder="Type your message…"
+                style={{
+                  width: "100%",
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  color: "#1E3A8A",
+                  borderRadius: "6px",
+                  padding: "10px 14px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: "13px",
+                  outline: "none",
+                  resize: "vertical",
+                  boxSizing: "border-box",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: "10px",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                }}
+              >
+                <span style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                  Max 2,000 characters · Visible to client and ONP
+                </span>
+                <button
+                  type="submit"
+                  style={{
+                    background: "#1E3A8A",
+                    color: "#FFFFFF",
+                    border: "none",
+                    padding: "9px 22px",
+                    borderRadius: "6px",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

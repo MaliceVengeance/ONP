@@ -142,7 +142,7 @@ export default async function ClientInspectorPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -185,7 +185,7 @@ export default async function ClientInspectorPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}
@@ -240,7 +240,7 @@ export default async function ClientInspectorPage({
                   fontWeight: 700,
                   fontSize: "18px",
                   letterSpacing: "1px",
-                  color: "#0A1628",
+                  color: "#1E3A8A",
                   textTransform: "uppercase",
                   margin: 0,
                 }}
@@ -267,7 +267,7 @@ export default async function ClientInspectorPage({
               {assignment.pricing_key && (
                 <div>
                   <span style={{ color: "#1B4F8A" }}>Inspection type: </span>
-                  <span style={{ color: "#0A1628" }}>
+                  <span style={{ color: "#1E3A8A" }}>
                     {assignment.pricing_key.replaceAll("_", " ")}
                   </span>
                 </div>
@@ -275,7 +275,7 @@ export default async function ClientInspectorPage({
               {assignment.fee_charged_cents && (
                 <div>
                   <span style={{ color: "#1B4F8A" }}>Fee paid: </span>
-                  <span style={{ color: "#0A1628", fontWeight: 600 }}>
+                  <span style={{ color: "#1E3A8A", fontWeight: 600 }}>
                     {formatFee(assignment.fee_charged_cents)}
                   </span>
                 </div>
@@ -283,7 +283,7 @@ export default async function ClientInspectorPage({
               {assignment.requested_at && (
                 <div>
                   <span style={{ color: "#1B4F8A" }}>Requested: </span>
-                  <span style={{ color: "#0A1628" }}>
+                  <span style={{ color: "#1E3A8A" }}>
                     {new Date(assignment.requested_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -291,13 +291,13 @@ export default async function ClientInspectorPage({
               {inspectorName && (
                 <div>
                   <span style={{ color: "#1B4F8A" }}>Inspector: </span>
-                  <span style={{ color: "#0A1628" }}>{inspectorName}</span>
+                  <span style={{ color: "#1E3A8A" }}>{inspectorName}</span>
                 </div>
               )}
               {assignment.assigned_at && (
                 <div>
                   <span style={{ color: "#1B4F8A" }}>Assigned: </span>
-                  <span style={{ color: "#0A1628" }}>
+                  <span style={{ color: "#1E3A8A" }}>
                     {new Date(assignment.assigned_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -305,7 +305,7 @@ export default async function ClientInspectorPage({
               {assignment.notes && (
                 <div>
                   <span style={{ color: "#1B4F8A" }}>Notes: </span>
-                  <span style={{ color: "#0A1628" }}>{assignment.notes}</span>
+                  <span style={{ color: "#1E3A8A" }}>{assignment.notes}</span>
                 </div>
               )}
             </div>
@@ -338,7 +338,7 @@ export default async function ClientInspectorPage({
               </p>
               {(assignment as any).upgrade_justification && (
                 <div style={{
-                  background: "#0A1628",
+                  background: "#1E3A8A",
                   borderRadius: "6px",
                   padding: "12px 16px",
                   marginBottom: "14px",
@@ -415,7 +415,7 @@ export default async function ClientInspectorPage({
 
               {/* Dispute status or CTA */}
               {existingDispute && (existingDispute as any).status !== "WITHDRAWN" ? (
-                <div style={{ background: "#0A1628", borderRadius: "8px", padding: "12px 16px" }}>
+                <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "12px 16px" }}>
                   <div style={{ fontSize: "12px", color: "#FBBF24", fontWeight: 700, marginBottom: "4px" }}>
                     Dispute Status: {(existingDispute as any).status.replaceAll("_", " ")}
                   </div>
@@ -427,7 +427,7 @@ export default async function ClientInspectorPage({
                   </a>
                 </div>
               ) : withinDisputeWindow ? (
-                <div style={{ background: "#0A1628", borderRadius: "8px", padding: "12px 16px" }}>
+                <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "12px 16px" }}>
                   <div style={{ fontSize: "12px", color: "#B8D0E8", lineHeight: 1.6, marginBottom: "10px" }}>
                     If you believe this upgrade was not justified, you have{" "}
                     <strong style={{ color: "#FBBF24" }}>{disputeDaysRemaining} day{disputeDaysRemaining !== 1 ? "s" : ""}</strong>{" "}
@@ -495,7 +495,7 @@ export default async function ClientInspectorPage({
                   borderRadius: "8px",
                   padding: "16px",
                   fontSize: "13px",
-                  color: "#0A1628",
+                  color: "#1E3A8A",
                   lineHeight: 1.7,
                   whiteSpace: "pre-wrap",
                 }}
@@ -521,7 +521,7 @@ export default async function ClientInspectorPage({
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "20px",
             }}

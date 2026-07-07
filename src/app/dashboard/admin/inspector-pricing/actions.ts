@@ -68,6 +68,38 @@ export async function updatePriceRow(pricingKey: string, formData: FormData) {
   revalidatePath("/dashboard/admin/inspector-pricing");
 }
 
+export async function setAllInspectorPercent(formData: FormData) {
+  const { user } = await requireRole(["ADMIN"]);
+
+  const percent = parseInt(formData.get("percent") as string, 10);
+  if (isNaN(percent) || percent < 1 || percent > 99)
+    throw new Error("Percentage must be between 1 and 99.");
+
+  const { error } = await supabaseAdmin
+    .from("inspector_price_list")
+    .update({
+      inspector_share_percent: percent,
+      updated_at: new Date().toISOString(),
+    })
+    .neq("pricing_key", ""); // update all rows
+
+  if (error) throw wrapErr("inspector_price_list.setAllPercent", error);
+
+  try {
+    await supabaseAdmin.from("admin_actions").insert({
+      admin_id: user.id,
+      action_type: "SET_ALL_INSPECTOR_PERCENT",
+      target_id: "ALL",
+      details: { inspector_share_percent: percent },
+      created_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.error("Admin audit log failed (non-fatal):", e);
+  }
+
+  revalidatePath("/dashboard/admin/inspector-pricing");
+}
+
 export async function togglePriceActive(pricingKey: string, currentIsActive: boolean) {
   const { user } = await requireRole(["ADMIN"]);
 

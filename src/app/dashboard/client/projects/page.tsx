@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 
@@ -26,7 +27,7 @@ export default async function ClientProjectsPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
+  const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
   const sp = await searchParams;
   const activeTab = sp.tab ?? null;
 
@@ -36,9 +37,9 @@ export default async function ClientProjectsPage({
     .order("created_at", { ascending: false })
     .limit(100);
 
-  if (error) throw error;
-
+  // Don't crash the page on DB errors — show empty list with a notice instead
   const projects = (data ?? []) as Project[];
+  const dbError = error ? (error as any).message ?? "Database error" : null;
   const now = new Date();
 
   // Fetch bid counts for all projects in one query
@@ -54,6 +55,34 @@ export default async function ClientProjectsPage({
   (bidCountsRaw ?? []).forEach((row) => {
     bidCountMap.set(row.project_id, (bidCountMap.get(row.project_id) ?? 0) + 1);
   });
+
+  // Fetch unread message counts for awarded projects
+  const awardedProjectIds = projects.filter((p) => p.state === "AWARDED").map((p) => p.id);
+  const unreadCountMap = new Map<string, number>();
+
+  if (awardedProjectIds.length > 0) {
+    const [{ data: msgs }, { data: reads }] = await Promise.all([
+      supabaseAdmin
+        .from("project_messages")
+        .select("project_id, sender_id, created_at")
+        .in("project_id", awardedProjectIds)
+        .neq("sender_id", user.id),
+      supabaseAdmin
+        .from("project_message_reads")
+        .select("project_id, last_read_at")
+        .eq("user_id", user.id)
+        .in("project_id", awardedProjectIds),
+    ]);
+
+    const readMap = new Map((reads ?? []).map((r: any) => [r.project_id, r.last_read_at]));
+    for (const msg of msgs ?? []) {
+      const m = msg as any;
+      const lastRead = readMap.get(m.project_id);
+      if (!lastRead || new Date(m.created_at) > new Date(lastRead)) {
+        unreadCountMap.set(m.project_id, (unreadCountMap.get(m.project_id) ?? 0) + 1);
+      }
+    }
+  }
 
   // Categorize projects
   const active = projects.filter((p) =>
@@ -89,13 +118,13 @@ export default async function ClientProjectsPage({
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <h1 style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: 0,
         }}>
           My Projects
@@ -117,6 +146,22 @@ export default async function ClientProjectsPage({
           + New Project
         </Link>
       </div>
+
+      {/* DB error notice */}
+      {dbError && (
+        <div style={{
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          borderRadius: "8px",
+          padding: "10px 14px",
+          marginBottom: "16px",
+          fontSize: "12px",
+          color: "#991B1B",
+          fontWeight: 600,
+        }}>
+          ⚠ Could not load projects: {dbError}. Please refresh or contact support if this persists.
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{
@@ -214,13 +259,13 @@ export default async function ClientProjectsPage({
       {/* Active section */}
       {(visibleActive.length > 0 || activeTab === "active") && (
         <div style={{ marginBottom: "28px" }}>
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#0A1628", textTransform: "uppercase", marginBottom: "12px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
             Active ({active.length})
           </h2>
           {visibleActive.length === 0 ? (
             <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
               No active projects.{" "}
-              <Link href="/dashboard/client/projects/new" style={{ color: "#0A1628", textDecoration: "underline" }}>
+              <Link href="/dashboard/client/projects/new" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
                 Create one
               </Link>
             </div>
@@ -238,7 +283,7 @@ export default async function ClientProjectsPage({
       {(visibleAwarded.length > 0 || activeTab === "awarded") && (
         <div style={{ marginBottom: "28px" }}>
           <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#0A1628", textTransform: "uppercase", marginBottom: "12px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
             Awarded ({awarded.length})
           </h2>
           {visibleAwarded.length === 0 ? (
@@ -248,7 +293,7 @@ export default async function ClientProjectsPage({
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {visibleAwarded.map((p) => (
-                <ProjectCard key={p.id} p={p} bidCount={bidCountMap.get(p.id) ?? 0} />
+                <ProjectCard key={p.id} p={p} bidCount={bidCountMap.get(p.id) ?? 0} unreadCount={unreadCountMap.get(p.id) ?? 0} />
               ))}
             </div>
           )}
@@ -280,7 +325,7 @@ export default async function ClientProjectsPage({
       {!activeTab && projects.length === 0 && (
         <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "48px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
           No projects yet.{" "}
-          <Link href="/dashboard/client/projects/new" style={{ color: "#0A1628", textDecoration: "underline" }}>
+          <Link href="/dashboard/client/projects/new" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
             Create your first project
           </Link>
         </div>
@@ -289,7 +334,7 @@ export default async function ClientProjectsPage({
   );
 }
 
-function ProjectCard({ p, urgent, bidCount }: { p: Project; urgent?: boolean; bidCount: number }) {
+function ProjectCard({ p, urgent, bidCount, unreadCount = 0 }: { p: Project; urgent?: boolean; bidCount: number; unreadCount?: number }) {
   const deadline = p.deadline_at ? new Date(p.deadline_at) : null;
   const now = new Date();
   const deadlinePassed = !!deadline && deadline.getTime() <= now.getTime();
@@ -313,7 +358,7 @@ function ProjectCard({ p, urgent, bidCount }: { p: Project; urgent?: boolean; bi
           <div style={{
             fontWeight: 600,
             fontSize: "15px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             marginBottom: "3px",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -342,8 +387,21 @@ function ProjectCard({ p, urgent, bidCount }: { p: Project; urgent?: boolean; bi
             </div>
           )}
         </div>
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
           <span style={stateBadge(p.state)}>{p.state}</span>
+          {unreadCount > 0 && (
+            <span style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "2px 8px",
+              borderRadius: "20px",
+              background: "#C8102E",
+              color: "#FFFFFF",
+              whiteSpace: "nowrap",
+            }}>
+              💬 {unreadCount} new
+            </span>
+          )}
         </div>
       </HoverCard>
     </Link>

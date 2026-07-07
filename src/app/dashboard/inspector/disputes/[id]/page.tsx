@@ -51,7 +51,7 @@ export default async function DisputeReviewPage({
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "32px",
-            color: "#0A1628",
+            color: "#1E3A8A",
           }}
         >
           Dispute Not Found
@@ -128,7 +128,7 @@ export default async function DisputeReviewPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -226,7 +226,7 @@ export default async function DisputeReviewPage({
             <div
               style={{
                 fontSize: "13px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 lineHeight: 1.6,
                 whiteSpace: "pre-wrap",
               }}
@@ -298,7 +298,7 @@ export default async function DisputeReviewPage({
                 borderRadius: "8px",
                 padding: "14px 16px",
                 fontSize: "13px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 lineHeight: 1.7,
                 whiteSpace: "pre-wrap",
               }}
@@ -317,7 +317,7 @@ export default async function DisputeReviewPage({
       <ReviewSection title="Client's Dispute Statement">
         <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
           Did inspector explain reasons on-site?{" "}
-          <strong style={{ color: "#0A1628" }}>{inspectorExplainedLabel}</strong>
+          <strong style={{ color: "#1E3A8A" }}>{inspectorExplainedLabel}</strong>
         </div>
         <div
           style={{
@@ -358,7 +358,7 @@ export default async function DisputeReviewPage({
                 borderRadius: "8px",
                 padding: "14px 16px",
                 fontSize: "13px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 lineHeight: 1.7,
                 whiteSpace: "pre-wrap",
               }}
@@ -421,7 +421,7 @@ export default async function DisputeReviewPage({
                 { value: "RESOLVED_PARTIAL_CREDIT", label: "Partial Credit — Issue the client a store credit" },
                 { value: "RESOLVED_REFUND", label: "Full Refund — Client receives full upgrade refund" },
               ].map((opt) => (
-                <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#0A1628", marginBottom: "6px", cursor: "pointer" }}>
+                <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#1E3A8A", marginBottom: "6px", cursor: "pointer" }}>
                   <input type="radio" name="decision" value={opt.value} required />
                   {opt.label}
                 </label>
@@ -491,7 +491,7 @@ export default async function DisputeReviewPage({
         <div
           style={{
             background: "#FFFFFF",
-            border: "2px solid #0A1628",
+            border: "2px solid #1E3A8A",
             borderRadius: "12px",
             padding: "28px",
             marginTop: "8px",
@@ -503,7 +503,7 @@ export default async function DisputeReviewPage({
               fontWeight: 700,
               fontSize: "20px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "6px",
             }}
@@ -572,7 +572,7 @@ function InfoField({ label, value }: { label: string; value: string }) {
       >
         {label}
       </div>
-      <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "2px", fontWeight: 500 }}>
+      <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "2px", fontWeight: 500 }}>
         {value}
       </div>
     </div>

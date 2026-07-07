@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 
@@ -32,7 +33,7 @@ function fmtMoney(cents: number | string) {
 }
 
 export default async function ContractorMyBidsPage() {
-  const { supabase } = await requireRole(["CONTRACTOR", "ADMIN"]);
+  const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
   const [
     { data: bidsData, error: bidsError },
@@ -51,6 +52,34 @@ export default async function ContractorMyBidsPage() {
   const closedBids = bids.filter((b) => b.project_state !== "OPEN" && b.project_state !== "AWARDED");
   const awardedBidIds = new Set(awarded.map((a) => a.project_id));
 
+  // Fetch unread message counts for awarded projects
+  const awardedProjectIds = awarded.map((a) => a.project_id);
+  const unreadCountMap = new Map<string, number>();
+
+  if (awardedProjectIds.length > 0) {
+    const [{ data: msgs }, { data: reads }] = await Promise.all([
+      supabaseAdmin
+        .from("project_messages")
+        .select("project_id, sender_id, created_at")
+        .in("project_id", awardedProjectIds)
+        .neq("sender_id", user.id),
+      supabaseAdmin
+        .from("project_message_reads")
+        .select("project_id, last_read_at")
+        .eq("user_id", user.id)
+        .in("project_id", awardedProjectIds),
+    ]);
+
+    const readMap = new Map((reads ?? []).map((r: any) => [r.project_id, r.last_read_at]));
+    for (const msg of msgs ?? []) {
+      const m = msg as any;
+      const lastRead = readMap.get(m.project_id);
+      if (!lastRead || new Date(m.created_at) > new Date(lastRead)) {
+        unreadCountMap.set(m.project_id, (unreadCountMap.get(m.project_id) ?? 0) + 1);
+      }
+    }
+  }
+
   // Stats
   const totalBidValue = bids.reduce((sum, b) => sum + Number(b.latest_amount_cents), 0);
   const wonCount = awarded.length;
@@ -58,14 +87,14 @@ export default async function ContractorMyBidsPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Bid History
@@ -113,7 +142,7 @@ export default async function ContractorMyBidsPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
+      <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
         {[
           { label: "Total Bids", count: bids.length, value: null, accent: false },
           { label: "Pending", count: openBids.length, value: null, accent: openBids.length > 0 },
@@ -131,7 +160,7 @@ export default async function ContractorMyBidsPage() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: s.value ? "22px" : "32px",
-              color: s.accent ? "#C8102E" : "#0A1628",
+              color: s.accent ? "#C8102E" : "#1E3A8A",
             }}>
               {s.value ?? s.count}
             </div>
@@ -153,7 +182,7 @@ export default async function ContractorMyBidsPage() {
           fontSize: "14px",
         }}>
           You haven't placed any bids yet.{" "}
-          <Link href="/dashboard/contractor/projects" style={{ color: "#0A1628", textDecoration: "underline" }}>
+          <Link href="/dashboard/contractor/projects" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
             Browse open projects
           </Link>
         </div>
@@ -182,14 +211,14 @@ export default async function ContractorMyBidsPage() {
                   >
                     <HoverCard style={{
                       background: "#EEF4FF",
-                      border: "1px solid #1B4F8A",
+                      border: `1px solid ${(unreadCountMap.get(a.project_id) ?? 0) > 0 ? "#C8102E" : "#1B4F8A"}`,
                       borderRadius: "10px",
                       padding: "18px",
                       cursor: "pointer",
                     }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                      <div className="mob-card-stack" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                          <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                             {a.project_title ?? "Untitled Project"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "6px" }}>
@@ -200,13 +229,18 @@ export default async function ContractorMyBidsPage() {
                               Awarded: {new Date(a.awarded_at).toLocaleDateString()}
                             </div>
                           )}
+                          {(unreadCountMap.get(a.project_id) ?? 0) > 0 && (
+                            <div style={{ fontSize: "11px", color: "#C8102E", fontWeight: 700, marginTop: "4px" }}>
+                              💬 {unreadCountMap.get(a.project_id)} new message{(unreadCountMap.get(a.project_id) ?? 0) !== 1 ? "s" : ""}
+                            </div>
+                          )}
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
                           <div style={{
                             fontFamily: "'Barlow Condensed', sans-serif",
                             fontWeight: 700,
                             fontSize: "28px",
-                            color: "#0A1628",
+                            color: "#1E3A8A",
                             lineHeight: 1,
                           }}>
                             {fmtMoney(a.latest_amount_cents)}
@@ -241,7 +275,7 @@ export default async function ContractorMyBidsPage() {
                 fontWeight: 700,
                 fontSize: "18px",
                 letterSpacing: "1px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 textTransform: "uppercase",
                 marginBottom: "12px",
               }}>
@@ -298,9 +332,9 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
         cursor: "pointer",
         opacity: !isOpen && !isWon ? 0.75 : 1,
       }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+        <div className="mob-card-stack" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+            <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
               {b.project_title ?? "Untitled Project"}
             </div>
             <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
@@ -326,7 +360,7 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "28px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               lineHeight: 1,
             }}>
               {fmtMoney(b.latest_amount_cents)}

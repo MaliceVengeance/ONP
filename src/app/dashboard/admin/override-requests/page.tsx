@@ -27,14 +27,14 @@ export default async function AdminOverrideRequestsPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Deadline Requests
@@ -74,15 +74,15 @@ export default async function AdminOverrideRequestsPage() {
 
             return (
               <div key={r.id} style={{
-                background: isEmergencyBid ? "#0A1628" : "#EEF4FF",
+                background: isEmergencyBid ? "#1E3A8A" : "#EEF4FF",
                 border: `1px solid ${isEmergencyBid ? "#C8102E" : "#FCD34D"}`,
                 borderRadius: "12px",
                 padding: "20px",
               }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
+                <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                      <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergencyBid ? "#FFFFFF" : "#0A1628" }}>
+                      <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergencyBid ? "#FFFFFF" : "#1E3A8A" }}>
                         {r.title ?? "Untitled Project"}
                       </div>
                       {isEmergencyBid ? (
@@ -144,7 +144,7 @@ export default async function AdminOverrideRequestsPage() {
                     padding: "12px",
                     marginBottom: "14px",
                     fontSize: "13px",
-                    color: isEmergencyBid ? "#FFFFFF" : "#0A1628",
+                    color: isEmergencyBid ? "#FFFFFF" : "#1E3A8A",
                     lineHeight: 1.6,
                   }}>
                     <span style={{ color: isEmergencyBid ? "#B8D0E8" : "#1B4F8A", fontWeight: 600 }}>Reason: </span>
@@ -205,7 +205,7 @@ export default async function AdminOverrideRequestsPage() {
                         style={{
                           background: "#FFFFFF",
                           border: "1px solid #B8D0E8",
-                          color: "#0A1628",
+                          color: "#1E3A8A",
                           borderRadius: "6px",
                           padding: "8px 12px",
                           fontFamily: "'Barlow', sans-serif",

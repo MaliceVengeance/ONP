@@ -74,7 +74,7 @@ export default async function DisputeUpgradePage({
     return (
       <div style={{ maxWidth: "560px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#0A1628", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
             Dispute Filed
           </h1>
           <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
@@ -82,7 +82,7 @@ export default async function DisputeUpgradePage({
           </Link>
         </div>
         <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "12px", padding: "24px" }}>
-          <div style={{ fontWeight: 700, fontSize: "15px", color: "#0A1628", marginBottom: "6px" }}>
+          <div style={{ fontWeight: 700, fontSize: "15px", color: "#1E3A8A", marginBottom: "6px" }}>
             ✅ Your dispute has already been submitted.
           </div>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "8px" }}>
@@ -103,7 +103,7 @@ export default async function DisputeUpgradePage({
     return (
       <div style={{ maxWidth: "560px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#0A1628", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
             Review Window Closed
           </h1>
           <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
@@ -131,7 +131,7 @@ export default async function DisputeUpgradePage({
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#0A1628", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
             Dispute Upgrade
           </h1>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
@@ -145,14 +145,14 @@ export default async function DisputeUpgradePage({
 
       {/* What this is */}
       <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
-        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "#0A1628", textTransform: "uppercase", marginBottom: "10px" }}>
+        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "10px" }}>
           Free Independent Review
         </h2>
         <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, marginBottom: "10px" }}>
           You were charged an additional{" "}
-          <strong style={{ color: "#0A1628" }}>{fmt(upgradeFeeCents)}</strong> when your inspector
+          <strong style={{ color: "#1E3A8A" }}>{fmt(upgradeFeeCents)}</strong> when your inspector
           upgraded to a Comprehensive Inspection on-site. If you believe that upgrade was not
-          justified, an independent <strong style={{ color: "#0A1628" }}>Master Inspector</strong>{" "}
+          justified, an independent <strong style={{ color: "#1E3A8A" }}>Master Inspector</strong>{" "}
           will review the case at no cost to you.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "13px", color: "#15803D" }}>
@@ -177,7 +177,7 @@ export default async function DisputeUpgradePage({
 
       {/* The form */}
       <div style={{ background: "#FFFFFF", border: "1px solid #B8D0E8", borderRadius: "12px", padding: "24px" }}>
-        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#0A1628", textTransform: "uppercase", marginBottom: "20px" }}>
+        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "20px" }}>
           Your Dispute Statement
         </h2>
         <DisputeForm

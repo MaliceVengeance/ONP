@@ -62,7 +62,7 @@ export default async function MasterInspectorsPage() {
   const cellStyle: React.CSSProperties = {
     padding: "12px 12px",
     fontSize: "13px",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderBottom: "1px solid #EEF4FF",
     verticalAlign: "middle",
   };
@@ -74,7 +74,7 @@ export default async function MasterInspectorsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: 0,
         }}>
           Master Inspectors
@@ -91,7 +91,7 @@ export default async function MasterInspectorsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "20px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: "0 0 16px 0",
         }}>
           Active Master Inspectors ({masterInspectors.length})
@@ -213,7 +213,7 @@ export default async function MasterInspectorsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "20px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: "0 0 8px 0",
         }}>
           Promote an Inspector

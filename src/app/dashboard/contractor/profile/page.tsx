@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/auth/requireRole";
 import { saveContractorProfile } from "./actions";
 import Link from "next/link";
+import { isProfileComplete, profileMissingFields } from "@/lib/contractor/profileComplete";
 
 const MILITARY_BRANCHES = [
   { value: "army", label: "U.S. Army", emoji: "🪖" },
@@ -23,18 +24,20 @@ export default async function ContractorProfilePage({
   const { data: profile } = await supabase
     .from("contractor_profiles")
     .select(
-      "business_name,city,state,categories,description,is_listed,veteran_applied_at,veteran_verified,veteran_verified_at,military_branch,license_number,license_expiry,coi_provider,coi_policy_number,coi_expiry,coi_amount,directory_verified,directory_verified_at"
+      "business_name,phone,address_line1,address_line2,city,state,address_zip,categories,description,is_listed,veteran_applied_at,veteran_verified,veteran_verified_at,military_branch,license_number,license_expiry,coi_provider,coi_policy_number,coi_expiry,coi_amount,directory_verified,directory_verified_at,has_no_license,has_no_insurance"
     )
     .eq("contractor_id", user.id)
     .maybeSingle();
 
   const categories = (profile?.categories ?? []) as string[];
+  const profileDone = isProfileComplete(profile);
+  const missing = profileMissingFields(profile);
 
   const inputStyle = {
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -56,14 +59,14 @@ export default async function ContractorProfilePage({
   return (
     <div style={{ maxWidth: "600px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             My Profile
@@ -88,6 +91,22 @@ export default async function ContractorProfilePage({
           Back
         </Link>
       </div>
+
+      {/* Profile incomplete banner */}
+      {!profileDone && (
+        <div style={{
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          borderRadius: "8px",
+          padding: "14px 18px",
+          marginBottom: "20px",
+          fontSize: "13px",
+          color: "#991B1B",
+          lineHeight: 1.6,
+        }}>
+          <strong>Profile incomplete</strong> — you must fill in your {missing.join(", ")} before you can subscribe or submit bids.
+        </div>
+      )}
 
       {/* Success banner */}
       {sp.saved === "1" && (
@@ -172,7 +191,7 @@ export default async function ContractorProfilePage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
@@ -183,15 +202,58 @@ export default async function ContractorProfilePage({
         </p>
 
         <form action={saveContractorProfile}>
-          <label style={{ ...labelStyle, marginTop: 0 }}>Business Name</label>
+          <div style={{
+            background: "#FFFFFF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "8px",
+            padding: "10px 14px",
+            marginBottom: "16px",
+            fontSize: "12px",
+            color: "#1B4F8A",
+          }}>
+            ★ <strong style={{ color: "#1E3A8A" }}>Business name, phone, and at least one trade category are required</strong> to subscribe and submit bids.
+          </div>
+
+          <label style={{ ...labelStyle, marginTop: 0 }}>
+            Business Name <span style={{ color: "#C8102E" }}>*</span>
+          </label>
           <input
             name="business_name"
             defaultValue={profile?.business_name ?? ""}
             style={inputStyle}
             placeholder="e.g. Bravo Roofing LLC"
+            required
           />
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          <label style={labelStyle}>
+            Phone Number <span style={{ color: "#C8102E" }}>*</span>
+          </label>
+          <input
+            name="phone"
+            type="tel"
+            defaultValue={(profile as any)?.phone ?? ""}
+            style={inputStyle}
+            placeholder="e.g. (915) 555-0100"
+            required
+          />
+
+          <label style={labelStyle}>Business Address</label>
+          <input
+            name="address_line1"
+            defaultValue={(profile as any)?.address_line1 ?? ""}
+            style={inputStyle}
+            placeholder="Street address"
+          />
+
+          <label style={{ ...labelStyle, marginTop: "8px" }}>Address Line 2</label>
+          <input
+            name="address_line2"
+            defaultValue={(profile as any)?.address_line2 ?? ""}
+            style={inputStyle}
+            placeholder="Suite, unit, building (optional)"
+          />
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 100px", gap: "12px" }}>
             <div>
               <label style={labelStyle}>City</label>
               <input
@@ -210,9 +272,21 @@ export default async function ContractorProfilePage({
                 placeholder="e.g. TX"
               />
             </div>
+            <div>
+              <label style={labelStyle}>ZIP</label>
+              <input
+                name="address_zip"
+                defaultValue={(profile as any)?.address_zip ?? ""}
+                style={inputStyle}
+                placeholder="79901"
+                maxLength={10}
+              />
+            </div>
           </div>
 
-          <label style={labelStyle}>Service Categories (comma-separated)</label>
+          <label style={labelStyle}>
+            Service Categories (comma-separated) <span style={{ color: "#C8102E" }}>*</span>
+          </label>
           <input
             name="categories"
             defaultValue={categories.join(", ")}
@@ -220,7 +294,7 @@ export default async function ContractorProfilePage({
             placeholder="Roofing, Drywall, Concrete, Electrical…"
           />
           <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
-            Used to match you with relevant projects in the directory.
+            Used to match you with relevant projects. At least one category is required.
           </p>
 
           <label style={labelStyle}>Business Description</label>
@@ -243,7 +317,7 @@ export default async function ContractorProfilePage({
               gap: "10px",
               cursor: "pointer",
               fontSize: "14px",
-              color: "#0A1628",
+              color: "#1E3A8A",
             }}>
               <input
                 type="checkbox"
@@ -285,7 +359,39 @@ export default async function ContractorProfilePage({
               color: "#1B4F8A",
               lineHeight: 1.6,
             }}>
-              <strong style={{ color: "#0A1628" }}>All contractors</strong> — veteran owned or not — must submit a valid contractor's license and Certificate of Insurance (COI) to be verified and appear in the public directory. This protects clients and builds trust in the platform.
+              <strong style={{ color: "#1E3A8A" }}>All contractors</strong> — veteran owned or not — must submit a valid contractor's license and Certificate of Insurance (COI) to be verified and appear in the public directory. This protects clients and builds trust in the platform.
+            </div>
+
+            {/* Disclosure checkboxes */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  name="has_no_license"
+                  defaultChecked={!!(profile as any)?.has_no_license}
+                  style={{ width: "16px", height: "16px", accentColor: "#C8102E", marginTop: "2px", flexShrink: 0 }}
+                />
+                <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+                  I do not hold a contractor's license.{" "}
+                  <span style={{ color: "#991B1B", fontSize: "12px" }}>
+                    (A "No License" notice will appear on your bids.)
+                  </span>
+                </span>
+              </label>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  name="has_no_insurance"
+                  defaultChecked={!!(profile as any)?.has_no_insurance}
+                  style={{ width: "16px", height: "16px", accentColor: "#C8102E", marginTop: "2px", flexShrink: 0 }}
+                />
+                <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+                  I do not carry liability insurance.{" "}
+                  <span style={{ color: "#991B1B", fontSize: "12px" }}>
+                    (A "No Insurance" notice will appear on your bids.)
+                  </span>
+                </span>
+              </label>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
@@ -378,7 +484,7 @@ export default async function ContractorProfilePage({
               color: "#1B4F8A",
               lineHeight: 1.6,
             }}>
-              <strong style={{ color: "#0A1628" }}>Optional.</strong> If you are a veteran, you can apply for Veteran Owned Certification. This is a separate badge displayed on your bids and directory listing. Admin will verify your status.
+              <strong style={{ color: "#1E3A8A" }}>Optional.</strong> If you are a veteran, you can apply for Veteran Owned Certification. This is a separate badge displayed on your bids and directory listing. Admin will verify your status.
             </div>
 
             <label style={labelStyle}>Military Branch</label>
@@ -401,7 +507,7 @@ export default async function ContractorProfilePage({
               gap: "10px",
               cursor: "pointer",
               fontSize: "14px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               marginTop: "16px",
             }}>
               <input

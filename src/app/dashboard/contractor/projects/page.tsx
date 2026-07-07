@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import HoverCard from "@/components/HoverCard";
 
 type OpenProject = {
@@ -49,7 +50,7 @@ export default async function ContractorOpenProjectsPage({
   // Fetch is_emergency for all returned projects in one query
   let emergencyMap = new Map<string, boolean>();
   if (rpcProjects.length > 0) {
-    const { data: emergencyRows } = await supabase
+    const { data: emergencyRows } = await supabaseAdmin
       .from("projects")
       .select("id, is_emergency")
       .in("id", rpcProjects.map((p) => p.id));
@@ -125,14 +126,14 @@ export default async function ContractorOpenProjectsPage({
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Open Projects
@@ -143,7 +144,7 @@ export default async function ContractorOpenProjectsPage({
         </div>
 
         {/* Sort controls + Back */}
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
           {[
             { label: "By Deadline", value: "deadline" },
             { label: "Newest", value: "newest" },
@@ -213,7 +214,7 @@ export default async function ContractorOpenProjectsPage({
               style={{
                 background: "#FFFFFF",
                 border: "1px solid #B8D0E8",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 borderRadius: "6px",
                 padding: "8px 12px",
                 fontFamily: "'Barlow', sans-serif",
@@ -246,7 +247,7 @@ export default async function ContractorOpenProjectsPage({
               style={{
                 background: "#FFFFFF",
                 border: "1px solid #B8D0E8",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 borderRadius: "6px",
                 padding: "8px 12px",
                 fontFamily: "'Barlow', sans-serif",
@@ -364,10 +365,10 @@ export default async function ContractorOpenProjectsPage({
                   padding: "20px",
                   cursor: "pointer",
                 }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+                  <div className="mob-card-stack" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-                        <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergency ? "#FED7AA" : "#0A1628" }}>
+                        <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergency ? "#FED7AA" : "#1E3A8A" }}>
                           {p.title ?? "Untitled Project"}
                         </div>
                         {isEmergency && (
@@ -443,7 +444,7 @@ export default async function ContractorOpenProjectsPage({
                       </div>
                       <div style={{
                         fontSize: "13px",
-                        color: isEmergency ? "#FDBA74" : isUrgent ? "#991B1B" : "#0A1628",
+                        color: isEmergency ? "#FDBA74" : isUrgent ? "#991B1B" : "#1E3A8A",
                         fontWeight: 500,
                         marginBottom: "4px",
                       }}>

@@ -23,7 +23,7 @@ export default async function InspectorProjectDetailPage({
   if (error || !assignment) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#0A1628" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>
           Assignment Not Found
         </h1>
         <Link href="/dashboard/inspector/projects" style={{ color: "#1B4F8A", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
@@ -37,7 +37,7 @@ export default async function InspectorProjectDetailPage({
   if (role !== "ADMIN" && assignment.inspector_id !== user.id) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#0A1628" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>
           Not Authorized
         </h1>
         <Link href="/dashboard/inspector/projects" style={{ color: "#1B4F8A", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
@@ -78,7 +78,7 @@ export default async function InspectorProjectDetailPage({
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -90,14 +90,14 @@ export default async function InspectorProjectDetailPage({
   return (
     <div style={{ maxWidth: "700px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             {project?.title ?? "Untitled Project"}
@@ -139,37 +139,37 @@ export default async function InspectorProjectDetailPage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Project Details
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+        <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
           <div>
             <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Location</div>
-            <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "2px" }}>{project?.location_general ?? "—"}</div>
+            <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "2px" }}>{project?.location_general ?? "—"}</div>
           </div>
           <div>
             <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Deadline</div>
-            <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "2px" }}>
+            <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "2px" }}>
               {project?.deadline_at ? new Date(project.deadline_at).toLocaleDateString() : "—"}
             </div>
           </div>
         </div>
         {/* Inspection type + pricing */}
         {assignment.pricing_key && (
-          <div style={{ paddingTop: "12px", borderTop: "1px solid #B8D0E8", display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <div className="mob-col-stretch" style={{ paddingTop: "12px", borderTop: "1px solid #B8D0E8", display: "flex", gap: "16px", flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Inspection Type</div>
-              <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "2px", fontWeight: 600 }}>
+              <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "2px", fontWeight: 600 }}>
                 {upgradeStatus === "PAID" ? "Comprehensive" : assignment.pricing_key.replaceAll("_", " ")}
               </div>
             </div>
             {assignment.fee_charged_cents && (
               <div>
                 <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>Fee</div>
-                <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "2px" }}>
+                <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "2px" }}>
                   ${(assignment.fee_charged_cents / 100).toFixed(0)} paid
                   {upgradeStatus === "PAID" && (assignment as any).upgrade_fee_cents && (
                     <span style={{ color: "#1B4F8A" }}>
@@ -184,7 +184,7 @@ export default async function InspectorProjectDetailPage({
         {project?.description && (
           <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #B8D0E8" }}>
             <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>Description</div>
-            <div style={{ fontSize: "13px", color: "#0A1628", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{project.description}</div>
+            <div style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{project.description}</div>
           </div>
         )}
       </div>
@@ -464,7 +464,7 @@ export default async function InspectorProjectDetailPage({
                 borderRadius: "8px",
                 padding: "14px 16px",
                 fontSize: "13px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 lineHeight: 1.7,
                 whiteSpace: "pre-wrap",
               }}>
@@ -508,7 +508,7 @@ export default async function InspectorProjectDetailPage({
             borderRadius: "8px",
             padding: "16px",
             fontSize: "13px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             lineHeight: 1.7,
             whiteSpace: "pre-wrap",
           }}>
@@ -527,7 +527,7 @@ export default async function InspectorProjectDetailPage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>

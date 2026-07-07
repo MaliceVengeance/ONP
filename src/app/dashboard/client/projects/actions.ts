@@ -76,6 +76,7 @@ export async function updateDraftProject(projectId: string, formData: FormData) 
   const city = clean(formData.get("city"));
   const usState = clean(formData.get("us_state"));
   const zip_code = clean(formData.get("zip_code")) || null;
+  const target_start_date = clean(formData.get("target_start_date")) || null;
 
   if (!title || !category || !city || !usState) {
     throw new Error("Missing required fields.");
@@ -92,6 +93,7 @@ export async function updateDraftProject(projectId: string, formData: FormData) 
       city,
       location_general,
       zip_code,
+      target_start_date,
       updated_at: new Date().toISOString(),
     })
     .eq("id", projectId)
@@ -249,4 +251,80 @@ export async function repostProject(projectId: string) {
 
   // data is the new project UUID
   redirect(`/dashboard/client/projects/${data}`);
+}
+
+/**
+ * Save / update the client's pre-answered catalog questions on a project.
+ * Works on both draft and published projects.
+ */
+export async function updateProjectRfis(projectId: string, formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  // Ownership check (admins bypass)
+  const { data: proj } = await supabase
+    .from("projects")
+    .select("client_id")
+    .eq("id", projectId)
+    .maybeSingle();
+
+  if (!proj) throw new Error("Project not found.");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const isAdmin = (profile as any)?.role === "ADMIN";
+  if (!isAdmin && proj.client_id !== user.id) throw new Error("Not authorized.");
+
+  const now = new Date().toISOString();
+
+  // Fetch existing pre-answered RFIs for this project (contractor_id IS NULL)
+  const { data: existing } = await supabaseAdmin
+    .from("rfis")
+    .select("id, catalog_id")
+    .eq("project_id", projectId)
+    .is("contractor_id", null);
+
+  const existingMap = new Map<string, string>(); // catalog_id → rfi row id
+  (existing ?? []).forEach((r: any) => existingMap.set(r.catalog_id, r.id));
+
+  // Process every rfi_<catalog_id> field from the form
+  for (const [key, val] of formData.entries()) {
+    if (!key.startsWith("rfi_")) continue;
+    const catalogId = key.slice(4);
+    const value = typeof val === "string" ? val.trim() : "";
+    const existingId = existingMap.get(catalogId);
+
+    if (existingId && value) {
+      // Update existing answer
+      const { error } = await supabaseAdmin
+        .from("rfis")
+        .update({ response: value, responded_at: now })
+        .eq("id", existingId);
+      if (error) throw new Error(`Failed to update RFI: ${error.message}`);
+    } else if (existingId && !value) {
+      // Client cleared the answer — remove it
+      const { error } = await supabaseAdmin.from("rfis").delete().eq("id", existingId);
+      if (error) throw new Error(`Failed to delete RFI: ${error.message}`);
+    } else if (!existingId && value) {
+      // New answer
+      const { error } = await supabaseAdmin.from("rfis").insert({
+        project_id: projectId,
+        contractor_id: null,
+        catalog_id: catalogId,
+        question: null,
+        response: value,
+        status: "ANSWERED",
+        responded_at: now,
+        revision_number: 0,
+      });
+      if (error) throw new Error(`Failed to save answer: ${error.message}`);
+    }
+  }
+
+  redirect(`/dashboard/client/projects/${projectId}?qa=saved`);
 }

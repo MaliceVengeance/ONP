@@ -75,7 +75,7 @@ export default async function InspectorUpgradePayPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -131,7 +131,7 @@ export default async function InspectorUpgradePayPage({
         </p>
         <div
           style={{
-            background: "#0A1628",
+            background: "#1E3A8A",
             borderRadius: "8px",
             padding: "14px 16px",
             marginBottom: "16px",
@@ -162,7 +162,7 @@ export default async function InspectorUpgradePayPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "16px",
           }}
@@ -190,8 +190,8 @@ export default async function InspectorUpgradePayPage({
               fontWeight: 700,
             }}
           >
-            <span style={{ color: "#0A1628" }}>Total for Comprehensive Inspection</span>
-            <span style={{ color: "#0A1628" }}>{fmt(originalFee + upgradeFee)}</span>
+            <span style={{ color: "#1E3A8A" }}>Total for Comprehensive Inspection</span>
+            <span style={{ color: "#1E3A8A" }}>{fmt(originalFee + upgradeFee)}</span>
           </div>
         </div>
 

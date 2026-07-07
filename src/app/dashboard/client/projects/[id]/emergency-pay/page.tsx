@@ -86,7 +86,7 @@ export default async function EmergencyPayPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -208,7 +208,7 @@ export default async function EmergencyPayPage({
         >
           Project Summary
         </div>
-        <div style={{ fontSize: "16px", fontWeight: 600, color: "#0A1628", marginBottom: "4px" }}>
+        <div style={{ fontSize: "16px", fontWeight: 600, color: "#1E3A8A", marginBottom: "4px" }}>
           {(project as any).title}
         </div>
         <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
@@ -220,7 +220,7 @@ export default async function EmergencyPayPage({
       {/* Disclaimer */}
       <div
         style={{
-          background: "#0A1628",
+          background: "#1E3A8A",
           border: "1px solid #1B4F8A",
           borderRadius: "10px",
           padding: "18px 20px",

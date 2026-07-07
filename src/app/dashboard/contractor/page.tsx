@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
+import { SERVICE_AREA_LABEL } from "@/lib/serviceArea/launchZips";
 
 type AwardedRow = {
   project_id: string;
@@ -60,6 +62,14 @@ export default async function ContractorDashboard({
 
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
+  // Service area status
+  const { data: profileStatus } = await supabaseAdmin
+    .from("profiles")
+    .select("service_area_status, service_area_zip")
+    .eq("id", user.id)
+    .single();
+  const isOutOfArea = profileStatus?.service_area_status === "OUT_OF_AREA";
+
   const [
     { data: awardedData },
     { data: bidsData },
@@ -97,35 +107,97 @@ export default async function ContractorDashboard({
   const bidProjectIds = new Set(activeBids.map((b) => b.project_id));
   const unbidProjects = openProjects.filter((p) => !bidProjectIds.has(p.id));
 
+  // Fetch total unread messages across awarded projects
+  const awardedIds = awarded.map((a) => a.project_id);
+  let totalUnreadMessages = 0;
+
+  if (awardedIds.length > 0) {
+    const [{ data: msgs }, { data: reads }] = await Promise.all([
+      supabaseAdmin
+        .from("project_messages")
+        .select("project_id, sender_id, created_at")
+        .in("project_id", awardedIds)
+        .neq("sender_id", user.id),
+      supabaseAdmin
+        .from("project_message_reads")
+        .select("project_id, last_read_at")
+        .eq("user_id", user.id)
+        .in("project_id", awardedIds),
+    ]);
+
+    const readMap = new Map((reads ?? []).map((r: any) => [r.project_id, r.last_read_at]));
+    for (const msg of msgs ?? []) {
+      const m = msg as any;
+      const lastRead = readMap.get(m.project_id);
+      if (!lastRead || new Date(m.created_at) > new Date(lastRead)) {
+        totalUnreadMessages++;
+      }
+    }
+  }
+
   return (
     <div>
-      {/* Legal links bar */}
-      <div style={{
-        display: "flex",
-        gap: "8px",
-        justifyContent: "flex-end",
-        marginBottom: "16px",
-        flexWrap: "wrap",
-      }}>
-        {[
-          { label: "Terms of Service", href: "/terms" },
-          { label: "Terms (Legal)", href: "/terms/legal" },
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Privacy (Legal)", href: "/privacy/legal" },
-        ].map((l) => (
-          <Link key={l.href} href={l.href} style={{
-            fontSize: "11px",
-            color: "#1B4F8A",
-            textDecoration: "underline",
-            padding: "3px 8px",
-            border: "1px solid #B8D0E8",
-            borderRadius: "4px",
-            whiteSpace: "nowrap",
+
+      {/* Out-of-area banner */}
+      {isOutOfArea && (
+        <div style={{
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+          borderRadius: "10px",
+          padding: "14px 18px",
+          marginBottom: "20px",
+          fontSize: "13px",
+          color: "#92400E",
+          lineHeight: 1.6,
+        }}>
+          📍 <strong>You're on the waitlist for your area ({profileStatus?.service_area_zip ?? "unknown ZIP"}).</strong>{" "}
+          ONP currently serves {SERVICE_AREA_LABEL} only. We'll notify you when we expand to your region.
+          Subscription activation is unavailable until then. If you operate in El Paso or Las Cruces,{" "}
+          <Link href="/dashboard/contractor/profile" style={{ color: "#92400E", fontWeight: 600 }}>
+            update your ZIP in your profile
+          </Link>{" "}
+          or <a href="mailto:support@ournextproject.us" style={{ color: "#92400E", fontWeight: 600 }}>contact support</a> for manual verification.
+        </div>
+      )}
+
+      {/* Unread messages banner */}
+      {totalUnreadMessages > 0 && (
+        <Link href="/dashboard/contractor/bids" style={{ textDecoration: "none", display: "block", marginBottom: "20px" }}>
+          <div style={{
+            background: "#1E3A8A",
+            border: "1px solid #1B4F8A",
+            borderRadius: "10px",
+            padding: "14px 18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
           }}>
-            {l.label}
-          </Link>
-        ))}
-      </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "20px" }}>💬</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#FFFFFF" }}>
+                  {totalUnreadMessages} unread message{totalUnreadMessages !== 1 ? "s" : ""}
+                </div>
+                <div style={{ fontSize: "12px", color: "#7A9CC4", marginTop: "1px" }}>
+                  New messages on your awarded project{awarded.length !== 1 ? "s" : ""}
+                </div>
+              </div>
+            </div>
+            <span style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "4px 12px",
+              borderRadius: "20px",
+              background: "#C8102E",
+              color: "#FFFFFF",
+              whiteSpace: "nowrap",
+            }}>
+              View →
+            </span>
+          </div>
+        </Link>
+      )}
 
       {/* Welcome banner */}
       {showWelcome && (
@@ -204,7 +276,7 @@ export default async function ContractorDashboard({
               fontWeight: 700,
               fontSize: "22px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               marginBottom: "6px",
             }}>
               Get Started — It's Free
@@ -247,14 +319,14 @@ export default async function ContractorDashboard({
       )}
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Contractor Dashboard
@@ -362,7 +434,7 @@ export default async function ContractorDashboard({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#0A1628",
+              color: s.accent ? "#C8102E" : "#1E3A8A",
             }}>
               {s.count}
             </div>
@@ -374,7 +446,7 @@ export default async function ContractorDashboard({
       </div>
 
       {/* Quick links */}
-      <div style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
+      <div className="mob-wrap" style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
         {[
           { label: "My Pending Bids", href: "/dashboard/contractor/bids" },
           { label: "My Profile", href: "/dashboard/contractor/profile" },
@@ -426,7 +498,7 @@ export default async function ContractorDashboard({
                   cursor: "pointer",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                       {p.title ?? "Untitled Project"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
@@ -469,7 +541,7 @@ export default async function ContractorDashboard({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -478,7 +550,7 @@ export default async function ContractorDashboard({
         {openBids.length === 0 ? (
           <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No pending bids.{" "}
-            <Link href="/dashboard/contractor/projects" style={{ color: "#0A1628", textDecoration: "underline" }}>
+            <Link href="/dashboard/contractor/projects" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
               Browse open projects
             </Link>
           </div>
@@ -497,7 +569,7 @@ export default async function ContractorDashboard({
                   cursor: "pointer",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                       {b.project_title ?? "Untitled Project"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
@@ -510,7 +582,7 @@ export default async function ContractorDashboard({
                     )}
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#0A1628" }}>
+                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#1E3A8A" }}>
                       {fmtMoney(b.latest_amount_cents)}
                     </div>
                     <div style={{ fontSize: "11px", color: "#1B4F8A" }}>v{b.version_number}</div>
@@ -536,7 +608,7 @@ export default async function ContractorDashboard({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -556,7 +628,7 @@ export default async function ContractorDashboard({
                   cursor: "pointer",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                       {p.project_title ?? "Untitled Project"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>

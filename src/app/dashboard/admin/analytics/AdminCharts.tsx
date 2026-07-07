@@ -20,7 +20,7 @@ type Props = {
 };
 
 const tooltipStyle = {
-  background: "#0A1628",
+  background: "#1E3A8A",
   border: "1px solid #1B4F8A",
   borderRadius: "6px",
   color: "#F0F4FF",

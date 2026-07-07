@@ -127,14 +127,14 @@ export default async function AdminAnalyticsPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Analytics
@@ -258,7 +258,7 @@ export default async function AdminAnalyticsPage() {
       )}
 
       {/* Key stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginBottom: "24px" }}>
+      <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginBottom: "24px" }}>
         {[
           { label: "Total Users", value: stats.totalUsers, sub: `${stats.totalClients} clients • ${stats.totalContractors} contractors • ${stats.totalInspectors} inspectors` },
           { label: "Total Projects", value: stats.totalProjects, sub: `${stats.openProjects} open • ${stats.awardedProjects} awarded` },
@@ -274,7 +274,7 @@ export default async function AdminAnalyticsPage() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "40px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               lineHeight: 1,
               marginBottom: "4px",
             }}>
@@ -350,7 +350,7 @@ export default async function AdminAnalyticsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "8px",
         }}>
@@ -359,7 +359,7 @@ export default async function AdminAnalyticsPage() {
         <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "16px" }}>
           Coming soon — will track contractor subscriptions and inspector fees.
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
+        <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
           {[
             { label: "Standard Subscriptions", value: "—", note: "$200/mo per contractor" },
             { label: "Veteran Subscriptions", value: "—", note: "$150/mo per contractor" },

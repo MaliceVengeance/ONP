@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { stripe, PRICES } from "@/lib/stripe";
 
-export async function createCheckoutSession(planType: "standard" | "veteran") {
+export async function createCheckoutSession(planType: "standard" | "veteran", formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
   // Security check — verify veteran status server-side
@@ -19,6 +19,23 @@ export async function createCheckoutSession(planType: "standard" | "veteran") {
   }
 
   const priceId = planType === "veteran" ? PRICES.veteran : PRICES.standard;
+
+  // Optional coupon code
+  const couponCodeRaw = String(formData.get("coupon_code") ?? "").trim().toUpperCase();
+  let stripeCouponId: string | null = null;
+
+  if (couponCodeRaw) {
+    const { supabaseAdmin } = await import("@/lib/supabase/admin");
+    const { data: couponRow } = await supabaseAdmin
+      .from("coupon_codes")
+      .select("stripe_coupon_id, is_active")
+      .eq("code", couponCodeRaw)
+      .maybeSingle();
+
+    if (!couponRow) throw new Error(`Coupon code "${couponCodeRaw}" is not valid.`);
+    if (!couponRow.is_active) throw new Error(`Coupon code "${couponCodeRaw}" is no longer active.`);
+    stripeCouponId = couponRow.stripe_coupon_id;
+  }
 
   // Get or create Stripe customer
   const { data: existingSub } = await supabase
@@ -53,6 +70,7 @@ export async function createCheckoutSession(planType: "standard" | "veteran") {
       },
     ],
     mode: "subscription",
+    ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
     success_url: `https://www.ournextproject.us/dashboard/contractor?welcome=1`,
     cancel_url: `https://www.ournextproject.us/dashboard/contractor/subscribe?canceled=1`,
     metadata: {

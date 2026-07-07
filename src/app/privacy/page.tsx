@@ -7,7 +7,7 @@ const h2Style: React.CSSProperties = {
   fontWeight: 700,
   fontSize: "26px",
   letterSpacing: "1px",
-  color: "#0A1628",
+  color: "#1E3A8A",
   textTransform: "uppercase",
   margin: "0 0 6px 0",
 };
@@ -33,7 +33,7 @@ const liStyle: React.CSSProperties = {
 const subheadStyle: React.CSSProperties = {
   fontSize: "14px",
   fontWeight: 700,
-  color: "#0A1628",
+  color: "#1E3A8A",
   marginBottom: "8px",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
@@ -41,9 +41,9 @@ const subheadStyle: React.CSSProperties = {
 
 export default function PrivacyPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF", color: "#0A1628", fontFamily: "'Barlow', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", color: "#1E3A8A", fontFamily: "'Barlow', sans-serif" }}>
       {/* Header */}
-      <header style={{ background: "#0A1628", borderBottom: "2px solid #C8102E", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <header style={{ background: "#1E3A8A", borderBottom: "2px solid #C8102E", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/login" style={{ textDecoration: "none" }}>
           <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "26px", letterSpacing: "2px", color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
             <span>★</span> ONP
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
       <main style={{ maxWidth: "800px", margin: "0 auto", padding: "60px 24px 80px" }}>
         {/* Title */}
         <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "48px", color: "#0A1628", marginBottom: "8px", lineHeight: 1.1 }}>Privacy Policy</h1>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "48px", color: "#1E3A8A", marginBottom: "8px", lineHeight: 1.1 }}>Privacy Policy</h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", marginBottom: "20px" }} />
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}><strong>Our Next Project, LLC</strong></p>
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Effective: [EFFECTIVE DATE]</p>
@@ -214,7 +214,7 @@ export default function PrivacyPage() {
         <div style={sectionStyle}>
           <h2 style={h2Style}>Contact us</h2>
           <div style={dividerStyle} />
-          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#0A1628", lineHeight: 1.9 }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#1E3A8A", lineHeight: 1.9 }}>
             <strong>Our Next Project, LLC</strong><br />
             [BUSINESS ADDRESS]<br />
             <a href="mailto:support@ournextproject.us" style={{ color: "#1B4F8A" }}>support@ournextproject.us</a>

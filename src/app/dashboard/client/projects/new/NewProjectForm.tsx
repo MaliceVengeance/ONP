@@ -10,7 +10,7 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   background: "#FFFFFF",
   border: "1px solid #B8D0E8",
-  color: "#0A1628",
+  color: "#1E3A8A",
   borderRadius: "6px",
   padding: "10px 14px",
   fontFamily: "'Barlow', sans-serif",
@@ -29,27 +29,48 @@ const labelStyle: React.CSSProperties = {
   marginTop: "16px",
 };
 
+type RfiCatalogItem = { id: string; code: string; prompt: string };
+
+// Placeholder hints shown inside the pre-answer textareas for specific prompts
+const RFI_HINTS: Record<string, string> = {
+  "primary goals":
+    "e.g., Maximize rental yield, expand living space for a growing family, repair storm damage, modernize the kitchen…",
+  "plans or blueprints":
+    "e.g., We have full architectural drawings ready / No plans yet — design and engineering should be included in the proposal.",
+  "materials or finishes":
+    "e.g., Hardwood floors throughout, quartz countertops, prefer a specific paint brand or color palette…",
+};
+
+function getHint(prompt: string): string {
+  for (const [key, hint] of Object.entries(RFI_HINTS)) {
+    if (prompt.toLowerCase().includes(key)) return hint;
+  }
+  return "Leave blank to skip…";
+}
+
 interface Props {
   categories: string[];
   rateLimit: EmergencyRequestStatus;
+  rfiCatalog: RfiCatalogItem[];
 }
 
-export default function NewProjectForm({ categories, rateLimit }: Props) {
+export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Props) {
   const [isEmergency, setIsEmergency] = useState(false);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [showRfi, setShowRfi] = useState(false);
   const canUseEmergency = rateLimit.remaining > 0;
 
   return (
     <div style={{ maxWidth: "600px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             New Project
@@ -105,7 +126,7 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
             ))}
           </select>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+          <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
             <div>
               <label style={labelStyle}>City</label>
               <input name="city" style={inputStyle} placeholder="e.g. Phoenix" required />
@@ -128,6 +149,95 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
             rows={6}
           />
 
+          <label style={labelStyle}>Target Start Date</label>
+          <input
+            type="date"
+            name="target_start_date"
+            style={inputStyle}
+          />
+          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+            When do you hope to begin work? (Optional — helps contractors plan availability)
+          </p>
+
+          {/* ── Optional: Pre-Answer Common Questions ──────────── */}
+          {rfiCatalog.length > 0 && (
+            <div style={{ marginTop: "20px" }}>
+              <button
+                type="button"
+                onClick={() => setShowRfi(!showRfi)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: showRfi ? "#1B4F8A" : "transparent",
+                  color: showRfi ? "#FFFFFF" : "#1B4F8A",
+                  border: "1px solid #1B4F8A",
+                  borderRadius: "6px",
+                  padding: "9px 16px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span>📋 Pre-answer common contractor questions (optional)</span>
+                <span style={{ fontSize: "11px", opacity: 0.8 }}>
+                  {showRfi ? "▲ Hide" : "▼ Show"}
+                </span>
+              </button>
+
+              {showRfi && (
+                <div style={{
+                  background: "#F0F6FF",
+                  border: "1px solid #B8D0E8",
+                  borderRadius: "0 0 10px 10px",
+                  borderTop: "none",
+                  padding: "20px",
+                }}>
+                  {/* Advisory notice */}
+                  <div style={{
+                    background: "#FFF7ED",
+                    border: "1px solid #FCD34D",
+                    borderRadius: "8px",
+                    padding: "12px 14px",
+                    marginBottom: "16px",
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "flex-start",
+                  }}>
+                    <span style={{ fontSize: "18px", flexShrink: 0 }}>⚠️</span>
+                    <div>
+                      <div style={{ fontSize: "12px", fontWeight: 700, color: "#92400E", marginBottom: "3px" }}>
+                        Unanswered questions can lead to higher bids
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#92400E", lineHeight: 1.5 }}>
+                        Contractors price in uncertainty. The more honestly and thoroughly you answer here, the more accurate and competitive their bids will be.
+                      </div>
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: "12px", color: "#1B4F8A", margin: "0 0 4px", lineHeight: 1.6 }}>
+                    These answers are visible to all bidding contractors immediately. All fields are optional but strongly encouraged.
+                  </p>
+                  {rfiCatalog.map((item) => (
+                    <div key={item.id}>
+                      <label style={{ ...labelStyle, marginTop: "14px", color: "#1E3A8A" }}>
+                        {item.prompt}
+                      </label>
+                      <textarea
+                        name={`rfi_${item.id}`}
+                        style={{ ...inputStyle, minHeight: "72px", resize: "vertical" }}
+                        placeholder={getHint(item.prompt)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Files tip */}
           <div style={{
             background: "#F0F6FF",
@@ -141,7 +251,7 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
           }}>
             <span style={{ fontSize: "20px", flexShrink: 0 }}>📁</span>
             <div>
-              <div style={{ fontSize: "13px", fontWeight: 600, color: "#0A1628", marginBottom: "3px" }}>
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "#1E3A8A", marginBottom: "3px" }}>
                 You can add photos and documents after creating your draft
               </div>
               <div style={{ fontSize: "12px", color: "#1B4F8A", lineHeight: 1.5 }}>
@@ -198,7 +308,7 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
                 style={{ marginTop: "3px", accentColor: "#1B4F8A" }}
               />
               <div>
-                <div style={{ fontWeight: 600, fontSize: "14px", color: "#0A1628", marginBottom: "2px" }}>
+                <div style={{ fontWeight: 600, fontSize: "14px", color: "#1E3A8A", marginBottom: "2px" }}>
                   Standard Bid Request — Free
                 </div>
                 <div style={{ fontSize: "12px", color: "#4A7FB5", lineHeight: 1.5 }}>
@@ -260,7 +370,7 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
           {isEmergency && (
             <div style={{ marginTop: "16px" }}>
               <div style={{
-                background: "#0A1628",
+                background: "#1E3A8A",
                 border: "1px solid #C2410C",
                 borderRadius: "10px",
                 padding: "18px 20px",
@@ -314,7 +424,7 @@ export default function NewProjectForm({ categories, rateLimit }: Props) {
           )}
 
           {/* Submit */}
-          <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
+          <div className="mob-wrap" style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
             <button
               type="submit"
               disabled={isEmergency && !disclaimerAccepted}

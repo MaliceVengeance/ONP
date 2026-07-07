@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
+import { SERVICE_AREA_LABEL } from "@/lib/serviceArea/launchZips";
 
 type Project = {
   id: string;
@@ -16,6 +17,14 @@ type Project = {
 
 export default async function ClientDashboard() {
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
+
+  // Service area status
+  const { data: profileStatus } = await supabaseAdmin
+    .from("profiles")
+    .select("service_area_status, service_area_zip")
+    .eq("id", user.id)
+    .single();
+  const isOutOfArea = profileStatus?.service_area_status === "OUT_OF_AREA";
 
   const { data, error } = await supabaseAdmin
     .from("projects")
@@ -32,40 +41,40 @@ export default async function ClientDashboard() {
   const needsAction = projects.filter((p) => ["BIDDING_CLOSED", "BIDS_UNLOCKED"].includes(p.state));
   const awarded = projects.filter((p) => p.state === "AWARDED");
 
+  // Fetch total unread messages across all awarded projects
+  const awardedIds = awarded.map((p) => p.id);
+  let totalUnreadMessages = 0;
+
+  if (awardedIds.length > 0) {
+    const [{ data: msgs }, { data: reads }] = await Promise.all([
+      supabaseAdmin
+        .from("project_messages")
+        .select("project_id, sender_id, created_at")
+        .in("project_id", awardedIds)
+        .neq("sender_id", user.id),
+      supabaseAdmin
+        .from("project_message_reads")
+        .select("project_id, last_read_at")
+        .eq("user_id", user.id)
+        .in("project_id", awardedIds),
+    ]);
+
+    const readMap = new Map((reads ?? []).map((r: any) => [r.project_id, r.last_read_at]));
+    for (const msg of msgs ?? []) {
+      const m = msg as any;
+      const lastRead = readMap.get(m.project_id);
+      if (!lastRead || new Date(m.created_at) > new Date(lastRead)) {
+        totalUnreadMessages++;
+      }
+    }
+  }
+
   return (
     <div>
-      {/* Legal links bar */}
-      <div style={{
-        display: "flex",
-        gap: "8px",
-        justifyContent: "flex-end",
-        marginBottom: "16px",
-        flexWrap: "wrap",
-      }}>
-        {[
-          { label: "Terms of Service", href: "/terms" },
-          { label: "Terms (Legal)", href: "/terms/legal" },
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Privacy (Legal)", href: "/privacy/legal" },
-        ].map((l) => (
-          <Link key={l.href} href={l.href} style={{
-            fontSize: "11px",
-            color: "#1B4F8A",
-            textDecoration: "underline",
-            padding: "3px 8px",
-            border: "1px solid #B8D0E8",
-            borderRadius: "4px",
-            whiteSpace: "nowrap",
-          }}>
-            {l.label}
-          </Link>
-        ))}
-      </div>
-
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#0A1628", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
             Client Dashboard
           </h1>
           <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
@@ -90,7 +99,7 @@ export default async function ClientDashboard() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
+      <div className="mob-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}>
         {[
           { label: "Drafts", count: drafts.length, accent: false },
           { label: "Open", count: open.length, accent: false },
@@ -108,7 +117,7 @@ export default async function ClientDashboard() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#0A1628",
+              color: s.accent ? "#C8102E" : "#1E3A8A",
             }}>
               {s.count}
             </div>
@@ -120,7 +129,7 @@ export default async function ClientDashboard() {
       </div>
 
 {/* Quick links */}
-      <div style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
+      <div className="mob-wrap" style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
         {[
           { label: "All Projects", href: "/dashboard/client/projects" },
           { label: "My Credits", href: "/dashboard/client/credits" },
@@ -144,6 +153,63 @@ export default async function ClientDashboard() {
         ))}
       </div>
 
+      {/* Out-of-area banner */}
+      {isOutOfArea && (
+        <div style={{
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+          borderRadius: "10px",
+          padding: "14px 18px",
+          marginBottom: "20px",
+          fontSize: "13px",
+          color: "#92400E",
+          lineHeight: 1.6,
+        }}>
+          📍 <strong>You're on the waitlist for your area ({profileStatus?.service_area_zip ?? "unknown ZIP"}).</strong>{" "}
+          ONP currently serves {SERVICE_AREA_LABEL} only. We'll notify you when we expand to your region.
+          Project posting is unavailable until then.
+        </div>
+      )}
+
+      {/* Unread messages banner */}
+      {totalUnreadMessages > 0 && (
+        <Link href="/dashboard/client/projects?tab=awarded" style={{ textDecoration: "none", display: "block", marginBottom: "20px" }}>
+          <div style={{
+            background: "#1E3A8A",
+            border: "1px solid #1B4F8A",
+            borderRadius: "10px",
+            padding: "14px 18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "20px" }}>💬</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: "14px", color: "#FFFFFF" }}>
+                  {totalUnreadMessages} unread message{totalUnreadMessages !== 1 ? "s" : ""}
+                </div>
+                <div style={{ fontSize: "12px", color: "#7A9CC4", marginTop: "1px" }}>
+                  New messages from your awarded project{awarded.length !== 1 ? "s" : ""}
+                </div>
+              </div>
+            </div>
+            <span style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "4px 12px",
+              borderRadius: "20px",
+              background: "#C8102E",
+              color: "#FFFFFF",
+              whiteSpace: "nowrap",
+            }}>
+              View →
+            </span>
+          </div>
+        </Link>
+      )}
+
       {/* Needs Action */}
       {needsAction.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
@@ -161,7 +227,7 @@ export default async function ClientDashboard() {
       {/* Recent Projects */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#0A1628", textTransform: "uppercase", margin: 0 }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", margin: 0 }}>
             Recent Projects
           </h2>
           <Link href="/dashboard/client/projects" style={{ fontSize: "13px", color: "#1B4F8A", textDecoration: "underline" }}>
@@ -176,7 +242,7 @@ export default async function ClientDashboard() {
         ) : projects.length === 0 ? (
           <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
             No projects yet.{" "}
-            <Link href="/dashboard/client/projects/new" style={{ color: "#0A1628", textDecoration: "underline" }}>
+            <Link href="/dashboard/client/projects/new" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
               Create your first project
             </Link>
           </div>
@@ -211,7 +277,7 @@ function ProjectCard({ p }: { p: Project }) {
         cursor: "pointer",
       }}>
         <div>
-          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
             {p.title ?? "Untitled"}
           </div>
           <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>

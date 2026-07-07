@@ -26,7 +26,7 @@ export default function ContractorBidDisclaimerPage() {
     fontWeight: 700,
     fontSize: "16px",
     letterSpacing: "1px",
-    color: "#0A1628",
+    color: "#1E3A8A",
     textTransform: "uppercase" as const,
     marginBottom: "6px",
     marginTop: "28px",
@@ -49,7 +49,7 @@ export default function ContractorBidDisclaimerPage() {
           fontWeight: 700,
           fontSize: "42px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: "16px 0 6px",
         }}>
           Contractor Bid Acknowledgment
@@ -178,7 +178,7 @@ export default function ContractorBidDisclaimerPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "18px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           marginBottom: "8px",
         }}>
           Questions about bidding?

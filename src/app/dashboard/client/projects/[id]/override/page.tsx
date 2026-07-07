@@ -27,7 +27,7 @@ export default async function ClientOverridePage({
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -46,7 +46,7 @@ export default async function ClientOverridePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Modify Deadline
@@ -85,13 +85,13 @@ export default async function ClientOverridePage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Current Deadline
         </h2>
-        <div style={{ fontSize: "24px", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, color: "#0A1628" }}>
+        <div style={{ fontSize: "24px", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, color: "#1E3A8A" }}>
           {deadline ? deadline.toLocaleDateString() : "—"}
         </div>
         <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
@@ -123,7 +123,7 @@ export default async function ClientOverridePage({
             Your deadline modification has been approved by an admin.
           </div>
           {approvedReason && (
-            <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "8px" }}>
+            <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "8px" }}>
               <span style={{ color: "#1B4F8A" }}>Reason: </span>
               {approvedReason}
             </div>
@@ -154,11 +154,11 @@ export default async function ClientOverridePage({
           <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
             Your request is being reviewed by an admin.
           </div>
-          <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "8px" }}>
+          <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "8px" }}>
             <span style={{ color: "#1B4F8A" }}>Submitted: </span>
             {new Date(project!.override_requested_at!).toLocaleDateString()}
           </div>
-          <div style={{ fontSize: "13px", color: "#0A1628", marginTop: "4px" }}>
+          <div style={{ fontSize: "13px", color: "#1E3A8A", marginTop: "4px" }}>
             <span style={{ color: "#1B4F8A" }}>Request: </span>
             {project!.override_requested_reason}
           </div>
@@ -178,7 +178,7 @@ export default async function ClientOverridePage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
@@ -221,7 +221,7 @@ export default async function ClientOverridePage({
                   style={{ marginTop: "2px", accentColor: "#1B4F8A" }}
                 />
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#0A1628", marginBottom: "2px" }}>
+                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1E3A8A", marginBottom: "2px" }}>
                     ⏰ Extend Deadline
                   </div>
                   <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
@@ -259,7 +259,7 @@ export default async function ClientOverridePage({
 
             {/* Emergency bid disclaimer */}
             <div style={{
-              background: "#0A1628",
+              background: "#1E3A8A",
               border: "1px solid #C8102E",
               borderRadius: "10px",
               padding: "18px 20px",

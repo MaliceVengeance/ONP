@@ -86,6 +86,7 @@ export default async function MasterInspectorDisputesPage({
     <div style={{ maxWidth: "800px" }}>
       {/* Header */}
       <div
+        className="mob-col mob-gap-sm"
         style={{
           display: "flex",
           alignItems: "flex-start",
@@ -100,7 +101,7 @@ export default async function MasterInspectorDisputesPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -203,7 +204,7 @@ export default async function MasterInspectorDisputesPage({
                       style={{
                         fontWeight: 700,
                         fontSize: "15px",
-                        color: "#0A1628",
+                        color: "#1E3A8A",
                         marginBottom: "4px",
                       }}
                     >

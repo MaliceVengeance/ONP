@@ -22,7 +22,7 @@ export default async function ForgotPasswordPage({
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <div style={{
           display: "inline-block",
-          background: "#0A1628",
+          background: "#1E3A8A",
           borderRadius: "12px",
           padding: "18px 36px 14px",
           marginBottom: "4px",
@@ -77,7 +77,7 @@ export default async function ForgotPasswordPage({
           fontWeight: 700,
           fontSize: "24px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           marginBottom: "8px",
           textAlign: "center",
         }}>
@@ -147,7 +147,7 @@ export default async function ForgotPasswordPage({
                   width: "100%",
                   background: "#FFFFFF",
                   border: "1px solid #B8D0E8",
-                  color: "#0A1628",
+                  color: "#1E3A8A",
                   borderRadius: "6px",
                   padding: "10px 14px",
                   fontFamily: "'Barlow', sans-serif",

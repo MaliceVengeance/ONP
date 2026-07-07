@@ -19,11 +19,17 @@ export async function saveContractorProfile(formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
   const business_name = clean(formData.get("business_name"));
+  const phone = clean(formData.get("phone"));
+  const address_line1 = clean(formData.get("address_line1"));
+  const address_line2 = clean(formData.get("address_line2"));
   const city = clean(formData.get("city"));
   const state = clean(formData.get("state"));
+  const address_zip = clean(formData.get("address_zip"));
   const description = clean(formData.get("description"));
   const categoriesText = String(formData.get("categories") ?? "").trim();
   const is_listed = formData.get("is_listed") === "on";
+  const has_no_license = formData.get("has_no_license") === "on";
+  const has_no_insurance = formData.get("has_no_insurance") === "on";
   const apply_veteran = formData.get("apply_veteran") === "on";
   const military_branch = clean(formData.get("military_branch"));
 
@@ -41,11 +47,17 @@ export async function saveContractorProfile(formData: FormData) {
   const payload: any = {
     contractor_id: user.id,
     business_name,
+    phone,
+    address_line1,
+    address_line2,
     city,
     state,
+    address_zip,
     description,
     categories,
     is_listed,
+    has_no_license,
+    has_no_insurance,
     military_branch,
     license_number,
     license_expiry: license_expiry || null,

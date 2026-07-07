@@ -104,7 +104,7 @@ export default async function InspectorFlagsPage() {
   const cellStyle: React.CSSProperties = {
     padding: "11px 12px",
     fontSize: "13px",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderBottom: "1px solid #EEF4FF",
     verticalAlign: "middle",
   };
@@ -116,7 +116,7 @@ export default async function InspectorFlagsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: 0,
         }}>
           Inspector Flag Dashboard
@@ -183,7 +183,7 @@ export default async function InspectorFlagsPage() {
                       </span>
                     </td>
                     <td style={cellStyle}>
-                      <span style={{ fontWeight: 600, color: insp.flags > 0 ? "#C8102E" : "#0A1628" }}>
+                      <span style={{ fontWeight: 600, color: insp.flags > 0 ? "#C8102E" : "#1E3A8A" }}>
                         {insp.flags}
                       </span>
                       <span style={{ color: "#4A7FB5" }}> / {insp.inspections}</span>

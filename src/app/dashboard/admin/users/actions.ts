@@ -1,12 +1,13 @@
 "use server";
 
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
 export async function changeUserRole(userId: string, newRole: string) {
-  const { supabase } = await requireRole(["ADMIN"]);
+  await requireRole(["ADMIN"]);
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("profiles")
     .update({ role: newRole })
     .eq("id", userId);
@@ -17,9 +18,9 @@ export async function changeUserRole(userId: string, newRole: string) {
 }
 
 export async function deactivateUser(userId: string) {
-  const { supabase } = await requireRole(["ADMIN"]);
+  await requireRole(["ADMIN"]);
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("profiles")
     .update({ deactivated: true })
     .eq("id", userId);
@@ -30,9 +31,9 @@ export async function deactivateUser(userId: string) {
 }
 
 export async function reactivateUser(userId: string) {
-  const { supabase } = await requireRole(["ADMIN"]);
+  await requireRole(["ADMIN"]);
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("profiles")
     .update({ deactivated: false })
     .eq("id", userId);

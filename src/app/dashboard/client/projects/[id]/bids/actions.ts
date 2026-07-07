@@ -9,7 +9,17 @@ function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
 }
 
-export async function awardBid(projectId: string, bidId: string) {
+export type BidReview = {
+  bidId: string;
+  rank: number;
+  note: string;
+};
+
+export async function awardBid(
+  projectId: string,
+  bidId: string,
+  reviews: BidReview[] = []
+) {
   const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
 
   // Fetch bid and project details before awarding
@@ -32,10 +42,43 @@ export async function awardBid(projectId: string, bidId: string) {
 
   if (error) throw wrapErr("rpc.award_project_bid", error);
 
+  // Save review rankings (server-side amount lookup — never trust client-sent values)
+  if (reviews.length > 0) {
+    const reviewedBidIds = reviews.map((r) => r.bidId);
+
+    const { data: bidVersions } = await supabaseAdmin
+      .from("bid_versions")
+      .select("bid_id, amount_cents, version_number")
+      .in("bid_id", reviewedBidIds)
+      .order("version_number", { ascending: false });
+
+    // Keep only the latest version per bid
+    const latestAmounts = new Map<string, number>();
+    (bidVersions ?? []).forEach((v: any) => {
+      if (!latestAmounts.has(v.bid_id)) latestAmounts.set(v.bid_id, v.amount_cents);
+    });
+
+    for (const review of reviews) {
+      const { error: rankErr } = await supabaseAdmin
+        .from("bids")
+        .update({
+          review_rank: review.rank,
+          review_note: review.note || null,
+          review_amount_cents: latestAmounts.get(review.bidId) ?? null,
+        })
+        .eq("id", review.bidId)
+        .eq("project_id", projectId);
+
+      if (rankErr) {
+        console.error(`Failed to save rank for bid ${review.bidId}:`, rankErr.message);
+      }
+    }
+  }
+
   // Send email to winning contractor
   try {
     if (bid?.contractor_id) {
-      const { data: contractorProfile } = await supabase
+      const { data: contractorProfile } = await supabaseAdmin
         .from("profiles")
         .select("display_name")
         .eq("id", bid.contractor_id)

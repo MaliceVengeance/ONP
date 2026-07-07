@@ -38,7 +38,7 @@ export default function ProjectFileLink({
 
   return (
     <div style={{
-      background: "#0A1628",
+      background: "#1E3A8A",
       border: "1px solid #1B4F8A",
       borderRadius: "8px",
       padding: "10px 14px",

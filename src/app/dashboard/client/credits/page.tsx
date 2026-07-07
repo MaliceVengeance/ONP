@@ -47,6 +47,7 @@ export default async function CreditsPage() {
     <div style={{ maxWidth: "680px" }}>
       {/* Header */}
       <div
+        className="mob-col mob-gap-sm"
         style={{
           display: "flex",
           alignItems: "flex-start",
@@ -61,7 +62,7 @@ export default async function CreditsPage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -91,7 +92,7 @@ export default async function CreditsPage() {
       {/* Balance card */}
       <div
         style={{
-          background: hasBalance ? "#0A1628" : "#EEF4FF",
+          background: hasBalance ? "#1E3A8A" : "#EEF4FF",
           border: `1px solid ${hasBalance ? "#1B4F8A" : "#B8D0E8"}`,
           borderRadius: "12px",
           padding: "28px 24px",
@@ -115,7 +116,7 @@ export default async function CreditsPage() {
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "60px",
-            color: hasBalance ? "#FFFFFF" : "#0A1628",
+            color: hasBalance ? "#FFFFFF" : "#1E3A8A",
             lineHeight: 1,
           }}
         >
@@ -145,7 +146,7 @@ export default async function CreditsPage() {
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -156,6 +157,7 @@ export default async function CreditsPage() {
             {available.map((c: any) => (
               <div
                 key={c.id}
+                className="mob-card-stack"
                 style={{
                   background: "#EEF4FF",
                   border: "1px solid #B8D0E8",
@@ -169,7 +171,7 @@ export default async function CreditsPage() {
               >
                 <div>
                   <div
-                    style={{ fontWeight: 600, fontSize: "14px", color: "#0A1628" }}
+                    style={{ fontWeight: 600, fontSize: "14px", color: "#1E3A8A" }}
                   >
                     {fmtSource(c.source)}
                   </div>
@@ -210,7 +212,7 @@ export default async function CreditsPage() {
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -221,6 +223,7 @@ export default async function CreditsPage() {
             {used.map((c: any) => (
               <div
                 key={c.id}
+                className="mob-card-stack"
                 style={{
                   background: "#F9FAFB",
                   border: "1px solid #E5E7EB",

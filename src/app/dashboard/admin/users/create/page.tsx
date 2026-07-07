@@ -14,7 +14,7 @@ export default async function CreateUserPage({
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -36,14 +36,14 @@ export default async function CreateUserPage({
   return (
     <div style={{ maxWidth: "500px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Create User

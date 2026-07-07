@@ -38,7 +38,7 @@ export default function BidDisclaimerPage() {
           fontWeight: 700,
           fontSize: "42px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: "16px 0 6px",
         }}>
           Bid Disclaimer
@@ -53,7 +53,7 @@ export default function BidDisclaimerPage() {
         All Bids submitted through the ONP Platform are estimates prepared by independent
         Contractors based solely on the information made available to them by the Client,
         including project descriptions, photographs, attached files, location data, and any
-        communications exchanged through the Platform. <strong style={{ color: "#0A1628" }}>
+        communications exchanged through the Platform. <strong style={{ color: "#1E3A8A" }}>
         Bids are not fixed-price quotations and do not constitute a binding contract for work
         or price</strong> unless and until the Client and the awarded Contractor enter into a
         separate written agreement off-Platform.
@@ -64,7 +64,7 @@ export default function BidDisclaimerPage() {
       </p>
 
       <p style={indentStyle}>
-        <strong style={{ color: "#0A1628" }}>(a)</strong> Contractors have not physically
+        <strong style={{ color: "#1E3A8A" }}>(a)</strong> Contractors have not physically
         inspected the project site at the time of bidding and may identify additional conditions,
         requirements, or scope upon site visit that materially affect final pricing, including
         but not limited to concealed damage, code compliance issues, access limitations, soil or
@@ -72,30 +72,30 @@ export default function BidDisclaimerPage() {
       </p>
 
       <p style={indentStyle}>
-        <strong style={{ color: "#0A1628" }}>(b)</strong> Contractors may, in the exercise of
+        <strong style={{ color: "#1E3A8A" }}>(b)</strong> Contractors may, in the exercise of
         their professional judgment, incorporate contingencies, allowances, or worst-case
         assumptions into their Bids to protect against underbidding, and such contingencies may
         cause Bids to exceed the Client's expectations of the most favorable possible price;
       </p>
 
       <p style={indentStyle}>
-        <strong style={{ color: "#0A1628" }}>(c)</strong> Material and labor costs are subject
+        <strong style={{ color: "#1E3A8A" }}>(c)</strong> Material and labor costs are subject
         to market fluctuation between the Bid date and the date work is performed;
       </p>
 
       <p style={indentStyle}>
-        <strong style={{ color: "#0A1628" }}>(d)</strong> Scope changes, additions, or
+        <strong style={{ color: "#1E3A8A" }}>(d)</strong> Scope changes, additions, or
         modifications requested by the Client after the project is awarded will typically result
         in adjusted pricing;
       </p>
 
       <p style={indentStyle}>
-        <strong style={{ color: "#0A1628" }}>(e)</strong> ONP does not verify, set, guarantee,
+        <strong style={{ color: "#1E3A8A" }}>(e)</strong> ONP does not verify, set, guarantee,
         or warrant the accuracy or completeness of any Bid; and
       </p>
 
       <p style={indentStyle}>
-        <strong style={{ color: "#0A1628" }}>(f)</strong> Clients are responsible for
+        <strong style={{ color: "#1E3A8A" }}>(f)</strong> Clients are responsible for
         negotiating and memorializing all pricing terms, including any cap, allowance structure,
         or change-order procedure, directly with the Contractor.
       </p>
@@ -113,7 +113,7 @@ export default function BidDisclaimerPage() {
           fontWeight: 700,
           fontSize: "20px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           marginBottom: "10px",
         }}>
           Inspector Services

@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createCheckoutSession, cancelSubscription } from "./actions";
+import { isProfileComplete, profileMissingFields } from "@/lib/contractor/profileComplete";
+import CouponInput from "./CouponInput";
+import { SERVICE_AREA_LABEL } from "@/lib/serviceArea/launchZips";
 
 export default async function ContractorSubscribePage({
   searchParams,
@@ -10,11 +14,22 @@ export default async function ContractorSubscribePage({
   const sp = await searchParams;
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
+  // Service area gate
+  const { data: profileStatus } = await supabaseAdmin
+    .from("profiles")
+    .select("service_area_status, service_area_zip")
+    .eq("id", user.id)
+    .single();
+  const isOutOfArea = profileStatus?.service_area_status === "OUT_OF_AREA";
+
   const { data: profile } = await supabase
     .from("contractor_profiles")
-    .select("business_name, veteran_verified, directory_verified")
+    .select("business_name, phone, categories, veteran_verified, directory_verified")
     .eq("contractor_id", user.id)
     .maybeSingle();
+
+  const profileComplete = isProfileComplete(profile as any);
+  const missingFields = profileMissingFields(profile as any);
 
   const { data: subscription } = await supabase
   .from("contractor_subscriptions")
@@ -57,14 +72,14 @@ export default async function ContractorSubscribePage({
   return (
     <div style={{ maxWidth: "600px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Subscription
@@ -158,7 +173,7 @@ export default async function ContractorSubscribePage({
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "28px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 marginBottom: "4px",
               }}>
                 {planLabel(subscription.plan_type)} Plan
@@ -187,7 +202,7 @@ export default async function ContractorSubscribePage({
               {subscription.current_period_end && (
                 <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
                   {subscription.status === "CANCELED" ? "Expires" : "Renews"}:{" "}
-                  <span style={{ color: "#0A1628" }}>
+                  <span style={{ color: "#1E3A8A" }}>
                     {fmtDate(subscription.current_period_end)}
                   </span>
                 </div>
@@ -271,9 +286,33 @@ export default async function ContractorSubscribePage({
         </div>
       )}
 
-      {/* Plans — show if no active sub */}
-      {!hasActiveSub && (
+      {/* Plans — show if no active sub AND profile is complete */}
+      {!hasActiveSub && profileComplete && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+
+          {/* Coupon code section */}
+          <div style={{
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "12px",
+            padding: "16px 20px",
+          }}>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "15px",
+              letterSpacing: "1px",
+              color: "#1E3A8A",
+              textTransform: "uppercase",
+              marginBottom: "8px",
+            }}>
+              Have a Coupon Code?
+            </div>
+            <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "10px" }}>
+              Enter your code below. It will be applied automatically when you click Subscribe.
+            </p>
+            <CouponInput />
+          </div>
 
           {/* Standard plan */}
           <div style={{
@@ -289,7 +328,7 @@ export default async function ContractorSubscribePage({
                   fontWeight: 700,
                   fontSize: "24px",
                   letterSpacing: "1px",
-                  color: "#0A1628",
+                  color: "#1E3A8A",
                   margin: 0,
                 }}>
                   Standard
@@ -303,7 +342,7 @@ export default async function ContractorSubscribePage({
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "36px",
-                  color: "#0A1628",
+                  color: "#1E3A8A",
                   lineHeight: 1,
                 }}>
                   $200
@@ -325,6 +364,7 @@ export default async function ContractorSubscribePage({
               ))}
             </div>
             <form action={createCheckoutSession.bind(null, "standard")}>
+              <input type="hidden" name="coupon_code" defaultValue="" />
               <button type="submit" style={{
                 width: "100%",
                 background: "#C8102E",
@@ -405,6 +445,7 @@ export default async function ContractorSubscribePage({
                 ))}
               </div>
               <form action={createCheckoutSession.bind(null, "veteran")}>
+                <input type="hidden" name="coupon_code" defaultValue="" />
                 <button type="submit" style={{
                   width: "100%",
                   background: "#D97706",
@@ -453,6 +494,92 @@ export default async function ContractorSubscribePage({
               </Link>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Profile incomplete gate */}
+      {!profileComplete && !hasActiveSub && (
+        <div style={{
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          borderRadius: "10px",
+          padding: "20px 24px",
+          marginBottom: "24px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "18px",
+            letterSpacing: "1px",
+            color: "#991B1B",
+            marginBottom: "8px",
+          }}>
+            Complete Your Profile First
+          </div>
+          <p style={{ fontSize: "13px", color: "#991B1B", lineHeight: 1.6, marginBottom: "14px" }}>
+            You must fill in your <strong>{missingFields.join(", ")}</strong> before subscribing.
+          </p>
+          <Link href="/dashboard/contractor/profile" style={{
+            background: "#C8102E",
+            color: "#fff",
+            padding: "10px 20px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 600,
+            fontSize: "13px",
+            textDecoration: "none",
+            display: "inline-block",
+          }}>
+            Complete My Profile →
+          </Link>
+        </div>
+      )}
+
+      {/* Out-of-area gate — blocks subscription */}
+      {isOutOfArea && (
+        <div style={{
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+          borderRadius: "12px",
+          padding: "24px",
+          marginBottom: "24px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            color: "#92400E",
+            marginBottom: "10px",
+          }}>
+            📍 Outside our current service area
+          </div>
+          <p style={{ fontSize: "13px", color: "#92400E", lineHeight: 1.6, marginBottom: "12px" }}>
+            Your business address ({profileStatus?.service_area_zip ?? "unknown ZIP"}) is outside our current service area.
+            ONP is currently serving <strong>{SERVICE_AREA_LABEL}</strong> only. We can't activate your subscription until we expand to your area.
+          </p>
+          <p style={{ fontSize: "13px", color: "#92400E", lineHeight: 1.6, marginBottom: "16px" }}>
+            If you operate in El Paso or Las Cruces but your business address is elsewhere,{" "}
+            <a href="mailto:support@ournextproject.us" style={{ color: "#92400E", fontWeight: 600 }}>
+              contact support
+            </a>{" "}
+            so we can verify your service area manually.
+          </p>
+          <Link
+            href="/login#waitlist"
+            style={{
+              display: "inline-block",
+              background: "#92400E",
+              color: "#fff",
+              padding: "9px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
+          >
+            Join the Expansion Waitlist →
+          </Link>
         </div>
       )}
 

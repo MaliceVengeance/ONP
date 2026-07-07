@@ -138,7 +138,7 @@ export default function FileUploader({
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "20px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           marginBottom: "6px",
         }}>
           {uploading ? "Uploading…" : "Click to upload files"}
@@ -228,7 +228,7 @@ export default function FileUploader({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
@@ -268,7 +268,7 @@ export default function FileUploader({
                   <div style={{ minWidth: 0 }}>
                     <div style={{
                       fontSize: "13px",
-                      color: "#0A1628",
+                      color: "#1E3A8A",
                       fontWeight: 500,
                       overflow: "hidden",
                       textOverflow: "ellipsis",

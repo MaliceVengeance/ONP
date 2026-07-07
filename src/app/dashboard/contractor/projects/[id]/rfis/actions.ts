@@ -71,7 +71,7 @@ export async function submitRfi(projectId: string, formData: FormData) {
       .single();
 
     if (project) {
-      const { data: clientProfile } = await supabase
+      const { data: clientProfile } = await supabaseAdmin
         .from("profiles")
         .select("display_name")
         .eq("id", project.client_id)

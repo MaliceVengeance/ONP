@@ -65,6 +65,7 @@ export default async function AdminInspectorRequestsPage() {
     <div>
       {/* Header */}
       <div
+        className="mob-col mob-gap-sm"
         style={{
           display: "flex",
           alignItems: "center",
@@ -81,7 +82,7 @@ export default async function AdminInspectorRequestsPage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -92,7 +93,7 @@ export default async function AdminInspectorRequestsPage() {
             {assigned.length} assigned · {completed.length} completed
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
           <Link
             href="/dashboard/admin/inspector-revenue"
             style={{
@@ -135,7 +136,7 @@ export default async function AdminInspectorRequestsPage() {
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: needsAssignment.length > 0 ? "#92400E" : "#0A1628",
+            color: needsAssignment.length > 0 ? "#92400E" : "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}
@@ -171,6 +172,7 @@ export default async function AdminInspectorRequestsPage() {
                   }}
                 >
                   <div
+                    className="mob-col mob-gap-sm"
                     style={{
                       display: "flex",
                       alignItems: "flex-start",
@@ -184,7 +186,7 @@ export default async function AdminInspectorRequestsPage() {
                         style={{
                           fontWeight: 600,
                           fontSize: "15px",
-                          color: "#0A1628",
+                          color: "#1E3A8A",
                           marginBottom: "3px",
                         }}
                       >
@@ -259,13 +261,13 @@ export default async function AdminInspectorRequestsPage() {
                   </div>
 
                   <form action={assignInspector.bind(null, r.id)}>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <div className="mob-col-stretch" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                       <select
                         name="inspector_id"
                         style={{
                           background: "#FFFFFF",
                           border: "1px solid #B8D0E8",
-                          color: "#0A1628",
+                          color: "#1E3A8A",
                           borderRadius: "6px",
                           padding: "8px 12px",
                           fontFamily: "'Barlow', sans-serif",
@@ -318,7 +320,7 @@ export default async function AdminInspectorRequestsPage() {
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -331,6 +333,7 @@ export default async function AdminInspectorRequestsPage() {
               return (
                 <div
                   key={r.id}
+                  className="mob-card-stack"
                   style={{
                     background: "#EEF4FF",
                     border: "1px solid #B8D0E8",
@@ -344,7 +347,7 @@ export default async function AdminInspectorRequestsPage() {
                 >
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}
+                      style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}
                     >
                       {(p as any)?.title ?? "Untitled"}
                     </div>
@@ -389,7 +392,7 @@ export default async function AdminInspectorRequestsPage() {
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -402,6 +405,7 @@ export default async function AdminInspectorRequestsPage() {
               return (
                 <div
                   key={r.id}
+                  className="mob-card-stack"
                   style={{
                     background: "#EEF4FF",
                     border: "1px solid #B8D0E8",
@@ -414,7 +418,7 @@ export default async function AdminInspectorRequestsPage() {
                 >
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}
+                      style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}
                     >
                       {(p as any)?.title ?? "Untitled"}
                     </div>
@@ -481,6 +485,7 @@ export default async function AdminInspectorRequestsPage() {
               return (
                 <div
                   key={r.id}
+                  className="mob-card-stack"
                   style={{
                     background: "#EEF4FF",
                     border: "1px solid #B8D0E8",
@@ -494,7 +499,7 @@ export default async function AdminInspectorRequestsPage() {
                 >
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}
+                      style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}
                     >
                       {(p as any)?.title ?? "Untitled"}
                     </div>

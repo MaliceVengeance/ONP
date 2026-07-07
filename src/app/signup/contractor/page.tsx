@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { processSignupServiceArea } from "@/lib/serviceArea/actions";
 
 export default function SignupContractorPage() {
   const supabase = createSupabaseBrowserClient();
@@ -12,13 +13,14 @@ export default function SignupContractorPage() {
   const [businessName, setBusinessName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [zip, setZip] = useState("");
   const [typedName, setTypedName] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const nameMatches = typedName.trim().toLowerCase() === businessName.trim().toLowerCase();
-  const canSubmit = businessName.trim() && email && password.length >= 8 && nameMatches && termsChecked;
+  const canSubmit = businessName.trim() && email && password.length >= 8 && zip.trim().length >= 5 && nameMatches && termsChecked;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +36,7 @@ export default function SignupContractorPage() {
           data: {
             display_name: businessName.trim() || "Contractor",
             signup_role: "CONTRACTOR",
+            service_area_zip: zip.trim().slice(0, 5),
             bid_disclaimer_agreed: true,
             bid_disclaimer_version: "v1.0-2026-05-25",
           },
@@ -47,7 +50,14 @@ export default function SignupContractorPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // Set service_area_status and auto-enroll waitlist if out-of-area
+      const { inArea } = await processSignupServiceArea(data.user!.id, zip, email, "CONTRACTOR");
+
+      if (!inArea) {
+        router.push(`/signup/out-of-area?zip=${encodeURIComponent(zip.trim().slice(0, 5))}`);
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setMsg(err?.message ?? "Signup failed");
     } finally {
@@ -59,7 +69,7 @@ export default function SignupContractorPage() {
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -97,7 +107,7 @@ export default function SignupContractorPage() {
         <div style={{ textAlign: "center", marginBottom: "8px" }}>
           <div style={{
             display: "inline-block",
-            background: "#0A1628",
+            background: "#1E3A8A",
             borderRadius: "12px",
             padding: "14px 28px 10px",
           }}>
@@ -117,13 +127,26 @@ export default function SignupContractorPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "28px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           letterSpacing: "1px",
           textAlign: "center",
           marginBottom: "4px",
         }}>
           Contractor Sign Up
         </h1>
+
+        {/* Service area notice */}
+        <div style={{
+          background: "#DBEAFE",
+          border: "1px solid #93C5FD",
+          borderRadius: "8px",
+          padding: "10px 14px",
+          fontSize: "12px",
+          color: "#1E40AF",
+          lineHeight: 1.5,
+        }}>
+          📍 ONP is currently serving <strong>El Paso, TX and Las Cruces, NM</strong>. Out-of-area? You can still sign up and join the waitlist.
+        </div>
 
         {/* Account fields */}
         <div style={{
@@ -141,7 +164,7 @@ export default function SignupContractorPage() {
               style={inputStyle}
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="Your company name"
+              placeholder="Your business name"
               required
             />
           </div>
@@ -171,6 +194,21 @@ export default function SignupContractorPage() {
               Minimum 8 characters
             </div>
           </div>
+
+          <div>
+            <label style={labelStyle}>Business ZIP Code</label>
+            <input
+              style={inputStyle}
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
+              required
+              maxLength={10}
+              placeholder="e.g. 79912"
+            />
+            <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+              Used to verify service area coverage.
+            </div>
+          </div>
         </div>
 
         {/* Formal disclaimer */}
@@ -185,7 +223,7 @@ export default function SignupContractorPage() {
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}>
@@ -272,7 +310,7 @@ export default function SignupContractorPage() {
               onChange={(e) => setTermsChecked(e.target.checked)}
               style={{ marginTop: "2px", accentColor: "#1B4F8A", flexShrink: 0 }}
             />
-            <span style={{ fontSize: "12px", color: "#0A1628", lineHeight: 1.5 }}>
+            <span style={{ fontSize: "12px", color: "#1E3A8A", lineHeight: 1.5 }}>
               I have read and agree to the{" "}
               <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "#1B4F8A" }}>
                 Contractor Bid Acknowledgment
@@ -321,13 +359,13 @@ export default function SignupContractorPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
             Client?{" "}
-            <Link style={{ color: "#0A1628", textDecoration: "underline" }} href="/signup">
+            <Link style={{ color: "#1E3A8A", textDecoration: "underline" }} href="/signup">
               Sign up here
             </Link>
           </p>
           <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
             Already have an account?{" "}
-            <Link style={{ color: "#0A1628", textDecoration: "underline" }} href="/login">
+            <Link style={{ color: "#1E3A8A", textDecoration: "underline" }} href="/login">
               Log in
             </Link>
           </p>

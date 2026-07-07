@@ -73,7 +73,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                     style={{
                       fontWeight: 600,
                       fontSize: "14px",
-                      color: isSelected ? "#fff" : "#0A1628",
+                      color: isSelected ? "#fff" : "#1E3A8A",
                     }}
                   >
                     {opt.display_name}
@@ -131,7 +131,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "18px",
-                  color: isSelected ? "#fff" : "#0A1628",
+                  color: isSelected ? "#fff" : "#1E3A8A",
                   whiteSpace: "nowrap",
                   flexShrink: 0,
                 }}
@@ -174,7 +174,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontSize: "28px",
                 fontWeight: 700,
-                color: "#0A1628",
+                color: "#1E3A8A",
               }}
             >
               {formatFee(selectedOption.fee_cents)}
@@ -224,7 +224,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
           onChange={(e) => setDisclaimerChecked(e.target.checked)}
           style={{ marginTop: "3px", flexShrink: 0, accentColor: "#1B4F8A" }}
         />
-        <span style={{ fontSize: "13px", color: "#0A1628", lineHeight: 1.6 }}>
+        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6 }}>
           I have read and agree to the <strong>Inspector Request terms</strong>. I understand
           my inspection fee is non-refundable and the report will be shared with bidding
           contractors.

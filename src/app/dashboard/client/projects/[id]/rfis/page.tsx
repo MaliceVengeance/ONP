@@ -44,7 +44,7 @@ export default async function ClientRfiPage({
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -71,7 +71,7 @@ export default async function ClientRfiPage({
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Questions (RFIs)
@@ -223,7 +223,7 @@ export default async function ClientRfiPage({
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontSize: "13px",
-                      color: "#0A1628",
+                      color: "#1E3A8A",
                       marginBottom: "14px",
                       lineHeight: 1.6,
                     }}>
@@ -370,7 +370,7 @@ export default async function ClientRfiPage({
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontSize: "13px",
-                      color: "#0A1628",
+                      color: "#1E3A8A",
                       marginBottom: "12px",
                       lineHeight: 1.6,
                     }}>
@@ -394,7 +394,7 @@ export default async function ClientRfiPage({
                     borderRadius: "6px",
                     padding: "10px 14px",
                     fontSize: "13px",
-                    color: "#0A1628",
+                    color: "#1E3A8A",
                     lineHeight: 1.6,
                   }}>
                     <div style={{

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { processSignupServiceArea } from "@/lib/serviceArea/actions";
 
 export default function SignupClientPage() {
   const supabase = createSupabaseBrowserClient();
@@ -11,6 +12,7 @@ export default function SignupClientPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [zip, setZip] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -27,19 +29,26 @@ export default function SignupClientPage() {
           data: {
             display_name: displayName || "Client",
             signup_role: "CLIENT",
+            service_area_zip: zip.trim().slice(0, 5),
           },
         },
       });
 
       if (error) throw error;
 
-      // If email confirmations are ON, there may be no session yet.
       if (!data.session) {
         setMsg("Check your email to confirm your account, then log in.");
         return;
       }
 
-      router.push("/dashboard");
+      // Set service_area_status and auto-enroll waitlist if out-of-area
+      const { inArea } = await processSignupServiceArea(data.user!.id, zip, email, "CLIENT");
+
+      if (!inArea) {
+        router.push(`/signup/out-of-area?zip=${encodeURIComponent(zip.trim().slice(0, 5))}`);
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setMsg(err?.message ?? "Signup failed");
     } finally {
@@ -51,7 +60,7 @@ export default function SignupClientPage() {
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -93,10 +102,23 @@ export default function SignupClientPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "28px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           letterSpacing: "1px",
           marginBottom: "8px",
         }}>Client Sign Up</h1>
+
+        {/* Service area notice */}
+        <div style={{
+          background: "#DBEAFE",
+          border: "1px solid #93C5FD",
+          borderRadius: "8px",
+          padding: "10px 14px",
+          fontSize: "12px",
+          color: "#1E40AF",
+          lineHeight: 1.5,
+        }}>
+          📍 ONP is currently serving <strong>El Paso, TX and Las Cruces, NM</strong>. Out-of-area? You can still sign up and join the waitlist.
+        </div>
 
         <div>
           <label style={labelStyle}>Display name</label>
@@ -133,11 +155,26 @@ export default function SignupClientPage() {
           <p style={{ fontSize: "12px", color: "#4A7FB5", marginTop: "4px" }}>Minimum 8 characters.</p>
         </div>
 
+        <div>
+          <label style={labelStyle}>ZIP Code</label>
+          <input
+            style={inputStyle}
+            value={zip}
+            onChange={(e) => setZip(e.target.value)}
+            required
+            maxLength={10}
+            placeholder="e.g. 79912"
+          />
+          <p style={{ fontSize: "12px", color: "#4A7FB5", marginTop: "4px" }}>
+            Used to verify service area coverage.
+          </p>
+        </div>
+
         {msg && (
           <div style={{
-            background: "#FEF2F2",
-            border: "1px solid #FCA5A5",
-            color: "#991B1B",
+            background: msg.includes("Check your email") ? "#F0FDF4" : "#FEF2F2",
+            border: `1px solid ${msg.includes("Check your email") ? "#166534" : "#FCA5A5"}`,
+            color: msg.includes("Check your email") ? "#15803D" : "#991B1B",
             padding: "10px 14px",
             borderRadius: "6px",
             fontSize: "13px",
@@ -169,14 +206,14 @@ export default function SignupClientPage() {
 
         <p style={{ fontSize: "13px", color: "#1B4F8A" }}>
           Contractor?{" "}
-          <a style={{ color: "#0A1628", textDecoration: "underline" }} href="/signup/contractor">
+          <a style={{ color: "#1E3A8A", textDecoration: "underline" }} href="/signup/contractor">
             Sign up here
           </a>
         </p>
 
         <p style={{ fontSize: "13px", color: "#1B4F8A" }}>
           Already have an account?{" "}
-          <a style={{ color: "#0A1628", textDecoration: "underline" }} href="/login">
+          <a style={{ color: "#1E3A8A", textDecoration: "underline" }} href="/login">
             Log in
           </a>
         </p>

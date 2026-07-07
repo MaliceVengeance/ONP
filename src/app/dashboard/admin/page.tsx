@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 export default async function AdminDashboard() {
-  const { supabase, user } = await requireRole(["ADMIN"]);
+  const { user } = await requireRole(["ADMIN"]);
 
   const [
     { count: userCount },
@@ -16,17 +17,19 @@ export default async function AdminDashboard() {
     { count: openDisputeCount },
     { count: masterInspectorCount },
     { count: flaggedInspectorCount },
+    { count: waitlistCount },
   ] = await Promise.all([
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase.from("projects").select("id", { count: "exact", head: true }),
-    supabase.from("support_requests").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
-    supabase.from("contractor_profiles").select("id", { count: "exact", head: true }).eq("veteran_verified", false).not("veteran_applied_at", "is", null),
-    supabase.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
-    supabase.from("projects").select("id", { count: "exact", head: true }).not("override_requested_at", "is", null).eq("urgent_override", false),
-    supabase.from("emergency_request_log").select("id", { count: "exact", head: true }).eq("payment_status", "PAID").is("closed_at", null),
-    supabase.from("inspector_upgrade_disputes").select("id", { count: "exact", head: true }).in("status", ["SUBMITTED", "UNDER_REVIEW"]),
-    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_master_inspector", true),
-    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("upgrade_blocked", true).eq("role", "INSPECTOR"),
+    supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
+    supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
+    supabaseAdmin.from("support_requests").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
+    supabaseAdmin.from("contractor_profiles").select("id", { count: "exact", head: true }).eq("veteran_verified", false).not("veteran_applied_at", "is", null),
+    supabaseAdmin.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
+    supabaseAdmin.from("projects").select("id", { count: "exact", head: true }).not("override_requested_at", "is", null).eq("urgent_override", false),
+    supabaseAdmin.from("emergency_request_log").select("id", { count: "exact", head: true }).eq("payment_status", "PAID").is("closed_at", null),
+    supabaseAdmin.from("inspector_upgrade_disputes").select("id", { count: "exact", head: true }).in("status", ["SUBMITTED", "UNDER_REVIEW"]),
+    supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).eq("is_master_inspector", true),
+    supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).eq("upgrade_blocked", true).eq("role", "INSPECTOR"),
+    supabaseAdmin.from("service_area_waitlist").select("id", { count: "exact", head: true }).is("notified_at", null),
   ]);
 
   const inspectorFeatureEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
@@ -137,6 +140,22 @@ export default async function AdminDashboard() {
       accent: (flaggedInspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
     },
     {
+      title: "Expansion Waitlist",
+      description: "View and notify users waiting for ONP to expand to their area.",
+      href: "/dashboard/admin/waitlist",
+      stat: waitlistCount ?? 0,
+      statLabel: "unnotified",
+      accent: (waitlistCount ?? 0) > 0 ? "#C2410C" : "#1B4F8A",
+    },
+    {
+      title: "Coupon Codes",
+      description: "Generate free-month promo codes for contractors. Codes are created directly in Stripe.",
+      href: "/dashboard/admin/coupons",
+      stat: null,
+      statLabel: "promo codes",
+      accent: "#1B4F8A",
+    },
+    {
       title: "Platform Settings",
       description: `Feature flags & toggles. Inspector feature is currently ${inspectorFeatureEnabled ? "ON" : "OFF"}.`,
       href: "/dashboard/admin/settings",
@@ -148,41 +167,13 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      {/* Legal links bar */}
-      <div style={{
-        display: "flex",
-        gap: "8px",
-        justifyContent: "flex-end",
-        marginBottom: "16px",
-        flexWrap: "wrap",
-      }}>
-        {[
-          { label: "Terms of Service", href: "/terms" },
-          { label: "Terms (Legal)", href: "/terms/legal" },
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Privacy (Legal)", href: "/privacy/legal" },
-        ].map((l) => (
-          <Link key={l.href} href={l.href} style={{
-            fontSize: "11px",
-            color: "#1B4F8A",
-            textDecoration: "underline",
-            padding: "3px 8px",
-            border: "1px solid #B8D0E8",
-            borderRadius: "4px",
-            whiteSpace: "nowrap",
-          }}>
-            {l.label}
-          </Link>
-        ))}
-      </div>
-
       <div style={{ marginBottom: "32px" }}>
         <h1 style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "36px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: 0,
         }}>
           Admin Dashboard
@@ -192,30 +183,7 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: "10px", marginBottom: "28px", flexWrap: "wrap" }}>
-        {[
-          { label: "Terms of Service", href: "/terms" },
-          { label: "Terms (Legal)", href: "/terms/legal" },
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Privacy (Legal)", href: "/privacy/legal" },
-        ].map((l) => (
-          <Link key={l.href} href={l.href} style={{
-            background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
-            padding: "8px 18px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontWeight: 500,
-            fontSize: "13px",
-            textDecoration: "none",
-          }}>
-            {l.label}
-          </Link>
-        ))}
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
+      <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
         {cards.map((card) => (
           <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
             <div style={{
@@ -233,7 +201,7 @@ export default async function AdminDashboard() {
                     fontWeight: 700,
                     fontSize: "22px",
                     letterSpacing: "0.5px",
-                    color: "#0A1628",
+                    color: "#1E3A8A",
                     marginBottom: "6px",
                   }}>
                     {card.title}
@@ -247,7 +215,7 @@ export default async function AdminDashboard() {
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontWeight: 700,
                     fontSize: "40px",
-                    color: card.accent === "#C8102E" ? "#C8102E" : "#0A1628",
+                    color: card.accent === "#C8102E" ? "#C8102E" : "#1E3A8A",
                     lineHeight: 1,
                   }}>
                     {card.stat ?? "—"}

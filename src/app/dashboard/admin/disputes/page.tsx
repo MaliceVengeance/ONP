@@ -66,7 +66,7 @@ export default async function AdminDisputesPage() {
         fontFamily: "'Barlow Condensed', sans-serif",
         fontWeight: 700,
         fontSize: "36px",
-        color: accent ?? "#0A1628",
+        color: accent ?? "#1E3A8A",
         lineHeight: 1,
       }}>
         {value ?? 0}
@@ -92,7 +92,7 @@ export default async function AdminDisputesPage() {
   const cellStyle: React.CSSProperties = {
     padding: "11px 12px",
     fontSize: "13px",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderBottom: "1px solid #EEF4FF",
     verticalAlign: "middle",
   };
@@ -104,7 +104,7 @@ export default async function AdminDisputesPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: 0,
         }}>
           Dispute Oversight
@@ -173,7 +173,7 @@ export default async function AdminDisputesPage() {
                         {d.status.replace("RESOLVED_", "").replace("_", " ")}
                       </span>
                     </td>
-                    <td style={{ ...cellStyle, color: d.master_inspector_id ? "#0A1628" : "#9CA3AF", fontStyle: d.master_inspector_id ? "normal" : "italic" }}>
+                    <td style={{ ...cellStyle, color: d.master_inspector_id ? "#1E3A8A" : "#9CA3AF", fontStyle: d.master_inspector_id ? "normal" : "italic" }}>
                       {miName}
                     </td>
                     <td style={cellStyle}>{assignedDate}</td>

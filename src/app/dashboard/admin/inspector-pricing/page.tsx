@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import PricingTable from "./PricingTable";
+import { setAllInspectorPercent } from "./actions";
 
 export default async function AdminInspectorPricingPage() {
   await requireRole(["ADMIN"]);
@@ -41,7 +42,7 @@ export default async function AdminInspectorPricingPage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -72,6 +73,7 @@ export default async function AdminInspectorPricingPage() {
 
       {/* Summary cards */}
       <div
+        className="mob-grid-1"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
@@ -124,7 +126,7 @@ export default async function AdminInspectorPricingPage() {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "28px",
-                color: "#0A1628",
+                color: "#1E3A8A",
               }}
             >
               {card.value}
@@ -132,6 +134,80 @@ export default async function AdminInspectorPricingPage() {
             <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>{card.sub}</div>
           </div>
         ))}
+      </div>
+
+      {/* Quick percentage adjust panel */}
+      <div
+        style={{
+          background: "#F0FDF4",
+          border: "1px solid #166534",
+          borderRadius: "12px",
+          padding: "20px 24px",
+          marginBottom: "20px",
+        }}
+      >
+        <div style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: "16px",
+          letterSpacing: "1px",
+          color: "#15803D",
+          textTransform: "uppercase",
+          marginBottom: "6px",
+        }}>
+          Set Inspector Earnings %
+        </div>
+        <p style={{ fontSize: "12px", color: "#166534", lineHeight: 1.5, marginBottom: "14px" }}>
+          Enter a percentage and apply it to all pricing tiers at once. ONP keeps the remainder.
+          Currently the default is <strong>{priceRows[0]?.inspector_share_percent ?? "—"}%</strong> inspector / <strong>{100 - (priceRows[0]?.inspector_share_percent ?? 0)}%</strong> ONP.
+          Changes apply to new requests only — existing paid assignments are not affected.
+        </p>
+        <form action={setAllInspectorPercent} style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <input
+              name="percent"
+              type="number"
+              min="1"
+              max="99"
+              defaultValue={priceRows[0]?.inspector_share_percent ?? 65}
+              required
+              style={{
+                width: "70px",
+                background: "#FFFFFF",
+                border: "1px solid #166534",
+                color: "#1E3A8A",
+                borderRadius: "6px",
+                padding: "9px 12px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 700,
+                fontSize: "16px",
+                outline: "none",
+                textAlign: "center",
+              }}
+            />
+            <span style={{ fontSize: "16px", fontWeight: 700, color: "#15803D" }}>%</span>
+            <span style={{ fontSize: "13px", color: "#166534", marginLeft: "4px" }}>to inspector</span>
+          </div>
+          <button
+            type="submit"
+            style={{
+              background: "#15803D",
+              color: "#fff",
+              border: "none",
+              padding: "10px 22px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              cursor: "pointer",
+            }}
+          >
+            Apply to All Tiers
+          </button>
+        </form>
+        <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "10px" }}>
+          To adjust a single tier individually, click the <strong>Edit</strong> button on that tier below.
+        </p>
       </div>
 
       {/* Revenue split legend */}
@@ -148,8 +224,8 @@ export default async function AdminInspectorPricingPage() {
         }}
       >
         <strong>Revenue split:</strong> "Insp. %" is the inspector&apos;s share of the fee. ONP
-        keeps the remainder. Default is 65% inspector / 35% ONP. Changes take effect on the next
-        client request — existing paid assignments are not affected.
+        keeps the remainder. To adjust a single tier, click <strong>Edit</strong> on that row.
+        Changes take effect on the next client request — existing paid assignments are not affected.
       </div>
 
       {/* Pricing table */}

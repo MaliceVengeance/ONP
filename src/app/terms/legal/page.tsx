@@ -7,14 +7,14 @@ const h2Style: React.CSSProperties = {
   fontWeight: 700,
   fontSize: "24px",
   letterSpacing: "1px",
-  color: "#0A1628",
+  color: "#1E3A8A",
   textTransform: "uppercase",
   margin: "0 0 6px 0",
 };
 const h3Style: React.CSSProperties = {
   fontSize: "15px",
   fontWeight: 700,
-  color: "#0A1628",
+  color: "#1E3A8A",
   margin: "20px 0 8px 0",
 };
 const dividerStyle: React.CSSProperties = {
@@ -43,16 +43,16 @@ const liStyle: React.CSSProperties = {
 const capsStyle: React.CSSProperties = {
   fontSize: "13px",
   fontWeight: 700,
-  color: "#0A1628",
+  color: "#1E3A8A",
   lineHeight: 1.8,
   marginBottom: "12px",
 };
 
 export default function TermsLegalPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFFF", color: "#0A1628", fontFamily: "'Barlow', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", color: "#1E3A8A", fontFamily: "'Barlow', sans-serif" }}>
       {/* Header */}
-      <header style={{ background: "#0A1628", borderBottom: "2px solid #C8102E", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <header style={{ background: "#1E3A8A", borderBottom: "2px solid #C8102E", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/login" style={{ textDecoration: "none" }}>
           <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "26px", letterSpacing: "2px", color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
             <span>★</span> ONP
@@ -65,14 +65,14 @@ export default function TermsLegalPage() {
       <main style={{ maxWidth: "820px", margin: "0 auto", padding: "60px 24px 80px" }}>
         {/* Title */}
         <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "44px", color: "#0A1628", marginBottom: "8px", lineHeight: 1.1 }}>Terms of Service</h1>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "44px", color: "#1E3A8A", marginBottom: "8px", lineHeight: 1.1 }}>Terms of Service</h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", marginBottom: "20px" }} />
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}><strong>Our Next Project, LLC</strong></p>
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}>Effective Date: [EFFECTIVE DATE]</p>
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Last Updated: [LAST UPDATED DATE]</p>
           <p style={pStyle}>These Terms of Service (the &ldquo;<strong>Terms</strong>&rdquo;) constitute a binding legal agreement between you and <strong>Our Next Project, LLC</strong>, a Texas limited liability company (&ldquo;<strong>ONP</strong>&rdquo;), governing your access to and use of the website at ournextproject.us and related services (the &ldquo;<strong>Platform</strong>&rdquo;).</p>
           <p style={pStyle}>A plain-English summary is available <Link href="/terms" style={{ color: "#C8102E" }}>here</Link>. In the event of any conflict, <strong>these Terms control.</strong></p>
-          <div style={{ background: "#0A1628", borderRadius: "8px", padding: "16px 20px", fontSize: "13px", color: "#FFFFFF", fontWeight: 600, lineHeight: 1.7, marginBottom: "12px" }}>
+          <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "16px 20px", fontSize: "13px", color: "#FFFFFF", fontWeight: 600, lineHeight: 1.7, marginBottom: "12px" }}>
             BY CREATING AN ACCOUNT, ACCESSING, OR USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS AND BY OUR{" "}
             <Link href="/privacy/legal" style={{ color: "#B8D0E8" }}>PRIVACY POLICY</Link>.
             {" "}IF YOU DO NOT AGREE, DO NOT USE THE PLATFORM.
@@ -251,13 +251,13 @@ export default function TermsLegalPage() {
           <p style={pStyle}><strong>15.1 Agreement to Arbitrate.</strong> You and ONP agree that any Dispute arising out of or relating to these Terms, the Platform, or the Services will be resolved by <strong>binding individual arbitration</strong>, except as provided in Section 15.5.</p>
           <p style={pStyle}><strong>15.2 Rules.</strong> Administered by the <strong>American Arbitration Association (AAA)</strong> under its Consumer Arbitration Rules. The arbitrator&apos;s decision will be final and binding.</p>
           <p style={pStyle}><strong>15.3 Location.</strong> El Paso County, Texas, or by telephone/video conference where permitted.</p>
-          <div style={{ background: "#0A1628", borderRadius: "8px", padding: "14px 18px", marginBottom: "12px" }}>
+          <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "14px 18px", marginBottom: "12px" }}>
             <p style={{ fontSize: "13px", fontWeight: 700, color: "#FFFFFF", lineHeight: 1.8, margin: 0 }}>
               15.4 Class Action Waiver. YOU AND ONP MAY BRING CLAIMS ONLY IN AN INDIVIDUAL CAPACITY, NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY CLASS, COLLECTIVE, OR REPRESENTATIVE PROCEEDING.
             </p>
           </div>
           <p style={pStyle}><strong>15.5 Exceptions.</strong> Either party may bring: (a) individual actions in small claims court; and (b) claims for injunctive relief related to intellectual property or unauthorized platform access.</p>
-          <div style={{ background: "#0A1628", borderRadius: "8px", padding: "14px 18px", marginBottom: "12px" }}>
+          <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "14px 18px", marginBottom: "12px" }}>
             <p style={{ fontSize: "13px", fontWeight: 700, color: "#FFFFFF", lineHeight: 1.8, margin: 0 }}>15.6 Jury Trial Waiver. YOU AND ONP WAIVE ANY RIGHT TO TRIAL BY JURY.</p>
           </div>
           <p style={pStyle}><strong>15.7 Opt-Out.</strong> You may opt out within <strong>30 days</strong> of first agreeing by emailing support@ournextproject.us with your name, account email, and &ldquo;Arbitration Opt-Out.&rdquo; If you opt out, no other portion of these Terms is affected.</p>
@@ -309,7 +309,7 @@ export default function TermsLegalPage() {
           <p style={pStyle}><strong>20.5 Notices.</strong> ONP may provide notice via your registered email or via the Platform. Legal notices to ONP: support@ournextproject.us / [BUSINESS ADDRESS].</p>
           <p style={pStyle}><strong>20.6 Force Majeure.</strong> ONP is not liable for delays or failures caused by events beyond its reasonable control.</p>
           <h3 style={h3Style}>20.8 Contact</h3>
-          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#0A1628", lineHeight: 1.9 }}>
+          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#1E3A8A", lineHeight: 1.9 }}>
             <strong>Our Next Project, LLC</strong><br />
             [BUSINESS ADDRESS]<br />
             <a href="mailto:support@ournextproject.us" style={{ color: "#1B4F8A" }}>support@ournextproject.us</a>

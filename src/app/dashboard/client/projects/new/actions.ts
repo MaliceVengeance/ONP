@@ -6,9 +6,48 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getEmergencyRequestStatus } from "@/lib/emergency/rateLimit";
 import { CLIENT_EMERGENCY_REQUEST } from "@/lib/disclaimers/clientEmergencyRequest";
 import type { ProjectCategory } from "@/lib/projects/categories";
+import { isInServiceArea } from "@/lib/serviceArea/launchZips";
 
 function clean(v: FormDataEntryValue | null) {
   return String(v ?? "").trim();
+}
+
+/** Insert any pre-answered RFI fields (name="rfi_<catalog_id>") from the new-project form. */
+async function insertPreAnsweredRfis(projectId: string, formData: FormData) {
+  const now = new Date().toISOString();
+  const toInsert: {
+    project_id: string;
+    contractor_id: null;
+    catalog_id: string;
+    question: null;
+    response: string;
+    status: string;
+    responded_at: string;
+    revision_number: number;
+  }[] = [];
+
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith("rfi_") && typeof value === "string" && value.trim()) {
+      toInsert.push({
+        project_id: projectId,
+        contractor_id: null,
+        catalog_id: key.slice(4),
+        question: null,
+        response: value.trim(),
+        status: "ANSWERED",
+        responded_at: now,
+        revision_number: 0,
+      });
+    }
+  }
+
+  if (toInsert.length === 0) return;
+
+  const { error } = await supabaseAdmin.from("rfis").insert(toInsert);
+  if (error) {
+    // Non-fatal — project creation succeeds regardless
+    console.error("Failed to insert pre-answered RFIs:", error.message);
+  }
 }
 
 export async function createProject(formData: FormData) {
@@ -20,11 +59,17 @@ export async function createProject(formData: FormData) {
   const city = clean(formData.get("city"));
   const usState = clean(formData.get("us_state"));
   const zip_code = clean(formData.get("zip_code")) || null;
+  const target_start_date = clean(formData.get("target_start_date")) || null;
   const isEmergency = formData.get("is_emergency") === "true";
   const disclaimerAccepted = formData.get("emergency_disclaimer_accepted") === "on";
 
   if (!title || !category || !city || !usState) {
     throw new Error("Missing required fields.");
+  }
+
+  // Server-side service area check — trust nothing from the client
+  if (zip_code && !isInServiceArea(zip_code)) {
+    redirect(`/dashboard/client/projects/new?area_error=1&zip=${encodeURIComponent(zip_code.slice(0, 5))}`);
   }
 
   const location_general = `${city}, ${usState}`;
@@ -42,11 +87,13 @@ export async function createProject(formData: FormData) {
         city,
         location_general,
         zip_code,
+        target_start_date,
       })
       .select("id")
       .single();
 
     if (error) throw error;
+    await insertPreAnsweredRfis(data.id, formData);
     redirect(`/dashboard/client/projects/${data.id}`);
   }
 
@@ -78,6 +125,7 @@ export async function createProject(formData: FormData) {
       city,
       location_general,
       zip_code,
+      target_start_date,
     })
     .select("id")
     .single();
@@ -130,6 +178,8 @@ export async function createProject(formData: FormData) {
       .update({ project_id: projectId })
       .eq("id", bonusRow.id);
   }
+
+  await insertPreAnsweredRfis(projectId, formData);
 
   redirect(`/dashboard/client/projects/${projectId}/emergency-pay`);
 }

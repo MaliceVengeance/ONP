@@ -22,7 +22,7 @@ export default async function AdminSettingsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: 0,
         }}>
           Platform Settings
@@ -34,13 +34,13 @@ export default async function AdminSettingsPage() {
 
       {/* Inspector Feature Flag */}
       <div style={sectionStyle}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+        <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
           <div style={{ flex: 1 }}>
             <div style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "20px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               marginBottom: "6px",
             }}>
               Inspector Takeoff Feature

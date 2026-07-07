@@ -47,7 +47,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
         "Charge stands but client receives a credit. No flag added to inspector's record.",
       bg: "#EEF4FF",
       border: "#1B4F8A",
-      labelColor: "#0A1628",
+      labelColor: "#1E3A8A",
       descColor: "#1B4F8A",
     },
     {
@@ -69,7 +69,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
           style={{
             fontWeight: 700,
             fontSize: "13px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             marginBottom: "12px",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
@@ -106,7 +106,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
                   style={{
                     fontWeight: 700,
                     fontSize: "14px",
-                    color: decision === d.value ? d.labelColor : "#0A1628",
+                    color: decision === d.value ? d.labelColor : "#1E3A8A",
                   }}
                 >
                   {d.label}
@@ -142,7 +142,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
             style={{
               fontWeight: 700,
               fontSize: "13px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               marginBottom: "6px",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
@@ -168,7 +168,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "26px",
-                color: "#0A1628",
+                color: "#1E3A8A",
                 minWidth: "64px",
                 textAlign: "right",
               }}
@@ -200,7 +200,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
             display: "block",
             fontWeight: 700,
             fontSize: "13px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             marginBottom: "6px",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
@@ -228,7 +228,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
             padding: "12px 14px",
             fontSize: "13px",
             fontFamily: "'Barlow', sans-serif",
-            color: "#0A1628",
+            color: "#1E3A8A",
             background: "#FFFFFF",
             resize: "vertical",
             lineHeight: 1.6,

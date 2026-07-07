@@ -64,14 +64,23 @@ export default async function ContractorRfiPage({
   const rfiRows = (rfis ?? []) as unknown as RfiRow[];
   const askedCatalogIds = rfiRows.map((r) => r.catalog_id);
 
-  // "I have a specific question not covered above." is always available and always last
-  const OPEN_ENDED = "I have a specific question not covered above.";
-  const openEndedItem = catalogItems.find((c) => c.prompt === OPEN_ENDED);
-  const standardItems = catalogItems.filter((c) => c.prompt !== OPEN_ENDED);
-  const availableStandard = standardItems.filter((c) => !askedCatalogIds.includes(c.id));
+  // Most catalog questions are pre-answered by the client in the RFP form.
+  // Only these contractor-specific prompts remain in the dropdown, plus open-ended.
+  const CONTRACTOR_ONLY_KEYWORDS = [
+    "additional photos of the area",
+    "clarify the scope of work for a specific area",
+  ];
+
+  const openEndedItem = catalogItems.find((c) =>
+    c.prompt.toLowerCase().includes("specific question not covered above")
+  );
+  const contractorItems = catalogItems.filter((c) =>
+    CONTRACTOR_ONLY_KEYWORDS.some((kw) => c.prompt.toLowerCase().includes(kw.toLowerCase())) &&
+    !askedCatalogIds.includes(c.id)
+  );
   const availableCatalog = openEndedItem
-    ? [...availableStandard, openEndedItem]
-    : availableStandard;
+    ? [...contractorItems, openEndedItem]
+    : contractorItems;
 
   const canSubmit = project.state === "OPEN";
 
@@ -80,7 +89,7 @@ export default async function ContractorRfiPage({
 
   const inputStyle = {
     width: "100%",
-    background: "#0A1628",
+    background: "#1E3A8A",
     border: "1px solid #1B4F8A",
     color: "#F0F4FF",
     borderRadius: "6px",
@@ -94,7 +103,7 @@ export default async function ContractorRfiPage({
   return (
     <div style={{ maxWidth: "680px" }}>
       {/* Header */}
-      <div style={{
+      <div className="mob-col mob-gap-sm" style={{
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",
@@ -171,7 +180,7 @@ export default async function ContractorRfiPage({
 
       {/* Platform rules */}
       <div style={{
-        background: "#0A1628",
+        background: "#1E3A8A",
         border: "1px solid #1B4F8A",
         borderRadius: "10px",
         padding: "14px 16px",
@@ -216,12 +225,12 @@ export default async function ContractorRfiPage({
             Ask a Question
           </h2>
           <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "16px" }}>
-            Select a question type. Answers are visible to all bidding contractors.
+            Have a question the client hasn't answered? Submit it here. Answers are visible to all bidding contractors.
           </p>
 
           {availableCatalog.length === 0 ? (
             <div style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center", padding: "16px 0" }}>
-              All available question types have already been asked on this project.
+              No question types are available at this time.
             </div>
           ) : (
             <form action={submitRfi.bind(null, projectId)}>
@@ -322,7 +331,7 @@ export default async function ContractorRfiPage({
             fontWeight: 700,
             padding: "3px 10px",
             borderRadius: "20px",
-            background: "#0A1628",
+            background: "#1E3A8A",
             color: "#7A9CC4",
             border: "1px solid #1B4F8A",
           }}>
@@ -386,7 +395,7 @@ export default async function ContractorRfiPage({
                 <div style={{ padding: "14px 16px" }}>
                   {r.question && (
                     <div style={{
-                      background: "#0A1628",
+                      background: "#1E3A8A",
                       border: "1px solid #1B4F8A",
                       borderRadius: "6px",
                       padding: "10px 14px",
@@ -449,7 +458,7 @@ export default async function ContractorRfiPage({
                 <div style={{ padding: "14px 16px" }}>
                   {r.question && (
                     <div style={{
-                      background: "#0A1628",
+                      background: "#1E3A8A",
                       border: "1px solid #1B4F8A",
                       borderRadius: "6px",
                       padding: "10px 14px",
@@ -465,7 +474,7 @@ export default async function ContractorRfiPage({
                     </div>
                   )}
                   <div style={{
-                    background: "#0A1628",
+                    background: "#1E3A8A",
                     border: "1px solid #166534",
                     borderRadius: "6px",
                     padding: "10px 14px",

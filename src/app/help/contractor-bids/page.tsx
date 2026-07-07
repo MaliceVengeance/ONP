@@ -19,7 +19,7 @@ export default function HelpContractorBidsPage() {
     fontWeight: 700,
     fontSize: "22px",
     letterSpacing: "1px",
-    color: "#0A1628",
+    color: "#1E3A8A",
     marginBottom: "10px",
   } as React.CSSProperties;
 
@@ -48,7 +48,7 @@ export default function HelpContractorBidsPage() {
           fontWeight: 700,
           fontSize: "42px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: "16px 0 8px",
         }}>
           Contractor Bidding Guide
@@ -68,23 +68,23 @@ export default function HelpContractorBidsPage() {
         <p style={{ ...bodyStyle, marginTop: "12px" }}>A few things to keep in mind:</p>
         <ul style={{ ...bodyStyle, paddingLeft: "20px", marginTop: "8px" }}>
           <li style={liStyle}>
-            <strong style={{ color: "#0A1628" }}>Build in appropriate contingencies.</strong> If
+            <strong style={{ color: "#1E3A8A" }}>Build in appropriate contingencies.</strong> If
             the information is thin, your bid should reflect that uncertainty. Don't price as if
             you've seen the job when you haven't.
           </li>
           <li style={liStyle}>
-            <strong style={{ color: "#0A1628" }}>Use RFIs.</strong> ONP's Request for Information
+            <strong style={{ color: "#1E3A8A" }}>Use RFIs.</strong> ONP's Request for Information
             feature lets you ask the Client clarifying questions before submitting. Use it. A
             5-minute RFI can save you thousands.
           </li>
           <li style={liStyle}>
-            <strong style={{ color: "#0A1628" }}>Check for an inspector report.</strong> Projects
+            <strong style={{ color: "#1E3A8A" }}>Check for an inspector report.</strong> Projects
             with an ONP Inspector report give you measurements, photos, and condition notes that
             dramatically improve your accuracy. Bid more confidently — and more competitively —
             on those.
           </li>
           <li style={{ ...liStyle, marginBottom: 0 }}>
-            <strong style={{ color: "#0A1628" }}>Request a site visit if needed.</strong> For larger
+            <strong style={{ color: "#1E3A8A" }}>Request a site visit if needed.</strong> For larger
             or complex projects, you can message the Client to arrange a walkthrough before submitting
             your final bid. Many Clients welcome this.
           </li>
@@ -96,12 +96,12 @@ export default function HelpContractorBidsPage() {
         <h2 style={h2Style}>Is my bid legally binding?</h2>
         <p style={bodyStyle}>
           Your bid is a good-faith offer to the Client. Once awarded, you and the Client should enter
-          into a <strong style={{ color: "#0A1628" }}>written contract</strong> that governs the actual
+          into a <strong style={{ color: "#1E3A8A" }}>written contract</strong> that governs the actual
           work, pricing, change-order process, payment schedule, warranties, and dispute resolution.
         </p>
         <p style={{ ...bodyStyle, marginTop: "10px" }}>
           Your contract with the Client — not the bid alone — is the binding document for performing
-          the work. <strong style={{ color: "#0A1628" }}>ONP is not a party to your agreement with the Client.</strong>
+          the work. <strong style={{ color: "#1E3A8A" }}>ONP is not a party to your agreement with the Client.</strong>
         </p>
       </div>
 

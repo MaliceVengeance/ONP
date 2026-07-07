@@ -72,7 +72,7 @@ export default async function InspectorPayPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               margin: 0,
             }}
           >
@@ -115,7 +115,7 @@ export default async function InspectorPayPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "16px",
           }}
@@ -135,7 +135,7 @@ export default async function InspectorPayPage({
           }}
         >
           <div>
-            <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "4px" }}>
+            <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "4px" }}>
               {(priceRow as any)?.display_name ??
                 (assignment as any).pricing_key?.replaceAll("_", " ") ??
                 "Inspection"}
@@ -151,7 +151,7 @@ export default async function InspectorPayPage({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "22px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               whiteSpace: "nowrap",
             }}
           >
@@ -165,7 +165,7 @@ export default async function InspectorPayPage({
             justifyContent: "space-between",
             fontSize: "14px",
             fontWeight: 700,
-            color: "#0A1628",
+            color: "#1E3A8A",
           }}
         >
           <span>Total due today</span>

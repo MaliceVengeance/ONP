@@ -42,14 +42,14 @@ export default async function InspectorDashboard() {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Inspector Dashboard
@@ -58,7 +58,7 @@ export default async function InspectorDashboard() {
             {user.email}
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
           {isMasterInspector && (
             <Link
               href="/dashboard/inspector/disputes"
@@ -99,7 +99,7 @@ export default async function InspectorDashboard() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginBottom: "28px" }}>
+      <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginBottom: "28px" }}>
         {[
           { label: "Assigned", count: active.length, accent: active.length > 0 },
           { label: "Pending", count: pending.length, accent: false },
@@ -116,7 +116,7 @@ export default async function InspectorDashboard() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#0A1628",
+              color: s.accent ? "#C8102E" : "#1E3A8A",
             }}>
               {s.count}
             </div>
@@ -134,7 +134,7 @@ export default async function InspectorDashboard() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -163,7 +163,7 @@ export default async function InspectorDashboard() {
                   href={`/dashboard/inspector/projects/${a.id}`}
                   style={{ textDecoration: "none" }}
                 >
-                  <div style={{
+                  <div className="mob-card-stack" style={{
                     background: "#EEF4FF",
                     border: "1px solid #B8D0E8",
                     borderRadius: "10px",
@@ -174,7 +174,7 @@ export default async function InspectorDashboard() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
                         {p.title ?? "Untitled"}
                       </div>
                       <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>

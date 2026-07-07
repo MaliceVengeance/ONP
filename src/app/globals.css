@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
-  --navy: #0A1628;
+  --navy: #1E3A8A;
   --navy-light: #EEF4FF;
   --navy-mid: #1B4F8A;
   --red: #C8102E;
@@ -12,6 +12,18 @@
   --text-muted: #1B4F8A;
   --border: #B8D0E8;
   --gold: #B45309;
+
+  /* ─── Camo system (Urban variant — ships this week; Desert/Jungle/Arctic are a documented fast-follow) ─── */
+  --camo-concrete: #E9EAEA;
+  --camo-paper: #F4F4F3;
+  --camo-steel: #9BA3A6;
+  --camo-gunmetal: #4B5054;
+  --camo-charcoal: #202326;
+  --camo-ink: #15171A;
+  /* Fixed identity threads — constant across all four camo variants */
+  --camo-accent: #FF9E1B;
+  --camo-accent-dim: #B8730F;
+  --camo-good: #5C8A6B;
 }
 
 * {
@@ -22,7 +34,7 @@
 
 html, body {
   background: #FFFFFF;
-  color: #0A1628;
+  color: #1E3A8A;
   font-family: 'Barlow', sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -33,7 +45,7 @@ h1, h2, h3, h4 {
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: #0A1628;
+  color: #1E3A8A;
 }
 
 a {
@@ -42,13 +54,13 @@ a {
 }
 
 a:hover {
-  color: #0A1628;
+  color: #1E3A8A;
 }
 
 input, textarea, select {
   background: #FFFFFF;
   border: 1px solid #B8D0E8;
-  color: #0A1628;
+  color: #1E3A8A;
   border-radius: 6px;
   padding: 8px 12px;
   font-family: 'Barlow', sans-serif;
@@ -78,7 +90,7 @@ input::placeholder, textarea::placeholder {
 
 select option {
   background: #FFFFFF;
-  color: #0A1628;
+  color: #1E3A8A;
 }
 
 button {
@@ -90,4 +102,66 @@ label {
   font-size: 13px;
   font-weight: 500;
   color: #1B4F8A;
+}
+
+/* ─── Responsive utilities ─── */
+@media (max-width: 640px) {
+  /* Stack flex rows vertically */
+  .mob-col {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .mob-col-stretch {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  /* Allow wrapping */
+  .mob-wrap {
+    flex-wrap: wrap !important;
+  }
+  /* Grid collapses */
+  .mob-grid-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .mob-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+  /* Full width elements */
+  .mob-full {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex-shrink: 1 !important;
+  }
+  /* Hide non-essential on mobile */
+  .mob-hide {
+    display: none !important;
+  }
+  /* Smaller heading on mobile */
+  .mob-h1 {
+    font-size: 26px !important;
+  }
+  /* Tighter spacing */
+  .mob-gap-sm {
+    gap: 8px !important;
+  }
+  .mob-p-sm {
+    padding: 12px !important;
+  }
+  /* Card rows that should stack */
+  .mob-card-stack {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  /* Right-aligned block becomes left-aligned */
+  .mob-left {
+    text-align: left !important;
+  }
+  /* Ensure selects and inputs fill their container on mobile */
+  .mob-full select,
+  .mob-full input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
 }

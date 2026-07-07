@@ -40,14 +40,14 @@ export default async function AdminSupportPage() {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Support Requests
@@ -80,7 +80,7 @@ export default async function AdminSupportPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: open.length > 0 ? "#991B1B" : "#0A1628",
+          color: open.length > 0 ? "#991B1B" : "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -130,9 +130,9 @@ function SupportCard({ r }: { r: SupportRequest }) {
       borderRadius: "10px",
       padding: "18px",
     }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 600, fontSize: "15px", color: "#0A1628", marginBottom: "3px" }}>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
             {r.subject ?? "No subject"}
           </div>
           {r.type && (

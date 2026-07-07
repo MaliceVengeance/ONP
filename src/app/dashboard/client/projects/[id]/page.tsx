@@ -3,24 +3,31 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
-import { updateDraftProject, publishProject, repostProject } from "../actions";
+import { updateDraftProject, publishProject, repostProject, updateProjectRfis } from "../actions";
 import DeleteProjectButton from "./DeleteProjectButton";
 import CountdownTimer from "@/components/CountdownTimer";
 import { stateBadge } from "@/lib/ui";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+import { sendClientMessage } from "./messages/actions";
+import { confirmCompletion, dismissCompletionRequest } from "./completion/actions";
 
 export default async function EditProjectPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ qa?: string; completed?: string }>;
 }) {
   const { user, role } = await requireRole(["CLIENT", "ADMIN"]);
   const { id } = await params;
+  const sp = await searchParams;
+  const qaSaved = sp.qa === "saved";
+  const justCompleted = sp.completed === "1";
 
   const { data: project, error } = await supabaseAdmin
     .from("projects")
     .select(
-      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency,client_id,inspector_hold_started_at"
+      "id,title,description,category,city,location_general,zip_code,state,deadline_at,published_at,max_open_days,emergency_bid_mode,is_emergency,client_id,inspector_hold_started_at,target_start_date,completion_requested_at"
     )
     .eq("id", id)
     .single();
@@ -55,6 +62,33 @@ export default async function EditProjectPage({
     .select("id", { count: "exact", head: true })
     .eq("project_id", id);
 
+  // Fetch catalog items (client-answerable) and existing pre-answers for this project
+  const CLIENT_EXCLUDED_KEYWORDS = [
+    "specific question not covered above",
+    "additional photos of the area",
+    "clarify the scope of work for a specific area",
+  ];
+  type CatalogItem = { id: string; code: string; prompt: string };
+
+  const [{ data: catalogRaw }, { data: existingRfisRaw }] = await Promise.all([
+    supabaseAdmin.from("rfi_catalog").select("id, code, prompt").order("code"),
+    supabaseAdmin
+      .from("rfis")
+      .select("id, catalog_id, response")
+      .eq("project_id", id)
+      .is("contractor_id", null),
+  ]);
+
+  const clientCatalog = ((catalogRaw ?? []) as CatalogItem[]).filter(
+    (c) => !CLIENT_EXCLUDED_KEYWORDS.some((kw) =>
+      c.prompt.toLowerCase().includes(kw.toLowerCase())
+    )
+  );
+
+  const existingAnswers = new Map<string, { rfiId: string; response: string | null }>();
+  ((existingRfisRaw ?? []) as { id: string; catalog_id: string; response: string | null }[])
+    .forEach((r) => existingAnswers.set(r.catalog_id, { rfiId: r.id, response: r.response }));
+
   const locParts = String(project.location_general ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -63,6 +97,8 @@ export default async function EditProjectPage({
   const defaultCity = project.city ?? locParts[0] ?? "";
   const defaultState = locParts[1] ?? "";
 
+  const completionRequestedAt: string | null = (project as any).completion_requested_at ?? null;
+
   const isDraft = project.state === "DRAFT";
   const isPendingPayment = project.state === "PENDING_PAYMENT";
   const isPublished = !isDraft && !isPendingPayment;
@@ -70,6 +106,51 @@ export default async function EditProjectPage({
     project.state === "DRAFT" ||
     project.state === "PENDING_PAYMENT" ||
     (project.state === "OPEN" && (bidCount ?? 0) === 0);
+
+  // Mark messages as read when client visits this page (AWARDED or COMPLETED)
+  if (["AWARDED", "COMPLETED"].includes(project.state)) {
+    await supabaseAdmin
+      .from("project_message_reads")
+      .upsert(
+        { project_id: id, user_id: user.id, last_read_at: new Date().toISOString() },
+        { onConflict: "project_id,user_id" }
+      );
+  }
+
+  // Fetch messages if project is AWARDED or COMPLETED
+  type MessageRow = {
+    id: string;
+    sender_id: string;
+    sender_role: string;
+    body: string;
+    created_at: string;
+    sender_name: string;
+  };
+  let projectMessages: MessageRow[] = [];
+
+  if (["AWARDED", "COMPLETED"].includes(project.state)) {
+    const { data: rawMessages } = await supabaseAdmin
+      .from("project_messages")
+      .select("id, sender_id, sender_role, body, created_at")
+      .eq("project_id", id)
+      .order("created_at", { ascending: true });
+
+    if (rawMessages && rawMessages.length > 0) {
+      const senderIds = [...new Set((rawMessages as any[]).map((m) => m.sender_id))];
+      const { data: senderProfiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", senderIds);
+
+      const nameMap = new Map<string, string>();
+      (senderProfiles ?? []).forEach((p: any) => nameMap.set(p.id, p.display_name || "ONP User"));
+
+      projectMessages = (rawMessages as any[]).map((m) => ({
+        ...m,
+        sender_name: nameMap.get(m.sender_id) ?? "ONP User",
+      }));
+    }
+  }
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
@@ -110,7 +191,7 @@ export default async function EditProjectPage({
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -132,14 +213,14 @@ export default async function EditProjectPage({
   return (
     <div style={{ maxWidth: "600px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             {isDraft ? "Edit Draft" : project.title ?? "Project"}
@@ -166,7 +247,7 @@ export default async function EditProjectPage({
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
           <form action={repostProject.bind(null, id)}>
             <button
               type="submit"
@@ -268,6 +349,86 @@ export default async function EditProjectPage({
           <p style={{ fontSize: "11px", color: "#9A6840", marginTop: "10px" }}>
             The "Convert to Standard" option is available on the payment page.
           </p>
+        </div>
+      )}
+
+      {/* Project completed confirmation banner */}
+      {justCompleted && (
+        <div style={{
+          background: "#F0FDF4",
+          border: "1px solid #166534",
+          color: "#15803D",
+          padding: "16px 20px",
+          borderRadius: "10px",
+          fontSize: "14px",
+          fontWeight: 600,
+          marginBottom: "20px",
+        }}>
+          🎉 Project marked as complete! Thank you for using ONP.
+        </div>
+      )}
+
+      {/* Completion request banner — shown when contractor signals work is done */}
+      {project.state === "AWARDED" && completionRequestedAt && (
+        <div style={{
+          background: "#F0FDF4",
+          border: "2px solid #166534",
+          borderRadius: "12px",
+          padding: "20px 24px",
+          marginBottom: "20px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            color: "#15803D",
+            marginBottom: "8px",
+          }}>
+            ✅ Your contractor has signaled work is complete
+          </div>
+          <p style={{ fontSize: "13px", color: "#166534", marginBottom: "16px", lineHeight: 1.6 }}>
+            Signaled on {new Date(completionRequestedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.
+            Confirm once you have verified the work is finished to close this project.
+          </p>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <form action={confirmCompletion.bind(null, id)}>
+              <button
+                type="submit"
+                style={{
+                  background: "#15803D",
+                  color: "#FFFFFF",
+                  border: "none",
+                  padding: "10px 24px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                ✓ Confirm Complete
+              </button>
+            </form>
+            <form action={dismissCompletionRequest.bind(null, id)}>
+              <button
+                type="submit"
+                style={{
+                  background: "transparent",
+                  color: "#166534",
+                  border: "1px solid #166534",
+                  padding: "10px 20px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 500,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                }}
+              >
+                Not Yet — Dismiss
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -402,7 +563,7 @@ export default async function EditProjectPage({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "16px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               marginBottom: "4px",
             }}>
               📁 Project Files
@@ -447,7 +608,7 @@ export default async function EditProjectPage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
@@ -486,7 +647,7 @@ export default async function EditProjectPage({
               ))}
             </select>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+            <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
               <div>
                 <label style={labelStyle}>City</label>
                 <input
@@ -526,6 +687,17 @@ export default async function EditProjectPage({
               rows={6}
             />
 
+            <label style={labelStyle}>Target Start Date</label>
+            <input
+              type="date"
+              name="target_start_date"
+              defaultValue={(project as any).target_start_date ?? ""}
+              style={inputStyle}
+            />
+            <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+              When do you hope to begin work? Visible to contractors.
+            </p>
+
             {isDraft && (
               <button
                 type="submit"
@@ -549,6 +721,137 @@ export default async function EditProjectPage({
         </form>
       </div>
 
+      {/* ── Project Q&A — client answers (editable at any time) ── */}
+      {clientCatalog.length > 0 && (
+        <div style={{
+          background: "#EEF4FF",
+          border: "1px solid #B8D0E8",
+          borderRadius: "12px",
+          padding: "24px",
+          marginBottom: "20px",
+        }}>
+          <h2 style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            letterSpacing: "1px",
+            color: "#1E3A8A",
+            textTransform: "uppercase",
+            marginBottom: "4px",
+          }}>
+            Project Questions
+          </h2>
+          <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px", lineHeight: 1.5 }}>
+            These answers are visible to all bidding contractors immediately. You can update them at any time — even after publishing.
+          </p>
+
+          {/* Advisory warning */}
+          <div style={{
+            background: "#FFF7ED",
+            border: "1px solid #FCD34D",
+            borderRadius: "8px",
+            padding: "12px 14px",
+            marginBottom: "20px",
+            display: "flex",
+            gap: "10px",
+            alignItems: "flex-start",
+          }}>
+            <span style={{ fontSize: "18px", flexShrink: 0 }}>⚠️</span>
+            <div style={{ fontSize: "12px", color: "#92400E", lineHeight: 1.5 }}>
+              <strong>Unanswered questions can lead to higher bids.</strong> Contractors price in uncertainty — the more thoroughly you answer, the more competitive their bids will be.
+            </div>
+          </div>
+
+          {/* Success banner */}
+          {qaSaved && (
+            <div style={{
+              background: "#F0FDF4",
+              border: "1px solid #166534",
+              color: "#15803D",
+              padding: "10px 14px",
+              borderRadius: "8px",
+              fontSize: "13px",
+              marginBottom: "16px",
+            }}>
+              ✅ Answers saved and visible to contractors.
+            </div>
+          )}
+
+          <form action={updateProjectRfis.bind(null, id)}>
+            {clientCatalog.map((item, idx) => {
+              const existing = existingAnswers.get(item.id);
+              const isAnswered = !!(existing?.response);
+              return (
+                <div key={item.id} style={{ marginTop: idx === 0 ? 0 : "18px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                    <label style={{
+                      display: "block",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#1E3A8A",
+                      lineHeight: 1.4,
+                    }}>
+                      {item.prompt}
+                    </label>
+                    {isAnswered && (
+                      <span style={{
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        padding: "2px 8px",
+                        borderRadius: "20px",
+                        background: "#F0FDF4",
+                        color: "#15803D",
+                        border: "1px solid #86EFAC",
+                        flexShrink: 0,
+                      }}>
+                        ✓ Answered
+                      </span>
+                    )}
+                  </div>
+                  <textarea
+                    name={`rfi_${item.id}`}
+                    defaultValue={existing?.response ?? ""}
+                    style={{
+                      width: "100%",
+                      background: "#FFFFFF",
+                      border: `1px solid ${isAnswered ? "#86EFAC" : "#B8D0E8"}`,
+                      color: "#1E3A8A",
+                      borderRadius: "6px",
+                      padding: "10px 14px",
+                      fontFamily: "'Barlow', sans-serif",
+                      fontSize: "13px",
+                      outline: "none",
+                      minHeight: "76px",
+                      resize: "vertical",
+                    }}
+                    placeholder="Leave blank to skip — contractors will see this as unanswered."
+                  />
+                </div>
+              );
+            })}
+
+            <button
+              type="submit"
+              style={{
+                marginTop: "20px",
+                background: "#1B4F8A",
+                color: "#FFFFFF",
+                border: "none",
+                padding: "10px 24px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer",
+                letterSpacing: "0.5px",
+              }}
+            >
+              Save Answers
+            </button>
+          </form>
+        </div>
+      )}
+
       {/* Publish controls */}
       {isPendingPayment ? null : isDraft ? (
         <div style={{
@@ -562,7 +865,7 @@ export default async function EditProjectPage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
@@ -573,7 +876,7 @@ export default async function EditProjectPage({
           </p>
 
           <form action={publishProject.bind(null, id)}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div className="mob-col-stretch mob-gap-sm" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <label style={{
                 fontSize: "11px",
                 fontWeight: 500,
@@ -590,7 +893,7 @@ export default async function EditProjectPage({
                 style={{
                   background: "#FFFFFF",
                   border: "1px solid #B8D0E8",
-                  color: "#0A1628",
+                  color: "#1E3A8A",
                   borderRadius: "6px",
                   padding: "8px 12px",
                   fontFamily: "'Barlow', sans-serif",
@@ -634,6 +937,218 @@ export default async function EditProjectPage({
           color: "#1B4F8A",
         }}>
           This project is published. Edits will trigger a revision workflow in a future update.
+        </div>
+      )}
+
+      {/* ── Post-Award Messages ── */}
+      {["AWARDED", "COMPLETED"].includes(project.state) && (
+        <div
+          id="messages"
+          style={{
+            background: "#EEF4FF",
+            border: "1px solid #B8D0E8",
+            borderRadius: "12px",
+            overflow: "hidden",
+            marginTop: "20px",
+          }}
+        >
+          {/* Section header */}
+          <div
+            style={{
+              background: "#1E3A8A",
+              padding: "14px 20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <span style={{ fontSize: "18px" }}>💬</span>
+            <div>
+              <div
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  letterSpacing: "1px",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                }}
+              >
+                Project Messages
+              </div>
+              <div style={{ fontSize: "11px", color: "#7A9CC4", marginTop: "1px" }}>
+                Private thread — visible only to you, the contractor, and ONP
+              </div>
+            </div>
+          </div>
+
+          {/* Message list */}
+          <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            {projectMessages.length === 0 ? (
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#4A7FB5",
+                  textAlign: "center",
+                  padding: "24px 0",
+                  fontStyle: "italic",
+                }}
+              >
+                No messages yet. Send the first message below.
+              </div>
+            ) : (
+              projectMessages.map((msg) => {
+                const isMe = msg.sender_id === user.id;
+                const roleBadgeColor =
+                  msg.sender_role === "CLIENT"
+                    ? { bg: "#EEF4FF", color: "#1B4F8A", border: "#B8D0E8" }
+                    : msg.sender_role === "ADMIN"
+                    ? { bg: "#FFF7ED", color: "#92400E", border: "#FCD34D" }
+                    : { bg: "#F0FDF4", color: "#15803D", border: "#86EFAC" };
+
+                return (
+                  <div
+                    key={msg.id}
+                    style={{
+                      display: "flex",
+                      flexDirection: isMe ? "row-reverse" : "row",
+                      gap: "10px",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxWidth: "80%",
+                        background: isMe ? "#1E3A8A" : "#FFFFFF",
+                        border: `1px solid ${isMe ? "#1B4F8A" : "#B8D0E8"}`,
+                        borderRadius: isMe ? "12px 2px 12px 12px" : "2px 12px 12px 12px",
+                        padding: "10px 14px",
+                      }}
+                    >
+                      {/* Sender + time */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "6px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            color: isMe ? "#B8D0E8" : "#1E3A8A",
+                          }}
+                        >
+                          {isMe ? "You" : msg.sender_name}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            padding: "1px 7px",
+                            borderRadius: "20px",
+                            background: roleBadgeColor.bg,
+                            color: roleBadgeColor.color,
+                            border: `1px solid ${roleBadgeColor.border}`,
+                          }}
+                        >
+                          {msg.sender_role === "ADMIN" ? "ONP" : msg.sender_role}
+                        </span>
+                        <span style={{ fontSize: "10px", color: isMe ? "#7A9CC4" : "#9CA3AF" }}>
+                          {new Date(msg.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}{" "}
+                          {new Date(msg.created_at).toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      {/* Body */}
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: isMe ? "#F0F4FF" : "#1E3A8A",
+                          lineHeight: 1.6,
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {msg.body}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Send form */}
+          <div
+            style={{
+              borderTop: "1px solid #B8D0E8",
+              padding: "16px 20px",
+              background: "#F8FBFF",
+            }}
+          >
+            <form action={sendClientMessage.bind(null, id)}>
+              <textarea
+                name="body"
+                required
+                maxLength={2000}
+                rows={3}
+                placeholder="Type your message…"
+                style={{
+                  width: "100%",
+                  background: "#FFFFFF",
+                  border: "1px solid #B8D0E8",
+                  color: "#1E3A8A",
+                  borderRadius: "6px",
+                  padding: "10px 14px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: "13px",
+                  outline: "none",
+                  resize: "vertical",
+                  boxSizing: "border-box",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: "10px",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                }}
+              >
+                <span style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                  Max 2,000 characters · Visible to contractor and ONP
+                </span>
+                <button
+                  type="submit"
+                  style={{
+                    background: "#1E3A8A",
+                    color: "#FFFFFF",
+                    border: "none",
+                    padding: "9px 22px",
+                    borderRadius: "6px",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    letterSpacing: "0.5px",
+                  }}
+                >
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -19,7 +19,7 @@ export default function HelpBidsPage() {
     fontWeight: 700,
     fontSize: "22px",
     letterSpacing: "1px",
-    color: "#0A1628",
+    color: "#1E3A8A",
     marginBottom: "10px",
   } as React.CSSProperties;
 
@@ -50,7 +50,7 @@ export default function HelpBidsPage() {
           fontWeight: 700,
           fontSize: "42px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           margin: "16px 0 8px",
         }}>
           Understanding Bids
@@ -71,22 +71,22 @@ export default function HelpBidsPage() {
         <p style={{ ...bodyStyle, marginTop: "12px" }}>A few realities of contractor bidding:</p>
         <ul style={{ ...bodyStyle, paddingLeft: "20px", marginTop: "8px" }}>
           <li style={liStyle}>
-            <strong style={{ color: "#0A1628" }}>Hidden conditions exist.</strong> Rotted decking
+            <strong style={{ color: "#1E3A8A" }}>Hidden conditions exist.</strong> Rotted decking
             under a roof, outdated wiring inside a wall, soft subfloor under tile — none of these
             show up in photos. They can only be discovered on-site.
           </li>
           <li style={liStyle}>
-            <strong style={{ color: "#0A1628" }}>Contractors protect themselves.</strong> A contractor
+            <strong style={{ color: "#1E3A8A" }}>Contractors protect themselves.</strong> A contractor
             who drastically underbids loses money on the job. To avoid that, many include allowances
             or contingencies for the most likely "worst case." This protects them — and it means honest
             contractors may bid higher than someone planning to come back and ask for change orders.
           </li>
           <li style={liStyle}>
-            <strong style={{ color: "#0A1628" }}>Materials and labor fluctuate.</strong> Lumber, copper,
+            <strong style={{ color: "#1E3A8A" }}>Materials and labor fluctuate.</strong> Lumber, copper,
             asphalt, and other materials can move significantly between the bid date and the work start date.
           </li>
           <li style={{ ...liStyle, marginBottom: 0 }}>
-            <strong style={{ color: "#0A1628" }}>Scope changes happen.</strong> If you change your mind
+            <strong style={{ color: "#1E3A8A" }}>Scope changes happen.</strong> If you change your mind
             about a finish, add a feature, or expand the work, pricing changes.
           </li>
         </ul>
@@ -96,7 +96,7 @@ export default function HelpBidsPage() {
       <div style={sectionStyle}>
         <h2 style={h2Style}>How can I get more accurate bids?</h2>
         <p style={bodyStyle}>
-          <strong style={{ color: "#0A1628" }}>Request an ONP Inspector.</strong> For a flat fee, a
+          <strong style={{ color: "#1E3A8A" }}>Request an ONP Inspector.</strong> For a flat fee, a
           qualified inspector visits the property and prepares a detailed report — measurements,
           photos, condition notes, and any issues a contractor should know about. This report is
           shared with bidding contractors and almost always results in:
@@ -138,7 +138,7 @@ export default function HelpBidsPage() {
         <p style={bodyStyle}>
           No. ONP is a platform that connects clients and contractors. We do not set prices,
           guarantee bids, or become a party to your agreement with the contractor. Any binding
-          price commitment must come from a <strong style={{ color: "#0A1628" }}>written
+          price commitment must come from a <strong style={{ color: "#1E3A8A" }}>written
           contract between you and the contractor.</strong>
         </p>
       </div>

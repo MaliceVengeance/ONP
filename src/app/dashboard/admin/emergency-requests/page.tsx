@@ -125,14 +125,14 @@ export default async function AdminEmergencyRequestsPage({
   return (
     <div style={{ maxWidth: "900px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             Emergency Requests
@@ -217,13 +217,13 @@ export default async function AdminEmergencyRequestsPage({
                 padding: "20px",
               }}>
                 {/* Client header */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "16px" }}>
+                <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "16px" }}>
                   <div>
                     <div style={{
                       fontFamily: "'Barlow Condensed', sans-serif",
                       fontWeight: 700,
                       fontSize: "18px",
-                      color: s.suspended ? "#FDBA74" : "#0A1628",
+                      color: s.suspended ? "#FDBA74" : "#1E3A8A",
                       marginBottom: "4px",
                     }}>
                       {s.email}
@@ -309,7 +309,7 @@ export default async function AdminEmergencyRequestsPage({
                         const sc = statusColor(row.payment_status);
                         return (
                           <tr key={row.id}>
-                            <td style={{ padding: "8px 10px", color: "#0A1628", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: "#1E3A8A", borderBottom: "1px solid #EEF4FF" }}>
                               {fmtDate(row.created_at)}
                             </td>
                             <td style={{ padding: "8px 10px", borderBottom: "1px solid #EEF4FF" }}>
@@ -335,10 +335,10 @@ export default async function AdminEmergencyRequestsPage({
                                 </Link>
                               ) : "—"}
                             </td>
-                            <td style={{ padding: "8px 10px", color: "#0A1628", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: "#1E3A8A", borderBottom: "1px solid #EEF4FF" }}>
                               {row.close_reason ?? (row.closed_at ? "CLOSED" : row.payment_status === "PAID" ? "ACTIVE" : "—")}
                             </td>
-                            <td style={{ padding: "8px 10px", color: row.counts_against_limit ? "#0A1628" : "#4A7FB5", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: row.counts_against_limit ? "#1E3A8A" : "#4A7FB5", borderBottom: "1px solid #EEF4FF" }}>
                               {row.counts_against_limit ? "Yes" : "No"}
                             </td>
                             <td style={{ padding: "8px 10px", color: row.admin_granted ? "#1B4F8A" : "#4A7FB5", borderBottom: "1px solid #EEF4FF" }}>

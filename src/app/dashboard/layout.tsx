@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     }}>
       {/* Header */}
       <header style={{
-        background: "#0A1628",
+        background: "#1E3A8A",
         borderBottom: "2px solid #C8102E",
         padding: "10px 16px",
         display: "flex",
@@ -45,7 +45,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Link href="/about" style={{
+          <Link href="/about" className="mob-hide" style={{
             background: "transparent",
             border: "1px solid #1B4F8A",
             color: "#B8D0E8",
@@ -57,7 +57,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           }}>
             About
           </Link>
-          <Link href="/why-onp" style={{
+          <Link href="/why-onp" className="mob-hide" style={{
             background: "transparent",
             border: "1px solid #1B4F8A",
             color: "#B8D0E8",
@@ -122,7 +122,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Legal footer */}
       <div style={{
-        background: "#0A1628",
+        background: "#1E3A8A",
         borderTop: "2px solid #C8102E",
         padding: "18px 16px",
         textAlign: "center",

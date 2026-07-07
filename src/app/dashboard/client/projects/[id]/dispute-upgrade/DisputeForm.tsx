@@ -32,7 +32,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
             display: "block",
             fontWeight: 700,
             fontSize: "14px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             marginBottom: "6px",
           }}
         >
@@ -57,7 +57,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
             padding: "12px 14px",
             fontSize: "13px",
             fontFamily: "'Barlow', sans-serif",
-            color: "#0A1628",
+            color: "#1E3A8A",
             background: "#FFFFFF",
             resize: "vertical",
             lineHeight: 1.6,
@@ -84,7 +84,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
           style={{
             fontWeight: 700,
             fontSize: "14px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             marginBottom: "10px",
           }}
         >
@@ -109,7 +109,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
                 background: inspectorExplained === value ? "#EEF4FF" : "#FFFFFF",
                 cursor: "pointer",
                 fontSize: "13px",
-                color: "#0A1628",
+                color: "#1E3A8A",
               }}
             >
               <input
@@ -129,7 +129,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
       {/* Dispute terms */}
       <div
         style={{
-          background: "#0A1628",
+          background: "#1E3A8A",
           border: "1px solid #1B4F8A",
           borderRadius: "10px",
           padding: "18px 20px",
@@ -180,7 +180,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
           onChange={(e) => setDisclaimerChecked(e.target.checked)}
           style={{ marginTop: "3px", flexShrink: 0, accentColor: "#1B4F8A" }}
         />
-        <span style={{ fontSize: "13px", color: "#0A1628", lineHeight: 1.6 }}>
+        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6 }}>
           I have read and understood the dispute terms above. I confirm this dispute is about
           whether the on-site upgrade was justified, and I accept that the Master Inspector&apos;s
           decision is final.

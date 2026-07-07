@@ -20,7 +20,7 @@ export default async function ClientProfilePage({
     width: "100%",
     background: "#FFFFFF",
     border: "1px solid #B8D0E8",
-    color: "#0A1628",
+    color: "#1E3A8A",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -42,14 +42,14 @@ export default async function ClientProfilePage({
   return (
     <div style={{ maxWidth: "600px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+      <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#0A1628",
+            color: "#1E3A8A",
             margin: 0,
           }}>
             My Profile
@@ -103,7 +103,7 @@ export default async function ClientProfilePage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
@@ -140,7 +140,7 @@ export default async function ClientProfilePage({
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "1px",
-              color: "#0A1628",
+              color: "#1E3A8A",
               textTransform: "uppercase",
               marginBottom: "4px",
             }}>
@@ -166,7 +166,7 @@ export default async function ClientProfilePage({
               placeholder="e.g. Apt 4B (optional)"
             />
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+            <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
               <div>
                 <label style={labelStyle}>City</label>
                 <input
@@ -231,7 +231,7 @@ export default async function ClientProfilePage({
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "16px",
-          color: "#0A1628",
+          color: "#1E3A8A",
           textTransform: "uppercase",
           marginBottom: "8px",
         }}>
