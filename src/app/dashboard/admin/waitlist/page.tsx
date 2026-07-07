@@ -18,10 +18,10 @@ type WaitlistRow = {
 
 function sourceBadge(source: string) {
   switch (source) {
-    case "HOMEPAGE": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    case "HOMEPAGE": return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
     case "SIGNUP_BLOCKED": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
     case "PROJECT_POST_BLOCKED": return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
-    default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    default: return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
   }
 }
 
@@ -79,12 +79,12 @@ export default async function AdminWaitlistPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Expansion Waitlist
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {total} total · {notified} notified · {last30} in last 30 days
           </p>
         </div>
@@ -107,8 +107,8 @@ export default async function AdminWaitlistPage({
           </a>
           <Link href="/dashboard/admin" style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -139,37 +139,37 @@ export default async function AdminWaitlistPage({
           { label: "Notified", value: notified },
           { label: "Last 30 Days", value: last30 },
         ].map((s) => (
-          <div key={s.label} style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "16px 20px" }}>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>{s.label}</div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>{s.value}</div>
+          <div key={s.label} style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 20px" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>{s.label}</div>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "var(--camo-charcoal)" }}>{s.value}</div>
           </div>
         ))}
       </div>
 
       {/* Top ZIPs and States */}
       <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "28px" }}>
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "16px 20px" }}>
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "14px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 20px" }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "14px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
             Top ZIPs
           </div>
           {topZips.length === 0 ? (
-            <div style={{ fontSize: "13px", color: "#4A7FB5" }}>No data yet</div>
+            <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>No data yet</div>
           ) : topZips.map(([zip, count]) => (
-            <div key={zip} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#1E3A8A", marginBottom: "6px" }}>
-              <Link href={`/dashboard/admin/waitlist?filter_state=`} style={{ color: "#1B4F8A", textDecoration: "none" }}>{zip}</Link>
+            <div key={zip} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--camo-charcoal)", marginBottom: "6px" }}>
+              <Link href={`/dashboard/admin/waitlist?filter_state=`} style={{ color: "var(--camo-gunmetal)", textDecoration: "none" }}>{zip}</Link>
               <span style={{ fontWeight: 700 }}>{count}</span>
             </div>
           ))}
         </div>
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "16px 20px" }}>
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "14px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 20px" }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "14px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
             Top States
           </div>
           {topStates.length === 0 ? (
-            <div style={{ fontSize: "13px", color: "#4A7FB5" }}>No data yet</div>
+            <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>No data yet</div>
           ) : topStates.map(([state, count]) => (
-            <div key={state} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#1E3A8A", marginBottom: "6px" }}>
-              <Link href={`/dashboard/admin/waitlist?filter_state=${state}`} style={{ color: "#1B4F8A", textDecoration: "none" }}>{state}</Link>
+            <div key={state} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--camo-charcoal)", marginBottom: "6px" }}>
+              <Link href={`/dashboard/admin/waitlist?filter_state=${state}`} style={{ color: "var(--camo-gunmetal)", textDecoration: "none" }}>{state}</Link>
               <span style={{ fontWeight: 700 }}>{count}</span>
             </div>
           ))}
@@ -203,7 +203,7 @@ export default async function AdminWaitlistPage({
                 width: "100%",
                 background: "#FFFFFF",
                 border: "1px solid #166534",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
                 borderRadius: "6px",
                 padding: "10px 14px",
                 fontFamily: "'Barlow', sans-serif",
@@ -225,7 +225,7 @@ export default async function AdminWaitlistPage({
                 width: "100%",
                 background: "#FFFFFF",
                 border: "1px solid #166534",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
                 borderRadius: "6px",
                 padding: "10px 14px",
                 fontFamily: "'Barlow', sans-serif",
@@ -247,7 +247,7 @@ export default async function AdminWaitlistPage({
                 width: "100%",
                 background: "#FFFFFF",
                 border: "1px solid #166534",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
                 borderRadius: "6px",
                 padding: "10px 14px",
                 fontFamily: "'Barlow', sans-serif",
@@ -280,7 +280,7 @@ export default async function AdminWaitlistPage({
 
       {/* Filters */}
       <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center" }}>
-        <span style={{ fontSize: "12px", color: "#1B4F8A", fontWeight: 600 }}>Filter:</span>
+        <span style={{ fontSize: "12px", color: "var(--camo-gunmetal)", fontWeight: 600 }}>Filter:</span>
         {["HOMEPAGE", "SIGNUP_BLOCKED", "PROJECT_POST_BLOCKED"].map((src) => (
           <Link
             key={src}
@@ -292,8 +292,8 @@ export default async function AdminWaitlistPage({
               borderRadius: "20px",
               textDecoration: "none",
               ...(sp.filter_source === src
-                ? { background: "#1E3A8A", color: "#fff" }
-                : { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" }),
+                ? { background: "var(--camo-charcoal)", color: "#fff" }
+                : { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" }),
             }}
           >
             {src.replace(/_/g, " ")}
@@ -305,13 +305,13 @@ export default async function AdminWaitlistPage({
           </Link>
         )}
         {sp.filter_state && (
-          <span style={{ fontSize: "12px", color: "#1B4F8A" }}>State: <strong>{sp.filter_state.toUpperCase()}</strong></span>
+          <span style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>State: <strong>{sp.filter_state.toUpperCase()}</strong></span>
         )}
       </div>
 
       {/* Table */}
       {rows.length === 0 ? (
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#4A7FB5", fontSize: "14px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "32px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
           No waitlist entries yet.
         </div>
       ) : (
@@ -319,22 +319,22 @@ export default async function AdminWaitlistPage({
           {rows.map((row) => (
             <div key={row.id} style={{
               background: row.notified_at ? "#F0FDF4" : "#FFFFFF",
-              border: `1px solid ${row.notified_at ? "#BBF7D0" : "#B8D0E8"}`,
+              border: `1px solid ${row.notified_at ? "#BBF7D0" : "#d9dbdb"}`,
               borderRadius: "10px",
               padding: "14px 18px",
             }}>
               <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: "14px", color: "#1E3A8A", marginBottom: "2px" }}>
+                  <div style={{ fontWeight: 600, fontSize: "14px", color: "var(--camo-charcoal)", marginBottom: "2px" }}>
                     {row.email}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "4px" }}>
                     ZIP: <strong>{row.zip}</strong>
                     {row.city && ` · ${row.city}`}
                     {row.state && `, ${row.state}`}
                     {row.intended_role && ` · ${row.intended_role}`}
                   </div>
-                  <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                  <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                     Signed up: {new Date(row.created_at).toLocaleDateString()}
                     {row.notified_at && (
                       <span style={{ color: "#15803D", marginLeft: "8px" }}>
@@ -343,7 +343,7 @@ export default async function AdminWaitlistPage({
                     )}
                   </div>
                   {row.notes && (
-                    <div style={{ fontSize: "12px", color: "#4A7FB5", marginTop: "4px", fontStyle: "italic" }}>
+                    <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "4px", fontStyle: "italic" }}>
                       {row.notes}
                     </div>
                   )}

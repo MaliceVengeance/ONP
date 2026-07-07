@@ -7,8 +7,8 @@ export default function CouponInput() {
       placeholder="e.g. WELCOME3"
       style={{
         background: "#FFFFFF",
-        border: "1px solid #B8D0E8",
-        color: "#1E3A8A",
+        border: "1px solid #d9dbdb",
+        color: "var(--camo-charcoal)",
         borderRadius: "6px",
         padding: "10px 14px",
         fontFamily: "'Barlow', sans-serif",

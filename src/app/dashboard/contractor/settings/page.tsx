@@ -32,12 +32,12 @@ export default async function ContractorSettingsPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Notification Settings
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Control how ONP contacts you about new opportunities.
           </p>
         </div>
@@ -45,8 +45,8 @@ export default async function ContractorSettingsPage({
           href="/dashboard/contractor"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -74,8 +74,8 @@ export default async function ContractorSettingsPage({
       )}
 
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "28px",
       }}>
@@ -83,7 +83,7 @@ export default async function ContractorSettingsPage({
           {/* Emergency notifications toggle */}
           <div style={{
             background: "#FFFFFF",
-            border: "1px solid #B8D0E8",
+            border: "1px solid #d9dbdb",
             borderRadius: "10px",
             padding: "20px",
             marginBottom: "20px",
@@ -91,7 +91,7 @@ export default async function ContractorSettingsPage({
             <div style={{
               fontSize: "11px",
               fontWeight: 600,
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "14px",
@@ -112,10 +112,10 @@ export default async function ContractorSettingsPage({
                 style={{ marginTop: "3px", accentColor: "#C2410C", width: "16px", height: "16px", flexShrink: 0 }}
               />
               <div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#1E3A8A", marginBottom: "4px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--camo-charcoal)", marginBottom: "4px" }}>
                   🚨 Receive Emergency Bid Request emails
                 </div>
-                <div style={{ fontSize: "13px", color: "#4A7FB5", lineHeight: 1.6 }}>
+                <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.6 }}>
                   When a client posts an emergency bid request in your category, we&apos;ll send you an immediate
                   email notification so you can respond quickly. Emergency projects have a 48-hour bidding window
                   and bids are visible as they come in.
@@ -124,13 +124,13 @@ export default async function ContractorSettingsPage({
             </label>
 
             <div style={{
-              background: "#F0F6FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-paper)",
+              border: "1px solid #d9dbdb",
               borderRadius: "8px",
               padding: "12px 14px",
               marginTop: "16px",
               fontSize: "12px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               lineHeight: 1.6,
             }}>
               <strong>Note:</strong> Emergency bid emails are sent to your account email address.
@@ -142,7 +142,7 @@ export default async function ContractorSettingsPage({
           <button
             type="submit"
             style={{
-              background: "#1B4F8A",
+              background: "var(--camo-gunmetal)",
               color: "#FFFFFF",
               border: "none",
               padding: "12px 28px",

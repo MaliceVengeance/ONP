@@ -40,8 +40,8 @@ export default async function MasterInspectorsPage() {
   const regularInspectors = (inspectors ?? []).filter((i: any) => !i.is_master_inspector);
 
   const sectionStyle: React.CSSProperties = {
-    background: "#EEF4FF",
-    border: "1px solid #B8D0E8",
+    background: "var(--camo-concrete)",
+    border: "1px solid #d9dbdb",
     borderRadius: "12px",
     padding: "24px",
     marginBottom: "24px",
@@ -51,19 +51,19 @@ export default async function MasterInspectorsPage() {
     fontFamily: "'Barlow', sans-serif",
     fontWeight: 600,
     fontSize: "11px",
-    color: "#4A7FB5",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase",
     letterSpacing: "1px",
     padding: "8px 12px",
     textAlign: "left",
-    borderBottom: "1px solid #B8D0E8",
+    borderBottom: "1px solid #d9dbdb",
   };
 
   const cellStyle: React.CSSProperties = {
     padding: "12px 12px",
     fontSize: "13px",
-    color: "#1E3A8A",
-    borderBottom: "1px solid #EEF4FF",
+    color: "var(--camo-charcoal)",
+    borderBottom: "1px solid var(--camo-concrete)",
     verticalAlign: "middle",
   };
 
@@ -74,12 +74,12 @@ export default async function MasterInspectorsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: 0,
         }}>
           Master Inspectors
         </h1>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "6px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
           Manage which inspectors can review upgrade disputes. Master Inspectors are
           auto-assigned to disputes and earn a $50 review fee per resolved case.
         </p>
@@ -91,20 +91,20 @@ export default async function MasterInspectorsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "20px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: "0 0 16px 0",
         }}>
           Active Master Inspectors ({masterInspectors.length})
         </h2>
 
         {masterInspectors.length === 0 ? (
-          <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>
             No Master Inspectors have been promoted yet.
           </p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "#F0F6FF" }}>
+              <tr style={{ background: "var(--camo-paper)" }}>
                 <th style={tableHeaderStyle}>Inspector</th>
                 <th style={tableHeaderStyle}>Master Since</th>
                 <th style={tableHeaderStyle}>Open Disputes</th>
@@ -121,7 +121,7 @@ export default async function MasterInspectorsPage() {
                   <tr key={insp.id} style={{ background: "#fff" }}>
                     <td style={cellStyle}>
                       <div style={{ fontWeight: 600 }}>{insp.full_name || "—"}</div>
-                      <div style={{ fontSize: "11px", color: "#4A7FB5" }}>{insp.email}</div>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>{insp.email}</div>
                     </td>
                     <td style={cellStyle}>
                       {insp.master_inspector_since
@@ -130,8 +130,8 @@ export default async function MasterInspectorsPage() {
                     </td>
                     <td style={cellStyle}>
                       <span style={{
-                        background: openCount > 0 ? "#FEF3C7" : "#EEF4FF",
-                        color: openCount > 0 ? "#92400E" : "#1B4F8A",
+                        background: openCount > 0 ? "#FEF3C7" : "var(--camo-concrete)",
+                        color: openCount > 0 ? "#92400E" : "var(--camo-gunmetal)",
                         padding: "2px 10px",
                         borderRadius: "12px",
                         fontSize: "12px",
@@ -156,7 +156,7 @@ export default async function MasterInspectorsPage() {
                       <details style={{ cursor: "pointer" }}>
                         <summary style={{
                           fontSize: "12px",
-                          color: "#C8102E",
+                          color: "var(--camo-accent-dim)",
                           fontWeight: 600,
                           cursor: "pointer",
                           listStyle: "none",
@@ -173,7 +173,7 @@ export default async function MasterInspectorsPage() {
                             style={{
                               width: "200px",
                               fontSize: "12px",
-                              border: "1px solid #B8D0E8",
+                              border: "1px solid #d9dbdb",
                               borderRadius: "6px",
                               padding: "6px 8px",
                               resize: "vertical",
@@ -184,8 +184,8 @@ export default async function MasterInspectorsPage() {
                           <button
                             type="submit"
                             style={{
-                              background: "#C8102E",
-                              color: "#fff",
+                              background: "var(--camo-accent)",
+                              color: "var(--camo-ink)",
                               border: "none",
                               borderRadius: "6px",
                               padding: "5px 12px",
@@ -213,22 +213,22 @@ export default async function MasterInspectorsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "20px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: "0 0 8px 0",
         }}>
           Promote an Inspector
         </h2>
-        <p style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "16px", marginTop: 0 }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px", marginTop: 0 }}>
           Before promoting, confirm the inspector has: passed the MI competency review, agreed to the MI terms,
           and completed at least 10 standard inspections on the platform.
         </p>
 
         {regularInspectors.length === 0 ? (
-          <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>No additional inspectors found.</p>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>No additional inspectors found.</p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "#F0F6FF" }}>
+              <tr style={{ background: "var(--camo-paper)" }}>
                 <th style={tableHeaderStyle}>Inspector</th>
                 <th style={tableHeaderStyle}>Status</th>
                 <th style={tableHeaderStyle}>Promote</th>
@@ -239,7 +239,7 @@ export default async function MasterInspectorsPage() {
                 <tr key={insp.id} style={{ background: "#fff" }}>
                   <td style={cellStyle}>
                     <div style={{ fontWeight: 600 }}>{insp.full_name || "—"}</div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5" }}>{insp.email}</div>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>{insp.email}</div>
                   </td>
                   <td style={cellStyle}>
                     {insp.upgrade_blocked ? (
@@ -247,7 +247,7 @@ export default async function MasterInspectorsPage() {
                         BLOCKED
                       </span>
                     ) : (
-                      <span style={{ background: "#EEF4FF", color: "#1B4F8A", padding: "2px 10px", borderRadius: "12px", fontSize: "11px" }}>
+                      <span style={{ background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", padding: "2px 10px", borderRadius: "12px", fontSize: "11px" }}>
                         Standard
                       </span>
                     )}
@@ -257,7 +257,7 @@ export default async function MasterInspectorsPage() {
                       <button
                         type="submit"
                         style={{
-                          background: "#1B4F8A",
+                          background: "var(--camo-gunmetal)",
                           color: "#fff",
                           border: "none",
                           borderRadius: "6px",

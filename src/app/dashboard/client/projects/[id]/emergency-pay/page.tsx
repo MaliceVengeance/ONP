@@ -46,7 +46,7 @@ export default async function EmergencyPayPage({
           href="/dashboard/client/projects"
           style={{
             fontSize: "13px",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
             textDecoration: "underline",
             display: "block",
             marginTop: "16px",
@@ -86,13 +86,13 @@ export default async function EmergencyPayPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Activate Emergency Bid
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {(project as any).title ?? "Untitled"}
           </p>
         </div>
@@ -100,8 +100,8 @@ export default async function EmergencyPayPage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -188,8 +188,8 @@ export default async function EmergencyPayPage({
       {/* Project summary */}
       <div
         style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "10px",
           padding: "18px 20px",
           marginBottom: "20px",
@@ -201,17 +201,17 @@ export default async function EmergencyPayPage({
             fontWeight: 700,
             fontSize: "13px",
             letterSpacing: "1px",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}
         >
           Project Summary
         </div>
-        <div style={{ fontSize: "16px", fontWeight: 600, color: "#1E3A8A", marginBottom: "4px" }}>
+        <div style={{ fontSize: "16px", fontWeight: 600, color: "var(--camo-charcoal)", marginBottom: "4px" }}>
           {(project as any).title}
         </div>
-        <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
+        <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
           {(project as any).category?.replaceAll("_", " ")} ·{" "}
           {(project as any).location_general}
         </div>
@@ -220,8 +220,8 @@ export default async function EmergencyPayPage({
       {/* Disclaimer */}
       <div
         style={{
-          background: "#1E3A8A",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-charcoal)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "10px",
           padding: "18px 20px",
           marginBottom: "20px",
@@ -233,7 +233,7 @@ export default async function EmergencyPayPage({
             fontWeight: 700,
             fontSize: "12px",
             letterSpacing: "1px",
-            color: "#B8D0E8",
+            color: "#d9dbdb",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}
@@ -243,7 +243,7 @@ export default async function EmergencyPayPage({
         <pre
           style={{
             fontSize: "11px",
-            color: "#7A9CC4",
+            color: "var(--camo-steel)",
             lineHeight: 1.65,
             whiteSpace: "pre-wrap",
             fontFamily: "'Barlow', sans-serif",
@@ -304,7 +304,7 @@ export default async function EmergencyPayPage({
 
       {/* Full price pay button */}
       {availableCredits > 0 && (
-        <p style={{ fontSize: "12px", color: "#4A7FB5", textAlign: "center", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", textAlign: "center", marginBottom: "8px" }}>
           — or pay the full amount —
         </p>
       )}
@@ -332,7 +332,7 @@ export default async function EmergencyPayPage({
       <p
         style={{
           fontSize: "11px",
-          color: "#4A7FB5",
+          color: "var(--camo-gunmetal)",
           textAlign: "center",
           marginTop: "10px",
           lineHeight: 1.6,
@@ -345,13 +345,13 @@ export default async function EmergencyPayPage({
       {/* Downgrade option */}
       <div
         style={{
-          borderTop: "1px solid #B8D0E8",
+          borderTop: "1px solid #d9dbdb",
           paddingTop: "20px",
           marginTop: "20px",
           textAlign: "center",
         }}
       >
-        <p style={{ fontSize: "13px", color: "#4A7FB5", marginBottom: "12px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
           Changed your mind? You can convert this to a free standard bid request instead.
         </p>
         <form action={downgradeToStandard.bind(null, projectId)}>
@@ -359,8 +359,8 @@ export default async function EmergencyPayPage({
             type="submit"
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "10px 24px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -371,7 +371,7 @@ export default async function EmergencyPayPage({
             Convert to Standard Bid (Free)
           </button>
         </form>
-        <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "8px" }}>
+        <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "8px" }}>
           Project becomes a regular draft — normal 5–10 day sealed bidding window. No charge.
         </p>
       </div>

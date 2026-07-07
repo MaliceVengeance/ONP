@@ -41,7 +41,7 @@ export default async function ContractorRfiPage({
         <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#fff" }}>
           Project Not Found
         </h1>
-        <Link href="/dashboard/contractor/projects" style={{ color: "#7A9CC4", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
+        <Link href="/dashboard/contractor/projects" style={{ color: "var(--camo-steel)", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
           ← Back to Projects
         </Link>
       </div>
@@ -89,9 +89,9 @@ export default async function ContractorRfiPage({
 
   const inputStyle = {
     width: "100%",
-    background: "#1E3A8A",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "var(--camo-charcoal)",
+    border: "1px solid var(--camo-gunmetal)",
+    color: "var(--camo-paper)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -121,18 +121,18 @@ export default async function ContractorRfiPage({
           }}>
             Questions (RFIs)
           </h1>
-          <p style={{ fontSize: "13px", color: "#7A9CC4", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-steel)", marginTop: "4px" }}>
             {project.title ?? "Untitled"} — {project.category ?? "—"}
           </p>
-          <p style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "2px" }}>
+          <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>
             All questions and answers are visible to every contractor on this project.
           </p>
         </div>
         <Link
           href={`/dashboard/contractor/projects/${projectId}`}
           style={{
-            background: "#C8102E",
-            color: "#fff",
+            background: "var(--camo-accent)",
+            color: "var(--camo-ink)",
             border: "none",
             padding: "10px 18px",
             borderRadius: "6px",
@@ -180,8 +180,8 @@ export default async function ContractorRfiPage({
 
       {/* Platform rules */}
       <div style={{
-        background: "#1E3A8A",
-        border: "1px solid #1B4F8A",
+        background: "var(--camo-charcoal)",
+        border: "1px solid var(--camo-gunmetal)",
         borderRadius: "10px",
         padding: "14px 16px",
         marginBottom: "20px",
@@ -189,7 +189,7 @@ export default async function ContractorRfiPage({
         <div style={{
           fontSize: "11px",
           fontWeight: 600,
-          color: "#7A9CC4",
+          color: "var(--camo-steel)",
           textTransform: "uppercase",
           letterSpacing: "1px",
           marginBottom: "8px",
@@ -207,8 +207,8 @@ export default async function ContractorRfiPage({
       {/* Submit new RFI */}
       {canSubmit && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-ink)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "24px",
@@ -224,12 +224,12 @@ export default async function ContractorRfiPage({
           }}>
             Ask a Question
           </h2>
-          <p style={{ fontSize: "12px", color: "#7A9CC4", marginBottom: "16px" }}>
+          <p style={{ fontSize: "12px", color: "var(--camo-steel)", marginBottom: "16px" }}>
             Have a question the client hasn't answered? Submit it here. Answers are visible to all bidding contractors.
           </p>
 
           {availableCatalog.length === 0 ? (
-            <div style={{ fontSize: "13px", color: "#7A9CC4", textAlign: "center", padding: "16px 0" }}>
+            <div style={{ fontSize: "13px", color: "var(--camo-steel)", textAlign: "center", padding: "16px 0" }}>
               No question types are available at this time.
             </div>
           ) : (
@@ -238,7 +238,7 @@ export default async function ContractorRfiPage({
                 display: "block",
                 fontSize: "11px",
                 fontWeight: 600,
-                color: "#7A9CC4",
+                color: "var(--camo-steel)",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
               }}>
@@ -261,7 +261,7 @@ export default async function ContractorRfiPage({
                 display: "block",
                 fontSize: "11px",
                 fontWeight: 600,
-                color: "#7A9CC4",
+                color: "var(--camo-steel)",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginTop: "14px",
@@ -278,8 +278,8 @@ export default async function ContractorRfiPage({
                 type="submit"
                 style={{
                   marginTop: "12px",
-                  background: "#C8102E",
-                  color: "#fff",
+                  background: "var(--camo-accent)",
+                  color: "var(--camo-ink)",
                   border: "none",
                   padding: "10px 20px",
                   borderRadius: "6px",
@@ -299,13 +299,13 @@ export default async function ContractorRfiPage({
 
       {!canSubmit && (
         <div style={{
-          background: "#0F2040",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-ink)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "10px",
           padding: "16px",
           marginBottom: "20px",
           fontSize: "13px",
-          color: "#7A9CC4",
+          color: "var(--camo-steel)",
           textAlign: "center",
         }}>
           Questions can only be submitted while the project is open for bidding.
@@ -331,9 +331,9 @@ export default async function ContractorRfiPage({
             fontWeight: 700,
             padding: "3px 10px",
             borderRadius: "20px",
-            background: "#1E3A8A",
-            color: "#7A9CC4",
-            border: "1px solid #1B4F8A",
+            background: "var(--camo-charcoal)",
+            color: "var(--camo-steel)",
+            border: "1px solid var(--camo-gunmetal)",
           }}>
             {rfiRows.length}
           </span>
@@ -341,12 +341,12 @@ export default async function ContractorRfiPage({
 
         {rfiRows.length === 0 ? (
           <div style={{
-            background: "#0F2040",
-            border: "1px solid #1B4F8A",
+            background: "var(--camo-ink)",
+            border: "1px solid var(--camo-gunmetal)",
             borderRadius: "10px",
             padding: "32px",
             textAlign: "center",
-            color: "#7A9CC4",
+            color: "var(--camo-steel)",
             fontSize: "14px",
           }}>
             No questions have been asked yet.
@@ -356,7 +356,7 @@ export default async function ContractorRfiPage({
             {/* Unanswered first */}
             {unanswered.map((r, idx) => (
               <div key={r.id} style={{
-                background: "#0F2040",
+                background: "var(--camo-ink)",
                 border: "1px solid #92400E",
                 borderRadius: "12px",
                 overflow: "hidden",
@@ -395,15 +395,15 @@ export default async function ContractorRfiPage({
                 <div style={{ padding: "14px 16px" }}>
                   {r.question && (
                     <div style={{
-                      background: "#1E3A8A",
-                      border: "1px solid #1B4F8A",
+                      background: "var(--camo-charcoal)",
+                      border: "1px solid var(--camo-gunmetal)",
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontSize: "13px",
-                      color: "#B0C4DE",
+                      color: "#d9dbdb",
                       lineHeight: 1.6,
                     }}>
-                      <div style={{ fontSize: "10px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                      <div style={{ fontSize: "10px", color: "var(--camo-steel)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                         Your notes
                       </div>
                       {r.question}
@@ -419,7 +419,7 @@ export default async function ContractorRfiPage({
             {/* Answered */}
             {answered.map((r, idx) => (
               <div key={r.id} style={{
-                background: "#0F2040",
+                background: "var(--camo-ink)",
                 border: "1px solid #166534",
                 borderRadius: "12px",
                 overflow: "hidden",
@@ -458,28 +458,28 @@ export default async function ContractorRfiPage({
                 <div style={{ padding: "14px 16px" }}>
                   {r.question && (
                     <div style={{
-                      background: "#1E3A8A",
-                      border: "1px solid #1B4F8A",
+                      background: "var(--camo-charcoal)",
+                      border: "1px solid var(--camo-gunmetal)",
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontSize: "13px",
-                      color: "#B0C4DE",
+                      color: "#d9dbdb",
                       marginBottom: "10px",
                       lineHeight: 1.6,
                     }}>
-                      <div style={{ fontSize: "10px", color: "#7A9CC4", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                      <div style={{ fontSize: "10px", color: "var(--camo-steel)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                         Your notes
                       </div>
                       {r.question}
                     </div>
                   )}
                   <div style={{
-                    background: "#1E3A8A",
+                    background: "var(--camo-charcoal)",
                     border: "1px solid #166534",
                     borderRadius: "6px",
                     padding: "10px 14px",
                     fontSize: "13px",
-                    color: "#F0F4FF",
+                    color: "var(--camo-paper)",
                     lineHeight: 1.6,
                   }}>
                     <div style={{ fontSize: "10px", color: "#4ADE80", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
@@ -488,7 +488,7 @@ export default async function ContractorRfiPage({
                     {r.response}
                   </div>
                   {r.responded_at && (
-                    <div style={{ fontSize: "11px", color: "#3A5A7A", marginTop: "8px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "8px" }}>
                       Answered: {new Date(r.responded_at).toLocaleString()}
                     </div>
                   )}

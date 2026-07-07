@@ -72,13 +72,13 @@ export default async function InspectorPayPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Complete Payment
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {(project as any)?.title ?? "Untitled"}
           </p>
         </div>
@@ -86,8 +86,8 @@ export default async function InspectorPayPage({
           href={`/dashboard/client/projects/${projectId}/inspector`}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -102,8 +102,8 @@ export default async function InspectorPayPage({
       {/* Order summary */}
       <div
         style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "24px",
           marginBottom: "20px",
@@ -115,7 +115,7 @@ export default async function InspectorPayPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "16px",
           }}
@@ -130,18 +130,18 @@ export default async function InspectorPayPage({
             alignItems: "flex-start",
             gap: "16px",
             paddingBottom: "16px",
-            borderBottom: "1px solid #B8D0E8",
+            borderBottom: "1px solid #d9dbdb",
             marginBottom: "16px",
           }}
         >
           <div>
-            <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "4px" }}>
+            <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "4px" }}>
               {(priceRow as any)?.display_name ??
                 (assignment as any).pricing_key?.replaceAll("_", " ") ??
                 "Inspection"}
             </div>
             {(priceRow as any)?.description && (
-              <div style={{ fontSize: "12px", color: "#4A7FB5", lineHeight: 1.5 }}>
+              <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", lineHeight: 1.5 }}>
                 {(priceRow as any).description}
               </div>
             )}
@@ -151,7 +151,7 @@ export default async function InspectorPayPage({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "22px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               whiteSpace: "nowrap",
             }}
           >
@@ -165,7 +165,7 @@ export default async function InspectorPayPage({
             justifyContent: "space-between",
             fontSize: "14px",
             fontWeight: 700,
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
           }}
         >
           <span>Total due today</span>
@@ -249,9 +249,9 @@ export default async function InspectorPayPage({
         <button
           type="submit"
           style={{
-            background: availableCredits > 0 ? "transparent" : "#C8102E",
-            color: availableCredits > 0 ? "#1B4F8A" : "#fff",
-            border: availableCredits > 0 ? "1px solid #B8D0E8" : "none",
+            background: availableCredits > 0 ? "transparent" : "var(--camo-accent)",
+            color: availableCredits > 0 ? "var(--camo-gunmetal)" : "var(--camo-ink)",
+            border: availableCredits > 0 ? "1px solid #d9dbdb" : "none",
             padding: "14px 28px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",

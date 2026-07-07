@@ -32,14 +32,14 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
             display: "block",
             fontWeight: 700,
             fontSize: "14px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             marginBottom: "6px",
           }}
         >
           What about the upgrade felt unjustified?{" "}
-          <span style={{ color: "#C8102E" }}>*</span>
+          <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
         </label>
-        <p style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "8px", marginTop: 0 }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px", marginTop: 0 }}>
           Describe what happened, what you observed, and why you believe the upgrade was not
           necessary. Be as specific as possible.
         </p>
@@ -52,12 +52,12 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
           placeholder="e.g. The inspector arrived and immediately said it needed to be comprehensive without examining anything. The project was clearly a single-trade scope..."
           style={{
             width: "100%",
-            border: `1px solid ${statementLen > 1000 ? "#C8102E" : "#B8D0E8"}`,
+            border: `1px solid ${statementLen > 1000 ? "var(--camo-accent)" : "#d9dbdb"}`,
             borderRadius: "8px",
             padding: "12px 14px",
             fontSize: "13px",
             fontFamily: "'Barlow', sans-serif",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             background: "#FFFFFF",
             resize: "vertical",
             lineHeight: 1.6,
@@ -69,7 +69,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
             display: "flex",
             justifyContent: "space-between",
             fontSize: "11px",
-            color: statementLen > 1000 ? "#C8102E" : statementLen < 20 ? "#9CA3AF" : "#15803D",
+            color: statementLen > 1000 ? "var(--camo-accent)" : statementLen < 20 ? "#9CA3AF" : "#15803D",
             marginTop: "4px",
           }}
         >
@@ -84,12 +84,12 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
           style={{
             fontWeight: 700,
             fontSize: "14px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             marginBottom: "10px",
           }}
         >
           Did the inspector explain specific reasons for the upgrade on-site?{" "}
-          <span style={{ color: "#C8102E" }}>*</span>
+          <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {[
@@ -105,11 +105,11 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
                 gap: "10px",
                 padding: "12px 14px",
                 borderRadius: "8px",
-                border: `1px solid ${inspectorExplained === value ? "#1B4F8A" : "#B8D0E8"}`,
-                background: inspectorExplained === value ? "#EEF4FF" : "#FFFFFF",
+                border: `1px solid ${inspectorExplained === value ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
+                background: inspectorExplained === value ? "var(--camo-concrete)" : "#FFFFFF",
                 cursor: "pointer",
                 fontSize: "13px",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
               }}
             >
               <input
@@ -118,7 +118,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
                 value={value}
                 checked={inspectorExplained === value}
                 onChange={() => setInspectorExplained(value)}
-                style={{ accentColor: "#1B4F8A" }}
+                style={{ accentColor: "var(--camo-gunmetal)" }}
               />
               {label}
             </label>
@@ -129,8 +129,8 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
       {/* Dispute terms */}
       <div
         style={{
-          background: "#1E3A8A",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-charcoal)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "10px",
           padding: "18px 20px",
           marginBottom: "20px",
@@ -142,7 +142,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
             fontWeight: 700,
             fontSize: "12px",
             letterSpacing: "1px",
-            color: "#B8D0E8",
+            color: "#d9dbdb",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}
@@ -152,7 +152,7 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
         <pre
           style={{
             fontSize: "11px",
-            color: "#7A9CC4",
+            color: "var(--camo-steel)",
             lineHeight: 1.7,
             whiteSpace: "pre-wrap",
             fontFamily: "'Barlow', sans-serif",
@@ -178,9 +178,9 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
           name="disclaimer_accepted"
           checked={disclaimerChecked}
           onChange={(e) => setDisclaimerChecked(e.target.checked)}
-          style={{ marginTop: "3px", flexShrink: 0, accentColor: "#1B4F8A" }}
+          style={{ marginTop: "3px", flexShrink: 0, accentColor: "var(--camo-gunmetal)" }}
         />
-        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6 }}>
+        <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.6 }}>
           I have read and understood the dispute terms above. I confirm this dispute is about
           whether the on-site upgrade was justified, and I accept that the Master Inspector&apos;s
           decision is final.
@@ -215,8 +215,8 @@ export default function DisputeForm({ formAction, upgradeFeeCents, daysRemaining
         disabled={!canSubmit}
         style={{
           width: "100%",
-          background: canSubmit ? "#C8102E" : "#E5E7EB",
-          color: canSubmit ? "#fff" : "#9CA3AF",
+          background: canSubmit ? "var(--camo-accent)" : "#E5E7EB",
+          color: canSubmit ? "var(--camo-ink)" : "#9CA3AF",
           border: "none",
           padding: "14px 28px",
           borderRadius: "6px",

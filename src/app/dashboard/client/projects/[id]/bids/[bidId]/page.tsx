@@ -44,8 +44,8 @@ function isExpired(dateStr: string | null | undefined) {
 }
 
 const card: React.CSSProperties = {
-  background: "#EEF4FF",
-  border: "1px solid #B8D0E8",
+  background: "var(--camo-concrete)",
+  border: "1px solid #d9dbdb",
   borderRadius: "10px",
   padding: "20px",
   marginBottom: "16px",
@@ -56,7 +56,7 @@ const sectionLabel: React.CSSProperties = {
   fontWeight: 700,
   fontSize: "13px",
   letterSpacing: "1px",
-  color: "#1B4F8A",
+  color: "var(--camo-gunmetal)",
   textTransform: "uppercase",
   marginBottom: "10px",
 };
@@ -97,7 +97,7 @@ export default async function BidDetailPage({
     !!(project as any).is_emergency;
 
   const backLink = (
-    <Link href={`/dashboard/client/projects/${projectId}/bids`} style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
+    <Link href={`/dashboard/client/projects/${projectId}/bids`} style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
       ← Back to all bids
     </Link>
   );
@@ -106,7 +106,7 @@ export default async function BidDetailPage({
     return (
       <div style={{ maxWidth: "700px" }}>
         {backLink}
-        <div style={{ ...card, marginTop: "20px", textAlign: "center", color: "#1B4F8A" }}>
+        <div style={{ ...card, marginTop: "20px", textAlign: "center", color: "var(--camo-gunmetal)" }}>
           🔒 Bids are sealed until the deadline passes.
         </div>
       </div>
@@ -123,7 +123,7 @@ export default async function BidDetailPage({
     return (
       <div style={{ maxWidth: "700px" }}>
         {backLink}
-        <div style={{ ...card, marginTop: "20px", textAlign: "center", color: "#1B4F8A" }}>
+        <div style={{ ...card, marginTop: "20px", textAlign: "center", color: "var(--camo-gunmetal)" }}>
           Bid not found.
         </div>
       </div>
@@ -181,10 +181,10 @@ export default async function BidDetailPage({
     <div style={{ maxWidth: "760px" }}>
       <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "var(--camo-charcoal)", margin: 0 }}>
             Bid Detail {displayIndex}
           </h1>
-          <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>{project.title ?? "Untitled project"}</div>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>{project.title ?? "Untitled project"}</div>
         </div>
         {backLink}
       </div>
@@ -198,11 +198,11 @@ export default async function BidDetailPage({
       {/* Contractor identity — sealed until this bid is awarded, matching the sealed-bid promise site-wide */}
       <div style={card}>
         <div style={sectionLabel}>Contractor</div>
-        <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "22px", color: "#1E3A8A", marginBottom: "4px" }}>
+        <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "22px", color: "var(--camo-charcoal)", marginBottom: "4px" }}>
           {isAwarded ? (contractorInfo?.business_name ?? "Unnamed business") : "Sealed until awarded"}
         </div>
         {isAwarded && (
-          <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "10px" }}>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "10px" }}>
             {[contractorInfo?.city, contractorInfo?.state].filter(Boolean).join(", ") || "Location not listed"}
           </div>
         )}
@@ -236,14 +236,14 @@ export default async function BidDetailPage({
 
         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
           <div>
-            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License Expires</div>
-            <div style={{ color: licenseExpired ? "#991B1B" : "#1E3A8A" }}>
+            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License Expires</div>
+            <div style={{ color: licenseExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
               {formatDate(contractorInfo?.license_expiry)}{licenseExpired && " ⚠ Expired"}
             </div>
           </div>
           <div>
-            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>COI Expires</div>
-            <div style={{ color: coiExpired ? "#991B1B" : "#1E3A8A" }}>
+            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
+            <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
               {formatDate(contractorInfo?.coi_expiry)}{coiExpired && " ⚠ Expired"}
             </div>
           </div>
@@ -256,7 +256,7 @@ export default async function BidDetailPage({
         {hasLineItems ? (
           <>
             <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-              <div className="mob-hide" style={{ display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr", gap: "8px", fontSize: "11px", color: "#4A7FB5", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 0 8px", borderBottom: "1px solid #B8D0E8" }}>
+              <div className="mob-hide" style={{ display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr", gap: "8px", fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "0 0 8px", borderBottom: "1px solid #d9dbdb" }}>
                 <div>Description</div>
                 <div>Qty</div>
                 <div>Unit Price</div>
@@ -267,7 +267,7 @@ export default async function BidDetailPage({
                 const lineSubtotal = Number(li.quantity) * Number(li.unit_price_cents);
                 const lineTotal = lineSubtotal * (1 + Number(li.tax_pct) / 100);
                 return (
-                  <div key={li.id} className="mob-card-stack" style={{ display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr", gap: "8px", fontSize: "13px", color: "#1E3A8A", padding: "10px 0", borderBottom: "1px solid #EEF4FF" }}>
+                  <div key={li.id} className="mob-card-stack" style={{ display: "grid", gridTemplateColumns: "3fr 1fr 1fr 1fr 1fr", gap: "8px", fontSize: "13px", color: "var(--camo-charcoal)", padding: "10px 0", borderBottom: "1px solid var(--camo-concrete)" }}>
                     <div>{li.description}</div>
                     <div>{Number(li.quantity)}</div>
                     <div>{centsToMoney(li.unit_price_cents)}</div>
@@ -277,21 +277,21 @@ export default async function BidDetailPage({
                 );
               })}
             </div>
-            <div style={{ marginTop: "14px", paddingTop: "14px", borderTop: "1px solid #B8D0E8", display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-end" }}>
-              <div style={{ fontSize: "13px", color: "#1B4F8A" }}>Subtotal: {centsToMoney(subtotalCents)}</div>
-              <div style={{ fontSize: "13px", color: "#1B4F8A" }}>Tax: {centsToMoney(taxCents)}</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#1E3A8A" }}>
+            <div style={{ marginTop: "14px", paddingTop: "14px", borderTop: "1px solid #d9dbdb", display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-end" }}>
+              <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Subtotal: {centsToMoney(subtotalCents)}</div>
+              <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Tax: {centsToMoney(taxCents)}</div>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "var(--camo-charcoal)" }}>
                 Total: {centsToMoney(totalCents)}
               </div>
             </div>
           </>
         ) : (
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "var(--camo-charcoal)" }}>
             {centsToMoney(totalCents)}
           </div>
         )}
         {version?.notes && (
-          <div style={{ background: "#FFFFFF", border: "1px solid #B8D0E8", borderRadius: "6px", padding: "12px", marginTop: "14px", fontSize: "13px", color: "#1B4F8A" }}>
+          <div style={{ background: "#FFFFFF", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "12px", marginTop: "14px", fontSize: "13px", color: "var(--camo-gunmetal)" }}>
             <span style={{ fontWeight: 600 }}>Notes: </span>{version.notes}
           </div>
         )}
@@ -300,7 +300,7 @@ export default async function BidDetailPage({
       {/* Warranty */}
       <div style={card}>
         <div style={sectionLabel}>Warranty Terms</div>
-        <p style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.7, margin: 0 }}>
           {version?.warranty_terms || "Not specified by contractor."}
         </p>
       </div>
@@ -308,7 +308,7 @@ export default async function BidDetailPage({
       {/* Payment / deposit */}
       <div style={card}>
         <div style={sectionLabel}>Payment / Deposit Terms</div>
-        <p style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.7, margin: 0 }}>
           {version?.deposit_terms || "Not specified by contractor."}
         </p>
       </div>
@@ -316,10 +316,10 @@ export default async function BidDetailPage({
       {/* Scope disclaimers + validity */}
       <div style={card}>
         <div style={sectionLabel}>Scope Disclaimers &amp; Estimate Validity</div>
-        <p style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.7, marginBottom: "10px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.7, marginBottom: "10px" }}>
           {version?.scope_disclaimers || "Not specified by contractor."}
         </p>
-        <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px" }}>
+        <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
           Estimate valid until: <strong>{formatDate(version?.estimate_valid_until)}</strong>
         </div>
         <div style={{ background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: "8px", padding: "12px 14px", fontSize: "12px", color: "#92400E", lineHeight: 1.6 }}>
@@ -335,14 +335,14 @@ export default async function BidDetailPage({
       {version?.quote_pdf_path && (
         <div style={card}>
           <div style={sectionLabel}>Official Quote Document</div>
-          <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px", lineHeight: 1.6 }}>
             The contractor&apos;s original letterhead quote — this is the authoritative document if a dispute ever arises about what was promised.
           </p>
           <a
             href={`/api/bids/${bidId}/quote-pdf`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: "inline-block", background: "#C8102E", color: "#fff", padding: "10px 20px", borderRadius: "6px", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}
+            style={{ display: "inline-block", background: "var(--camo-accent)", color: "var(--camo-ink)", padding: "10px 20px", borderRadius: "6px", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}
           >
             📄 Download {version.quote_pdf_filename ?? "Quote PDF"}
           </a>

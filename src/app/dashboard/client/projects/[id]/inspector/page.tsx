@@ -111,11 +111,11 @@ export default async function ClientInspectorPage({
       case "PENDING":
         return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
       case "ASSIGNED":
-        return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+        return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
       case "COMPLETED":
         return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
       default:
-        return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+        return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
     }
   }
 
@@ -142,13 +142,13 @@ export default async function ClientInspectorPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Inspector Takeoff
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {project?.title ?? "Untitled"}
           </p>
         </div>
@@ -156,8 +156,8 @@ export default async function ClientInspectorPage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -172,8 +172,8 @@ export default async function ClientInspectorPage({
       {/* What is a Takeoff */}
       <div
         style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "24px",
@@ -185,14 +185,14 @@ export default async function ClientInspectorPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}
         >
           What is a Bid-Accuracy Inspection?
         </h2>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, marginBottom: "10px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.7, marginBottom: "10px" }}>
           An ONP Inspector visits your property and produces a focused scope document — measurements,
           photos, condition notes, and access observations — targeted to your project trade. This
           gives bidding contractors the information they need to price accurately.
@@ -219,8 +219,8 @@ export default async function ClientInspectorPage({
           {/* Status card */}
           <div
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "12px",
               padding: "20px",
               marginBottom: "20px",
@@ -240,7 +240,7 @@ export default async function ClientInspectorPage({
                   fontWeight: 700,
                   fontSize: "18px",
                   letterSpacing: "1px",
-                  color: "#1E3A8A",
+                  color: "var(--camo-charcoal)",
                   textTransform: "uppercase",
                   margin: 0,
                 }}
@@ -266,46 +266,46 @@ export default async function ClientInspectorPage({
             >
               {assignment.pricing_key && (
                 <div>
-                  <span style={{ color: "#1B4F8A" }}>Inspection type: </span>
-                  <span style={{ color: "#1E3A8A" }}>
+                  <span style={{ color: "var(--camo-gunmetal)" }}>Inspection type: </span>
+                  <span style={{ color: "var(--camo-charcoal)" }}>
                     {assignment.pricing_key.replaceAll("_", " ")}
                   </span>
                 </div>
               )}
               {assignment.fee_charged_cents && (
                 <div>
-                  <span style={{ color: "#1B4F8A" }}>Fee paid: </span>
-                  <span style={{ color: "#1E3A8A", fontWeight: 600 }}>
+                  <span style={{ color: "var(--camo-gunmetal)" }}>Fee paid: </span>
+                  <span style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
                     {formatFee(assignment.fee_charged_cents)}
                   </span>
                 </div>
               )}
               {assignment.requested_at && (
                 <div>
-                  <span style={{ color: "#1B4F8A" }}>Requested: </span>
-                  <span style={{ color: "#1E3A8A" }}>
+                  <span style={{ color: "var(--camo-gunmetal)" }}>Requested: </span>
+                  <span style={{ color: "var(--camo-charcoal)" }}>
                     {new Date(assignment.requested_at).toLocaleDateString()}
                   </span>
                 </div>
               )}
               {inspectorName && (
                 <div>
-                  <span style={{ color: "#1B4F8A" }}>Inspector: </span>
-                  <span style={{ color: "#1E3A8A" }}>{inspectorName}</span>
+                  <span style={{ color: "var(--camo-gunmetal)" }}>Inspector: </span>
+                  <span style={{ color: "var(--camo-charcoal)" }}>{inspectorName}</span>
                 </div>
               )}
               {assignment.assigned_at && (
                 <div>
-                  <span style={{ color: "#1B4F8A" }}>Assigned: </span>
-                  <span style={{ color: "#1E3A8A" }}>
+                  <span style={{ color: "var(--camo-gunmetal)" }}>Assigned: </span>
+                  <span style={{ color: "var(--camo-charcoal)" }}>
                     {new Date(assignment.assigned_at).toLocaleDateString()}
                   </span>
                 </div>
               )}
               {assignment.notes && (
                 <div>
-                  <span style={{ color: "#1B4F8A" }}>Notes: </span>
-                  <span style={{ color: "#1E3A8A" }}>{assignment.notes}</span>
+                  <span style={{ color: "var(--camo-gunmetal)" }}>Notes: </span>
+                  <span style={{ color: "var(--camo-charcoal)" }}>{assignment.notes}</span>
                 </div>
               )}
             </div>
@@ -338,12 +338,12 @@ export default async function ClientInspectorPage({
               </p>
               {(assignment as any).upgrade_justification && (
                 <div style={{
-                  background: "#1E3A8A",
+                  background: "var(--camo-charcoal)",
                   borderRadius: "6px",
                   padding: "12px 16px",
                   marginBottom: "14px",
                   fontSize: "13px",
-                  color: "#F0F4FF",
+                  color: "var(--camo-paper)",
                   fontStyle: "italic",
                 }}>
                   "{(assignment as any).upgrade_justification}"
@@ -353,8 +353,8 @@ export default async function ClientInspectorPage({
                 <a
                   href={`/dashboard/client/projects/${projectId}/inspector/upgrade-pay`}
                   style={{
-                    background: "#C8102E",
-                    color: "#fff",
+                    background: "var(--camo-accent)",
+                    color: "var(--camo-ink)",
                     padding: "10px 22px",
                     borderRadius: "6px",
                     fontFamily: "'Barlow', sans-serif",
@@ -415,11 +415,11 @@ export default async function ClientInspectorPage({
 
               {/* Dispute status or CTA */}
               {existingDispute && (existingDispute as any).status !== "WITHDRAWN" ? (
-                <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "12px 16px" }}>
+                <div style={{ background: "var(--camo-charcoal)", borderRadius: "8px", padding: "12px 16px" }}>
                   <div style={{ fontSize: "12px", color: "#FBBF24", fontWeight: 700, marginBottom: "4px" }}>
                     Dispute Status: {(existingDispute as any).status.replaceAll("_", " ")}
                   </div>
-                  <div style={{ fontSize: "11px", color: "#7A9CC4" }}>
+                  <div style={{ fontSize: "11px", color: "var(--camo-steel)" }}>
                     Filed {new Date((existingDispute as any).created_at).toLocaleDateString()} · A Master Inspector will render a decision within 5 business days.
                   </div>
                   <a href={`/dashboard/client/projects/${projectId}/dispute-upgrade`} style={{ display: "inline-block", marginTop: "8px", fontSize: "11px", color: "#4ADE80", textDecoration: "underline" }}>
@@ -427,8 +427,8 @@ export default async function ClientInspectorPage({
                   </a>
                 </div>
               ) : withinDisputeWindow ? (
-                <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "12px 16px" }}>
-                  <div style={{ fontSize: "12px", color: "#B8D0E8", lineHeight: 1.6, marginBottom: "10px" }}>
+                <div style={{ background: "var(--camo-charcoal)", borderRadius: "8px", padding: "12px 16px" }}>
+                  <div style={{ fontSize: "12px", color: "#d9dbdb", lineHeight: 1.6, marginBottom: "10px" }}>
                     If you believe this upgrade was not justified, you have{" "}
                     <strong style={{ color: "#FBBF24" }}>{disputeDaysRemaining} day{disputeDaysRemaining !== 1 ? "s" : ""}</strong>{" "}
                     remaining to request a free independent review.
@@ -452,7 +452,7 @@ export default async function ClientInspectorPage({
                   </a>
                 </div>
               ) : (
-                <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                   The 14-day independent review window has closed.
                 </div>
               )}
@@ -463,7 +463,7 @@ export default async function ClientInspectorPage({
           {assignment.takeoff_report && (
             <div
               style={{
-                background: "#EEF4FF",
+                background: "var(--camo-concrete)",
                 border: "1px solid #166534",
                 borderRadius: "12px",
                 padding: "24px",
@@ -483,7 +483,7 @@ export default async function ClientInspectorPage({
                 ✅ Takeoff Report
               </h2>
               {assignment.takeoff_completed_at && (
-                <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px" }}>
+                <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
                   Completed:{" "}
                   {new Date(assignment.takeoff_completed_at).toLocaleDateString()}
                 </div>
@@ -491,11 +491,11 @@ export default async function ClientInspectorPage({
               <div
                 style={{
                   background: "#FFFFFF",
-                  border: "1px solid #B8D0E8",
+                  border: "1px solid #d9dbdb",
                   borderRadius: "8px",
                   padding: "16px",
                   fontSize: "13px",
-                  color: "#1E3A8A",
+                  color: "var(--camo-charcoal)",
                   lineHeight: 1.7,
                   whiteSpace: "pre-wrap",
                 }}
@@ -510,7 +510,7 @@ export default async function ClientInspectorPage({
         <div
           style={{
             background: "#FFFFFF",
-            border: "1px solid #B8D0E8",
+            border: "1px solid #d9dbdb",
             borderRadius: "12px",
             padding: "24px",
           }}
@@ -521,7 +521,7 @@ export default async function ClientInspectorPage({
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "20px",
             }}

@@ -18,7 +18,7 @@ export default function HoverCard({
       className={className}
       style={{
         ...style,
-        borderColor: hovered ? "#C8102E" : "#1B4F8A",
+        borderColor: hovered ? "var(--camo-accent)" : "var(--camo-gunmetal)",
         transition: "border-color 0.2s",
       }}
       onMouseEnter={() => setHovered(true)}

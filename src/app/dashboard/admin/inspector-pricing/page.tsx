@@ -42,13 +42,13 @@ export default async function AdminInspectorPricingPage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Inspector Pricing
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {activeCount} of {priceRows.length} tiers active · Edit fee, inspector share, or
             description inline · Toggle active/inactive to show or hide from clients
           </p>
@@ -57,8 +57,8 @@ export default async function AdminInspectorPricingPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -86,26 +86,26 @@ export default async function AdminInspectorPricingPage() {
             label: "Active Tiers",
             value: activeCount,
             sub: `${priceRows.length - activeCount} inactive`,
-            accent: "#1B4F8A",
+            accent: "var(--camo-gunmetal)",
           },
           {
             label: "Lowest Fee",
             value: `$${Math.min(...priceRows.filter((r) => r.is_active).map((r) => r.fee_cents)) / 100}`,
             sub: "active tier",
-            accent: "#1B4F8A",
+            accent: "var(--camo-gunmetal)",
           },
           {
             label: "Highest Fee",
             value: `$${Math.max(...priceRows.filter((r) => r.is_active).map((r) => r.fee_cents)) / 100}`,
             sub: "active tier",
-            accent: "#1B4F8A",
+            accent: "var(--camo-gunmetal)",
           },
         ].map((card) => (
           <div
             key={card.label}
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "16px 20px",
             }}
@@ -113,7 +113,7 @@ export default async function AdminInspectorPricingPage() {
             <div
               style={{
                 fontSize: "11px",
-                color: "#1B4F8A",
+                color: "var(--camo-gunmetal)",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "4px",
@@ -126,12 +126,12 @@ export default async function AdminInspectorPricingPage() {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "28px",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
               }}
             >
               {card.value}
             </div>
-            <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>{card.sub}</div>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>{card.sub}</div>
           </div>
         ))}
       </div>
@@ -175,7 +175,7 @@ export default async function AdminInspectorPricingPage() {
                 width: "70px",
                 background: "#FFFFFF",
                 border: "1px solid #166534",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
                 borderRadius: "6px",
                 padding: "9px 12px",
                 fontFamily: "'Barlow', sans-serif",
@@ -205,7 +205,7 @@ export default async function AdminInspectorPricingPage() {
             Apply to All Tiers
           </button>
         </form>
-        <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "10px" }}>
+        <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "10px" }}>
           To adjust a single tier individually, click the <strong>Edit</strong> button on that tier below.
         </p>
       </div>
@@ -232,7 +232,7 @@ export default async function AdminInspectorPricingPage() {
       <div
         style={{
           background: "#FFFFFF",
-          border: "1px solid #B8D0E8",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           overflow: "hidden",
         }}
@@ -257,7 +257,7 @@ export default async function AdminInspectorPricingPage() {
       </p>
       <pre
         style={{
-          background: "#F9FAFB",
+          background: "var(--camo-paper)",
           border: "1px solid #E5E7EB",
           borderRadius: "6px",
           padding: "12px 16px",

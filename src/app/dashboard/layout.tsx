@@ -5,14 +5,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#FFFFFF",
+      background: "var(--camo-paper)",
       display: "flex",
       flexDirection: "column",
     }}>
       {/* Header */}
       <header style={{
-        background: "#1E3A8A",
-        borderBottom: "2px solid #C8102E",
+        background: "var(--camo-charcoal)",
+        borderBottom: "2px solid var(--camo-accent)",
         padding: "10px 16px",
         display: "flex",
         alignItems: "center",
@@ -47,8 +47,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Link href="/about" className="mob-hide" style={{
             background: "transparent",
-            border: "1px solid #1B4F8A",
-            color: "#B8D0E8",
+            border: "1px solid var(--camo-gunmetal)",
+            color: "#d9dbdb",
             padding: "5px 10px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -59,8 +59,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </Link>
           <Link href="/why-onp" className="mob-hide" style={{
             background: "transparent",
-            border: "1px solid #1B4F8A",
-            color: "#B8D0E8",
+            border: "1px solid var(--camo-gunmetal)",
+            color: "#d9dbdb",
             padding: "5px 10px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -72,7 +72,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <form action="/auth/signout" method="post">
             <button style={{
               background: "transparent",
-              border: "1px solid #1B4F8A",
+              border: "1px solid var(--camo-gunmetal)",
               color: "#FFFFFF",
               padding: "6px 12px",
               borderRadius: "6px",
@@ -88,18 +88,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Beta banner */}
       <div style={{
-        background: "#FEF2F2",
-        borderBottom: "1px solid #FCA5A5",
+        background: "var(--camo-gunmetal)",
         padding: "6px 16px",
         textAlign: "center",
         fontSize: "11px",
-        color: "#991B1B",
+        color: "var(--camo-concrete)",
         lineHeight: 1.5,
         flexShrink: 0,
       }}>
         <span style={{
           fontWeight: 700,
-          color: "#991B1B",
+          color: "var(--camo-accent)",
           textTransform: "uppercase",
           letterSpacing: "1px",
           marginRight: "6px",
@@ -122,15 +121,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Legal footer */}
       <div style={{
-        background: "#1E3A8A",
-        borderTop: "2px solid #C8102E",
+        background: "var(--camo-charcoal)",
+        borderTop: "2px solid var(--camo-accent)",
         padding: "18px 16px",
         textAlign: "center",
         flexShrink: 0,
       }}>
         <div style={{
           fontSize: "11px",
-          color: "#B8D0E8",
+          color: "#d9dbdb",
           marginBottom: "12px",
           letterSpacing: "0.5px",
         }}>
@@ -154,7 +153,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               textDecoration: "underline",
               padding: "4px 12px",
               borderRadius: "4px",
-              border: "1px solid #1B4F8A",
+              border: "1px solid var(--camo-gunmetal)",
             }}>
               {l.label}
             </Link>

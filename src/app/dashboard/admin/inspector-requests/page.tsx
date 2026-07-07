@@ -82,13 +82,13 @@ export default async function AdminInspectorRequestsPage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Inspector Requests
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {needsAssignment.length} needs assignment · {awaitingPayment.length} awaiting payment ·{" "}
             {assigned.length} assigned · {completed.length} completed
           </p>
@@ -97,7 +97,7 @@ export default async function AdminInspectorRequestsPage() {
           <Link
             href="/dashboard/admin/inspector-revenue"
             style={{
-              background: "#1B4F8A",
+              background: "var(--camo-gunmetal)",
               color: "#fff",
               border: "none",
               padding: "8px 16px",
@@ -114,8 +114,8 @@ export default async function AdminInspectorRequestsPage() {
             href="/dashboard/admin"
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -136,7 +136,7 @@ export default async function AdminInspectorRequestsPage() {
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: needsAssignment.length > 0 ? "#92400E" : "#1E3A8A",
+            color: needsAssignment.length > 0 ? "#92400E" : "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}
@@ -146,12 +146,12 @@ export default async function AdminInspectorRequestsPage() {
         {needsAssignment.length === 0 ? (
           <div
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "24px",
               textAlign: "center",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               fontSize: "14px",
             }}
           >
@@ -165,7 +165,7 @@ export default async function AdminInspectorRequestsPage() {
                 <div
                   key={r.id}
                   style={{
-                    background: "#EEF4FF",
+                    background: "var(--camo-concrete)",
                     border: "1px solid #FCD34D",
                     borderRadius: "10px",
                     padding: "18px",
@@ -186,13 +186,13 @@ export default async function AdminInspectorRequestsPage() {
                         style={{
                           fontWeight: 600,
                           fontSize: "15px",
-                          color: "#1E3A8A",
+                          color: "var(--camo-charcoal)",
                           marginBottom: "3px",
                         }}
                       >
                         {(p as any)?.title ?? "Untitled Project"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                         {(p as any)?.category?.replaceAll("_", " ") ?? "—"} ·{" "}
                         {(p as any)?.city ?? "—"}
                       </div>
@@ -208,11 +208,11 @@ export default async function AdminInspectorRequestsPage() {
                         >
                           <span
                             style={{
-                              background: "#EEF4FF",
-                              border: "1px solid #B8D0E8",
+                              background: "var(--camo-concrete)",
+                              border: "1px solid #d9dbdb",
                               borderRadius: "4px",
                               padding: "2px 7px",
-                              color: "#1B4F8A",
+                              color: "var(--camo-gunmetal)",
                               fontWeight: 600,
                             }}
                           >
@@ -226,7 +226,7 @@ export default async function AdminInspectorRequestsPage() {
                         </div>
                       )}
                       {r.requested_at && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                           Requested: {new Date(r.requested_at).toLocaleDateString()}
                         </div>
                       )}
@@ -234,7 +234,7 @@ export default async function AdminInspectorRequestsPage() {
                         href={`/dashboard/admin/projects/${r.project_id}`}
                         style={{
                           fontSize: "11px",
-                          color: "#4A7FB5",
+                          color: "var(--camo-gunmetal)",
                           textDecoration: "underline",
                           display: "inline-block",
                           marginTop: "6px",
@@ -266,8 +266,8 @@ export default async function AdminInspectorRequestsPage() {
                         name="inspector_id"
                         style={{
                           background: "#FFFFFF",
-                          border: "1px solid #B8D0E8",
-                          color: "#1E3A8A",
+                          border: "1px solid #d9dbdb",
+                          color: "var(--camo-charcoal)",
                           borderRadius: "6px",
                           padding: "8px 12px",
                           fontFamily: "'Barlow', sans-serif",
@@ -287,8 +287,8 @@ export default async function AdminInspectorRequestsPage() {
                       <button
                         type="submit"
                         style={{
-                          background: "#C8102E",
-                          color: "#fff",
+                          background: "var(--camo-accent)",
+                          color: "var(--camo-ink)",
                           border: "none",
                           padding: "8px 20px",
                           borderRadius: "6px",
@@ -313,14 +313,14 @@ export default async function AdminInspectorRequestsPage() {
       {/* Awaiting Payment */}
       {awaitingPayment.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
           <h2
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -335,8 +335,8 @@ export default async function AdminInspectorRequestsPage() {
                   key={r.id}
                   className="mob-card-stack"
                   style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -347,15 +347,15 @@ export default async function AdminInspectorRequestsPage() {
                 >
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}
+                      style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}
                     >
                       {(p as any)?.title ?? "Untitled"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
+                    <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
                       {(p as any)?.category?.replaceAll("_", " ") ?? "—"} · {(p as any)?.city ?? "—"}
                     </div>
                     {r.pricing_key && (
-                      <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "3px" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "3px" }}>
                         {r.pricing_key.replaceAll("_", " ")}
                         {r.fee_charged_cents ? ` · ${formatFee(r.fee_charged_cents)}` : ""}
                       </div>
@@ -385,14 +385,14 @@ export default async function AdminInspectorRequestsPage() {
       {/* Assigned */}
       {assigned.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
           <h2
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -407,8 +407,8 @@ export default async function AdminInspectorRequestsPage() {
                   key={r.id}
                   className="mob-card-stack"
                   style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -418,26 +418,26 @@ export default async function AdminInspectorRequestsPage() {
                 >
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}
+                      style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}
                     >
                       {(p as any)?.title ?? "Untitled"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "2px" }}>
+                    <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "2px" }}>
                       {(p as any)?.category?.replaceAll("_", " ") ?? "—"} · {(p as any)?.city ?? "—"}
                     </div>
                     {r.pricing_key && (
-                      <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "2px" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "2px" }}>
                         {r.pricing_key.replaceAll("_", " ")}
                         {r.fee_charged_cents ? ` · ${formatFee(r.fee_charged_cents)}` : ""}
                       </div>
                     )}
                     {inspectorMap.get(r.inspector_id) && (
-                      <div style={{ fontSize: "11px", color: "#1B4F8A" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                         Inspector: {inspectorMap.get(r.inspector_id)}
                       </div>
                     )}
                     {r.assigned_at && (
-                      <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                         Assigned: {new Date(r.assigned_at).toLocaleDateString()}
                       </div>
                     )}
@@ -448,9 +448,9 @@ export default async function AdminInspectorRequestsPage() {
                       fontWeight: 600,
                       padding: "4px 10px",
                       borderRadius: "20px",
-                      background: "#EEF4FF",
-                      color: "#1B4F8A",
-                      border: "1px solid #B8D0E8",
+                      background: "var(--camo-concrete)",
+                      color: "var(--camo-gunmetal)",
+                      border: "1px solid #d9dbdb",
                     }}
                   >
                     ASSIGNED
@@ -465,14 +465,14 @@ export default async function AdminInspectorRequestsPage() {
       {/* Completed */}
       {completed.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
           <h2
             style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -487,8 +487,8 @@ export default async function AdminInspectorRequestsPage() {
                   key={r.id}
                   className="mob-card-stack"
                   style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -499,21 +499,21 @@ export default async function AdminInspectorRequestsPage() {
                 >
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}
+                      style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}
                     >
                       {(p as any)?.title ?? "Untitled"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "2px" }}>
+                    <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "2px" }}>
                       {(p as any)?.category?.replaceAll("_", " ") ?? "—"} · {(p as any)?.city ?? "—"}
                     </div>
                     {r.pricing_key && (
-                      <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                         {r.pricing_key.replaceAll("_", " ")}
                         {r.fee_charged_cents ? ` · ${formatFee(r.fee_charged_cents)}` : ""}
                       </div>
                     )}
                     {inspectorMap.get(r.inspector_id) && (
-                      <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                         Inspector: {inspectorMap.get(r.inspector_id)}
                       </div>
                     )}

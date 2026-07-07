@@ -38,8 +38,8 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
           <div
             key={row.pricing_key}
             style={{
-              background: isEditing ? "#FFFBEB" : i % 2 === 0 ? "#EEF4FF" : "#FFFFFF",
-              borderBottom: "1px solid #B8D0E8",
+              background: isEditing ? "#FFFBEB" : i % 2 === 0 ? "var(--camo-concrete)" : "#FFFFFF",
+              borderBottom: "1px solid #d9dbdb",
               padding: "16px 20px",
             }}
           >
@@ -51,9 +51,9 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                   fontWeight: 700,
                   padding: "3px 8px",
                   borderRadius: "4px",
-                  background: "#EEF4FF",
-                  color: "#1B4F8A",
-                  border: "1px solid #B8D0E8",
+                  background: "var(--camo-concrete)",
+                  color: "var(--camo-gunmetal)",
+                  border: "1px solid #d9dbdb",
                   letterSpacing: "0.3px",
                 }}>
                   {row.pricing_key}
@@ -61,7 +61,7 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                 <span style={{
                   fontWeight: 600,
                   fontSize: "15px",
-                  color: "#1E3A8A",
+                  color: "var(--camo-charcoal)",
                 }}>
                   {row.display_name}
                 </span>
@@ -132,8 +132,8 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                     onClick={() => setEditingKey(row.pricing_key)}
                     style={{
                       background: "transparent",
-                      color: "#1B4F8A",
-                      border: "1px solid #B8D0E8",
+                      color: "var(--camo-gunmetal)",
+                      border: "1px solid #d9dbdb",
                       padding: "5px 12px",
                       borderRadius: "4px",
                       fontSize: "12px",
@@ -148,7 +148,7 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
             </div>
 
             {/* Description */}
-            <div style={{ fontSize: "13px", color: "#4A7FB5", marginBottom: "12px" }}>
+            <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
               {isEditing ? (
                 <input
                   form={`edit-${row.pricing_key}`}
@@ -156,13 +156,13 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                   defaultValue={row.description ?? ""}
                   style={{
                     width: "100%",
-                    border: "1px solid #B8D0E8",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "4px",
                     padding: "6px 10px",
                     fontSize: "13px",
                     fontFamily: "'Barlow', sans-serif",
                     background: "#fff",
-                    color: "#1E3A8A",
+                    color: "var(--camo-charcoal)",
                     boxSizing: "border-box",
                   }}
                 />
@@ -175,10 +175,10 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
             <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "flex-end" }}>
               {/* Fee */}
               <div>
-                <div style={{ fontSize: "10px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Fee</div>
+                <div style={{ fontSize: "10px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Fee</div>
                 {isEditing ? (
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <span style={{ color: "#1E3A8A", fontWeight: 600, fontSize: "14px" }}>$</span>
+                    <span style={{ color: "var(--camo-charcoal)", fontWeight: 600, fontSize: "14px" }}>$</span>
                     <input
                       form={`edit-${row.pricing_key}`}
                       name="fee_dollars"
@@ -188,19 +188,19 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                       defaultValue={(row.fee_cents / 100).toFixed(0)}
                       style={{
                         width: "70px",
-                        border: "1px solid #B8D0E8",
+                        border: "1px solid #d9dbdb",
                         borderRadius: "4px",
                         padding: "5px 8px",
                         fontSize: "14px",
                         fontFamily: "'Barlow', sans-serif",
                         background: "#fff",
-                        color: "#1E3A8A",
+                        color: "var(--camo-charcoal)",
                         fontWeight: 700,
                       }}
                     />
                   </div>
                 ) : (
-                  <span style={{ fontWeight: 700, fontSize: "18px", color: "#1E3A8A" }}>
+                  <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--camo-charcoal)" }}>
                     {formatFee(row.fee_cents)}
                   </span>
                 )}
@@ -208,7 +208,7 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
 
               {/* Inspector % */}
               <div>
-                <div style={{ fontSize: "10px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Insp. %</div>
+                <div style={{ fontSize: "10px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Insp. %</div>
                 {isEditing ? (
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                     <input
@@ -220,19 +220,19 @@ export default function PricingTable({ rows }: { rows: PriceRow[] }) {
                       defaultValue={row.inspector_share_percent}
                       style={{
                         width: "55px",
-                        border: "1px solid #B8D0E8",
+                        border: "1px solid #d9dbdb",
                         borderRadius: "4px",
                         padding: "5px 8px",
                         fontSize: "14px",
                         fontFamily: "'Barlow', sans-serif",
                         background: "#fff",
-                        color: "#1E3A8A",
+                        color: "var(--camo-charcoal)",
                       }}
                     />
-                    <span style={{ color: "#1E3A8A", fontWeight: 600 }}>%</span>
+                    <span style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>%</span>
                   </div>
                 ) : (
-                  <span style={{ fontSize: "18px", fontWeight: 600, color: "#1B4F8A" }}>
+                  <span style={{ fontSize: "18px", fontWeight: 600, color: "var(--camo-gunmetal)" }}>
                     {row.inspector_share_percent}%
                   </span>
                 )}

@@ -31,8 +31,8 @@ function statusColor(status: string) {
     case "PAID": return { bg: "#F0FDF4", color: "#15803D", border: "#166534" };
     case "PENDING": return { bg: "#FFFBEB", color: "#92400E", border: "#FCD34D" };
     case "DISPUTED": return { bg: "#FEF2F2", color: "#991B1B", border: "#FCA5A5" };
-    case "FAILED": return { bg: "#F8FAFF", color: "#4A7FB5", border: "#B8D0E8" };
-    default: return { bg: "#EEF4FF", color: "#1B4F8A", border: "#B8D0E8" };
+    case "FAILED": return { bg: "var(--camo-paper)", color: "var(--camo-gunmetal)", border: "#d9dbdb" };
+    default: return { bg: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "#d9dbdb" };
   }
 }
 
@@ -132,12 +132,12 @@ export default async function AdminEmergencyRequestsPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Emergency Requests
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {allLogs.length} total log rows · {totalActive} active · {totalDisputed} disputed · {totalSuspended} suspended clients
           </p>
         </div>
@@ -145,8 +145,8 @@ export default async function AdminEmergencyRequestsPage({
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -170,9 +170,9 @@ export default async function AdminEmergencyRequestsPage({
             key={tab.value}
             href={`/dashboard/admin/emergency-requests?filter=${tab.value}`}
             style={{
-              background: filter === tab.value ? "#1B4F8A" : "transparent",
-              color: filter === tab.value ? "#FFFFFF" : "#1B4F8A",
-              border: "1px solid #1B4F8A",
+              background: filter === tab.value ? "var(--camo-gunmetal)" : "transparent",
+              color: filter === tab.value ? "#FFFFFF" : "var(--camo-gunmetal)",
+              border: "1px solid var(--camo-gunmetal)",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -188,12 +188,12 @@ export default async function AdminEmergencyRequestsPage({
 
       {summaries.length === 0 ? (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "10px",
           padding: "32px",
           textAlign: "center",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
           fontSize: "14px",
         }}>
           No emergency requests match this filter.
@@ -211,8 +211,8 @@ export default async function AdminEmergencyRequestsPage({
 
             return (
               <div key={s.clientId} style={{
-                background: s.suspended ? "#1A0000" : "#EEF4FF",
-                border: `1px solid ${s.suspended ? "#C2410C" : "#B8D0E8"}`,
+                background: s.suspended ? "#1A0000" : "var(--camo-concrete)",
+                border: `1px solid ${s.suspended ? "#C2410C" : "#d9dbdb"}`,
                 borderRadius: "12px",
                 padding: "20px",
               }}>
@@ -223,12 +223,12 @@ export default async function AdminEmergencyRequestsPage({
                       fontFamily: "'Barlow Condensed', sans-serif",
                       fontWeight: 700,
                       fontSize: "18px",
-                      color: s.suspended ? "#FDBA74" : "#1E3A8A",
+                      color: s.suspended ? "#FDBA74" : "var(--camo-charcoal)",
                       marginBottom: "4px",
                     }}>
                       {s.email}
                     </div>
-                    <div style={{ fontSize: "12px", color: s.suspended ? "#FED7AA" : "#4A7FB5" }}>
+                    <div style={{ fontSize: "12px", color: s.suspended ? "#FED7AA" : "var(--camo-gunmetal)" }}>
                       {used} of 2{s.unusedBonusSlots > 0 ? ` (+${s.unusedBonusSlots} bonus)` : ""} used in rolling 30 days
                       {s.suspended && (
                         <span style={{ marginLeft: "10px", color: "#FCA5A5", fontWeight: 600 }}>
@@ -244,7 +244,7 @@ export default async function AdminEmergencyRequestsPage({
                       <button
                         type="submit"
                         style={{
-                          background: "#1B4F8A",
+                          background: "var(--camo-gunmetal)",
                           color: "#FFFFFF",
                           border: "none",
                           padding: "8px 14px",
@@ -294,10 +294,10 @@ export default async function AdminEmergencyRequestsPage({
                             padding: "6px 10px",
                             fontSize: "10px",
                             fontWeight: 600,
-                            color: "#4A7FB5",
+                            color: "var(--camo-gunmetal)",
                             textTransform: "uppercase",
                             letterSpacing: "0.5px",
-                            borderBottom: "1px solid #B8D0E8",
+                            borderBottom: "1px solid #d9dbdb",
                           }}>
                             {h}
                           </th>
@@ -309,10 +309,10 @@ export default async function AdminEmergencyRequestsPage({
                         const sc = statusColor(row.payment_status);
                         return (
                           <tr key={row.id}>
-                            <td style={{ padding: "8px 10px", color: "#1E3A8A", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: "var(--camo-charcoal)", borderBottom: "1px solid var(--camo-concrete)" }}>
                               {fmtDate(row.created_at)}
                             </td>
-                            <td style={{ padding: "8px 10px", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", borderBottom: "1px solid var(--camo-concrete)" }}>
                               <span style={{
                                 fontSize: "10px",
                                 fontWeight: 600,
@@ -325,26 +325,26 @@ export default async function AdminEmergencyRequestsPage({
                                 {row.payment_status}
                               </span>
                             </td>
-                            <td style={{ padding: "8px 10px", color: "#1B4F8A", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: "var(--camo-gunmetal)", borderBottom: "1px solid var(--camo-concrete)" }}>
                               {row.project_id ? (
                                 <Link
                                   href={`/dashboard/admin/projects/${row.project_id}`}
-                                  style={{ color: "#1B4F8A", textDecoration: "underline", fontSize: "11px" }}
+                                  style={{ color: "var(--camo-gunmetal)", textDecoration: "underline", fontSize: "11px" }}
                                 >
                                   View →
                                 </Link>
                               ) : "—"}
                             </td>
-                            <td style={{ padding: "8px 10px", color: "#1E3A8A", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: "var(--camo-charcoal)", borderBottom: "1px solid var(--camo-concrete)" }}>
                               {row.close_reason ?? (row.closed_at ? "CLOSED" : row.payment_status === "PAID" ? "ACTIVE" : "—")}
                             </td>
-                            <td style={{ padding: "8px 10px", color: row.counts_against_limit ? "#1E3A8A" : "#4A7FB5", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: row.counts_against_limit ? "var(--camo-charcoal)" : "var(--camo-gunmetal)", borderBottom: "1px solid var(--camo-concrete)" }}>
                               {row.counts_against_limit ? "Yes" : "No"}
                             </td>
-                            <td style={{ padding: "8px 10px", color: row.admin_granted ? "#1B4F8A" : "#4A7FB5", borderBottom: "1px solid #EEF4FF" }}>
+                            <td style={{ padding: "8px 10px", color: row.admin_granted ? "var(--camo-gunmetal)" : "var(--camo-gunmetal)", borderBottom: "1px solid var(--camo-concrete)" }}>
                               {row.admin_granted ? "✓" : "—"}
                             </td>
-                            <td style={{ padding: "8px 10px", color: "#4A7FB5", borderBottom: "1px solid #EEF4FF", fontFamily: "monospace", fontSize: "10px" }}>
+                            <td style={{ padding: "8px 10px", color: "var(--camo-gunmetal)", borderBottom: "1px solid var(--camo-concrete)", fontFamily: "monospace", fontSize: "10px" }}>
                               {row.stripe_payment_intent_id ? row.stripe_payment_intent_id.slice(-8) : "—"}
                             </td>
                           </tr>
@@ -353,7 +353,7 @@ export default async function AdminEmergencyRequestsPage({
                     </tbody>
                   </table>
                   {s.rows.length > 10 && (
-                    <div style={{ fontSize: "11px", color: "#4A7FB5", padding: "6px 10px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", padding: "6px 10px" }}>
                       Showing 10 of {s.rows.length} rows
                     </div>
                   )}

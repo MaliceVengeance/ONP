@@ -56,8 +56,8 @@ export default async function AdminDisputesPage() {
 
   const statCard = (label: string, value: number, accent?: string) => (
     <div style={{
-      background: "#EEF4FF",
-      border: `1px solid ${accent ?? "#B8D0E8"}`,
+      background: "var(--camo-concrete)",
+      border: `1px solid ${accent ?? "#d9dbdb"}`,
       borderRadius: "10px",
       padding: "16px 20px",
       minWidth: "120px",
@@ -66,12 +66,12 @@ export default async function AdminDisputesPage() {
         fontFamily: "'Barlow Condensed', sans-serif",
         fontWeight: 700,
         fontSize: "36px",
-        color: accent ?? "#1E3A8A",
+        color: accent ?? "var(--camo-charcoal)",
         lineHeight: 1,
       }}>
         {value ?? 0}
       </div>
-      <div style={{ fontSize: "11px", color: "#4A7FB5", textTransform: "uppercase", letterSpacing: "1px", marginTop: "4px" }}>
+      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "4px" }}>
         {label}
       </div>
     </div>
@@ -81,19 +81,19 @@ export default async function AdminDisputesPage() {
     fontFamily: "'Barlow', sans-serif",
     fontWeight: 600,
     fontSize: "11px",
-    color: "#4A7FB5",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase",
     letterSpacing: "1px",
     padding: "8px 12px",
     textAlign: "left",
-    borderBottom: "1px solid #B8D0E8",
+    borderBottom: "1px solid #d9dbdb",
   };
 
   const cellStyle: React.CSSProperties = {
     padding: "11px 12px",
     fontSize: "13px",
-    color: "#1E3A8A",
-    borderBottom: "1px solid #EEF4FF",
+    color: "var(--camo-charcoal)",
+    borderBottom: "1px solid var(--camo-concrete)",
     verticalAlign: "middle",
   };
 
@@ -104,12 +104,12 @@ export default async function AdminDisputesPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: 0,
         }}>
           Dispute Oversight
         </h1>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "6px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
           All inspector upgrade disputes. Click a row to open the full review page.
         </p>
       </div>
@@ -117,23 +117,23 @@ export default async function AdminDisputesPage() {
       {/* Stats row */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "28px" }}>
         {statCard("Total", totalCount ?? 0)}
-        {statCard("Open", openCount ?? 0, (openCount ?? 0) > 0 ? "#C8102E" : undefined)}
-        {statCard("Unassigned", unassignedCount ?? 0, (unassignedCount ?? 0) > 0 ? "#C8102E" : undefined)}
+        {statCard("Open", openCount ?? 0, (openCount ?? 0) > 0 ? "var(--camo-accent)" : undefined)}
+        {statCard("Unassigned", unassignedCount ?? 0, (unassignedCount ?? 0) > 0 ? "var(--camo-accent)" : undefined)}
         {statCard("Refunded", refundCount ?? 0)}
         {statCard("Partial Credit", partialCount ?? 0)}
         {statCard("Denied", deniedCount ?? 0)}
       </div>
 
       {/* Disputes table */}
-      <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "12px", overflow: "hidden" }}>
+      <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "12px", overflow: "hidden" }}>
         {(disputes ?? []).length === 0 ? (
-          <p style={{ padding: "24px", fontSize: "13px", color: "#4A7FB5", margin: 0 }}>
+          <p style={{ padding: "24px", fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>
             No disputes found.
           </p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "#F0F6FF" }}>
+              <tr style={{ background: "var(--camo-paper)" }}>
                 <th style={tableHeaderStyle}>Project</th>
                 <th style={tableHeaderStyle}>Status</th>
                 <th style={tableHeaderStyle}>Assigned To</th>
@@ -156,7 +156,7 @@ export default async function AdminDisputesPage() {
                   <tr key={d.id} style={{ background: "#fff" }}>
                     <td style={cellStyle}>
                       <div style={{ fontWeight: 600 }}>{projectTitle}</div>
-                      <div style={{ fontSize: "10px", color: "#4A7FB5", fontFamily: "monospace" }}>
+                      <div style={{ fontSize: "10px", color: "var(--camo-gunmetal)", fontFamily: "monospace" }}>
                         {d.id.slice(0, 8)}…
                       </div>
                     </td>
@@ -173,7 +173,7 @@ export default async function AdminDisputesPage() {
                         {d.status.replace("RESOLVED_", "").replace("_", " ")}
                       </span>
                     </td>
-                    <td style={{ ...cellStyle, color: d.master_inspector_id ? "#1E3A8A" : "#9CA3AF", fontStyle: d.master_inspector_id ? "normal" : "italic" }}>
+                    <td style={{ ...cellStyle, color: d.master_inspector_id ? "var(--camo-charcoal)" : "#9CA3AF", fontStyle: d.master_inspector_id ? "normal" : "italic" }}>
                       {miName}
                     </td>
                     <td style={cellStyle}>{assignedDate}</td>
@@ -182,7 +182,7 @@ export default async function AdminDisputesPage() {
                       <Link
                         href={`/dashboard/inspector/disputes/${d.id}`}
                         style={{
-                          background: "#1B4F8A",
+                          background: "var(--camo-gunmetal)",
                           color: "#fff",
                           padding: "5px 12px",
                           borderRadius: "6px",

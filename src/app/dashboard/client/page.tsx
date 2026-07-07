@@ -74,16 +74,16 @@ export default async function ClientDashboard() {
       {/* Header */}
       <div className="mob-col" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "var(--camo-charcoal)", margin: 0 }}>
             Client Dashboard
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
         <Link href="/dashboard/client/projects/new" style={{
-          background: "#C8102E",
-          color: "#fff",
+          background: "var(--camo-accent)",
+          color: "var(--camo-ink)",
           border: "none",
           padding: "10px 20px",
           borderRadius: "6px",
@@ -107,8 +107,8 @@ export default async function ClientDashboard() {
           { label: "Awarded", count: awarded.length, accent: false },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#EEF4FF",
-            border: `1px solid ${s.accent ? "#C8102E" : "#B8D0E8"}`,
+            background: "var(--camo-concrete)",
+            border: `1px solid ${s.accent ? "var(--camo-accent)" : "#d9dbdb"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -117,11 +117,11 @@ export default async function ClientDashboard() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#1E3A8A",
+              color: s.accent ? "var(--camo-accent)" : "var(--camo-charcoal)",
             }}>
               {s.count}
             </div>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
             </div>
           </div>
@@ -139,8 +139,8 @@ export default async function ClientDashboard() {
         ].map((l) => (
           <Link key={l.href} href={l.href} style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 18px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -175,8 +175,8 @@ export default async function ClientDashboard() {
       {totalUnreadMessages > 0 && (
         <Link href="/dashboard/client/projects?tab=awarded" style={{ textDecoration: "none", display: "block", marginBottom: "20px" }}>
           <div style={{
-            background: "#1E3A8A",
-            border: "1px solid #1B4F8A",
+            background: "var(--camo-charcoal)",
+            border: "1px solid var(--camo-gunmetal)",
             borderRadius: "10px",
             padding: "14px 18px",
             display: "flex",
@@ -190,7 +190,7 @@ export default async function ClientDashboard() {
                 <div style={{ fontWeight: 700, fontSize: "14px", color: "#FFFFFF" }}>
                   {totalUnreadMessages} unread message{totalUnreadMessages !== 1 ? "s" : ""}
                 </div>
-                <div style={{ fontSize: "12px", color: "#7A9CC4", marginTop: "1px" }}>
+                <div style={{ fontSize: "12px", color: "var(--camo-steel)", marginTop: "1px" }}>
                   New messages from your awarded project{awarded.length !== 1 ? "s" : ""}
                 </div>
               </div>
@@ -200,8 +200,8 @@ export default async function ClientDashboard() {
               fontWeight: 700,
               padding: "4px 12px",
               borderRadius: "20px",
-              background: "#C8102E",
-              color: "#FFFFFF",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               whiteSpace: "nowrap",
             }}>
               View →
@@ -213,7 +213,7 @@ export default async function ClientDashboard() {
       {/* Needs Action */}
       {needsAction.length > 0 && (
         <div style={{ marginBottom: "32px" }}>
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#C8102E", textTransform: "uppercase", marginBottom: "12px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-accent-dim)", textTransform: "uppercase", marginBottom: "12px" }}>
             ⚠ Needs Your Attention
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -227,10 +227,10 @@ export default async function ClientDashboard() {
       {/* Recent Projects */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", margin: 0 }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", margin: 0 }}>
             Recent Projects
           </h2>
-          <Link href="/dashboard/client/projects" style={{ fontSize: "13px", color: "#1B4F8A", textDecoration: "underline" }}>
+          <Link href="/dashboard/client/projects" style={{ fontSize: "13px", color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
             View all
           </Link>
         </div>
@@ -240,9 +240,9 @@ export default async function ClientDashboard() {
             Failed to load projects.
           </div>
         ) : projects.length === 0 ? (
-          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+          <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "32px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
             No projects yet.{" "}
-            <Link href="/dashboard/client/projects/new" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
+            <Link href="/dashboard/client/projects/new" style={{ color: "var(--camo-charcoal)", textDecoration: "underline" }}>
               Create your first project
             </Link>
           </div>
@@ -267,8 +267,8 @@ function ProjectCard({ p }: { p: Project }) {
   return (
     <Link href={`/dashboard/client/projects/${p.id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "10px",
         padding: "18px",
         display: "flex",
@@ -277,14 +277,14 @@ function ProjectCard({ p }: { p: Project }) {
         cursor: "pointer",
       }}>
         <div>
-          <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
             {p.title ?? "Untitled"}
           </div>
-          <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
+          <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
             {p.category ?? "—"} • {p.city ?? "—"}
           </div>
           {deadline && (
-            <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5" }}>
+            <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "var(--camo-gunmetal)" }}>
               {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
             </div>
           )}

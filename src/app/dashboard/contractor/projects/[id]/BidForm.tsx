@@ -103,8 +103,8 @@ export default function BidForm({
   const inputStyle: React.CSSProperties = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -117,7 +117,7 @@ export default function BidForm({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#1B4F8A",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase",
     letterSpacing: "1px",
     marginTop: "16px",
@@ -127,8 +127,8 @@ export default function BidForm({
   if (step === "form") {
     return (
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "24px",
       }}>
@@ -137,13 +137,13 @@ export default function BidForm({
           fontWeight: 700,
           fontSize: "20px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           {existingBid ? "Revise Your Bid" : "Submit a Bid"}
         </h2>
-        <p style={{ fontSize: "12px", color: isEmergency ? "#C8102E" : "#1B4F8A", marginBottom: "4px" }}>
+        <p style={{ fontSize: "12px", color: isEmergency ? "var(--camo-accent)" : "var(--camo-gunmetal)", marginBottom: "4px" }}>
           {isEmergency
             ? "🚨 Emergency bid — your bid is visible to the client immediately upon submission."
             : "Bids are sealed until the deadline. You can revise anytime before it closes."}
@@ -192,8 +192,8 @@ export default function BidForm({
           style={{
             marginTop: "18px",
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px dashed #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px dashed #d9dbdb",
             borderRadius: "8px",
             padding: "10px 14px",
             fontFamily: "'Barlow', sans-serif",
@@ -210,12 +210,12 @@ export default function BidForm({
         {showDetails && (
           <div style={{
             background: "#FFFFFF",
-            border: "1px solid #B8D0E8",
+            border: "1px solid #d9dbdb",
             borderRadius: "8px",
             padding: "16px",
             marginTop: "10px",
           }}>
-            <p style={{ fontSize: "12px", color: "#4A7FB5", lineHeight: 1.6, marginBottom: "14px" }}>
+            <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "14px" }}>
               This drives the side-by-side comparison view the client sees. Attaching your official quote PDF keeps your letterhead and signature as the authoritative document if a dispute ever comes up.
             </p>
 
@@ -262,7 +262,7 @@ export default function BidForm({
               <button
                 type="button"
                 onClick={() => setLineItems((items) => [...items, emptyLineItem()])}
-                style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", borderRadius: "6px", padding: "8px", fontSize: "12px", cursor: "pointer", alignSelf: "flex-start" }}
+                style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "8px", fontSize: "12px", cursor: "pointer", alignSelf: "flex-start" }}
               >
                 + Add line item
               </button>
@@ -312,20 +312,20 @@ export default function BidForm({
 
         {/* Short inline notice */}
         <div style={{
-          background: "#F0F6FF",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-paper)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "8px",
           padding: "12px 14px",
           marginTop: "16px",
           fontSize: "12px",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
           lineHeight: 1.6,
         }}>
-          <strong style={{ color: "#1E3A8A" }}>Your bid is your commitment.</strong> By submitting,
+          <strong style={{ color: "var(--camo-charcoal)" }}>Your bid is your commitment.</strong> By submitting,
           you confirm you've reviewed the project details, asked any clarifying questions (RFIs),
           and priced the work based on the information available. ONP does not verify project details
           and is not a party to your agreement with the Client.{" "}
-          <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "#1B4F8A", fontWeight: 600 }}>
+          <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)", fontWeight: 600 }}>
             Full disclaimer →
           </Link>
         </div>
@@ -339,8 +339,8 @@ export default function BidForm({
           }}
           style={{
             marginTop: "20px",
-            background: amount.trim() ? "#C8102E" : "#B8D0E8",
-            color: "#fff",
+            background: amount.trim() ? "var(--camo-accent)" : "#d9dbdb",
+            color: "var(--camo-ink)",
             border: "none",
             padding: "12px 28px",
             borderRadius: "6px",
@@ -360,8 +360,8 @@ export default function BidForm({
   // ─── Step 2: Pre-submit Confirmation ────────────────────────────────────────
   return (
     <div style={{
-      background: "#EEF4FF",
-      border: "1px solid #B8D0E8",
+      background: "var(--camo-concrete)",
+      border: "1px solid #d9dbdb",
       borderRadius: "12px",
       padding: "24px",
     }}>
@@ -370,7 +370,7 @@ export default function BidForm({
         fontWeight: 700,
         fontSize: "20px",
         letterSpacing: "1px",
-        color: "#1E3A8A",
+        color: "var(--camo-charcoal)",
         textTransform: "uppercase",
         marginBottom: "4px",
       }}>
@@ -379,7 +379,7 @@ export default function BidForm({
 
       <div style={{
         background: "#FFFFFF",
-        border: "1px solid #B8D0E8",
+        border: "1px solid #d9dbdb",
         borderRadius: "8px",
         padding: "14px 16px",
         marginTop: "12px",
@@ -389,30 +389,30 @@ export default function BidForm({
         justifyContent: "space-between",
         gap: "12px",
       }}>
-        <span style={{ fontSize: "13px", color: "#1B4F8A" }}>Your bid amount</span>
+        <span style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Your bid amount</span>
         <span style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "28px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           lineHeight: 1,
         }}>
           ${Number(amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </span>
       </div>
 
-      <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.6, marginBottom: "14px" }}>
+      <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "14px" }}>
         By submitting, you acknowledge and agree:
       </p>
 
       <ul style={{
         background: "#FFFFFF",
-        border: "1px solid #B8D0E8",
+        border: "1px solid #d9dbdb",
         borderRadius: "8px",
         padding: "14px 14px 14px 30px",
         marginBottom: "16px",
         fontSize: "12px",
-        color: "#1E3A8A",
+        color: "var(--camo-charcoal)",
         lineHeight: 1.8,
       }}>
         <li>You have reviewed the project description, photos, files, and any inspector report provided</li>
@@ -433,16 +433,16 @@ export default function BidForm({
         marginBottom: "10px",
         padding: "10px 12px",
         background: termsChecked ? "#F0FDF4" : "#FFFFFF",
-        border: `1px solid ${termsChecked ? "#166534" : "#B8D0E8"}`,
+        border: `1px solid ${termsChecked ? "#166534" : "#d9dbdb"}`,
         borderRadius: "8px",
       }}>
         <input
           type="checkbox"
           checked={termsChecked}
           onChange={(e) => setTermsChecked(e.target.checked)}
-          style={{ marginTop: "2px", accentColor: "#1B4F8A", flexShrink: 0 }}
+          style={{ marginTop: "2px", accentColor: "var(--camo-gunmetal)", flexShrink: 0 }}
         />
-        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+        <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
           I understand and accept these terms.
         </span>
       </label>
@@ -456,16 +456,16 @@ export default function BidForm({
         marginBottom: isEmergency ? "10px" : "16px",
         padding: "10px 12px",
         background: credentialsChecked ? "#F0FDF4" : "#FFFFFF",
-        border: `1px solid ${credentialsChecked ? "#166534" : "#B8D0E8"}`,
+        border: `1px solid ${credentialsChecked ? "#166534" : "#d9dbdb"}`,
         borderRadius: "8px",
       }}>
         <input
           type="checkbox"
           checked={credentialsChecked}
           onChange={(e) => setCredentialsChecked(e.target.checked)}
-          style={{ marginTop: "2px", accentColor: "#1B4F8A", flexShrink: 0 }}
+          style={{ marginTop: "2px", accentColor: "var(--camo-gunmetal)", flexShrink: 0 }}
         />
-        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+        <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
           I confirm my license, insurance, and business information on file are current and accurate.
         </span>
       </label>
@@ -479,15 +479,15 @@ export default function BidForm({
           cursor: "pointer",
           marginBottom: "16px",
           padding: "10px 12px",
-          background: emergencyChecked ? "#1B4F8A" : "#1E3A8A",
-          border: `1px solid ${emergencyChecked ? "#1B4F8A" : "#C8102E"}`,
+          background: emergencyChecked ? "var(--camo-gunmetal)" : "var(--camo-charcoal)",
+          border: `1px solid ${emergencyChecked ? "var(--camo-gunmetal)" : "var(--camo-accent)"}`,
           borderRadius: "8px",
         }}>
           <input
             type="checkbox"
             checked={emergencyChecked}
             onChange={(e) => setEmergencyChecked(e.target.checked)}
-            style={{ marginTop: "2px", accentColor: "#C8102E", flexShrink: 0 }}
+            style={{ marginTop: "2px", accentColor: "var(--camo-accent)", flexShrink: 0 }}
           />
           <span style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.5 }}>
             I understand this is an emergency bid. My bid is <strong style={{ color: "#FFFFFF" }}>preliminary and incomplete</strong> — no site visit has been conducted. This bid will be immediately visible to the client. I am not held to a final price until scope and conditions are confirmed in person.
@@ -515,8 +515,8 @@ export default function BidForm({
           disabled={!bothChecked || submitting}
           onClick={handleConfirm}
           style={{
-            background: bothChecked ? "#C8102E" : "#B8D0E8",
-            color: "#fff",
+            background: bothChecked ? "var(--camo-accent)" : "#d9dbdb",
+            color: "var(--camo-ink)",
             border: "none",
             padding: "12px 28px",
             borderRadius: "6px",
@@ -535,8 +535,8 @@ export default function BidForm({
           onClick={() => { setStep("form"); setTermsChecked(false); setCredentialsChecked(false); setEmergencyChecked(false); }}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "12px 20px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -548,8 +548,8 @@ export default function BidForm({
         </button>
       </div>
 
-      <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "10px" }}>
-        <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "#1B4F8A" }}>
+      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "10px" }}>
+        <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)" }}>
           Read full Contractor Bid Acknowledgment →
         </Link>
       </div>

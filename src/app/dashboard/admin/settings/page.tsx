@@ -8,8 +8,8 @@ export default async function AdminSettingsPage() {
   const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
 
   const sectionStyle: React.CSSProperties = {
-    background: "#EEF4FF",
-    border: "1px solid #B8D0E8",
+    background: "var(--camo-concrete)",
+    border: "1px solid #d9dbdb",
     borderRadius: "12px",
     padding: "24px",
     marginBottom: "20px",
@@ -22,12 +22,12 @@ export default async function AdminSettingsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: 0,
         }}>
           Platform Settings
         </h1>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "6px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
           Toggle platform features on or off without touching the code. Changes take effect immediately.
         </p>
       </div>
@@ -40,12 +40,12 @@ export default async function AdminSettingsPage() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "20px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               marginBottom: "6px",
             }}>
               Inspector Takeoff Feature
             </div>
-            <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.7, margin: 0 }}>
               Controls whether clients can request an on-site inspector takeoff for their projects.
               When <strong>OFF</strong>, the inspector button is hidden from client project pages and
               the inspector request flow is disabled. Existing assignments and all inspector code
@@ -87,8 +87,8 @@ export default async function AdminSettingsPage() {
                 <button
                   type="submit"
                   style={{
-                    background: "#C8102E",
-                    color: "#fff",
+                    background: "var(--camo-accent)",
+                    color: "var(--camo-ink)",
                     border: "none",
                     borderRadius: "8px",
                     padding: "10px 20px",
@@ -127,12 +127,12 @@ export default async function AdminSettingsPage() {
 
       {/* Placeholder for future flags */}
       <div style={{
-        background: "#F8FAFF",
-        border: "1px dashed #B8D0E8",
+        background: "var(--camo-paper)",
+        border: "1px dashed #d9dbdb",
         borderRadius: "12px",
         padding: "20px 24px",
         fontSize: "13px",
-        color: "#4A7FB5",
+        color: "var(--camo-gunmetal)",
         fontStyle: "italic",
       }}>
         Additional feature flags (emergency bids, contractor onboarding, etc.) can be added here as needed.

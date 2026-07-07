@@ -15,8 +15,8 @@ type Profile = {
 const ALL_ROLES = ["CLIENT", "CONTRACTOR", "INSPECTOR", "ADMIN"];
 
 const TABS = [
-  { label: "All",         value: null,         color: "#1B4F8A" },
-  { label: "Clients",     value: "CLIENT",     color: "#1B4F8A" },
+  { label: "All",         value: null,         color: "var(--camo-gunmetal)" },
+  { label: "Clients",     value: "CLIENT",     color: "var(--camo-gunmetal)" },
   { label: "Contractors", value: "CONTRACTOR", color: "#15803D" },
   { label: "Inspectors",  value: "INSPECTOR",  color: "#92400E" },
   { label: "Admins",      value: "ADMIN",      color: "#991B1B" },
@@ -25,10 +25,10 @@ const TABS = [
 function roleColor(role: string) {
   switch (role) {
     case "ADMIN":      return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
-    case "CLIENT":     return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    case "CLIENT":     return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
     case "CONTRACTOR": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
     case "INSPECTOR":  return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
-    default:           return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+    default:           return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
   }
 }
 
@@ -83,12 +83,12 @@ export default async function AdminUsersPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Users
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {totalActive} active • {profiles.filter((p) => p.deactivated).length} deactivated
           </p>
         </div>
@@ -96,8 +96,8 @@ export default async function AdminUsersPage({
           <Link
             href="/dashboard/admin/users/create"
             style={{
-              background: "#C8102E",
-              color: "#fff",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               border: "none",
               padding: "8px 16px",
               borderRadius: "6px",
@@ -114,8 +114,8 @@ export default async function AdminUsersPage({
             href="/dashboard/admin"
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -133,7 +133,7 @@ export default async function AdminUsersPage({
         display: "flex",
         gap: "6px",
         marginBottom: "24px",
-        borderBottom: "2px solid #B8D0E8",
+        borderBottom: "2px solid #d9dbdb",
         paddingBottom: "0",
         flexWrap: "wrap",
       }}>
@@ -154,11 +154,11 @@ export default async function AdminUsersPage({
                 fontWeight: isActive ? 700 : 500,
                 fontSize: "13px",
                 textDecoration: "none",
-                color: isActive ? tab.color : "#4A7FB5",
+                color: isActive ? tab.color : "var(--camo-gunmetal)",
                 background: isActive ? "#FFFFFF" : "transparent",
                 borderTop: isActive ? `2px solid ${tab.color}` : "2px solid transparent",
-                borderLeft: isActive ? "1px solid #B8D0E8" : "1px solid transparent",
-                borderRight: isActive ? "1px solid #B8D0E8" : "1px solid transparent",
+                borderLeft: isActive ? "1px solid #d9dbdb" : "1px solid transparent",
+                borderRight: isActive ? "1px solid #d9dbdb" : "1px solid transparent",
                 borderBottom: isActive ? "2px solid #FFFFFF" : "none",
                 marginBottom: isActive ? "-2px" : "0",
                 display: "inline-flex",
@@ -172,8 +172,8 @@ export default async function AdminUsersPage({
                 fontWeight: 700,
                 padding: "1px 7px",
                 borderRadius: "20px",
-                background: isActive ? tab.color : "#EEF4FF",
-                color: isActive ? "#fff" : "#4A7FB5",
+                background: isActive ? tab.color : "var(--camo-concrete)",
+                color: isActive ? "#fff" : "var(--camo-gunmetal)",
               }}>
                 {count}
               </span>
@@ -189,7 +189,7 @@ export default async function AdminUsersPage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -198,12 +198,12 @@ export default async function AdminUsersPage({
 
         {active.length === 0 ? (
           <div style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "10px",
             padding: "24px",
             textAlign: "center",
-            color: "#4A7FB5",
+            color: "var(--camo-gunmetal)",
             fontSize: "14px",
           }}>
             No {activeTab ? activeTab.toLowerCase() + " " : ""}users found.
@@ -215,22 +215,22 @@ export default async function AdminUsersPage({
               return (
                 <div key={p.id} style={{
                   background: "#FFFFFF",
-                  border: "1px solid #B8D0E8",
+                  border: "1px solid #d9dbdb",
                   borderRadius: "10px",
                   padding: "18px",
                 }}>
                   <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                         {p.display_name ?? p.company_name ?? "No name set"}
                       </div>
-                      <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                         {auth?.email ?? "No email found"}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                         ID: {p.id}
                       </div>
-                      <div className="mob-wrap" style={{ display: "flex", gap: "16px", fontSize: "11px", color: "#4A7FB5" }}>
+                      <div className="mob-wrap" style={{ display: "flex", gap: "16px", fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                         <span>Joined: {new Date(p.created_at).toLocaleDateString()}</span>
                         {auth?.last_sign_in_at && (
                           <span>Last login: {new Date(auth.last_sign_in_at).toLocaleDateString()}</span>
@@ -255,8 +255,8 @@ export default async function AdminUsersPage({
                           href={`/dashboard/admin/users/${p.id}`}
                           style={{
                             background: "transparent",
-                            color: "#1B4F8A",
-                            border: "1px solid #B8D0E8",
+                            color: "var(--camo-gunmetal)",
+                            border: "1px solid #d9dbdb",
                             padding: "5px 10px",
                             borderRadius: "6px",
                             fontFamily: "'Barlow', sans-serif",
@@ -280,8 +280,8 @@ export default async function AdminUsersPage({
                                 defaultValue={p.role}
                                 style={{
                                   background: "#FFFFFF",
-                                  border: "1px solid #B8D0E8",
-                                  color: "#1E3A8A",
+                                  border: "1px solid #d9dbdb",
+                                  color: "var(--camo-charcoal)",
                                   borderRadius: "6px",
                                   padding: "5px 8px",
                                   fontFamily: "'Barlow', sans-serif",
@@ -295,8 +295,8 @@ export default async function AdminUsersPage({
                               </select>
                               <button style={{
                                 background: "transparent",
-                                color: "#1B4F8A",
-                                border: "1px solid #B8D0E8",
+                                color: "var(--camo-gunmetal)",
+                                border: "1px solid #d9dbdb",
                                 padding: "5px 10px",
                                 borderRadius: "6px",
                                 fontFamily: "'Barlow', sans-serif",
@@ -328,7 +328,7 @@ export default async function AdminUsersPage({
                         )}
 
                         {p.id === adminUser.id && (
-                          <span style={{ fontSize: "12px", color: "#4A7FB5" }}>(you)</span>
+                          <span style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>(you)</span>
                         )}
                       </div>
                     </div>
@@ -343,7 +343,7 @@ export default async function AdminUsersPage({
       {/* Deactivated users */}
       {deactivated.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
@@ -368,7 +368,7 @@ export default async function AdminUsersPage({
                 }}>
                   <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                         {p.display_name ?? p.company_name ?? "No name set"}
                       </div>
                       <div style={{ fontSize: "13px", color: "#991B1B", marginBottom: "2px" }}>
@@ -389,8 +389,8 @@ export default async function AdminUsersPage({
                         href={`/dashboard/admin/users/${p.id}`}
                         style={{
                           background: "transparent",
-                          color: "#1B4F8A",
-                          border: "1px solid #B8D0E8",
+                          color: "var(--camo-gunmetal)",
+                          border: "1px solid #d9dbdb",
                           padding: "6px 12px",
                           borderRadius: "6px",
                           fontFamily: "'Barlow', sans-serif",

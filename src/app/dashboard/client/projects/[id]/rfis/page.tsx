@@ -43,8 +43,8 @@ export default async function ClientRfiPage({
   const inputStyle = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -71,23 +71,23 @@ export default async function ClientRfiPage({
             fontWeight: 700,
             fontSize: "32px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Questions (RFIs)
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {project?.title ?? "Untitled"} — {project?.category ?? "—"}
           </p>
-          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>
+          <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>
             Your responses are visible to all bidding contractors.
           </p>
         </div>
         <Link
           href={`/dashboard/client/projects/${projectId}`}
           style={{
-            background: "#C8102E",
-            color: "#fff",
+            background: "var(--camo-accent)",
+            color: "var(--camo-ink)",
             border: "none",
             padding: "10px 18px",
             borderRadius: "6px",
@@ -136,12 +136,12 @@ export default async function ClientRfiPage({
       {/* No RFIs */}
       {rfiRows.length === 0 && !error && (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "10px",
           padding: "32px",
           textAlign: "center",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
           fontSize: "14px",
         }}>
           No questions have been submitted yet. Check back once contractors start reviewing your project.
@@ -218,18 +218,18 @@ export default async function ClientRfiPage({
                   {/* Contractor's additional notes */}
                   {r.question && (
                     <div style={{
-                      background: "#EEF4FF",
-                      border: "1px solid #B8D0E8",
+                      background: "var(--camo-concrete)",
+                      border: "1px solid #d9dbdb",
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontSize: "13px",
-                      color: "#1E3A8A",
+                      color: "var(--camo-charcoal)",
                       marginBottom: "14px",
                       lineHeight: 1.6,
                     }}>
                       <div style={{
                         fontSize: "10px",
-                        color: "#1B4F8A",
+                        color: "var(--camo-gunmetal)",
                         textTransform: "uppercase",
                         letterSpacing: "1px",
                         marginBottom: "4px",
@@ -246,7 +246,7 @@ export default async function ClientRfiPage({
                       display: "block",
                       fontSize: "11px",
                       fontWeight: 600,
-                      color: "#1B4F8A",
+                      color: "var(--camo-gunmetal)",
                       textTransform: "uppercase",
                       letterSpacing: "1px",
                       marginBottom: "4px",
@@ -263,8 +263,8 @@ export default async function ClientRfiPage({
                       type="submit"
                       style={{
                         marginTop: "10px",
-                        background: "#C8102E",
-                        color: "#fff",
+                        background: "var(--camo-accent)",
+                        color: "var(--camo-ink)",
                         border: "none",
                         padding: "10px 20px",
                         borderRadius: "6px",
@@ -289,7 +289,7 @@ export default async function ClientRfiPage({
       {answered.length > 0 && (
         <div>
           {unanswered.length > 0 && (
-            <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 24px" }} />
+            <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 24px" }} />
           )}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
             <h2 style={{
@@ -365,18 +365,18 @@ export default async function ClientRfiPage({
                   {/* Contractor notes */}
                   {r.question && (
                     <div style={{
-                      background: "#EEF4FF",
-                      border: "1px solid #B8D0E8",
+                      background: "var(--camo-concrete)",
+                      border: "1px solid #d9dbdb",
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontSize: "13px",
-                      color: "#1E3A8A",
+                      color: "var(--camo-charcoal)",
                       marginBottom: "12px",
                       lineHeight: 1.6,
                     }}>
                       <div style={{
                         fontSize: "10px",
-                        color: "#1B4F8A",
+                        color: "var(--camo-gunmetal)",
                         textTransform: "uppercase",
                         letterSpacing: "1px",
                         marginBottom: "4px",
@@ -394,7 +394,7 @@ export default async function ClientRfiPage({
                     borderRadius: "6px",
                     padding: "10px 14px",
                     fontSize: "13px",
-                    color: "#1E3A8A",
+                    color: "var(--camo-charcoal)",
                     lineHeight: 1.6,
                   }}>
                     <div style={{
@@ -410,7 +410,7 @@ export default async function ClientRfiPage({
                   </div>
 
                   {r.responded_at && (
-                    <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "8px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "8px" }}>
                       Responded: {new Date(r.responded_at).toLocaleString()}
                     </div>
                   )}

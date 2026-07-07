@@ -36,8 +36,8 @@ export default async function ContractorProfilePage({
   const inputStyle = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -50,7 +50,7 @@ export default async function ContractorProfilePage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#1B4F8A",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -66,12 +66,12 @@ export default async function ContractorProfilePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             My Profile
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Your public profile shown to clients and in the contractor directory.
           </p>
         </div>
@@ -79,8 +79,8 @@ export default async function ContractorProfilePage({
           href="/dashboard/contractor"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -127,8 +127,8 @@ export default async function ContractorProfilePage({
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
         {/* Directory verification status */}
         <div style={{
-          background: profile?.directory_verified ? "#F0FDF4" : "#EEF4FF",
-          border: `1px solid ${profile?.directory_verified ? "#166534" : "#B8D0E8"}`,
+          background: profile?.directory_verified ? "#F0FDF4" : "var(--camo-concrete)",
+          border: `1px solid ${profile?.directory_verified ? "#166534" : "#d9dbdb"}`,
           borderRadius: "10px",
           padding: "14px 16px",
         }}>
@@ -137,13 +137,13 @@ export default async function ContractorProfilePage({
             fontWeight: 700,
             fontSize: "14px",
             letterSpacing: "1px",
-            color: profile?.directory_verified ? "#15803D" : "#1B4F8A",
+            color: profile?.directory_verified ? "#15803D" : "var(--camo-gunmetal)",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             {profile?.directory_verified ? "✅ Verified" : "⏳ Not Verified"}
           </div>
-          <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+          <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
             {profile?.directory_verified
               ? `Since ${profile.directory_verified_at ? new Date(profile.directory_verified_at).toLocaleDateString() : "—"}`
               : "License & COI pending review"}
@@ -152,8 +152,8 @@ export default async function ContractorProfilePage({
 
         {/* Veteran status */}
         <div style={{
-          background: profile?.veteran_verified ? "#FFF7ED" : "#EEF4FF",
-          border: `1px solid ${profile?.veteran_verified ? "#D97706" : "#B8D0E8"}`,
+          background: profile?.veteran_verified ? "#FFF7ED" : "var(--camo-concrete)",
+          border: `1px solid ${profile?.veteran_verified ? "#D97706" : "#d9dbdb"}`,
           borderRadius: "10px",
           padding: "14px 16px",
         }}>
@@ -162,13 +162,13 @@ export default async function ContractorProfilePage({
             fontWeight: 700,
             fontSize: "14px",
             letterSpacing: "1px",
-            color: profile?.veteran_verified ? "#B45309" : "#1B4F8A",
+            color: profile?.veteran_verified ? "#B45309" : "var(--camo-gunmetal)",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             {profile?.veteran_verified ? "★ Veteran Owned" : "Veteran Status"}
           </div>
-          <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+          <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
             {profile?.veteran_verified
               ? "Certified veteran owned"
               : profile?.veteran_applied_at
@@ -180,8 +180,8 @@ export default async function ContractorProfilePage({
 
       {/* Main form */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "24px",
         marginBottom: "20px",
@@ -191,31 +191,31 @@ export default async function ContractorProfilePage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           Business Information
         </h2>
-        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px" }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px" }}>
           Visible to clients when you submit a bid and in the public directory.
         </p>
 
         <form action={saveContractorProfile}>
           <div style={{
             background: "#FFFFFF",
-            border: "1px solid #B8D0E8",
+            border: "1px solid #d9dbdb",
             borderRadius: "8px",
             padding: "10px 14px",
             marginBottom: "16px",
             fontSize: "12px",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
           }}>
-            ★ <strong style={{ color: "#1E3A8A" }}>Business name, phone, and at least one trade category are required</strong> to subscribe and submit bids.
+            ★ <strong style={{ color: "var(--camo-charcoal)" }}>Business name, phone, and at least one trade category are required</strong> to subscribe and submit bids.
           </div>
 
           <label style={{ ...labelStyle, marginTop: 0 }}>
-            Business Name <span style={{ color: "#C8102E" }}>*</span>
+            Business Name <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
           </label>
           <input
             name="business_name"
@@ -226,7 +226,7 @@ export default async function ContractorProfilePage({
           />
 
           <label style={labelStyle}>
-            Phone Number <span style={{ color: "#C8102E" }}>*</span>
+            Phone Number <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
           </label>
           <input
             name="phone"
@@ -285,7 +285,7 @@ export default async function ContractorProfilePage({
           </div>
 
           <label style={labelStyle}>
-            Service Categories (comma-separated) <span style={{ color: "#C8102E" }}>*</span>
+            Service Categories (comma-separated) <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
           </label>
           <input
             name="categories"
@@ -293,7 +293,7 @@ export default async function ContractorProfilePage({
             style={inputStyle}
             placeholder="Roofing, Drywall, Concrete, Electrical…"
           />
-          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+          <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Used to match you with relevant projects. At least one category is required.
           </p>
 
@@ -307,7 +307,7 @@ export default async function ContractorProfilePage({
 
           {/* Directory listing toggle */}
           <div style={{
-            borderTop: "1px solid #B8D0E8",
+            borderTop: "1px solid #d9dbdb",
             marginTop: "20px",
             paddingTop: "20px",
           }}>
@@ -317,24 +317,24 @@ export default async function ContractorProfilePage({
               gap: "10px",
               cursor: "pointer",
               fontSize: "14px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
             }}>
               <input
                 type="checkbox"
                 name="is_listed"
                 defaultChecked={profile?.is_listed ?? true}
-                style={{ width: "16px", height: "16px", accentColor: "#C8102E" }}
+                style={{ width: "16px", height: "16px", accentColor: "var(--camo-accent)" }}
               />
               Show me in the public contractor directory
             </label>
-            <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "6px" }}>
+            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
               You must also be verified by an admin before appearing in the directory.
             </p>
           </div>
 
           {/* License & COI Section */}
           <div style={{
-            borderTop: "1px solid #B8D0E8",
+            borderTop: "1px solid #d9dbdb",
             marginTop: "24px",
             paddingTop: "24px",
           }}>
@@ -343,7 +343,7 @@ export default async function ContractorProfilePage({
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "1px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               textTransform: "uppercase",
               marginBottom: "4px",
             }}>
@@ -351,15 +351,15 @@ export default async function ContractorProfilePage({
             </h3>
             <div style={{
               background: "#FFFFFF",
-              border: "1px solid #B8D0E8",
+              border: "1px solid #d9dbdb",
               borderRadius: "8px",
               padding: "12px 14px",
               marginBottom: "16px",
               fontSize: "12px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               lineHeight: 1.6,
             }}>
-              <strong style={{ color: "#1E3A8A" }}>All contractors</strong> — veteran owned or not — must submit a valid contractor's license and Certificate of Insurance (COI) to be verified and appear in the public directory. This protects clients and builds trust in the platform.
+              <strong style={{ color: "var(--camo-charcoal)" }}>All contractors</strong> — veteran owned or not — must submit a valid contractor's license and Certificate of Insurance (COI) to be verified and appear in the public directory. This protects clients and builds trust in the platform.
             </div>
 
             {/* Disclosure checkboxes */}
@@ -369,9 +369,9 @@ export default async function ContractorProfilePage({
                   type="checkbox"
                   name="has_no_license"
                   defaultChecked={!!(profile as any)?.has_no_license}
-                  style={{ width: "16px", height: "16px", accentColor: "#C8102E", marginTop: "2px", flexShrink: 0 }}
+                  style={{ width: "16px", height: "16px", accentColor: "var(--camo-accent)", marginTop: "2px", flexShrink: 0 }}
                 />
-                <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+                <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
                   I do not hold a contractor's license.{" "}
                   <span style={{ color: "#991B1B", fontSize: "12px" }}>
                     (A "No License" notice will appear on your bids.)
@@ -383,9 +383,9 @@ export default async function ContractorProfilePage({
                   type="checkbox"
                   name="has_no_insurance"
                   defaultChecked={!!(profile as any)?.has_no_insurance}
-                  style={{ width: "16px", height: "16px", accentColor: "#C8102E", marginTop: "2px", flexShrink: 0 }}
+                  style={{ width: "16px", height: "16px", accentColor: "var(--camo-accent)", marginTop: "2px", flexShrink: 0 }}
                 />
-                <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+                <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
                   I do not carry liability insurance.{" "}
                   <span style={{ color: "#991B1B", fontSize: "12px" }}>
                     (A "No Insurance" notice will appear on your bids.)
@@ -452,14 +452,14 @@ export default async function ContractorProfilePage({
               style={inputStyle}
               placeholder="e.g. 1000000"
             />
-            <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
               Enter total coverage in dollars (e.g. 1000000 = $1,000,000).
             </p>
           </div>
 
           {/* Veteran section */}
           <div style={{
-            borderTop: "1px solid #B8D0E8",
+            borderTop: "1px solid #d9dbdb",
             marginTop: "24px",
             paddingTop: "24px",
           }}>
@@ -476,15 +476,15 @@ export default async function ContractorProfilePage({
             </h3>
             <div style={{
               background: "#FFFFFF",
-              border: "1px solid #B8D0E8",
+              border: "1px solid #d9dbdb",
               borderRadius: "8px",
               padding: "12px 14px",
               marginBottom: "16px",
               fontSize: "12px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               lineHeight: 1.6,
             }}>
-              <strong style={{ color: "#1E3A8A" }}>Optional.</strong> If you are a veteran, you can apply for Veteran Owned Certification. This is a separate badge displayed on your bids and directory listing. Admin will verify your status.
+              <strong style={{ color: "var(--camo-charcoal)" }}>Optional.</strong> If you are a veteran, you can apply for Veteran Owned Certification. This is a separate badge displayed on your bids and directory listing. Admin will verify your status.
             </div>
 
             <label style={labelStyle}>Military Branch</label>
@@ -507,18 +507,18 @@ export default async function ContractorProfilePage({
               gap: "10px",
               cursor: "pointer",
               fontSize: "14px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               marginTop: "16px",
             }}>
               <input
                 type="checkbox"
                 name="apply_veteran"
                 defaultChecked={!!profile?.veteran_applied_at && !profile?.veteran_verified}
-                style={{ width: "16px", height: "16px", accentColor: "#C8102E" }}
+                style={{ width: "16px", height: "16px", accentColor: "var(--camo-accent)" }}
               />
               Apply for Veteran Owned Certification
             </label>
-            <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "6px" }}>
+            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
               Checking this flags your account for admin review. Document upload coming in a future update.
             </p>
           </div>
@@ -527,8 +527,8 @@ export default async function ContractorProfilePage({
             type="submit"
             style={{
               marginTop: "24px",
-              background: "#C8102E",
-              color: "#fff",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               border: "none",
               padding: "12px 28px",
               borderRadius: "6px",

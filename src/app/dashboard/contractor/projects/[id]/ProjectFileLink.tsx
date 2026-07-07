@@ -38,8 +38,8 @@ export default function ProjectFileLink({
 
   return (
     <div style={{
-      background: "#1E3A8A",
-      border: "1px solid #1B4F8A",
+      background: "var(--camo-charcoal)",
+      border: "1px solid var(--camo-gunmetal)",
       borderRadius: "8px",
       padding: "10px 14px",
       display: "flex",
@@ -49,14 +49,14 @@ export default function ProjectFileLink({
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <span style={{ fontSize: "16px" }}>{getFileIcon(fileName)}</span>
-        <span style={{ fontSize: "13px", color: "#F0F4FF" }}>{displayName}</span>
+        <span style={{ fontSize: "13px", color: "var(--camo-paper)" }}>{displayName}</span>
       </div>
       <button
         onClick={handleView}
         style={{
           background: "transparent",
-          color: "#7A9CC4",
-          border: "1px solid #1B4F8A",
+          color: "var(--camo-steel)",
+          border: "1px solid var(--camo-gunmetal)",
           padding: "4px 10px",
           borderRadius: "6px",
           fontFamily: "'Barlow', sans-serif",

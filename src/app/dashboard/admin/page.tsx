@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/users",
       stat: userCount ?? 0,
       statLabel: "total users",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Projects",
@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/projects",
       stat: projectCount ?? 0,
       statLabel: "total projects",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Vet Certification",
@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/vet-certification",
       stat: vetCount ?? 0,
       statLabel: "pending reviews",
-      accent: (vetCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+      accent: (vetCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Support Requests",
@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/support",
       stat: supportCount ?? 0,
       statLabel: "open tickets",
-      accent: (supportCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+      accent: (supportCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Inspector Requests",
@@ -73,7 +73,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/inspector-requests",
       stat: inspectorCount ?? 0,
       statLabel: "pending",
-      accent: (inspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+      accent: (inspectorCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Override Requests",
@@ -81,7 +81,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/override-requests",
       stat: overrideCount ?? 0,
       statLabel: "pending",
-      accent: (overrideCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+      accent: (overrideCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Emergency Requests",
@@ -89,7 +89,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/emergency-requests",
       stat: emergencyActiveCount ?? 0,
       statLabel: "active now",
-      accent: (emergencyActiveCount ?? 0) > 0 ? "#C2410C" : "#1B4F8A",
+      accent: (emergencyActiveCount ?? 0) > 0 ? "#C2410C" : "var(--camo-gunmetal)",
     },
     {
       title: "Analytics",
@@ -97,7 +97,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/analytics",
       stat: projectCount ?? 0,
       statLabel: "total projects",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Inspector Pricing",
@@ -105,7 +105,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/inspector-pricing",
       stat: null,
       statLabel: "pricing tiers",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Inspector Revenue",
@@ -113,7 +113,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/inspector-revenue",
       stat: null,
       statLabel: "revenue & stats",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Master Inspectors",
@@ -121,7 +121,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/master-inspectors",
       stat: masterInspectorCount ?? 0,
       statLabel: "active MIs",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Dispute Oversight",
@@ -129,7 +129,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/disputes",
       stat: openDisputeCount ?? 0,
       statLabel: "open disputes",
-      accent: (openDisputeCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+      accent: (openDisputeCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Inspector Flags",
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/inspector-flags",
       stat: flaggedInspectorCount ?? 0,
       statLabel: "blocked inspectors",
-      accent: (flaggedInspectorCount ?? 0) > 0 ? "#C8102E" : "#1B4F8A",
+      accent: (flaggedInspectorCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Expansion Waitlist",
@@ -145,7 +145,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/waitlist",
       stat: waitlistCount ?? 0,
       statLabel: "unnotified",
-      accent: (waitlistCount ?? 0) > 0 ? "#C2410C" : "#1B4F8A",
+      accent: (waitlistCount ?? 0) > 0 ? "#C2410C" : "var(--camo-gunmetal)",
     },
     {
       title: "Coupon Codes",
@@ -153,7 +153,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/coupons",
       stat: null,
       statLabel: "promo codes",
-      accent: "#1B4F8A",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Platform Settings",
@@ -161,7 +161,7 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/settings",
       stat: null,
       statLabel: inspectorFeatureEnabled ? "inspector ON" : "inspector OFF",
-      accent: inspectorFeatureEnabled ? "#1B4F8A" : "#C8102E",
+      accent: inspectorFeatureEnabled ? "var(--camo-gunmetal)" : "var(--camo-accent)",
     },
   ];
 
@@ -173,12 +173,12 @@ export default async function AdminDashboard() {
           fontWeight: 700,
           fontSize: "36px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: 0,
         }}>
           Admin Dashboard
         </h1>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
           {user.email}
         </p>
       </div>
@@ -187,7 +187,7 @@ export default async function AdminDashboard() {
         {cards.map((card) => (
           <Link key={card.href} href={card.href} style={{ textDecoration: "none" }}>
             <div style={{
-              background: "#EEF4FF",
+              background: "var(--camo-concrete)",
               border: `1px solid ${card.accent}`,
               borderRadius: "12px",
               padding: "24px",
@@ -201,12 +201,12 @@ export default async function AdminDashboard() {
                     fontWeight: 700,
                     fontSize: "22px",
                     letterSpacing: "0.5px",
-                    color: "#1E3A8A",
+                    color: "var(--camo-charcoal)",
                     marginBottom: "6px",
                   }}>
                     {card.title}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.5 }}>
+                  <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.5 }}>
                     {card.description}
                   </div>
                 </div>
@@ -215,14 +215,14 @@ export default async function AdminDashboard() {
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontWeight: 700,
                     fontSize: "40px",
-                    color: card.accent === "#C8102E" ? "#C8102E" : "#1E3A8A",
+                    color: card.accent === "var(--camo-accent)" ? "var(--camo-accent)" : "var(--camo-charcoal)",
                     lineHeight: 1,
                   }}>
                     {card.stat ?? "—"}
                   </div>
                   <div style={{
                     fontSize: "11px",
-                    color: "#1B4F8A",
+                    color: "var(--camo-gunmetal)",
                     textTransform: "uppercase",
                     letterSpacing: "1px",
                     marginTop: "4px",
@@ -234,9 +234,9 @@ export default async function AdminDashboard() {
               <div style={{
                 marginTop: "16px",
                 paddingTop: "16px",
-                borderTop: "1px solid #B8D0E8",
+                borderTop: "1px solid #d9dbdb",
                 fontSize: "12px",
-                color: "#4A7FB5",
+                color: "var(--camo-gunmetal)",
               }}>
                 View {card.title} →
               </div>

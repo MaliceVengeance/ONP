@@ -37,7 +37,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
       <div
         style={{
           fontSize: "11px",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
           textTransform: "uppercase",
           letterSpacing: "1px",
           marginBottom: "10px",
@@ -56,8 +56,8 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
               key={opt.pricing_key}
               onClick={() => setSelectedKey(opt.pricing_key)}
               style={{
-                background: isSelected ? "#1B4F8A" : "#FFFFFF",
-                border: `2px solid ${isSelected ? "#1B4F8A" : "#B8D0E8"}`,
+                background: isSelected ? "var(--camo-gunmetal)" : "#FFFFFF",
+                border: `2px solid ${isSelected ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
                 borderRadius: "8px",
                 padding: "14px 16px",
                 cursor: "pointer",
@@ -73,7 +73,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                     style={{
                       fontWeight: 600,
                       fontSize: "14px",
-                      color: isSelected ? "#fff" : "#1E3A8A",
+                      color: isSelected ? "#fff" : "var(--camo-charcoal)",
                     }}
                   >
                     {opt.display_name}
@@ -85,9 +85,9 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                         fontWeight: 700,
                         padding: "2px 8px",
                         borderRadius: "20px",
-                        background: isSelected ? "rgba(255,255,255,0.18)" : "#EEF4FF",
-                        color: isSelected ? "#fff" : "#1B4F8A",
-                        border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#B8D0E8"}`,
+                        background: isSelected ? "rgba(255,255,255,0.18)" : "var(--camo-concrete)",
+                        color: isSelected ? "#fff" : "var(--camo-gunmetal)",
+                        border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#d9dbdb"}`,
                         letterSpacing: "0.5px",
                         whiteSpace: "nowrap",
                       }}
@@ -103,7 +103,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                         padding: "2px 8px",
                         borderRadius: "20px",
                         background: isSelected ? "rgba(255,255,255,0.18)" : "#FEF2F2",
-                        color: isSelected ? "#fff" : "#C8102E",
+                        color: isSelected ? "#fff" : "var(--camo-accent)",
                         border: `1px solid ${isSelected ? "rgba(255,255,255,0.3)" : "#FECACA"}`,
                         letterSpacing: "0.5px",
                         whiteSpace: "nowrap",
@@ -117,7 +117,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                   <div
                     style={{
                       fontSize: "12px",
-                      color: isSelected ? "rgba(255,255,255,0.75)" : "#4A7FB5",
+                      color: isSelected ? "rgba(255,255,255,0.75)" : "var(--camo-gunmetal)",
                       marginTop: "4px",
                       lineHeight: 1.5,
                     }}
@@ -131,7 +131,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "18px",
-                  color: isSelected ? "#fff" : "#1E3A8A",
+                  color: isSelected ? "#fff" : "var(--camo-charcoal)",
                   whiteSpace: "nowrap",
                   flexShrink: 0,
                 }}
@@ -174,7 +174,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontSize: "28px",
                 fontWeight: 700,
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
               }}
             >
               {formatFee(selectedOption.fee_cents)}
@@ -183,7 +183,7 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
           <div style={{ fontSize: "12px", color: "#15803D", textAlign: "right", lineHeight: 1.6 }}>
             {selectedOption.display_name}
             <br />
-            <span style={{ color: "#4A7FB5" }}>Typically scheduled within 3–5 business days</span>
+            <span style={{ color: "var(--camo-gunmetal)" }}>Typically scheduled within 3–5 business days</span>
           </div>
         </div>
       )}
@@ -222,9 +222,9 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
           name="disclaimer_accepted"
           checked={disclaimerChecked}
           onChange={(e) => setDisclaimerChecked(e.target.checked)}
-          style={{ marginTop: "3px", flexShrink: 0, accentColor: "#1B4F8A" }}
+          style={{ marginTop: "3px", flexShrink: 0, accentColor: "var(--camo-gunmetal)" }}
         />
-        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6 }}>
+        <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.6 }}>
           I have read and agree to the <strong>Inspector Request terms</strong>. I understand
           my inspection fee is non-refundable and the report will be shared with bidding
           contractors.
@@ -236,8 +236,8 @@ export default function InspectorPricingForm({ options, formAction }: Props) {
         type="submit"
         disabled={!disclaimerChecked || !selectedKey}
         style={{
-          background: disclaimerChecked && selectedKey ? "#C8102E" : "#E5E7EB",
-          color: disclaimerChecked && selectedKey ? "#fff" : "#9CA3AF",
+          background: disclaimerChecked && selectedKey ? "var(--camo-accent)" : "#E5E7EB",
+          color: disclaimerChecked && selectedKey ? "var(--camo-ink)" : "#9CA3AF",
           border: "none",
           padding: "14px 28px",
           borderRadius: "6px",

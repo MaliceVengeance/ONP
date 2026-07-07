@@ -36,12 +36,12 @@ export default async function InspectorProjectsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             My Assignments
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {pending.length} pending • {completed.length} completed
           </p>
         </div>
@@ -49,8 +49,8 @@ export default async function InspectorProjectsPage() {
           href="/dashboard/inspector"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -69,14 +69,14 @@ export default async function InspectorProjectsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
           Pending ({pending.length})
         </h2>
         {pending.length === 0 ? (
-          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+          <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
             No pending assignments.
           </div>
         ) : (
@@ -92,8 +92,8 @@ export default async function InspectorProjectsPage() {
                   style={{ textDecoration: "none" }}
                 >
                   <div className="mob-card-stack" style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -102,24 +102,24 @@ export default async function InspectorProjectsPage() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                         {p?.category ?? "—"} • {p?.city ?? "—"}
                       </div>
                       {p?.location_general && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                           📍 {p.location_general}
                         </div>
                       )}
                       {a.assigned_at && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                           Assigned: {new Date(a.assigned_at).toLocaleDateString()}
                         </div>
                       )}
                       {deadline && (
-                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5", marginTop: "2px" }}>
+                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "var(--camo-gunmetal)", marginTop: "2px" }}>
                           {deadlinePassed ? "⚠ Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
                         </div>
                       )}
@@ -136,13 +136,13 @@ export default async function InspectorProjectsPage() {
       {/* Completed */}
       {completed.length > 0 && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
             textTransform: "uppercase",
             marginBottom: "12px",
           }}>
@@ -158,8 +158,8 @@ export default async function InspectorProjectsPage() {
                   style={{ textDecoration: "none" }}
                 >
                   <div className="mob-card-stack" style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -169,14 +169,14 @@ export default async function InspectorProjectsPage() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                         {p?.title ?? "Untitled Project"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                         {p?.category ?? "—"} • {p?.city ?? "—"}
                       </div>
                       {p?.location_general && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "3px" }}>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                           📍 {p.location_general}
                         </div>
                       )}

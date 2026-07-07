@@ -45,8 +45,8 @@ export default function CountdownTimer({ deadline }: { deadline: string }) {
 
   return (
     <div style={{
-      background: "#0F2040",
-      border: `1px solid ${isUrgent ? "#991B1B" : "#1B4F8A"}`,
+      background: "var(--camo-ink)",
+      border: `1px solid ${isUrgent ? "#991B1B" : "var(--camo-gunmetal)"}`,
       borderRadius: "10px",
       padding: "12px 16px",
       display: "flex",
@@ -58,7 +58,7 @@ export default function CountdownTimer({ deadline }: { deadline: string }) {
       {/* Label */}
       <div style={{
         fontSize: "12px",
-        color: isUrgent ? "#F87171" : "#7A9CC4",
+        color: isUrgent ? "#F87171" : "var(--camo-steel)",
         fontFamily: "'Barlow', sans-serif",
         fontWeight: 500,
         flexShrink: 0,
@@ -83,7 +83,7 @@ export default function CountdownTimer({ deadline }: { deadline: string }) {
           <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             {i > 0 && (
               <span style={{
-                color: isUrgent ? "#F87171" : "#1B4F8A",
+                color: isUrgent ? "#F87171" : "var(--camo-gunmetal)",
                 fontSize: "18px",
                 fontWeight: 700,
                 lineHeight: 1,
@@ -103,7 +103,7 @@ export default function CountdownTimer({ deadline }: { deadline: string }) {
               </div>
               <div style={{
                 fontSize: "9px",
-                color: "#7A9CC4",
+                color: "var(--camo-steel)",
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
                 marginTop: "2px",

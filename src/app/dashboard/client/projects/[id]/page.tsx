@@ -170,11 +170,11 @@ export default async function EditProjectPage({
       case "COMPLETED":
         return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
       case "ASSIGNED":
-        return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+        return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
       case "PENDING":
         return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
       default:
-        return { background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+        return { background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
     }
   }
 
@@ -190,8 +190,8 @@ export default async function EditProjectPage({
   const inputStyle = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -204,7 +204,7 @@ export default async function EditProjectPage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#1B4F8A",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -220,7 +220,7 @@ export default async function EditProjectPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             {isDraft ? "Edit Draft" : project.title ?? "Project"}
@@ -240,7 +240,7 @@ export default async function EditProjectPage({
                 ⏸ Timer paused · Awaiting inspector report
               </span>
             ) : isPublished && project.deadline_at ? (
-              <span style={{ fontSize: "13px", color: "#1B4F8A" }}>
+              <span style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
                 Deadline: {new Date(project.deadline_at).toLocaleDateString()}
               </span>
             ) : null}
@@ -253,8 +253,8 @@ export default async function EditProjectPage({
               type="submit"
               style={{
                 background: "transparent",
-                color: "#1B4F8A",
-                border: "1px solid #B8D0E8",
+                color: "var(--camo-gunmetal)",
+                border: "1px solid #d9dbdb",
                 padding: "8px 16px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -273,8 +273,8 @@ export default async function EditProjectPage({
             href="/dashboard/client/projects"
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -445,9 +445,9 @@ export default async function EditProjectPage({
           <Link
             href={`/dashboard/client/projects/${id}/bids`}
             style={{
-              background: bidsUnlocked ? "#C8102E" : "#EEF4FF",
-              color: bidsUnlocked ? "#fff" : "#1B4F8A",
-              border: `1px solid ${bidsUnlocked ? "#C8102E" : "#B8D0E8"}`,
+              background: bidsUnlocked ? "var(--camo-accent)" : "var(--camo-concrete)",
+              color: bidsUnlocked ? "var(--camo-ink)" : "var(--camo-gunmetal)",
+              border: `1px solid ${bidsUnlocked ? "var(--camo-accent)" : "#d9dbdb"}`,
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -468,8 +468,8 @@ export default async function EditProjectPage({
             href={`/dashboard/client/projects/${id}/rfis`}
             style={{
               background: hasUnansweredRfis ? "#FFFBEB" : "transparent",
-              color: hasUnansweredRfis ? "#92400E" : "#1B4F8A",
-              border: `1px solid ${hasUnansweredRfis ? "#FCD34D" : "#B8D0E8"}`,
+              color: hasUnansweredRfis ? "#92400E" : "var(--camo-gunmetal)",
+              border: `1px solid ${hasUnansweredRfis ? "#FCD34D" : "#d9dbdb"}`,
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -487,8 +487,8 @@ export default async function EditProjectPage({
             href={`/dashboard/client/projects/${id}/files`}
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "10px 20px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -522,8 +522,8 @@ export default async function EditProjectPage({
               href={`/dashboard/client/projects/${id}/override`}
               style={{
                 background: "transparent",
-                color: "#1B4F8A",
-                border: "1px solid #B8D0E8",
+                color: "var(--camo-gunmetal)",
+                border: "1px solid #d9dbdb",
                 padding: "10px 20px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -539,7 +539,7 @@ export default async function EditProjectPage({
       )}
 
       {!bidsUnlocked && isPublished && (
-        <p style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "20px" }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "20px" }}>
           Bids are sealed until the deadline passes.
         </p>
       )}
@@ -547,8 +547,8 @@ export default async function EditProjectPage({
       {/* Files callout — shown on draft and published projects */}
       {(isDraft || isPublished) && (
         <div style={{
-          background: "#F0F6FF",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-paper)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "10px",
           padding: "16px 20px",
           marginBottom: "20px",
@@ -563,12 +563,12 @@ export default async function EditProjectPage({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "16px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               marginBottom: "4px",
             }}>
               📁 Project Files
             </div>
-            <div style={{ fontSize: "12px", color: "#1B4F8A", lineHeight: 1.5 }}>
+            <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", lineHeight: 1.5 }}>
               {isDraft
                 ? "Upload photos, blueprints, or documents so contractors understand the full scope of work."
                 : `${(bidCount ?? 0) > 0 ? "Contractors can view your uploaded files while preparing their bids." : "Adding photos or documents may help attract more bids and clarify scope."}`}
@@ -577,7 +577,7 @@ export default async function EditProjectPage({
           <a
             href={`/dashboard/client/projects/${id}/files`}
             style={{
-              background: "#1B4F8A",
+              background: "var(--camo-gunmetal)",
               color: "#fff",
               border: "none",
               padding: "10px 20px",
@@ -597,8 +597,8 @@ export default async function EditProjectPage({
 
       {/* Edit form */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "24px",
         marginBottom: "20px",
@@ -608,13 +608,13 @@ export default async function EditProjectPage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           Project Details
         </h2>
-        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px" }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px" }}>
           {isDraft
             ? "Edit your project before publishing."
             : isPendingPayment
@@ -694,7 +694,7 @@ export default async function EditProjectPage({
               defaultValue={(project as any).target_start_date ?? ""}
               style={inputStyle}
             />
-            <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
               When do you hope to begin work? Visible to contractors.
             </p>
 
@@ -704,8 +704,8 @@ export default async function EditProjectPage({
                 style={{
                   marginTop: "20px",
                   background: "transparent",
-                  color: "#1B4F8A",
-                  border: "1px solid #B8D0E8",
+                  color: "var(--camo-gunmetal)",
+                  border: "1px solid #d9dbdb",
                   padding: "10px 20px",
                   borderRadius: "6px",
                   fontFamily: "'Barlow', sans-serif",
@@ -724,8 +724,8 @@ export default async function EditProjectPage({
       {/* ── Project Q&A — client answers (editable at any time) ── */}
       {clientCatalog.length > 0 && (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "24px",
           marginBottom: "20px",
@@ -735,13 +735,13 @@ export default async function EditProjectPage({
             fontWeight: 700,
             fontSize: "20px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             Project Questions
           </h2>
-          <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "16px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px", lineHeight: 1.5 }}>
             These answers are visible to all bidding contractors immediately. You can update them at any time — even after publishing.
           </p>
 
@@ -788,7 +788,7 @@ export default async function EditProjectPage({
                       display: "block",
                       fontSize: "12px",
                       fontWeight: 600,
-                      color: "#1E3A8A",
+                      color: "var(--camo-charcoal)",
                       lineHeight: 1.4,
                     }}>
                       {item.prompt}
@@ -814,8 +814,8 @@ export default async function EditProjectPage({
                     style={{
                       width: "100%",
                       background: "#FFFFFF",
-                      border: `1px solid ${isAnswered ? "#86EFAC" : "#B8D0E8"}`,
-                      color: "#1E3A8A",
+                      border: `1px solid ${isAnswered ? "#86EFAC" : "#d9dbdb"}`,
+                      color: "var(--camo-charcoal)",
                       borderRadius: "6px",
                       padding: "10px 14px",
                       fontFamily: "'Barlow', sans-serif",
@@ -834,7 +834,7 @@ export default async function EditProjectPage({
               type="submit"
               style={{
                 marginTop: "20px",
-                background: "#1B4F8A",
+                background: "var(--camo-gunmetal)",
                 color: "#FFFFFF",
                 border: "none",
                 padding: "10px 24px",
@@ -855,8 +855,8 @@ export default async function EditProjectPage({
       {/* Publish controls */}
       {isPendingPayment ? null : isDraft ? (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "24px",
         }}>
@@ -865,13 +865,13 @@ export default async function EditProjectPage({
             fontWeight: 700,
             fontSize: "18px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             Publish to Contractors
           </h2>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "20px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "20px" }}>
             Choose how long bidding stays open. Minimum 5 days, maximum 10 days.
           </p>
 
@@ -880,7 +880,7 @@ export default async function EditProjectPage({
               <label style={{
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "#1B4F8A",
+                color: "var(--camo-gunmetal)",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 flexShrink: 0,
@@ -892,8 +892,8 @@ export default async function EditProjectPage({
                 defaultValue="7"
                 style={{
                   background: "#FFFFFF",
-                  border: "1px solid #B8D0E8",
-                  color: "#1E3A8A",
+                  border: "1px solid #d9dbdb",
+                  color: "var(--camo-charcoal)",
                   borderRadius: "6px",
                   padding: "8px 12px",
                   fontFamily: "'Barlow', sans-serif",
@@ -910,8 +910,8 @@ export default async function EditProjectPage({
                 type="submit"
                 style={{
                   marginLeft: "auto",
-                  background: "#C8102E",
-                  color: "#fff",
+                  background: "var(--camo-accent)",
+                  color: "var(--camo-ink)",
                   border: "none",
                   padding: "10px 24px",
                   borderRadius: "6px",
@@ -929,12 +929,12 @@ export default async function EditProjectPage({
         </div>
       ) : (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "20px",
           fontSize: "13px",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
         }}>
           This project is published. Edits will trigger a revision workflow in a future update.
         </div>
@@ -945,8 +945,8 @@ export default async function EditProjectPage({
         <div
           id="messages"
           style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "12px",
             overflow: "hidden",
             marginTop: "20px",
@@ -955,7 +955,7 @@ export default async function EditProjectPage({
           {/* Section header */}
           <div
             style={{
-              background: "#1E3A8A",
+              background: "var(--camo-charcoal)",
               padding: "14px 20px",
               display: "flex",
               alignItems: "center",
@@ -976,7 +976,7 @@ export default async function EditProjectPage({
               >
                 Project Messages
               </div>
-              <div style={{ fontSize: "11px", color: "#7A9CC4", marginTop: "1px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-steel)", marginTop: "1px" }}>
                 Private thread — visible only to you, the contractor, and ONP
               </div>
             </div>
@@ -988,7 +988,7 @@ export default async function EditProjectPage({
               <div
                 style={{
                   fontSize: "13px",
-                  color: "#4A7FB5",
+                  color: "var(--camo-gunmetal)",
                   textAlign: "center",
                   padding: "24px 0",
                   fontStyle: "italic",
@@ -1001,7 +1001,7 @@ export default async function EditProjectPage({
                 const isMe = msg.sender_id === user.id;
                 const roleBadgeColor =
                   msg.sender_role === "CLIENT"
-                    ? { bg: "#EEF4FF", color: "#1B4F8A", border: "#B8D0E8" }
+                    ? { bg: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "#d9dbdb" }
                     : msg.sender_role === "ADMIN"
                     ? { bg: "#FFF7ED", color: "#92400E", border: "#FCD34D" }
                     : { bg: "#F0FDF4", color: "#15803D", border: "#86EFAC" };
@@ -1019,8 +1019,8 @@ export default async function EditProjectPage({
                     <div
                       style={{
                         maxWidth: "80%",
-                        background: isMe ? "#1E3A8A" : "#FFFFFF",
-                        border: `1px solid ${isMe ? "#1B4F8A" : "#B8D0E8"}`,
+                        background: isMe ? "var(--camo-charcoal)" : "#FFFFFF",
+                        border: `1px solid ${isMe ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
                         borderRadius: isMe ? "12px 2px 12px 12px" : "2px 12px 12px 12px",
                         padding: "10px 14px",
                       }}
@@ -1039,7 +1039,7 @@ export default async function EditProjectPage({
                           style={{
                             fontSize: "12px",
                             fontWeight: 700,
-                            color: isMe ? "#B8D0E8" : "#1E3A8A",
+                            color: isMe ? "#d9dbdb" : "var(--camo-charcoal)",
                           }}
                         >
                           {isMe ? "You" : msg.sender_name}
@@ -1057,7 +1057,7 @@ export default async function EditProjectPage({
                         >
                           {msg.sender_role === "ADMIN" ? "ONP" : msg.sender_role}
                         </span>
-                        <span style={{ fontSize: "10px", color: isMe ? "#7A9CC4" : "#9CA3AF" }}>
+                        <span style={{ fontSize: "10px", color: isMe ? "var(--camo-steel)" : "#9CA3AF" }}>
                           {new Date(msg.created_at).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
@@ -1072,7 +1072,7 @@ export default async function EditProjectPage({
                       <div
                         style={{
                           fontSize: "13px",
-                          color: isMe ? "#F0F4FF" : "#1E3A8A",
+                          color: isMe ? "var(--camo-paper)" : "var(--camo-charcoal)",
                           lineHeight: 1.6,
                           whiteSpace: "pre-wrap",
                           wordBreak: "break-word",
@@ -1090,9 +1090,9 @@ export default async function EditProjectPage({
           {/* Send form */}
           <div
             style={{
-              borderTop: "1px solid #B8D0E8",
+              borderTop: "1px solid #d9dbdb",
               padding: "16px 20px",
-              background: "#F8FBFF",
+              background: "var(--camo-paper)",
             }}
           >
             <form action={sendClientMessage.bind(null, id)}>
@@ -1105,8 +1105,8 @@ export default async function EditProjectPage({
                 style={{
                   width: "100%",
                   background: "#FFFFFF",
-                  border: "1px solid #B8D0E8",
-                  color: "#1E3A8A",
+                  border: "1px solid #d9dbdb",
+                  color: "var(--camo-charcoal)",
                   borderRadius: "6px",
                   padding: "10px 14px",
                   fontFamily: "'Barlow', sans-serif",
@@ -1126,13 +1126,13 @@ export default async function EditProjectPage({
                   gap: "8px",
                 }}
               >
-                <span style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                <span style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                   Max 2,000 characters · Visible to contractor and ONP
                 </span>
                 <button
                   type="submit"
                   style={{
-                    background: "#1E3A8A",
+                    background: "var(--camo-charcoal)",
                     color: "#FFFFFF",
                     border: "none",
                     padding: "9px 22px",

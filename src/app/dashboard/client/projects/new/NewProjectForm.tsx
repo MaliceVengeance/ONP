@@ -9,8 +9,8 @@ import type { EmergencyRequestStatus } from "@/lib/emergency/rateLimit";
 const inputStyle: React.CSSProperties = {
   width: "100%",
   background: "#FFFFFF",
-  border: "1px solid #B8D0E8",
-  color: "#1E3A8A",
+  border: "1px solid #d9dbdb",
+  color: "var(--camo-charcoal)",
   borderRadius: "6px",
   padding: "10px 14px",
   fontFamily: "'Barlow', sans-serif",
@@ -23,7 +23,7 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: "11px",
   fontWeight: 500,
-  color: "#1B4F8A",
+  color: "var(--camo-gunmetal)",
   textTransform: "uppercase",
   letterSpacing: "1px",
   marginTop: "16px",
@@ -70,12 +70,12 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             New Project
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Fill in the details below, then choose standard or emergency bidding.
           </p>
         </div>
@@ -83,8 +83,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
           href="/dashboard/client/projects"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -98,8 +98,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
 
       {/* Form card */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "28px",
         marginBottom: "20px",
@@ -155,7 +155,7 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
             name="target_start_date"
             style={inputStyle}
           />
-          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+          <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             When do you hope to begin work? (Optional — helps contractors plan availability)
           </p>
 
@@ -169,9 +169,9 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
                   display: "flex",
                   alignItems: "center",
                   gap: "8px",
-                  background: showRfi ? "#1B4F8A" : "transparent",
-                  color: showRfi ? "#FFFFFF" : "#1B4F8A",
-                  border: "1px solid #1B4F8A",
+                  background: showRfi ? "var(--camo-gunmetal)" : "transparent",
+                  color: showRfi ? "#FFFFFF" : "var(--camo-gunmetal)",
+                  border: "1px solid var(--camo-gunmetal)",
                   borderRadius: "6px",
                   padding: "9px 16px",
                   fontFamily: "'Barlow', sans-serif",
@@ -190,8 +190,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
 
               {showRfi && (
                 <div style={{
-                  background: "#F0F6FF",
-                  border: "1px solid #B8D0E8",
+                  background: "var(--camo-paper)",
+                  border: "1px solid #d9dbdb",
                   borderRadius: "0 0 10px 10px",
                   borderTop: "none",
                   padding: "20px",
@@ -218,12 +218,12 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
                     </div>
                   </div>
 
-                  <p style={{ fontSize: "12px", color: "#1B4F8A", margin: "0 0 4px", lineHeight: 1.6 }}>
+                  <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", margin: "0 0 4px", lineHeight: 1.6 }}>
                     These answers are visible to all bidding contractors immediately. All fields are optional but strongly encouraged.
                   </p>
                   {rfiCatalog.map((item) => (
                     <div key={item.id}>
-                      <label style={{ ...labelStyle, marginTop: "14px", color: "#1E3A8A" }}>
+                      <label style={{ ...labelStyle, marginTop: "14px", color: "var(--camo-charcoal)" }}>
                         {item.prompt}
                       </label>
                       <textarea
@@ -240,8 +240,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
 
           {/* Files tip */}
           <div style={{
-            background: "#F0F6FF",
-            border: "1px solid #1B4F8A",
+            background: "var(--camo-paper)",
+            border: "1px solid var(--camo-gunmetal)",
             borderRadius: "8px",
             padding: "14px 16px",
             marginTop: "20px",
@@ -251,10 +251,10 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
           }}>
             <span style={{ fontSize: "20px", flexShrink: 0 }}>📁</span>
             <div>
-              <div style={{ fontSize: "13px", fontWeight: 600, color: "#1E3A8A", marginBottom: "3px" }}>
+              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                 You can add photos and documents after creating your draft
               </div>
-              <div style={{ fontSize: "12px", color: "#1B4F8A", lineHeight: 1.5 }}>
+              <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", lineHeight: 1.5 }}>
                 Once your draft is saved you'll be able to upload blueprints, photos, and files to help contractors understand the scope.
               </div>
             </div>
@@ -263,12 +263,12 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
           {/* Platform rules */}
           <div style={{
             background: "#FFFFFF",
-            border: "1px solid #B8D0E8",
+            border: "1px solid #d9dbdb",
             borderRadius: "8px",
             padding: "16px",
             marginTop: "20px",
           }}>
-            <div style={{ fontSize: "11px", fontWeight: 600, color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "10px" }}>
               Platform Rules — Shown to All Contractors
             </div>
             <div style={{ fontSize: "13px", color: "#15803D", marginBottom: "6px" }}>✅ The contractor is responsible for pulling all required permits.</div>
@@ -280,7 +280,7 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
             <div style={{
               fontSize: "11px",
               fontWeight: 600,
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "12px",
@@ -293,8 +293,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
               display: "flex",
               alignItems: "flex-start",
               gap: "12px",
-              background: !isEmergency ? "#FFFFFF" : "#F8FAFF",
-              border: `1px solid ${!isEmergency ? "#1B4F8A" : "#B8D0E8"}`,
+              background: !isEmergency ? "#FFFFFF" : "var(--camo-paper)",
+              border: `1px solid ${!isEmergency ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
               borderRadius: "8px",
               padding: "14px 16px",
               marginBottom: "8px",
@@ -305,13 +305,13 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
                 name="_bid_type_ui"
                 checked={!isEmergency}
                 onChange={() => { setIsEmergency(false); setDisclaimerAccepted(false); }}
-                style={{ marginTop: "3px", accentColor: "#1B4F8A" }}
+                style={{ marginTop: "3px", accentColor: "var(--camo-gunmetal)" }}
               />
               <div>
-                <div style={{ fontWeight: 600, fontSize: "14px", color: "#1E3A8A", marginBottom: "2px" }}>
+                <div style={{ fontWeight: 600, fontSize: "14px", color: "var(--camo-charcoal)", marginBottom: "2px" }}>
                   Standard Bid Request — Free
                 </div>
-                <div style={{ fontSize: "12px", color: "#4A7FB5", lineHeight: 1.5 }}>
+                <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", lineHeight: 1.5 }}>
                   Sealed bidding for 5–10 days. Bids are hidden until the deadline, giving contractors equal footing and you the most accurate pricing. Best for non-urgent work.
                 </div>
               </div>
@@ -322,8 +322,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
               display: "flex",
               alignItems: "flex-start",
               gap: "12px",
-              background: isEmergency ? "#7C1A00" : canUseEmergency ? "#FEF2F2" : "#F8FAFF",
-              border: `1px solid ${isEmergency ? "#C2410C" : canUseEmergency ? "#FCA5A5" : "#B8D0E8"}`,
+              background: isEmergency ? "#7C1A00" : canUseEmergency ? "#FEF2F2" : "var(--camo-paper)",
+              border: `1px solid ${isEmergency ? "#C2410C" : canUseEmergency ? "#FCA5A5" : "#d9dbdb"}`,
               borderRadius: "8px",
               padding: "14px 16px",
               cursor: canUseEmergency ? "pointer" : "not-allowed",
@@ -338,10 +338,10 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
                 style={{ marginTop: "3px", accentColor: "#C2410C" }}
               />
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: "14px", color: isEmergency ? "#FDBA74" : canUseEmergency ? "#991B1B" : "#4A7FB5", marginBottom: "2px" }}>
+                <div style={{ fontWeight: 600, fontSize: "14px", color: isEmergency ? "#FDBA74" : canUseEmergency ? "#991B1B" : "var(--camo-gunmetal)", marginBottom: "2px" }}>
                   🚨 Emergency Bid Request — $10
                 </div>
-                <div style={{ fontSize: "12px", color: isEmergency ? "#FED7AA" : canUseEmergency ? "#991B1B" : "#4A7FB5", lineHeight: 1.5 }}>
+                <div style={{ fontSize: "12px", color: isEmergency ? "#FED7AA" : canUseEmergency ? "#991B1B" : "var(--camo-gunmetal)", lineHeight: 1.5 }}>
                   {canUseEmergency
                     ? "Bids visible immediately as contractors submit. Contractors notified right away. 48-hour window. For burst pipes, storm damage, and genuine emergencies only."
                     : `Emergency limit reached. Next slot available ${rateLimit.nextSlotAvailableAt
@@ -353,7 +353,7 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
                 <div style={{
                   marginTop: "8px",
                   fontSize: "11px",
-                  color: isEmergency ? "#FED7AA" : canUseEmergency ? "#991B1B" : "#4A7FB5",
+                  color: isEmergency ? "#FED7AA" : canUseEmergency ? "#991B1B" : "var(--camo-gunmetal)",
                 }}>
                   {rateLimit.used} of {2 + rateLimit.adminBonus} emergency requests used in the last 30 days
                   {rateLimit.adminBonus > 0 && (
@@ -370,7 +370,7 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
           {isEmergency && (
             <div style={{ marginTop: "16px" }}>
               <div style={{
-                background: "#1E3A8A",
+                background: "var(--camo-charcoal)",
                 border: "1px solid #C2410C",
                 borderRadius: "10px",
                 padding: "18px 20px",
@@ -389,7 +389,7 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
                 </div>
                 <pre style={{
                   fontSize: "11px",
-                  color: "#B8D0E8",
+                  color: "#d9dbdb",
                   lineHeight: 1.65,
                   whiteSpace: "pre-wrap",
                   fontFamily: "'Barlow', sans-serif",
@@ -431,7 +431,7 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
               style={{
                 background: isEmergency
                   ? (disclaimerAccepted ? "#C2410C" : "#7A4030")
-                  : "#C8102E",
+                  : "var(--camo-accent)",
                 color: "#fff",
                 border: "none",
                 padding: "12px 28px",
@@ -450,8 +450,8 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
               href="/dashboard/client/projects"
               style={{
                 background: "transparent",
-                color: "#1B4F8A",
-                border: "1px solid #B8D0E8",
+                color: "var(--camo-gunmetal)",
+                border: "1px solid #d9dbdb",
                 padding: "12px 24px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",

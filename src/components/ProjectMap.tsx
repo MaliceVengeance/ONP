@@ -69,7 +69,7 @@ export default function ProjectMap({ city, state }: Props) {
                 ],
                 base: 2,
               },
-              "circle-color": "#C8102E",
+              "circle-color": "var(--camo-accent)",
               "circle-opacity": 0.15,
             },
           });
@@ -89,7 +89,7 @@ export default function ProjectMap({ city, state }: Props) {
               },
               "circle-color": "transparent",
               "circle-stroke-width": 2,
-              "circle-stroke-color": "#C8102E",
+              "circle-stroke-color": "var(--camo-accent)",
               "circle-opacity": 0,
             },
           });
@@ -109,8 +109,8 @@ export default function ProjectMap({ city, state }: Props) {
 
   return (
     <div style={{
-      background: "#0F2040",
-      border: "1px solid #1B4F8A",
+      background: "var(--camo-ink)",
+      border: "1px solid var(--camo-gunmetal)",
       borderRadius: "10px",
       overflow: "hidden",
       marginBottom: "16px",
@@ -120,7 +120,7 @@ export default function ProjectMap({ city, state }: Props) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        borderBottom: "1px solid #1B4F8A",
+        borderBottom: "1px solid var(--camo-gunmetal)",
       }}>
         <div style={{
           fontFamily: "'Barlow Condensed', sans-serif",
@@ -132,7 +132,7 @@ export default function ProjectMap({ city, state }: Props) {
         }}>
           📍 General Area
         </div>
-        <div style={{ fontSize: "11px", color: "#3A5A7A" }}>
+        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
           Approximate location only
         </div>
       </div>
@@ -143,7 +143,7 @@ export default function ProjectMap({ city, state }: Props) {
       <div style={{
         padding: "8px 18px",
         fontSize: "11px",
-        color: "#3A5A7A",
+        color: "var(--camo-gunmetal)",
         textAlign: "center",
       }}>
         Exact address revealed only after project is awarded

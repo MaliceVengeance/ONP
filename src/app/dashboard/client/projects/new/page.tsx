@@ -47,7 +47,7 @@ export default async function NewDraftProjectPage({
           fontWeight: 700,
           fontSize: "36px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: "0 0 24px",
         }}>
           New Project
@@ -97,8 +97,8 @@ export default async function NewDraftProjectPage({
               await joinWaitlist(formData);
             }}
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "12px",
               padding: "20px",
               marginBottom: "20px",
@@ -111,7 +111,7 @@ export default async function NewDraftProjectPage({
             <input type="hidden" name="intended_role" value="CLIENT" />
             {blockedZip && <input type="hidden" name="zip" value={blockedZip} />}
 
-            <div style={{ fontSize: "13px", fontWeight: 600, color: "#1E3A8A" }}>
+            <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--camo-charcoal)" }}>
               Join the Expansion Waitlist
             </div>
 
@@ -123,8 +123,8 @@ export default async function NewDraftProjectPage({
                 placeholder="Project ZIP code"
                 style={{
                   background: "#FFFFFF",
-                  border: "1px solid #B8D0E8",
-                  color: "#1E3A8A",
+                  border: "1px solid #d9dbdb",
+                  color: "var(--camo-charcoal)",
                   borderRadius: "6px",
                   padding: "10px 14px",
                   fontFamily: "'Barlow', sans-serif",
@@ -141,8 +141,8 @@ export default async function NewDraftProjectPage({
               placeholder="your@email.com"
               style={{
                 background: "#FFFFFF",
-                border: "1px solid #B8D0E8",
-                color: "#1E3A8A",
+                border: "1px solid #d9dbdb",
+                color: "var(--camo-charcoal)",
                 borderRadius: "6px",
                 padding: "10px 14px",
                 fontFamily: "'Barlow', sans-serif",
@@ -154,7 +154,7 @@ export default async function NewDraftProjectPage({
             <button
               type="submit"
               style={{
-                background: "#1E3A8A",
+                background: "var(--camo-charcoal)",
                 color: "#fff",
                 border: "none",
                 padding: "11px",
@@ -175,8 +175,8 @@ export default async function NewDraftProjectPage({
           style={{
             display: "inline-block",
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "10px 20px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",

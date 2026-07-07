@@ -17,9 +17,9 @@ function slaChipStyle(daysLeft: number, passed: boolean) {
       color: "#92400E",
     };
   return {
-    background: "#EEF4FF",
-    border: "1px solid #B8D0E8",
-    color: "#1B4F8A",
+    background: "var(--camo-concrete)",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-gunmetal)",
   };
 }
 
@@ -101,13 +101,13 @@ export default async function MasterInspectorDisputesPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Dispute Reviews
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Master Inspector — assigned cases
           </p>
         </div>
@@ -115,8 +115,8 @@ export default async function MasterInspectorDisputesPage({
           href="/dashboard/inspector"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -150,8 +150,8 @@ export default async function MasterInspectorDisputesPage({
       {disputeList.length === 0 ? (
         <div
           style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "12px",
             padding: "48px",
             textAlign: "center",
@@ -162,13 +162,13 @@ export default async function MasterInspectorDisputesPage({
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "18px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               marginBottom: "8px",
             }}
           >
             No Disputes Assigned
           </div>
-          <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>
             You have no pending dispute reviews. New assignments will appear here automatically.
           </p>
         </div>
@@ -188,8 +188,8 @@ export default async function MasterInspectorDisputesPage({
               >
                 <div
                   style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px 20px",
                     display: "grid",
@@ -204,7 +204,7 @@ export default async function MasterInspectorDisputesPage({
                       style={{
                         fontWeight: 700,
                         fontSize: "15px",
-                        color: "#1E3A8A",
+                        color: "var(--camo-charcoal)",
                         marginBottom: "4px",
                       }}
                     >
@@ -213,13 +213,13 @@ export default async function MasterInspectorDisputesPage({
                     <div
                       style={{
                         fontSize: "12px",
-                        color: "#1B4F8A",
+                        color: "var(--camo-gunmetal)",
                         marginBottom: "4px",
                       }}
                     >
                       {project?.category?.replaceAll("_", " ") ?? "—"} • {project?.city ?? "—"}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                       Original inspector: {inspector?.display_name ?? "—"} · Filed:{" "}
                       {new Date(d.created_at).toLocaleDateString()}
                     </div>

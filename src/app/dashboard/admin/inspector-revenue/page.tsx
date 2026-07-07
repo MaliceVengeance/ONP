@@ -130,13 +130,13 @@ export default async function AdminInspectorRevenuePage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Inspector Revenue
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             All-time · {totalCount} paid inspection{totalCount !== 1 ? "s" : ""} ·{" "}
             {completedCount} completed
           </p>
@@ -146,8 +146,8 @@ export default async function AdminInspectorRevenuePage() {
             href="/dashboard/admin/inspector-requests"
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -162,8 +162,8 @@ export default async function AdminInspectorRevenuePage() {
             href="/dashboard/admin"
             style={{
               background: "transparent",
-              color: "#1B4F8A",
-              border: "1px solid #B8D0E8",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
               padding: "8px 16px",
               borderRadius: "6px",
               fontFamily: "'Barlow', sans-serif",
@@ -187,16 +187,16 @@ export default async function AdminInspectorRevenuePage() {
         }}
       >
         {[
-          { label: "Total Collected",    value: fmt(totalFees),    sub: "from clients",         accent: "#1E3A8A" },
+          { label: "Total Collected",    value: fmt(totalFees),    sub: "from clients",         accent: "var(--camo-charcoal)" },
           { label: "Inspector Payouts",  value: fmt(totalInspPay), sub: "65% avg",              accent: "#15803D" },
-          { label: "ONP Revenue",        value: fmt(totalOnp),     sub: "35% avg",              accent: "#1B4F8A" },
-          { label: "Inspections",        value: String(totalCount), sub: `${completedCount} completed`, accent: "#1E3A8A" },
+          { label: "ONP Revenue",        value: fmt(totalOnp),     sub: "35% avg",              accent: "var(--camo-gunmetal)" },
+          { label: "Inspections",        value: String(totalCount), sub: `${completedCount} completed`, accent: "var(--camo-charcoal)" },
         ].map((card) => (
           <div
             key={card.label}
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "16px 20px",
             }}
@@ -204,7 +204,7 @@ export default async function AdminInspectorRevenuePage() {
             <div
               style={{
                 fontSize: "11px",
-                color: "#1B4F8A",
+                color: "var(--camo-gunmetal)",
                 textTransform: "uppercase",
                 letterSpacing: "1px",
                 marginBottom: "4px",
@@ -222,7 +222,7 @@ export default async function AdminInspectorRevenuePage() {
             >
               {card.value}
             </div>
-            <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>{card.sub}</div>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>{card.sub}</div>
           </div>
         ))}
       </div>
@@ -235,7 +235,7 @@ export default async function AdminInspectorRevenuePage() {
             fontWeight: 700,
             fontSize: "20px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}
@@ -245,12 +245,12 @@ export default async function AdminInspectorRevenuePage() {
         {months.length === 0 ? (
           <div
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "24px",
               textAlign: "center",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               fontSize: "14px",
             }}
           >
@@ -260,14 +260,14 @@ export default async function AdminInspectorRevenuePage() {
           <div
             style={{
               background: "#FFFFFF",
-              border: "1px solid #B8D0E8",
+              border: "1px solid #d9dbdb",
               borderRadius: "12px",
               overflow: "hidden",
             }}
           >
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
               <thead>
-                <tr style={{ background: "#1E3A8A", color: "#fff", textAlign: "left" }}>
+                <tr style={{ background: "var(--camo-charcoal)", color: "#fff", textAlign: "left" }}>
                   {["Month", "Inspections", "Completed", "Fees Collected", "Inspector Payouts", "ONP Retained"].map(
                     (h) => (
                       <th
@@ -293,20 +293,20 @@ export default async function AdminInspectorRevenuePage() {
                   <tr
                     key={key}
                     style={{
-                      background: i % 2 === 0 ? "#EEF4FF" : "#FFFFFF",
-                      borderBottom: "1px solid #B8D0E8",
+                      background: i % 2 === 0 ? "var(--camo-concrete)" : "#FFFFFF",
+                      borderBottom: "1px solid #d9dbdb",
                     }}
                   >
-                    <td style={{ padding: "11px 16px", fontWeight: 600, color: "#1E3A8A", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "11px 16px", fontWeight: 600, color: "var(--camo-charcoal)", whiteSpace: "nowrap" }}>
                       {monthLabel(key)}
                     </td>
-                    <td style={{ padding: "11px 16px", color: "#1E3A8A" }}>{b.count}</td>
+                    <td style={{ padding: "11px 16px", color: "var(--camo-charcoal)" }}>{b.count}</td>
                     <td style={{ padding: "11px 16px", color: "#15803D" }}>{b.completed}</td>
-                    <td style={{ padding: "11px 16px", fontWeight: 700, color: "#1E3A8A" }}>
+                    <td style={{ padding: "11px 16px", fontWeight: 700, color: "var(--camo-charcoal)" }}>
                       {fmt(b.fees)}
                     </td>
                     <td style={{ padding: "11px 16px", color: "#15803D" }}>{fmt(b.inspPay)}</td>
-                    <td style={{ padding: "11px 16px", color: "#1B4F8A", fontWeight: 600 }}>
+                    <td style={{ padding: "11px 16px", color: "var(--camo-gunmetal)", fontWeight: 600 }}>
                       {fmt(b.onp)}
                     </td>
                   </tr>
@@ -325,7 +325,7 @@ export default async function AdminInspectorRevenuePage() {
             fontWeight: 700,
             fontSize: "20px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}
@@ -335,12 +335,12 @@ export default async function AdminInspectorRevenuePage() {
         {inspRows.length === 0 ? (
           <div
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "24px",
               textAlign: "center",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               fontSize: "14px",
             }}
           >
@@ -350,14 +350,14 @@ export default async function AdminInspectorRevenuePage() {
           <div
             style={{
               background: "#FFFFFF",
-              border: "1px solid #B8D0E8",
+              border: "1px solid #d9dbdb",
               borderRadius: "12px",
               overflow: "hidden",
             }}
           >
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
               <thead>
-                <tr style={{ background: "#1E3A8A", color: "#fff", textAlign: "left" }}>
+                <tr style={{ background: "var(--camo-charcoal)", color: "#fff", textAlign: "left" }}>
                   {["Inspector", "Assigned", "Completed", "Completion Rate", "Total Earnings", "Avg Earning / Job"].map(
                     (h) => (
                       <th
@@ -389,14 +389,14 @@ export default async function AdminInspectorRevenuePage() {
                     <tr
                       key={inspId}
                       style={{
-                        background: i % 2 === 0 ? "#EEF4FF" : "#FFFFFF",
-                        borderBottom: "1px solid #B8D0E8",
+                        background: i % 2 === 0 ? "var(--camo-concrete)" : "#FFFFFF",
+                        borderBottom: "1px solid #d9dbdb",
                       }}
                     >
-                      <td style={{ padding: "11px 16px", fontWeight: 600, color: "#1E3A8A" }}>
+                      <td style={{ padding: "11px 16px", fontWeight: 600, color: "var(--camo-charcoal)" }}>
                         {name}
                       </td>
-                      <td style={{ padding: "11px 16px", color: "#1E3A8A" }}>{b.assigned}</td>
+                      <td style={{ padding: "11px 16px", color: "var(--camo-charcoal)" }}>{b.assigned}</td>
                       <td style={{ padding: "11px 16px", color: "#15803D" }}>{b.completed}</td>
                       <td style={{ padding: "11px 16px" }}>
                         <span
@@ -425,7 +425,7 @@ export default async function AdminInspectorRevenuePage() {
                       <td style={{ padding: "11px 16px", fontWeight: 700, color: "#15803D" }}>
                         {fmt(b.earnings)}
                       </td>
-                      <td style={{ padding: "11px 16px", color: "#1B4F8A" }}>
+                      <td style={{ padding: "11px 16px", color: "var(--camo-gunmetal)" }}>
                         {fmt(avgEarning)}
                       </td>
                     </tr>
@@ -445,7 +445,7 @@ export default async function AdminInspectorRevenuePage() {
             fontWeight: 700,
             fontSize: "20px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}
@@ -455,12 +455,12 @@ export default async function AdminInspectorRevenuePage() {
         {rows.length === 0 ? (
           <div
             style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "24px",
               textAlign: "center",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               fontSize: "14px",
             }}
           >
@@ -470,7 +470,7 @@ export default async function AdminInspectorRevenuePage() {
           <div
             style={{
               background: "#FFFFFF",
-              border: "1px solid #B8D0E8",
+              border: "1px solid #d9dbdb",
               borderRadius: "12px",
               overflow: "auto",
             }}
@@ -484,7 +484,7 @@ export default async function AdminInspectorRevenuePage() {
               }}
             >
               <thead>
-                <tr style={{ background: "#1E3A8A", color: "#fff", textAlign: "left" }}>
+                <tr style={{ background: "var(--camo-charcoal)", color: "#fff", textAlign: "left" }}>
                   {["Project", "Type", "Fee", "Insp. Pay", "ONP", "Inspector", "Status", "Date"].map(
                     (h) => (
                       <th
@@ -510,7 +510,7 @@ export default async function AdminInspectorRevenuePage() {
                   const p = projectMap.get(r.project_id) as any;
                   const statusColors: Record<string, { bg: string; color: string; border: string }> = {
                     PENDING:   { bg: "#FFFBEB", color: "#92400E",  border: "#FCD34D" },
-                    ASSIGNED:  { bg: "#EEF4FF", color: "#1B4F8A",  border: "#B8D0E8" },
+                    ASSIGNED:  { bg: "var(--camo-concrete)", color: "var(--camo-gunmetal)",  border: "#d9dbdb" },
                     COMPLETED: { bg: "#F0FDF4", color: "#15803D",  border: "#BBF7D0" },
                   };
                   const sc = statusColors[r.request_status] ?? statusColors.PENDING;
@@ -518,15 +518,15 @@ export default async function AdminInspectorRevenuePage() {
                     <tr
                       key={r.id}
                       style={{
-                        background: i % 2 === 0 ? "#EEF4FF" : "#FFFFFF",
-                        borderBottom: "1px solid #B8D0E8",
+                        background: i % 2 === 0 ? "var(--camo-concrete)" : "#FFFFFF",
+                        borderBottom: "1px solid #d9dbdb",
                       }}
                     >
                       <td style={{ padding: "10px 14px" }}>
-                        <div style={{ fontWeight: 600, color: "#1E3A8A" }}>
+                        <div style={{ fontWeight: 600, color: "var(--camo-charcoal)" }}>
                           {p?.title ?? "—"}
                         </div>
-                        <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                           {p?.category?.replaceAll("_", " ") ?? "—"} · {p?.city ?? "—"}
                         </div>
                       </td>
@@ -534,22 +534,22 @@ export default async function AdminInspectorRevenuePage() {
                         style={{
                           padding: "10px 14px",
                           fontSize: "11px",
-                          color: "#1B4F8A",
+                          color: "var(--camo-gunmetal)",
                           whiteSpace: "nowrap",
                         }}
                       >
                         {r.pricing_key?.replaceAll("_", " ") ?? "—"}
                       </td>
-                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#1E3A8A", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "var(--camo-charcoal)", whiteSpace: "nowrap" }}>
                         {fmt(r.fee_charged_cents ?? 0)}
                       </td>
                       <td style={{ padding: "10px 14px", color: "#15803D", whiteSpace: "nowrap" }}>
                         {fmt(r.inspector_share_cents ?? 0)}
                       </td>
-                      <td style={{ padding: "10px 14px", color: "#1B4F8A", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 14px", color: "var(--camo-gunmetal)", whiteSpace: "nowrap" }}>
                         {fmt(r.onp_share_cents ?? 0)}
                       </td>
-                      <td style={{ padding: "10px 14px", color: "#1E3A8A", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 14px", color: "var(--camo-charcoal)", whiteSpace: "nowrap" }}>
                         {r.inspector_id
                           ? inspectorMap.get(r.inspector_id) ?? "—"
                           : <em style={{ color: "#9CA3AF" }}>Unassigned</em>}
@@ -569,7 +569,7 @@ export default async function AdminInspectorRevenuePage() {
                           {r.request_status}
                         </span>
                       </td>
-                      <td style={{ padding: "10px 14px", fontSize: "12px", color: "#4A7FB5", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 14px", fontSize: "12px", color: "var(--camo-gunmetal)", whiteSpace: "nowrap" }}>
                         {r.requested_at
                           ? new Date(r.requested_at).toLocaleDateString()
                           : "—"}

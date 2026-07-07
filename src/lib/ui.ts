@@ -1,19 +1,19 @@
 export const ui = {
   card: {
-    background: "#0F2040",
-    border: "1px solid #1B4F8A",
+    background: "var(--camo-ink)",
+    border: "1px solid var(--camo-gunmetal)",
     borderRadius: "10px",
     padding: "18px",
     marginBottom: "10px",
   } as React.CSSProperties,
 
   cardHover: {
-    borderColor: "#C8102E",
+    borderColor: "var(--camo-accent)",
   } as React.CSSProperties,
 
   btnPrimary: {
-    background: "#C8102E",
-    color: "#fff",
+    background: "var(--camo-accent)",
+    color: "var(--camo-ink)",
     border: "none",
     padding: "10px 20px",
     borderRadius: "6px",
@@ -28,8 +28,8 @@ export const ui = {
 
   btnSecondary: {
     background: "transparent",
-    color: "#7A9CC4",
-    border: "1px solid #1B4F8A",
+    color: "var(--camo-steel)",
+    border: "1px solid var(--camo-gunmetal)",
     padding: "10px 20px",
     borderRadius: "6px",
     fontFamily: "'Barlow', sans-serif",
@@ -60,12 +60,12 @@ export const ui = {
 
   muted: {
     fontSize: "13px",
-    color: "#7A9CC4",
+    color: "var(--camo-steel)",
   } as React.CSSProperties,
 
   statCard: {
-    background: "#0F2040",
-    border: "1px solid #1B4F8A",
+    background: "var(--camo-ink)",
+    border: "1px solid var(--camo-gunmetal)",
     borderRadius: "10px",
     padding: "16px",
     textAlign: "center" as const,
@@ -80,7 +80,7 @@ export const ui = {
 
   statLabel: {
     fontSize: "11px",
-    color: "#7A9CC4",
+    color: "var(--camo-steel)",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "2px",
@@ -88,14 +88,14 @@ export const ui = {
 
   divider: {
     border: "none",
-    borderTop: "1px solid #1B4F8A",
+    borderTop: "1px solid var(--camo-gunmetal)",
     margin: "20px 0",
   } as React.CSSProperties,
 
   input: {
-    background: "#1E3A8A",
-    border: "1px solid #1B4F8A",
-    color: "#F0F4FF",
+    background: "var(--camo-charcoal)",
+    border: "1px solid var(--camo-gunmetal)",
+    color: "var(--camo-paper)",
     borderRadius: "6px",
     padding: "8px 12px",
     fontFamily: "'Barlow', sans-serif",
@@ -116,7 +116,7 @@ export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "c
   };
   switch (type) {
     case "open": return { ...base, background: "#0D3320", color: "#4ADE80", border: "1px solid #166534" };
-    case "draft": return { ...base, background: "#1A2540", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+    case "draft": return { ...base, background: "var(--camo-charcoal)", color: "var(--camo-steel)", border: "1px solid var(--camo-gunmetal)" };
     case "awarded": return { ...base, background: "#2D1B69", color: "#A78BFA", border: "1px solid #5B21B6" };
     case "closed": return { ...base, background: "#2D1A00", color: "#FBBF24", border: "1px solid #92400E" };
     case "vet": return { ...base, background: "#1e1a00", color: "#FBBF24", border: "1px solid #92400E" };
@@ -124,7 +124,7 @@ export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "c
     case "completed": return { ...base, background: "#0D2D1A", color: "#34D399", border: "1px solid #065F46" };
     case "emergency": return { ...base, background: "#7C1A00", color: "#FDBA74", border: "1px solid #C2410C" };
     case "pending_payment": return { ...base, background: "#1A1000", color: "#FBBF24", border: "1px solid #D97706" };
-    default: return { ...base, background: "#1A2540", color: "#7A9CC4", border: "1px solid #1B4F8A" };
+    default: return { ...base, background: "var(--camo-charcoal)", color: "var(--camo-steel)", border: "1px solid var(--camo-gunmetal)" };
   }
 }
 

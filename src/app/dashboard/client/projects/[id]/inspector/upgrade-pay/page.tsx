@@ -75,13 +75,13 @@ export default async function InspectorUpgradePayPage({
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             Inspector Upgrade
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {(project as any).title ?? "Untitled"}
           </p>
         </div>
@@ -89,8 +89,8 @@ export default async function InspectorUpgradePayPage({
           href={`/dashboard/client/projects/${projectId}/inspector`}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -131,12 +131,12 @@ export default async function InspectorUpgradePayPage({
         </p>
         <div
           style={{
-            background: "#1E3A8A",
+            background: "var(--camo-charcoal)",
             borderRadius: "8px",
             padding: "14px 16px",
             marginBottom: "16px",
             fontSize: "13px",
-            color: "#F0F4FF",
+            color: "var(--camo-paper)",
             lineHeight: 1.6,
             fontStyle: "italic",
           }}
@@ -149,8 +149,8 @@ export default async function InspectorUpgradePayPage({
       {/* Pricing summary */}
       <div
         style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "24px",
           marginBottom: "20px",
@@ -162,7 +162,7 @@ export default async function InspectorUpgradePayPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "16px",
           }}
@@ -171,18 +171,18 @@ export default async function InspectorUpgradePayPage({
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-            <span style={{ color: "#1B4F8A" }}>Standard Inspection (already paid)</span>
+            <span style={{ color: "var(--camo-gunmetal)" }}>Standard Inspection (already paid)</span>
             <span style={{ color: "#6B7280", textDecoration: "line-through" }}>
               {fmt(originalFee)}
             </span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-            <span style={{ color: "#1B4F8A" }}>Upgrade to Comprehensive</span>
-            <span style={{ color: "#C8102E", fontWeight: 700 }}>+{fmt(upgradeFee)}</span>
+            <span style={{ color: "var(--camo-gunmetal)" }}>Upgrade to Comprehensive</span>
+            <span style={{ color: "var(--camo-accent-dim)", fontWeight: 700 }}>+{fmt(upgradeFee)}</span>
           </div>
           <div
             style={{
-              borderTop: "1px solid #B8D0E8",
+              borderTop: "1px solid #d9dbdb",
               paddingTop: "10px",
               display: "flex",
               justifyContent: "space-between",
@@ -190,8 +190,8 @@ export default async function InspectorUpgradePayPage({
               fontWeight: 700,
             }}
           >
-            <span style={{ color: "#1E3A8A" }}>Total for Comprehensive Inspection</span>
-            <span style={{ color: "#1E3A8A" }}>{fmt(originalFee + upgradeFee)}</span>
+            <span style={{ color: "var(--camo-charcoal)" }}>Total for Comprehensive Inspection</span>
+            <span style={{ color: "var(--camo-charcoal)" }}>{fmt(originalFee + upgradeFee)}</span>
           </div>
         </div>
 
@@ -273,9 +273,9 @@ export default async function InspectorUpgradePayPage({
             type="submit"
             style={{
               width: "100%",
-              background: availableCredits > 0 ? "transparent" : "#C8102E",
-              color: availableCredits > 0 ? "#1B4F8A" : "#fff",
-              border: availableCredits > 0 ? "1px solid #B8D0E8" : "none",
+              background: availableCredits > 0 ? "transparent" : "var(--camo-accent)",
+              color: availableCredits > 0 ? "var(--camo-gunmetal)" : "var(--camo-ink)",
+              border: availableCredits > 0 ? "1px solid #d9dbdb" : "none",
               padding: "14px 24px",
               borderRadius: "8px",
               fontFamily: "'Barlow', sans-serif",

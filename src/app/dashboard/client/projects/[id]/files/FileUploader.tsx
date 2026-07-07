@@ -123,8 +123,8 @@ export default function FileUploader({
       {/* Upload area */}
       <div
         style={{
-          background: "#EEF4FF",
-          border: "2px dashed #1B4F8A",
+          background: "var(--camo-concrete)",
+          border: "2px dashed var(--camo-gunmetal)",
           borderRadius: "12px",
           padding: "32px",
           textAlign: "center",
@@ -138,15 +138,15 @@ export default function FileUploader({
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "20px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           marginBottom: "6px",
         }}>
           {uploading ? "Uploading…" : "Click to upload files"}
         </div>
-        <div style={{ fontSize: "13px", color: "#4A7FB5", marginBottom: "4px" }}>
+        <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "4px" }}>
           Photos, PDFs, plans, documents — max 10MB per file
         </div>
-        <div style={{ fontSize: "12px", color: "#1B4F8A" }}>
+        <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
           All files are visible to bidding contractors
         </div>
         <input
@@ -167,8 +167,8 @@ export default function FileUploader({
             }}
             style={{
               marginTop: "16px",
-              background: "#C8102E",
-              color: "#fff",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               border: "none",
               padding: "10px 28px",
               borderRadius: "6px",
@@ -182,7 +182,7 @@ export default function FileUploader({
           </button>
         )}
         {uploading && (
-          <div style={{ marginTop: "16px", fontSize: "13px", color: "#1B4F8A" }}>
+          <div style={{ marginTop: "16px", fontSize: "13px", color: "var(--camo-gunmetal)" }}>
             Please wait…
           </div>
         )}
@@ -219,7 +219,7 @@ export default function FileUploader({
       {/* File list */}
       <div style={{
         background: "#FFFFFF",
-        border: "1px solid #B8D0E8",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "20px",
       }}>
@@ -228,7 +228,7 @@ export default function FileUploader({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
@@ -238,13 +238,13 @@ export default function FileUploader({
         {files.length === 0 ? (
           <div style={{
             fontSize: "13px",
-            color: "#4A7FB5",
+            color: "var(--camo-gunmetal)",
             textAlign: "center",
             padding: "24px 0",
             lineHeight: 1.6,
           }}>
             No files uploaded yet.<br />
-            <span style={{ fontSize: "12px", color: "#1B4F8A" }}>
+            <span style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
               Add photos, blueprints, or documents to help contractors understand the scope of work.
             </span>
           </div>
@@ -252,8 +252,8 @@ export default function FileUploader({
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {files.map((file) => (
               <div key={file.name} style={{
-                background: "#EEF4FF",
-                border: "1px solid #B8D0E8",
+                background: "var(--camo-concrete)",
+                border: "1px solid #d9dbdb",
                 borderRadius: "8px",
                 padding: "12px 16px",
                 display: "flex",
@@ -268,7 +268,7 @@ export default function FileUploader({
                   <div style={{ minWidth: 0 }}>
                     <div style={{
                       fontSize: "13px",
-                      color: "#1E3A8A",
+                      color: "var(--camo-charcoal)",
                       fontWeight: 500,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -276,7 +276,7 @@ export default function FileUploader({
                     }}>
                       {file.name.replace(/^\d+_/, "")}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                       {formatSize(file.metadata?.size)}
                     </div>
                   </div>
@@ -287,8 +287,8 @@ export default function FileUploader({
                     onClick={() => handleDownload(file.name)}
                     style={{
                       background: "transparent",
-                      color: "#1B4F8A",
-                      border: "1px solid #B8D0E8",
+                      color: "var(--camo-gunmetal)",
+                      border: "1px solid #d9dbdb",
                       padding: "5px 12px",
                       borderRadius: "6px",
                       fontFamily: "'Barlow', sans-serif",

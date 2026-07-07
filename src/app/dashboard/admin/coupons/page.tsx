@@ -28,8 +28,8 @@ export default async function AdminCouponsPage({
   const inputStyle = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -42,7 +42,7 @@ export default async function AdminCouponsPage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#1B4F8A",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -58,19 +58,19 @@ export default async function AdminCouponsPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Coupon Codes
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Generate codes that give contractors a set number of free months.
           </p>
         </div>
         <Link href="/dashboard/admin" style={{
           background: "transparent",
-          color: "#1B4F8A",
-          border: "1px solid #B8D0E8",
+          color: "var(--camo-gunmetal)",
+          border: "1px solid #d9dbdb",
           padding: "8px 16px",
           borderRadius: "6px",
           fontFamily: "'Barlow', sans-serif",
@@ -95,8 +95,8 @@ export default async function AdminCouponsPage({
 
       {/* Create form */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "24px",
         marginBottom: "32px",
@@ -106,13 +106,13 @@ export default async function AdminCouponsPage({
           fontWeight: 700,
           fontSize: "20px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           Create New Coupon
         </h2>
-        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px" }}>
           Creates a 100%-off Stripe coupon for the specified number of months. Contractors enter the code at checkout.
         </p>
 
@@ -120,7 +120,7 @@ export default async function AdminCouponsPage({
           <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
               <label style={{ ...labelStyle, marginTop: 0 }}>
-                Coupon Code <span style={{ color: "#C8102E" }}>*</span>
+                Coupon Code <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
               </label>
               <input
                 name="code"
@@ -129,13 +129,13 @@ export default async function AdminCouponsPage({
                 required
                 maxLength={30}
               />
-              <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+              <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
                 Letters, numbers, hyphens, underscores. Will be uppercased.
               </p>
             </div>
             <div>
               <label style={{ ...labelStyle, marginTop: 0 }}>
-                Months Free <span style={{ color: "#C8102E" }}>*</span>
+                Months Free <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
               </label>
               <input
                 name="months_free"
@@ -146,7 +146,7 @@ export default async function AdminCouponsPage({
                 placeholder="e.g. 3"
                 required
               />
-              <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+              <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
                 1–24 months of 100% off.
               </p>
             </div>
@@ -163,8 +163,8 @@ export default async function AdminCouponsPage({
             type="submit"
             style={{
               marginTop: "20px",
-              background: "#C8102E",
-              color: "#fff",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               border: "none",
               padding: "11px 28px",
               borderRadius: "6px",
@@ -186,7 +186,7 @@ export default async function AdminCouponsPage({
         fontWeight: 700,
         fontSize: "20px",
         letterSpacing: "1px",
-        color: "#1E3A8A",
+        color: "var(--camo-charcoal)",
         textTransform: "uppercase",
         marginBottom: "14px",
       }}>
@@ -194,15 +194,15 @@ export default async function AdminCouponsPage({
       </h2>
 
       {rows.length === 0 ? (
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
           No coupons created yet.
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {rows.map((c) => (
             <div key={c.id} className="mob-card-stack" style={{
-              background: c.is_active ? "#EEF4FF" : "#F8F8F8",
-              border: `1px solid ${c.is_active ? "#B8D0E8" : "#D1D5DB"}`,
+              background: c.is_active ? "var(--camo-concrete)" : "#F8F8F8",
+              border: `1px solid ${c.is_active ? "#d9dbdb" : "#D1D5DB"}`,
               borderRadius: "10px",
               padding: "16px 20px",
               display: "flex",
@@ -218,7 +218,7 @@ export default async function AdminCouponsPage({
                     fontWeight: 700,
                     fontSize: "20px",
                     letterSpacing: "2px",
-                    color: "#1E3A8A",
+                    color: "var(--camo-charcoal)",
                   }}>
                     {c.code}
                   </span>
@@ -234,11 +234,11 @@ export default async function AdminCouponsPage({
                     {c.is_active ? "ACTIVE" : "INACTIVE"}
                   </span>
                 </div>
-                <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
+                <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
                   {c.months_free} month{c.months_free !== 1 ? "s" : ""} free
                   {c.description ? ` — ${c.description}` : ""}
                 </div>
-                <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>
+                <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>
                   Created {new Date(c.created_at).toLocaleDateString()}
                 </div>
               </div>

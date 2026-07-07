@@ -53,10 +53,10 @@ export default async function AdminUserProfilePage({
   if (!profile) {
     return (
       <div style={{ maxWidth: "760px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "var(--camo-charcoal)" }}>
           User Not Found
         </h1>
-        <Link href="/dashboard/admin/users" style={{ color: "#1B4F8A", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
+        <Link href="/dashboard/admin/users" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
           ← Back to Users
         </Link>
       </div>
@@ -150,10 +150,10 @@ export default async function AdminUserProfilePage({
   function roleColor(role: string) {
     switch (role) {
       case "ADMIN": return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
-      case "CLIENT": return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+      case "CLIENT": return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
       case "CONTRACTOR": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
       case "INSPECTOR": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
-      default: return { background: "#EEF4FF", color: "#1B4F8A", border: "1px solid #B8D0E8" };
+      default: return { background: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb" };
     }
   }
 
@@ -166,8 +166,8 @@ export default async function AdminUserProfilePage({
   }
 
   const sectionCard = {
-    background: "#EEF4FF",
-    border: "1px solid #B8D0E8",
+    background: "var(--camo-concrete)",
+    border: "1px solid #d9dbdb",
     borderRadius: "12px",
     padding: "20px",
     marginBottom: "16px",
@@ -178,7 +178,7 @@ export default async function AdminUserProfilePage({
     fontWeight: 700,
     fontSize: "16px",
     letterSpacing: "1px",
-    color: "#1E3A8A",
+    color: "var(--camo-charcoal)",
     textTransform: "uppercase" as const,
     marginBottom: "14px",
     marginTop: 0,
@@ -189,20 +189,20 @@ export default async function AdminUserProfilePage({
     return (
       <div style={{
         background: "#FFFFFF",
-        border: "1px solid #B8D0E8",
+        border: "1px solid #d9dbdb",
         borderRadius: "8px",
         padding: "12px 16px",
         marginBottom: "8px",
       }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: "14px", fontWeight: 600, color: "#1E3A8A", marginBottom: "3px" }}>
+            <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--camo-charcoal)", marginBottom: "3px" }}>
               {project.title ?? "Untitled Project"}
             </div>
-            <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
+            <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "4px" }}>
               {[project.category, project.zip_code].filter(Boolean).join(" · ") || "—"}
             </div>
-            <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
               Created: {new Date(project.created_at).toLocaleDateString()}
               {project.bid_deadline && (
                 <span style={{ marginLeft: "10px" }}>
@@ -222,8 +222,8 @@ export default async function AdminUserProfilePage({
               href={`/dashboard/admin/projects/${project.id}`}
               style={{
                 fontSize: "11px",
-                color: "#1B4F8A",
-                border: "1px solid #B8D0E8",
+                color: "var(--camo-gunmetal)",
+                border: "1px solid #d9dbdb",
                 borderRadius: "4px",
                 padding: "3px 8px",
                 textDecoration: "none",
@@ -248,7 +248,7 @@ export default async function AdminUserProfilePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             {profile.display_name ?? profile.company_name ?? "No Name"}
@@ -309,8 +309,8 @@ export default async function AdminUserProfilePage({
           href="/dashboard/admin/users"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -339,10 +339,10 @@ export default async function AdminUserProfilePage({
             { label: "Company Name", value: profile.company_name ?? "—" },
           ].map((item) => (
             <div key={item.label}>
-              <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
                 {item.label}
               </div>
-              <div style={{ fontSize: "13px", color: "#1E3A8A", wordBreak: "break-all" }}>
+              <div style={{ fontSize: "13px", color: "var(--camo-charcoal)", wordBreak: "break-all" }}>
                 {item.value}
               </div>
             </div>
@@ -355,18 +355,18 @@ export default async function AdminUserProfilePage({
         <h2 style={sectionTitle}>Contact & Service Area</h2>
         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
           <div>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Phone</div>
-            <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Phone</div>
+            <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
               {(profile.role === "CONTRACTOR" ? (contractorProfile as any)?.phone : profile.phone) ?? "—"}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Service Area ZIP</div>
-            <div style={{ fontSize: "13px", color: "#1E3A8A" }}>{saData?.service_area_zip ?? "—"}</div>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Service Area ZIP</div>
+            <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>{saData?.service_area_zip ?? "—"}</div>
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Address</div>
-            <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Address</div>
+            <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
               {profile.address_line1 ? (
                 <>
                   {profile.address_line1}
@@ -379,7 +379,7 @@ export default async function AdminUserProfilePage({
             </div>
           </div>
           <div>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>Service Area Status</div>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>Service Area Status</div>
             {saData?.service_area_status ? (
               <span style={{
                 fontSize: "11px",
@@ -392,7 +392,7 @@ export default async function AdminUserProfilePage({
                 {saData.service_area_status.replace(/_/g, " ")}
               </span>
             ) : (
-              <span style={{ fontSize: "13px", color: "#1E3A8A" }}>—</span>
+              <span style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>—</span>
             )}
           </div>
         </div>
@@ -411,16 +411,16 @@ export default async function AdminUserProfilePage({
                   { label: "Military Branch", value: contractorProfile.military_branch ?? "—" },
                 ].map((item) => (
                   <div key={item.label}>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
                       {item.label}
                     </div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>{item.value}</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>{item.value}</div>
                   </div>
                 ))}
                 {/* Business Address — full field */}
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Business Address</div>
-                  <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+                  <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Business Address</div>
+                  <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                     {contractorProfile.address_line1 ? (
                       <>
                         {contractorProfile.address_line1}
@@ -437,7 +437,7 @@ export default async function AdminUserProfilePage({
               </div>
               {contractorProfile.categories && (contractorProfile.categories as string[]).length > 0 && (
                 <div>
-                  <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
+                  <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
                     Trade Categories
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
@@ -480,18 +480,18 @@ export default async function AdminUserProfilePage({
               )}
               {contractorProfile.description && (
                 <div>
-                  <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+                  <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
                     Business Description
                   </div>
-                  <div style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6, background: "#F8FAFF", border: "1px solid #B8D0E8", borderRadius: "6px", padding: "10px 14px" }}>
+                  <div style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.6, background: "var(--camo-paper)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "10px 14px" }}>
                     {contractorProfile.description}
                   </div>
                 </div>
               )}
 
               {/* License & Insurance */}
-              <div style={{ borderTop: "1px solid #B8D0E8", paddingTop: "16px", marginTop: "4px" }}>
-                <div style={{ fontSize: "13px", fontWeight: 700, color: "#1E3A8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>
+              <div style={{ borderTop: "1px solid #d9dbdb", paddingTop: "16px", marginTop: "4px" }}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--camo-charcoal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>
                   License & Insurance
                 </div>
 
@@ -516,44 +516,44 @@ export default async function AdminUserProfilePage({
 
                 <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                   <div>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>License Number</div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>License Number</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                       {(contractorProfile as any).has_no_license
                         ? <span style={{ color: "#991B1B", fontStyle: "italic" }}>No license disclosed</span>
                         : (contractorProfile as any).license_number || "—"}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>License Expiry</div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>License Expiry</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                       {(contractorProfile as any).license_expiry
                         ? new Date((contractorProfile as any).license_expiry).toLocaleDateString()
                         : "—"}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Insurance Provider</div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Insurance Provider</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                       {(contractorProfile as any).has_no_insurance
                         ? <span style={{ color: "#991B1B", fontStyle: "italic" }}>No insurance disclosed</span>
                         : (contractorProfile as any).coi_provider || "—"}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>COI Policy #</div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>{(contractorProfile as any).coi_policy_number || "—"}</div>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>COI Policy #</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>{(contractorProfile as any).coi_policy_number || "—"}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>COI Expiry</div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>COI Expiry</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                       {(contractorProfile as any).coi_expiry
                         ? new Date((contractorProfile as any).coi_expiry).toLocaleDateString()
                         : "—"}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Coverage Amount</div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Coverage Amount</div>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                       {(contractorProfile as any).coi_amount
                         ? `$${Number((contractorProfile as any).coi_amount).toLocaleString()}`
                         : "—"}
@@ -563,7 +563,7 @@ export default async function AdminUserProfilePage({
               </div>
             </div>
           ) : (
-            <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>No contractor profile created yet.</p>
+            <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>No contractor profile created yet.</p>
           )}
         </div>
       )}
@@ -575,7 +575,7 @@ export default async function AdminUserProfilePage({
             Projects ({projects.length} total)
           </h2>
           {projects.length === 0 ? (
-            <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>No projects yet.</p>
+            <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>No projects yet.</p>
           ) : (
             <>
               {/* For Bid */}
@@ -591,7 +591,7 @@ export default async function AdminUserProfilePage({
               {/* Draft */}
               {draftProjects.length > 0 && (
                 <div style={{ marginBottom: "20px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #B8D0E8" }}>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #d9dbdb" }}>
                     Drafts ({draftProjects.length})
                   </div>
                   {draftProjects.map((p) => <ProjectRow key={p.id} project={p} />)}
@@ -611,7 +611,7 @@ export default async function AdminUserProfilePage({
               {/* Closed / Other */}
               {closedProjects.length > 0 && (
                 <div>
-                  <div style={{ fontSize: "12px", fontWeight: 700, color: "#4A7FB5", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #B8D0E8" }}>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", paddingBottom: "6px", borderBottom: "1px solid #d9dbdb" }}>
                     Closed / Other ({closedProjects.length})
                   </div>
                   {closedProjects.map((p) => <ProjectRow key={p.id} project={p} />)}
@@ -627,7 +627,7 @@ export default async function AdminUserProfilePage({
         <div style={sectionCard}>
           <h2 style={sectionTitle}>Verification History ({verificationLog.length})</h2>
           {verificationLog.length === 0 ? (
-            <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>No verification actions recorded yet.</p>
+            <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>No verification actions recorded yet.</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {verificationLog.map((entry) => {
@@ -647,14 +647,14 @@ export default async function AdminUserProfilePage({
                       <span style={{ fontSize: "12px", fontWeight: 700, padding: "3px 10px", borderRadius: "20px", ...colors.badge }}>
                         {label}
                       </span>
-                      <span style={{ fontSize: "11px", color: "#4A7FB5", whiteSpace: "nowrap", flexShrink: 0 }}>
+                      <span style={{ fontSize: "11px", color: "var(--camo-gunmetal)", whiteSpace: "nowrap", flexShrink: 0 }}>
                         {new Date(entry.created_at).toLocaleDateString()} {new Date(entry.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
-                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "4px" }}>
                       By: <strong>{entry.admin_email || "Admin"}</strong>
                     </div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A", fontStyle: "italic", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)", fontStyle: "italic", lineHeight: 1.5 }}>
                       "{entry.note}"
                     </div>
                   </div>
@@ -670,13 +670,13 @@ export default async function AdminUserProfilePage({
         <div style={sectionCard}>
           <h2 style={sectionTitle}>Bids Submitted ({bids.length} total)</h2>
           {bids.length === 0 ? (
-            <p style={{ fontSize: "13px", color: "#4A7FB5", margin: 0 }}>No bids submitted yet.</p>
+            <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>No bids submitted yet.</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {bids.map((b) => (
                 <div key={b.id} style={{
                   background: "#FFFFFF",
-                  border: "1px solid #B8D0E8",
+                  border: "1px solid #d9dbdb",
                   borderRadius: "8px",
                   padding: "12px 16px",
                   display: "flex",
@@ -685,17 +685,17 @@ export default async function AdminUserProfilePage({
                   gap: "12px",
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#1E3A8A", marginBottom: "3px" }}>
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                       {b.project_title ?? "Unknown Project"}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                       {new Date(b.created_at).toLocaleDateString()}
                       {b.project_zip && <span style={{ marginLeft: "8px" }}>ZIP: {b.project_zip}</span>}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                     {b.amount != null && (
-                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#1E3A8A" }}>
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--camo-charcoal)" }}>
                         ${b.amount.toLocaleString()}
                       </span>
                     )}
@@ -704,8 +704,8 @@ export default async function AdminUserProfilePage({
                       href={`/dashboard/admin/projects/${b.project_id}`}
                       style={{
                         fontSize: "11px",
-                        color: "#1B4F8A",
-                        border: "1px solid #B8D0E8",
+                        color: "var(--camo-gunmetal)",
+                        border: "1px solid #d9dbdb",
                         borderRadius: "4px",
                         padding: "3px 8px",
                         textDecoration: "none",

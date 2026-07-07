@@ -15,11 +15,11 @@ type Project = {
 };
 
 const TABS = [
-  { label: "All",           value: null,           color: "#1B4F8A" },
+  { label: "All",           value: null,           color: "var(--camo-gunmetal)" },
   { label: "Active",        value: "active",       color: "#15803D" },
   { label: "Needs Action",  value: "needs_action", color: "#991B1B" },
   { label: "Awarded",       value: "awarded",      color: "#92400E" },
-  { label: "Closed",        value: "closed",       color: "#4A7FB5" },
+  { label: "Closed",        value: "closed",       color: "var(--camo-gunmetal)" },
 ];
 
 export default async function ClientProjectsPage({
@@ -124,14 +124,14 @@ export default async function ClientProjectsPage({
           fontWeight: 700,
           fontSize: "32px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: 0,
         }}>
           My Projects
         </h1>
         <Link href="/dashboard/client/projects/new" style={{
-          background: "#C8102E",
-          color: "#fff",
+          background: "var(--camo-accent)",
+          color: "var(--camo-ink)",
           border: "none",
           padding: "10px 16px",
           borderRadius: "6px",
@@ -168,7 +168,7 @@ export default async function ClientProjectsPage({
         display: "flex",
         gap: "6px",
         marginBottom: "24px",
-        borderBottom: "2px solid #B8D0E8",
+        borderBottom: "2px solid #d9dbdb",
         flexWrap: "wrap",
       }}>
         {TABS.map((tab) => {
@@ -193,11 +193,11 @@ export default async function ClientProjectsPage({
                 fontWeight: isActive ? 700 : 500,
                 fontSize: "13px",
                 textDecoration: "none",
-                color: isActive ? tab.color : isAlert ? "#991B1B" : "#4A7FB5",
+                color: isActive ? tab.color : isAlert ? "#991B1B" : "var(--camo-gunmetal)",
                 background: isActive ? "#FFFFFF" : "transparent",
                 borderTop: isActive ? `2px solid ${tab.color}` : "2px solid transparent",
-                borderLeft: isActive ? "1px solid #B8D0E8" : "1px solid transparent",
-                borderRight: isActive ? "1px solid #B8D0E8" : "1px solid transparent",
+                borderLeft: isActive ? "1px solid #d9dbdb" : "1px solid transparent",
+                borderRight: isActive ? "1px solid #d9dbdb" : "1px solid transparent",
                 borderBottom: isActive ? "2px solid #FFFFFF" : "none",
                 marginBottom: isActive ? "-2px" : "0",
                 display: "inline-flex",
@@ -215,8 +215,8 @@ export default async function ClientProjectsPage({
                   ? tab.color
                   : isAlert
                   ? "#FEF2F2"
-                  : "#EEF4FF",
-                color: isActive ? "#fff" : isAlert ? "#991B1B" : "#4A7FB5",
+                  : "var(--camo-concrete)",
+                color: isActive ? "#fff" : isAlert ? "#991B1B" : "var(--camo-gunmetal)",
                 border: isAlert && !isActive ? "1px solid #FCA5A5" : "none",
               }}>
                 {count}
@@ -259,13 +259,13 @@ export default async function ClientProjectsPage({
       {/* Active section */}
       {(visibleActive.length > 0 || activeTab === "active") && (
         <div style={{ marginBottom: "28px" }}>
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
             Active ({active.length})
           </h2>
           {visibleActive.length === 0 ? (
-            <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+            <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
               No active projects.{" "}
-              <Link href="/dashboard/client/projects/new" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
+              <Link href="/dashboard/client/projects/new" style={{ color: "var(--camo-charcoal)", textDecoration: "underline" }}>
                 Create one
               </Link>
             </div>
@@ -282,12 +282,12 @@ export default async function ClientProjectsPage({
       {/* Awarded section */}
       {(visibleAwarded.length > 0 || activeTab === "awarded") && (
         <div style={{ marginBottom: "28px" }}>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
             Awarded ({awarded.length})
           </h2>
           {visibleAwarded.length === 0 ? (
-            <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+            <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
               No awarded projects yet.
             </div>
           ) : (
@@ -303,12 +303,12 @@ export default async function ClientProjectsPage({
       {/* Closed section */}
       {(visibleClosed.length > 0 || activeTab === "closed") && (
         <div>
-          <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
-          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1B4F8A", textTransform: "uppercase", marginBottom: "12px" }}>
+          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-gunmetal)", textTransform: "uppercase", marginBottom: "12px" }}>
             Closed / Completed ({closed.length})
           </h2>
           {visibleClosed.length === 0 ? (
-            <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+            <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
               No closed projects.
             </div>
           ) : (
@@ -323,9 +323,9 @@ export default async function ClientProjectsPage({
 
       {/* All tab: empty state */}
       {!activeTab && projects.length === 0 && (
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "48px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "48px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
           No projects yet.{" "}
-          <Link href="/dashboard/client/projects/new" style={{ color: "#1E3A8A", textDecoration: "underline" }}>
+          <Link href="/dashboard/client/projects/new" style={{ color: "var(--camo-charcoal)", textDecoration: "underline" }}>
             Create your first project
           </Link>
         </div>
@@ -344,8 +344,8 @@ function ProjectCard({ p, urgent, bidCount, unreadCount = 0 }: { p: Project; urg
   return (
     <Link href={`/dashboard/client/projects/${p.id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
-        background: "#EEF4FF",
-        border: `1px solid ${urgent ? "#FCA5A5" : "#B8D0E8"}`,
+        background: "var(--camo-concrete)",
+        border: `1px solid ${urgent ? "#FCA5A5" : "#d9dbdb"}`,
         borderRadius: "10px",
         padding: "16px",
         display: "flex",
@@ -358,7 +358,7 @@ function ProjectCard({ p, urgent, bidCount, unreadCount = 0 }: { p: Project; urg
           <div style={{
             fontWeight: 600,
             fontSize: "15px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             marginBottom: "3px",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -366,11 +366,11 @@ function ProjectCard({ p, urgent, bidCount, unreadCount = 0 }: { p: Project; urg
           }}>
             {p.title ?? "Untitled"}
           </div>
-          <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
+          <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
             {p.category ?? "—"} • {p.city ?? "—"}
           </div>
           {deadline && (
-            <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5" }}>
+            <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "var(--camo-gunmetal)" }}>
               {deadlinePassed
                 ? "⚠ Deadline passed"
                 : `Deadline: ${deadline.toLocaleDateString()}`}
@@ -395,8 +395,8 @@ function ProjectCard({ p, urgent, bidCount, unreadCount = 0 }: { p: Project; urg
               fontWeight: 700,
               padding: "2px 8px",
               borderRadius: "20px",
-              background: "#C8102E",
-              color: "#FFFFFF",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               whiteSpace: "nowrap",
             }}>
               💬 {unreadCount} new

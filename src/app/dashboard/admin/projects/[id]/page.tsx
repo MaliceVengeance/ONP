@@ -21,10 +21,10 @@ export default async function AdminProjectDetailPage({
   if (error || !project) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "#1E3A8A" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "32px", color: "var(--camo-charcoal)" }}>
           Project Not Found
         </h1>
-        <Link href="/dashboard/admin/projects" style={{ color: "#1B4F8A", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
+        <Link href="/dashboard/admin/projects" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline", fontSize: "13px", display: "block", marginTop: "16px" }}>
           ← Back to Projects
         </Link>
       </div>
@@ -130,14 +130,14 @@ export default async function AdminProjectDetailPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             {project.title ?? "Untitled Project"}
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
             <span style={stateBadge(project.state)}>{project.state}</span>
-            <span style={{ fontSize: "13px", color: "#1B4F8A" }}>
+            <span style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
               {project.category ?? "—"} • {project.city ?? "—"}
             </span>
           </div>
@@ -146,8 +146,8 @@ export default async function AdminProjectDetailPage({
           href="/dashboard/admin/projects"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -161,8 +161,8 @@ export default async function AdminProjectDetailPage({
 
       {/* Project details */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "16px",
@@ -172,7 +172,7 @@ export default async function AdminProjectDetailPage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
@@ -186,21 +186,21 @@ export default async function AdminProjectDetailPage({
             { label: "Revision #", value: String(project.revision_number ?? 0) },
           ].map((item) => (
             <div key={item.label}>
-              <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>
                 {item.label}
               </div>
-              <div style={{ fontSize: "13px", color: "#1E3A8A" }}>
+              <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
                 {item.value}
               </div>
             </div>
           ))}
         </div>
         {project.description && (
-          <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #B8D0E8" }}>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+          <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid #d9dbdb" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
               Description
             </div>
-            <div style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+            <div style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
               {project.description}
             </div>
           </div>
@@ -209,8 +209,8 @@ export default async function AdminProjectDetailPage({
 
       {/* Client info */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "16px",
@@ -220,28 +220,28 @@ export default async function AdminProjectDetailPage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
           Client
         </h2>
-        <div style={{ fontSize: "14px", color: "#1E3A8A", marginBottom: "4px" }}>
+        <div style={{ fontSize: "14px", color: "var(--camo-charcoal)", marginBottom: "4px" }}>
           {clientProfile?.display_name ?? clientProfile?.company_name ?? "No name set"}
         </div>
         {clientProfile?.phone && (
-          <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "3px" }}>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
             📞 {clientProfile.phone}
           </div>
         )}
         {(clientProfile?.address_city || clientProfile?.address_state) && (
-          <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "3px" }}>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
             📍 {[clientProfile.address_city, clientProfile.address_state].filter(Boolean).join(", ")}
           </div>
         )}
         <Link
           href={`/dashboard/admin/users/${project.client_id}`}
-          style={{ fontSize: "12px", color: "#4A7FB5", textDecoration: "underline", display: "block", marginTop: "8px" }}
+          style={{ fontSize: "12px", color: "var(--camo-gunmetal)", textDecoration: "underline", display: "block", marginTop: "8px" }}
         >
           View full client profile →
         </Link>
@@ -249,8 +249,8 @@ export default async function AdminProjectDetailPage({
 
       {/* Bids */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "16px",
@@ -260,14 +260,14 @@ export default async function AdminProjectDetailPage({
           fontWeight: 700,
           fontSize: "16px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
           Bids ({(bids ?? []).length})
         </h2>
         {(bids ?? []).length === 0 ? (
-          <div style={{ fontSize: "13px", color: "#1B4F8A" }}>No bids submitted yet.</div>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>No bids submitted yet.</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {(bids ?? []).map((b, idx) => {
@@ -276,7 +276,7 @@ export default async function AdminProjectDetailPage({
               return (
                 <div key={b.id} className="mob-card-stack" style={{
                   background: "#FFFFFF",
-                  border: `1px solid ${isAwarded ? "#1B4F8A" : "#B8D0E8"}`,
+                  border: `1px solid ${isAwarded ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
                   borderRadius: "8px",
                   padding: "14px",
                   display: "flex",
@@ -284,18 +284,18 @@ export default async function AdminProjectDetailPage({
                   justifyContent: "space-between",
                 }}>
                   <div>
-                    <div style={{ fontSize: "13px", color: "#1E3A8A", fontWeight: 500, marginBottom: "3px" }}>
+                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)", fontWeight: 500, marginBottom: "3px" }}>
                       Bid #{idx + 1}
                       {isAwarded && (
-                        <span style={{ marginLeft: "8px", fontSize: "11px", color: "#1B4F8A" }}>★ AWARDED</span>
+                        <span style={{ marginLeft: "8px", fontSize: "11px", color: "var(--camo-gunmetal)" }}>★ AWARDED</span>
                       )}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
                       Submitted: {new Date(b.created_at).toLocaleDateString()}
                     </div>
                     <Link
                       href={`/dashboard/admin/users/${b.contractor_id}`}
-                      style={{ fontSize: "11px", color: "#4A7FB5", textDecoration: "underline" }}
+                      style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textDecoration: "underline" }}
                     >
                       View contractor →
                     </Link>
@@ -305,7 +305,7 @@ export default async function AdminProjectDetailPage({
                       fontFamily: "'Barlow Condensed', sans-serif",
                       fontWeight: 700,
                       fontSize: "24px",
-                      color: "#1E3A8A",
+                      color: "var(--camo-charcoal)",
                     }}>
                       {amount ? fmtMoney(amount) : "—"}
                     </div>
@@ -323,8 +323,8 @@ export default async function AdminProjectDetailPage({
       {/* RFIs */}
       {(rfis ?? []).length > 0 && (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "12px",
           padding: "20px",
           marginBottom: "16px",
@@ -334,7 +334,7 @@ export default async function AdminProjectDetailPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "14px",
           }}>
@@ -344,15 +344,15 @@ export default async function AdminProjectDetailPage({
             {(rfis ?? []).map((r: any) => (
               <div key={r.id} style={{
                 background: "#FFFFFF",
-                border: "1px solid #B8D0E8",
+                border: "1px solid #d9dbdb",
                 borderRadius: "8px",
                 padding: "14px",
               }}>
-                <div style={{ fontSize: "13px", color: "#1E3A8A", fontWeight: 500, marginBottom: "6px" }}>
+                <div style={{ fontSize: "13px", color: "var(--camo-charcoal)", fontWeight: 500, marginBottom: "6px" }}>
                   {r.rfi_catalog?.prompt ?? "Question"}
                 </div>
                 {r.question && (
-                  <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px" }}>
                     {r.question}
                   </div>
                 )}
@@ -374,8 +374,8 @@ export default async function AdminProjectDetailPage({
       {/* Award info */}
       {award && (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #1B4F8A",
+          background: "var(--camo-concrete)",
+          border: "1px solid var(--camo-gunmetal)",
           borderRadius: "12px",
           padding: "20px",
         }}>
@@ -384,18 +384,18 @@ export default async function AdminProjectDetailPage({
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}>
             ★ Award
           </h2>
-          <div style={{ fontSize: "13px", color: "#1B4F8A" }}>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
             Awarded: {new Date(award.awarded_at).toLocaleDateString()}
           </div>
           <Link
             href={`/dashboard/admin/users/${award.contractor_id}`}
-            style={{ fontSize: "12px", color: "#4A7FB5", textDecoration: "underline", display: "block", marginTop: "6px" }}
+            style={{ fontSize: "12px", color: "var(--camo-gunmetal)", textDecoration: "underline", display: "block", marginTop: "6px" }}
           >
             View awarded contractor →
           </Link>
@@ -407,8 +407,8 @@ export default async function AdminProjectDetailPage({
         <div
           id="messages"
           style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "12px",
             overflow: "hidden",
             marginTop: "20px",
@@ -417,7 +417,7 @@ export default async function AdminProjectDetailPage({
           {/* Section header */}
           <div
             style={{
-              background: "#1E3A8A",
+              background: "var(--camo-charcoal)",
               padding: "14px 20px",
               display: "flex",
               alignItems: "center",
@@ -438,7 +438,7 @@ export default async function AdminProjectDetailPage({
               >
                 Project Messages
               </div>
-              <div style={{ fontSize: "11px", color: "#7A9CC4", marginTop: "1px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-steel)", marginTop: "1px" }}>
                 Admin view — full thread between client, contractor, and ONP
               </div>
             </div>
@@ -450,7 +450,7 @@ export default async function AdminProjectDetailPage({
               <div
                 style={{
                   fontSize: "13px",
-                  color: "#4A7FB5",
+                  color: "var(--camo-gunmetal)",
                   textAlign: "center",
                   padding: "24px 0",
                   fontStyle: "italic",
@@ -463,7 +463,7 @@ export default async function AdminProjectDetailPage({
                 const isAdmin = msg.sender_role === "ADMIN";
                 const roleBadgeColor =
                   msg.sender_role === "CLIENT"
-                    ? { bg: "#EEF4FF", color: "#1B4F8A", border: "#B8D0E8" }
+                    ? { bg: "var(--camo-concrete)", color: "var(--camo-gunmetal)", border: "#d9dbdb" }
                     : msg.sender_role === "ADMIN"
                     ? { bg: "#FFF7ED", color: "#92400E", border: "#FCD34D" }
                     : { bg: "#F0FDF4", color: "#15803D", border: "#86EFAC" };
@@ -482,7 +482,7 @@ export default async function AdminProjectDetailPage({
                       style={{
                         maxWidth: "80%",
                         background: isAdmin ? "#FFF7ED" : "#FFFFFF",
-                        border: `1px solid ${isAdmin ? "#FCD34D" : "#B8D0E8"}`,
+                        border: `1px solid ${isAdmin ? "#FCD34D" : "#d9dbdb"}`,
                         borderRadius: isAdmin ? "12px 2px 12px 12px" : "2px 12px 12px 12px",
                         padding: "10px 14px",
                       }}
@@ -496,7 +496,7 @@ export default async function AdminProjectDetailPage({
                           flexWrap: "wrap",
                         }}
                       >
-                        <span style={{ fontSize: "12px", fontWeight: 700, color: "#1E3A8A" }}>
+                        <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--camo-charcoal)" }}>
                           {msg.sender_name}
                         </span>
                         <span
@@ -526,7 +526,7 @@ export default async function AdminProjectDetailPage({
                       <div
                         style={{
                           fontSize: "13px",
-                          color: "#1E3A8A",
+                          color: "var(--camo-charcoal)",
                           lineHeight: 1.6,
                           whiteSpace: "pre-wrap",
                           wordBreak: "break-word",
@@ -544,7 +544,7 @@ export default async function AdminProjectDetailPage({
           {/* Admin send form */}
           <div
             style={{
-              borderTop: "1px solid #B8D0E8",
+              borderTop: "1px solid #d9dbdb",
               padding: "16px 20px",
               background: "#FFFBEB",
             }}
@@ -563,7 +563,7 @@ export default async function AdminProjectDetailPage({
                   width: "100%",
                   background: "#FFFFFF",
                   border: "1px solid #FCD34D",
-                  color: "#1E3A8A",
+                  color: "var(--camo-charcoal)",
                   borderRadius: "6px",
                   padding: "10px 14px",
                   fontFamily: "'Barlow', sans-serif",

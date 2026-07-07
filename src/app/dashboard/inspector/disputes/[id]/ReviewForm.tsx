@@ -45,10 +45,10 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
       label: "Upgrade was a reasonable judgment call",
       description:
         "Charge stands but client receives a credit. No flag added to inspector's record.",
-      bg: "#EEF4FF",
-      border: "#1B4F8A",
-      labelColor: "#1E3A8A",
-      descColor: "#1B4F8A",
+      bg: "var(--camo-concrete)",
+      border: "var(--camo-gunmetal)",
+      labelColor: "var(--camo-charcoal)",
+      descColor: "var(--camo-gunmetal)",
     },
     {
       value: "RESOLVED_REFUND",
@@ -69,13 +69,13 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
           style={{
             fontWeight: 700,
             fontSize: "13px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             marginBottom: "12px",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
           }}
         >
-          Decision <span style={{ color: "#C8102E" }}>*</span>
+          Decision <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {DECISIONS.map((d) => (
@@ -87,7 +87,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
                 gap: "12px",
                 padding: "14px 16px",
                 borderRadius: "10px",
-                border: `1px solid ${decision === d.value ? d.border : "#B8D0E8"}`,
+                border: `1px solid ${decision === d.value ? d.border : "#d9dbdb"}`,
                 background: decision === d.value ? d.bg : "#FFFFFF",
                 cursor: "pointer",
                 transition: "border-color 0.15s, background 0.15s",
@@ -99,14 +99,14 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
                 value={d.value}
                 checked={decision === d.value}
                 onChange={() => setDecision(d.value)}
-                style={{ marginTop: "3px", flexShrink: 0, accentColor: "#1B4F8A" }}
+                style={{ marginTop: "3px", flexShrink: 0, accentColor: "var(--camo-gunmetal)" }}
               />
               <div>
                 <div
                   style={{
                     fontWeight: 700,
                     fontSize: "14px",
-                    color: decision === d.value ? d.labelColor : "#1E3A8A",
+                    color: decision === d.value ? d.labelColor : "var(--camo-charcoal)",
                   }}
                 >
                   {d.label}
@@ -114,7 +114,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
                 <div
                   style={{
                     fontSize: "12px",
-                    color: decision === d.value ? d.descColor : "#4A7FB5",
+                    color: decision === d.value ? d.descColor : "var(--camo-gunmetal)",
                     marginTop: "3px",
                     lineHeight: 1.5,
                   }}
@@ -131,8 +131,8 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
       {decision === "RESOLVED_PARTIAL_CREDIT" && (
         <div
           style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "10px",
             padding: "16px 20px",
             marginBottom: "24px",
@@ -142,15 +142,15 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
             style={{
               fontWeight: 700,
               fontSize: "13px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               marginBottom: "6px",
               textTransform: "uppercase",
               letterSpacing: "0.5px",
             }}
           >
-            Credit Amount <span style={{ color: "#C8102E" }}>*</span>
+            Credit Amount <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
           </div>
-          <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px", marginTop: 0 }}>
+          <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px", marginTop: 0 }}>
             Amount to credit the client&apos;s account ($50–$200). Default is $100.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
@@ -161,14 +161,14 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
               step={1000}
               value={creditCents}
               onChange={(e) => setCreditCents(Number(e.target.value))}
-              style={{ flex: 1, accentColor: "#1B4F8A" }}
+              style={{ flex: 1, accentColor: "var(--camo-gunmetal)" }}
             />
             <div
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "26px",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
                 minWidth: "64px",
                 textAlign: "right",
               }}
@@ -181,7 +181,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
               display: "flex",
               justifyContent: "space-between",
               fontSize: "11px",
-              color: "#4A7FB5",
+              color: "var(--camo-gunmetal)",
               marginTop: "4px",
             }}
           >
@@ -200,15 +200,15 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
             display: "block",
             fontWeight: 700,
             fontSize: "13px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             marginBottom: "6px",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
           }}
         >
-          Written Reasoning <span style={{ color: "#C8102E" }}>*</span>
+          Written Reasoning <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
         </label>
-        <p style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "8px", marginTop: 0 }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px", marginTop: 0 }}>
           Explain your decision. This will be shared with both the client and the inspector.
           Minimum 100 characters.
         </p>
@@ -222,13 +222,13 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
           style={{
             width: "100%",
             border: `1px solid ${
-              reasoningLen > 0 && reasoningLen < 100 ? "#FCD34D" : "#B8D0E8"
+              reasoningLen > 0 && reasoningLen < 100 ? "#FCD34D" : "#d9dbdb"
             }`,
             borderRadius: "8px",
             padding: "12px 14px",
             fontSize: "13px",
             fontFamily: "'Barlow', sans-serif",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             background: "#FFFFFF",
             resize: "vertical",
             lineHeight: 1.6,
@@ -242,7 +242,7 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
             fontSize: "11px",
             marginTop: "4px",
             color:
-              reasoningLen < 100 ? "#9CA3AF" : reasoningLen > 1900 ? "#C8102E" : "#15803D",
+              reasoningLen < 100 ? "#9CA3AF" : reasoningLen > 1900 ? "var(--camo-accent)" : "#15803D",
           }}
         >
           <span>
@@ -279,8 +279,8 @@ export default function ReviewForm({ formAction, upgradeChargeCents }: Props) {
         disabled={!canSubmit}
         style={{
           width: "100%",
-          background: canSubmit ? "#C8102E" : "#E5E7EB",
-          color: canSubmit ? "#fff" : "#9CA3AF",
+          background: canSubmit ? "var(--camo-accent)" : "#E5E7EB",
+          color: canSubmit ? "var(--camo-ink)" : "#9CA3AF",
           border: "none",
           padding: "14px 28px",
           borderRadius: "6px",

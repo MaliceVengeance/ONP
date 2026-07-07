@@ -34,12 +34,12 @@ export default async function AdminOverrideRequestsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Deadline Requests
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {requests.length} pending deadline modification request{requests.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -47,8 +47,8 @@ export default async function AdminOverrideRequestsPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -61,7 +61,7 @@ export default async function AdminOverrideRequestsPage() {
       </div>
 
       {requests.length === 0 ? (
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "32px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
           No pending override requests.
         </div>
       ) : (
@@ -74,15 +74,15 @@ export default async function AdminOverrideRequestsPage() {
 
             return (
               <div key={r.id} style={{
-                background: isEmergencyBid ? "#1E3A8A" : "#EEF4FF",
-                border: `1px solid ${isEmergencyBid ? "#C8102E" : "#FCD34D"}`,
+                background: isEmergencyBid ? "var(--camo-charcoal)" : "var(--camo-concrete)",
+                border: `1px solid ${isEmergencyBid ? "var(--camo-accent)" : "#FCD34D"}`,
                 borderRadius: "12px",
                 padding: "20px",
               }}>
                 <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                      <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergencyBid ? "#FFFFFF" : "#1E3A8A" }}>
+                      <div style={{ fontWeight: 600, fontSize: "16px", color: isEmergencyBid ? "#FFFFFF" : "var(--camo-charcoal)" }}>
                         {r.title ?? "Untitled Project"}
                       </div>
                       {isEmergencyBid ? (
@@ -91,9 +91,9 @@ export default async function AdminOverrideRequestsPage() {
                           fontWeight: 700,
                           padding: "2px 8px",
                           borderRadius: "20px",
-                          background: "#C8102E",
-                          color: "#FFFFFF",
-                          border: "1px solid #C8102E",
+                          background: "var(--camo-accent)",
+                          color: "var(--camo-ink)",
+                          border: "1px solid var(--camo-accent)",
                           letterSpacing: "0.5px",
                           flexShrink: 0,
                         }}>
@@ -105,9 +105,9 @@ export default async function AdminOverrideRequestsPage() {
                           fontWeight: 700,
                           padding: "2px 8px",
                           borderRadius: "20px",
-                          background: "#EEF4FF",
-                          color: "#1B4F8A",
-                          border: "1px solid #B8D0E8",
+                          background: "var(--camo-concrete)",
+                          color: "var(--camo-gunmetal)",
+                          border: "1px solid #d9dbdb",
                           letterSpacing: "0.5px",
                           flexShrink: 0,
                         }}>
@@ -115,11 +115,11 @@ export default async function AdminOverrideRequestsPage() {
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: "12px", color: isEmergencyBid ? "#B8D0E8" : "#1B4F8A", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "12px", color: isEmergencyBid ? "#d9dbdb" : "var(--camo-gunmetal)", marginBottom: "4px" }}>
                       Current deadline: {deadline ? deadline.toLocaleDateString() : "—"}
-                      {deadlinePassed && <span style={{ color: "#C8102E", marginLeft: "8px" }}>⚠ Passed</span>}
+                      {deadlinePassed && <span style={{ color: "var(--camo-accent-dim)", marginLeft: "8px" }}>⚠ Passed</span>}
                     </div>
-                    <div style={{ fontSize: "12px", color: isEmergencyBid ? "#B8D0E8" : "#4A7FB5" }}>
+                    <div style={{ fontSize: "12px", color: isEmergencyBid ? "#d9dbdb" : "var(--camo-gunmetal)" }}>
                       Requested: {r.override_requested_at ? new Date(r.override_requested_at).toLocaleDateString() : "—"}
                     </div>
                   </div>
@@ -127,7 +127,7 @@ export default async function AdminOverrideRequestsPage() {
                     href={`/dashboard/admin/projects/${r.id}`}
                     style={{
                       fontSize: "12px",
-                      color: isEmergencyBid ? "#B8D0E8" : "#4A7FB5",
+                      color: isEmergencyBid ? "#d9dbdb" : "var(--camo-gunmetal)",
                       textDecoration: "underline",
                       flexShrink: 0,
                     }}
@@ -138,16 +138,16 @@ export default async function AdminOverrideRequestsPage() {
 
                 {r.override_requested_reason && (
                   <div style={{
-                    background: isEmergencyBid ? "#1B4F8A" : "#FFFFFF",
-                    border: `1px solid ${isEmergencyBid ? "#1B4F8A" : "#B8D0E8"}`,
+                    background: isEmergencyBid ? "var(--camo-gunmetal)" : "#FFFFFF",
+                    border: `1px solid ${isEmergencyBid ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
                     borderRadius: "8px",
                     padding: "12px",
                     marginBottom: "14px",
                     fontSize: "13px",
-                    color: isEmergencyBid ? "#FFFFFF" : "#1E3A8A",
+                    color: isEmergencyBid ? "#FFFFFF" : "var(--camo-charcoal)",
                     lineHeight: 1.6,
                   }}>
-                    <span style={{ color: isEmergencyBid ? "#B8D0E8" : "#1B4F8A", fontWeight: 600 }}>Reason: </span>
+                    <span style={{ color: isEmergencyBid ? "#d9dbdb" : "var(--camo-gunmetal)", fontWeight: 600 }}>Reason: </span>
                     {r.override_requested_reason}
                   </div>
                 )}
@@ -156,7 +156,7 @@ export default async function AdminOverrideRequestsPage() {
                   /* Emergency Bid Mode approval — no date picker, just unlocks bids */
                   <>
                     <div style={{
-                      background: "#1B4F8A",
+                      background: "var(--camo-gunmetal)",
                       borderRadius: "8px",
                       padding: "12px 14px",
                       marginBottom: "12px",
@@ -170,8 +170,8 @@ export default async function AdminOverrideRequestsPage() {
                       <button
                         type="submit"
                         style={{
-                          background: "#C8102E",
-                          color: "#FFFFFF",
+                          background: "var(--camo-accent)",
+                          color: "var(--camo-ink)",
                           border: "none",
                           padding: "8px 20px",
                           borderRadius: "6px",
@@ -192,7 +192,7 @@ export default async function AdminOverrideRequestsPage() {
                       <label style={{
                         display: "block",
                         fontSize: "11px",
-                        color: "#1B4F8A",
+                        color: "var(--camo-gunmetal)",
                         textTransform: "uppercase",
                         letterSpacing: "1px",
                         marginBottom: "4px",
@@ -204,8 +204,8 @@ export default async function AdminOverrideRequestsPage() {
                         name="new_deadline"
                         style={{
                           background: "#FFFFFF",
-                          border: "1px solid #B8D0E8",
-                          color: "#1E3A8A",
+                          border: "1px solid #d9dbdb",
+                          color: "var(--camo-charcoal)",
                           borderRadius: "6px",
                           padding: "8px 12px",
                           fontFamily: "'Barlow', sans-serif",
@@ -239,8 +239,8 @@ export default async function AdminOverrideRequestsPage() {
                     type="submit"
                     style={{
                       background: "transparent",
-                      color: isEmergencyBid ? "#B8D0E8" : "#991B1B",
-                      border: `1px solid ${isEmergencyBid ? "#1B4F8A" : "#FCA5A5"}`,
+                      color: isEmergencyBid ? "#d9dbdb" : "#991B1B",
+                      border: `1px solid ${isEmergencyBid ? "var(--camo-gunmetal)" : "#FCA5A5"}`,
                       padding: "6px 16px",
                       borderRadius: "6px",
                       fontFamily: "'Barlow', sans-serif",

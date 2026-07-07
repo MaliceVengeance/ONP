@@ -79,7 +79,7 @@ export default async function ClientProjectBidsPage({
   if (pErr) {
     return (
       <div style={{ maxWidth: "700px" }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", color: "#1E3A8A" }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", color: "var(--camo-charcoal)" }}>
           Bids
         </h1>
         <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B", padding: "14px", borderRadius: "8px", fontSize: "13px", marginTop: "16px" }}>
@@ -213,8 +213,8 @@ export default async function ClientProjectBidsPage({
 
   const inputStyle = {
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "8px 12px",
     fontFamily: "'Barlow', sans-serif",
@@ -232,13 +232,13 @@ export default async function ClientProjectBidsPage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Bids
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
-            <span style={{ fontSize: "14px", color: "#1B4F8A" }}>
+            <span style={{ fontSize: "14px", color: "var(--camo-gunmetal)" }}>
               {project.title ?? "Untitled"}
             </span>
             <span style={stateBadge(project.state)}>{project.state}</span>
@@ -248,8 +248,8 @@ export default async function ClientProjectBidsPage({
           href={`/dashboard/client/projects/${projectId}`}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -263,8 +263,8 @@ export default async function ClientProjectBidsPage({
 
       {/* Lock status */}
       <div style={{
-        background: "#EEF4FF",
-        border: `1px solid ${unlocked ? "#166534" : "#B8D0E8"}`,
+        background: "var(--camo-concrete)",
+        border: `1px solid ${unlocked ? "#166534" : "#d9dbdb"}`,
         borderRadius: "10px",
         padding: "16px 20px",
         marginBottom: "20px",
@@ -278,12 +278,12 @@ export default async function ClientProjectBidsPage({
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "20px",
-            color: unlocked ? "#15803D" : "#1B4F8A",
+            color: unlocked ? "#15803D" : "var(--camo-gunmetal)",
             letterSpacing: "1px",
           }}>
             {unlocked ? "✅ BIDS UNLOCKED" : "🔒 BIDS LOCKED"}
           </div>
-          <div style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {unlocked
               ? (isEmergencyBidMode || isEmergencyPaid) && !deadlinePassed
                 ? "Emergency bid request — bids are visible as contractors submit them."
@@ -294,10 +294,10 @@ export default async function ClientProjectBidsPage({
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "11px", color: "#4A7FB5", textTransform: "uppercase", letterSpacing: "1px" }}>
+          <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px" }}>
             Deadline
           </div>
-          <div style={{ fontSize: "14px", color: "#1E3A8A", fontWeight: 500, marginTop: "2px" }}>
+          <div style={{ fontSize: "14px", color: "var(--camo-charcoal)", fontWeight: 500, marginTop: "2px" }}>
             {deadline ? deadline.toLocaleDateString() : "—"}
           </div>
         </div>
@@ -306,8 +306,8 @@ export default async function ClientProjectBidsPage({
       {/* Emergency bid mode disclaimer */}
       {(isEmergencyBidMode || isEmergencyPaid) && !deadlinePassed && (
         <div style={{
-          background: "#1E3A8A",
-          border: "1px solid #C8102E",
+          background: "var(--camo-charcoal)",
+          border: "1px solid var(--camo-accent)",
           borderRadius: "10px",
           padding: "18px 20px",
           marginBottom: "20px",
@@ -317,7 +317,7 @@ export default async function ClientProjectBidsPage({
             fontWeight: 700,
             fontSize: "14px",
             letterSpacing: "1px",
-            color: "#C8102E",
+            color: "var(--camo-accent)",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}>
@@ -327,9 +327,9 @@ export default async function ClientProjectBidsPage({
             This project is operating in Emergency Bid Mode. Bids are being revealed as contractors submit them — the standard sealed bidding process is not in effect for this project.
           </p>
           <p style={{ fontSize: "13px", color: "#FFFFFF", lineHeight: 1.75, marginBottom: "8px" }}>
-            <strong style={{ color: "#C8102E" }}>These bids are preliminary and incomplete.</strong> Because no site visit has been conducted and contractors are responding to an urgent request, bids may reflect significant contingency padding, missing scope items, or worst-case pricing assumptions. They are not accurate final estimates.
+            <strong style={{ color: "var(--camo-accent)" }}>These bids are preliminary and incomplete.</strong> Because no site visit has been conducted and contractors are responding to an urgent request, bids may reflect significant contingency padding, missing scope items, or worst-case pricing assumptions. They are not accurate final estimates.
           </p>
-          <p style={{ fontSize: "13px", color: "#B8D0E8", lineHeight: 1.75 }}>
+          <p style={{ fontSize: "13px", color: "#d9dbdb", lineHeight: 1.75 }}>
             ONP is not responsible for pricing differences, disputes, or outcomes arising from bids submitted under emergency conditions. Award any contractor at your own risk and expect to negotiate final scope and pricing after a proper site visit.
           </p>
         </div>
@@ -368,23 +368,23 @@ export default async function ClientProjectBidsPage({
 
         return (
           <div style={{
-            background: "#EEF4FF",
-            border: "1px solid #1B4F8A",
+            background: "var(--camo-concrete)",
+            border: "1px solid var(--camo-gunmetal)",
             borderRadius: "12px",
             padding: "20px",
             marginBottom: "24px",
           }}>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
               ★ Winner Selected
             </div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "#1E3A8A", marginBottom: "4px" }}>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "var(--camo-charcoal)", marginBottom: "4px" }}>
               {String(name)}
             </div>
-            <div style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "12px" }}>
+            <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
               {[city, state].filter(Boolean).join(", ") || "Location not listed"}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "12px", color: "#4A7FB5" }}>
+              <span style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
                 Awarded: {new Date(award.awarded_at).toLocaleString()}
               </span>
               {veteran === true && (
@@ -408,16 +408,16 @@ export default async function ClientProjectBidsPage({
       {/* Locked state */}
       {!unlocked ? (
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
           borderRadius: "10px",
           padding: "32px",
           textAlign: "center",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
           fontSize: "14px",
         }}>
           🔒 Bids are sealed until the deadline passes. Check back after{" "}
-          <span style={{ color: "#1E3A8A" }}>
+          <span style={{ color: "var(--camo-charcoal)" }}>
             {deadline ? deadline.toLocaleDateString() : "the deadline"}
           </span>.
         </div>
@@ -425,8 +425,8 @@ export default async function ClientProjectBidsPage({
         <>
           {/* Filters */}
           <div style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "10px",
             padding: "20px",
             marginBottom: "20px",
@@ -436,7 +436,7 @@ export default async function ClientProjectBidsPage({
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "14px",
             }}>
@@ -445,19 +445,19 @@ export default async function ClientProjectBidsPage({
 
             <form className="mob-col-stretch" style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" }}>
               <div>
-                <label style={{ display: "block", fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                <label style={{ display: "block", fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                   Min ($)
                 </label>
                 <input name="min" defaultValue={sp.min ?? ""} style={{ ...inputStyle, width: "120px" }} placeholder="e.g. 25000" />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                <label style={{ display: "block", fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                   Max ($)
                 </label>
                 <input name="max" defaultValue={sp.max ?? ""} style={{ ...inputStyle, width: "120px" }} placeholder="e.g. 50000" />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
+                <label style={{ display: "block", fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                   Sort
                 </label>
                 <select name="sort" defaultValue={sort} style={inputStyle}>
@@ -466,7 +466,7 @@ export default async function ClientProjectBidsPage({
                 </select>
               </div>
               <button type="submit" style={{
-                background: "#1B4F8A",
+                background: "var(--camo-gunmetal)",
                 color: "#fff",
                 border: "none",
                 padding: "8px 20px",
@@ -482,8 +482,8 @@ export default async function ClientProjectBidsPage({
                 href={`/dashboard/client/projects/${projectId}/bids`}
                 style={{
                   background: "transparent",
-                  color: "#1B4F8A",
-                  border: "1px solid #B8D0E8",
+                  color: "var(--camo-gunmetal)",
+                  border: "1px solid #d9dbdb",
                   padding: "8px 16px",
                   borderRadius: "6px",
                   fontFamily: "'Barlow', sans-serif",
@@ -495,7 +495,7 @@ export default async function ClientProjectBidsPage({
               </Link>
             </form>
 
-            <p style={{ fontSize: "12px", color: "#4A7FB5", marginTop: "12px" }}>
+            <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "12px" }}>
               Bids are anonymous. Contractor identities are revealed only after award.
             </p>
           </div>
@@ -525,12 +525,12 @@ export default async function ClientProjectBidsPage({
           {/* Bid cards */}
           {bids.length === 0 ? (
             <div style={{
-              background: "#EEF4FF",
-              border: "1px solid #B8D0E8",
+              background: "var(--camo-concrete)",
+              border: "1px solid #d9dbdb",
               borderRadius: "10px",
               padding: "32px",
               textAlign: "center",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               fontSize: "14px",
             }}>
               No bids match your filters.
@@ -547,8 +547,8 @@ export default async function ClientProjectBidsPage({
 
                 return (
                   <div key={b.bid_id} style={{
-                    background: "#EEF4FF",
-                    border: `1px solid ${isAwarded ? "#1B4F8A" : "#B8D0E8"}`,
+                    background: "var(--camo-concrete)",
+                    border: `1px solid ${isAwarded ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
                     borderRadius: "10px",
                     padding: "20px",
                   }}>
@@ -559,7 +559,7 @@ export default async function ClientProjectBidsPage({
                             fontFamily: "'Barlow Condensed', sans-serif",
                             fontWeight: 700,
                             fontSize: "18px",
-                            color: "#1B4F8A",
+                            color: "var(--camo-gunmetal)",
                             textTransform: "uppercase",
                             letterSpacing: "1px",
                           }}>
@@ -579,10 +579,10 @@ export default async function ClientProjectBidsPage({
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
                           Submitted: {new Date(b.submitted_at).toLocaleString()}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
                           Version {b.version_number}
                         </div>
                       </div>
@@ -591,7 +591,7 @@ export default async function ClientProjectBidsPage({
                           fontFamily: "'Barlow Condensed', sans-serif",
                           fontWeight: 700,
                           fontSize: "32px",
-                          color: "#1E3A8A",
+                          color: "var(--camo-charcoal)",
                           lineHeight: 1,
                         }}>
                           {centsToMoney(b.amount_cents)}
@@ -603,14 +603,14 @@ export default async function ClientProjectBidsPage({
                     {contractor && (
                       <div style={{
                         background: "#FFFFFF",
-                        border: "1px solid #B8D0E8",
+                        border: "1px solid #d9dbdb",
                         borderRadius: "8px",
                         padding: "12px 14px",
                         marginTop: "12px",
                       }}>
                         <div style={{
                           fontSize: "11px",
-                          color: "#1B4F8A",
+                          color: "var(--camo-gunmetal)",
                           textTransform: "uppercase",
                           letterSpacing: "1px",
                           marginBottom: "10px",
@@ -693,35 +693,35 @@ export default async function ClientProjectBidsPage({
                         {/* License info */}
                         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License #</div>
-                            <div style={{ color: "#1E3A8A" }}>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License #</div>
+                            <div style={{ color: "var(--camo-charcoal)" }}>
                               {contractor.license_number ?? "Not provided"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License Expires</div>
-                            <div style={{ color: licenseExpired ? "#991B1B" : "#1E3A8A" }}>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License Expires</div>
+                            <div style={{ color: licenseExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
                               {formatDate(contractor.license_expiry)}
                               {licenseExpired && " ⚠ Expired"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Insurance Provider</div>
-                            <div style={{ color: "#1E3A8A" }}>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Insurance Provider</div>
+                            <div style={{ color: "var(--camo-charcoal)" }}>
                               {contractor.coi_provider ?? "Not provided"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>COI Expires</div>
-                            <div style={{ color: coiExpired ? "#991B1B" : "#1E3A8A" }}>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
+                            <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
                               {formatDate(contractor.coi_expiry)}
                               {coiExpired && " ⚠ Expired"}
                             </div>
                           </div>
                           {contractor.coi_amount && (
                             <div>
-                              <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Coverage Amount</div>
-                              <div style={{ color: "#1E3A8A" }}>
+                              <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Coverage Amount</div>
+                              <div style={{ color: "var(--camo-charcoal)" }}>
                                 {fmtMoney(contractor.coi_amount)}
                               </div>
                             </div>
@@ -733,14 +733,14 @@ export default async function ClientProjectBidsPage({
                     {b.notes && (
                       <div style={{
                         background: "#FFFFFF",
-                        border: "1px solid #B8D0E8",
+                        border: "1px solid #d9dbdb",
                         borderRadius: "6px",
                         padding: "12px",
                         marginTop: "12px",
                         fontSize: "13px",
-                        color: "#1B4F8A",
+                        color: "var(--camo-gunmetal)",
                       }}>
-                        <span style={{ color: "#1B4F8A", fontWeight: 600 }}>Notes: </span>
+                        <span style={{ color: "var(--camo-gunmetal)", fontWeight: 600 }}>Notes: </span>
                         {b.notes}
                       </div>
                     )}
@@ -750,7 +750,7 @@ export default async function ClientProjectBidsPage({
                         href={`/dashboard/client/projects/${projectId}/bids/${b.bid_id}?index=${idx + 1}`}
                         style={{
                           display: "inline-block",
-                          background: "#1E3A8A",
+                          background: "var(--camo-charcoal)",
                           color: "#fff",
                           padding: "8px 16px",
                           borderRadius: "6px",
@@ -777,7 +777,7 @@ export default async function ClientProjectBidsPage({
                                 displayIndex: bids.indexOf(ob) + 1,
                               }))}
                           />
-                          <p style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "6px" }}>
+                          <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
                             Reveals contractor identity for this bid only.
                           </p>
                         </>
@@ -785,7 +785,7 @@ export default async function ClientProjectBidsPage({
                         <div style={{
                           fontSize: "13px",
                           fontWeight: 600,
-                          color: "#1B4F8A",
+                          color: "var(--camo-gunmetal)",
                           display: "flex",
                           alignItems: "center",
                           gap: "6px",
@@ -793,7 +793,7 @@ export default async function ClientProjectBidsPage({
                           ★ Awarded Bid
                         </div>
                       ) : (
-                        <div style={{ fontSize: "13px", color: "#4A7FB5" }}>
+                        <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
                           {rankLabel ? `Ranked ${rankLabel}` : "Not ranked"}
                         </div>
                       )}

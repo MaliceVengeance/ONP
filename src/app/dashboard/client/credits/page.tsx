@@ -62,13 +62,13 @@ export default async function CreditsPage() {
               fontWeight: 700,
               fontSize: "36px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               margin: 0,
             }}
           >
             My Credits
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Credits apply automatically at checkout toward inspections and emergency fees.
           </p>
         </div>
@@ -76,8 +76,8 @@ export default async function CreditsPage() {
           href="/dashboard/client"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -92,8 +92,8 @@ export default async function CreditsPage() {
       {/* Balance card */}
       <div
         style={{
-          background: hasBalance ? "#1E3A8A" : "#EEF4FF",
-          border: `1px solid ${hasBalance ? "#1B4F8A" : "#B8D0E8"}`,
+          background: hasBalance ? "var(--camo-charcoal)" : "var(--camo-concrete)",
+          border: `1px solid ${hasBalance ? "var(--camo-gunmetal)" : "#d9dbdb"}`,
           borderRadius: "12px",
           padding: "28px 24px",
           marginBottom: "28px",
@@ -105,7 +105,7 @@ export default async function CreditsPage() {
             fontSize: "12px",
             letterSpacing: "2px",
             textTransform: "uppercase",
-            color: hasBalance ? "#B8D0E8" : "#4A7FB5",
+            color: hasBalance ? "#d9dbdb" : "var(--camo-gunmetal)",
             marginBottom: "8px",
           }}
         >
@@ -116,7 +116,7 @@ export default async function CreditsPage() {
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 700,
             fontSize: "60px",
-            color: hasBalance ? "#FFFFFF" : "#1E3A8A",
+            color: hasBalance ? "#FFFFFF" : "var(--camo-charcoal)",
             lineHeight: 1,
           }}
         >
@@ -126,7 +126,7 @@ export default async function CreditsPage() {
           <p
             style={{
               fontSize: "13px",
-              color: "#4A7FB5",
+              color: "var(--camo-gunmetal)",
               marginTop: "12px",
               lineHeight: 1.6,
             }}
@@ -146,7 +146,7 @@ export default async function CreditsPage() {
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -159,8 +159,8 @@ export default async function CreditsPage() {
                 key={c.id}
                 className="mob-card-stack"
                 style={{
-                  background: "#EEF4FF",
-                  border: "1px solid #B8D0E8",
+                  background: "var(--camo-concrete)",
+                  border: "1px solid #d9dbdb",
                   borderRadius: "8px",
                   padding: "14px 18px",
                   display: "flex",
@@ -171,14 +171,14 @@ export default async function CreditsPage() {
               >
                 <div>
                   <div
-                    style={{ fontWeight: 600, fontSize: "14px", color: "#1E3A8A" }}
+                    style={{ fontWeight: 600, fontSize: "14px", color: "var(--camo-charcoal)" }}
                   >
                     {fmtSource(c.source)}
                   </div>
                   <div
                     style={{
                       fontSize: "12px",
-                      color: "#4A7FB5",
+                      color: "var(--camo-gunmetal)",
                       marginTop: "2px",
                     }}
                   >
@@ -212,7 +212,7 @@ export default async function CreditsPage() {
               fontWeight: 700,
               fontSize: "18px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "12px",
             }}
@@ -225,7 +225,7 @@ export default async function CreditsPage() {
                 key={c.id}
                 className="mob-card-stack"
                 style={{
-                  background: "#F9FAFB",
+                  background: "var(--camo-paper)",
                   border: "1px solid #E5E7EB",
                   borderRadius: "8px",
                   padding: "14px 18px",
@@ -272,12 +272,12 @@ export default async function CreditsPage() {
       {available.length === 0 && used.length === 0 && (
         <div
           style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "10px",
             padding: "40px",
             textAlign: "center",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
             fontSize: "14px",
           }}
         >

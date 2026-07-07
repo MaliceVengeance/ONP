@@ -134,12 +134,12 @@ export default async function AdminAnalyticsPage() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Analytics
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             Platform overview and growth metrics
           </p>
         </div>
@@ -147,8 +147,8 @@ export default async function AdminAnalyticsPage() {
           href="/dashboard/admin"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -265,8 +265,8 @@ export default async function AdminAnalyticsPage() {
           { label: "Total Bids", value: stats.totalBids, sub: `Across all projects` },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#EEF4FF",
-            border: "1px solid #B8D0E8",
+            background: "var(--camo-concrete)",
+            border: "1px solid #d9dbdb",
             borderRadius: "12px",
             padding: "20px",
           }}>
@@ -274,7 +274,7 @@ export default async function AdminAnalyticsPage() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "40px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               lineHeight: 1,
               marginBottom: "4px",
             }}>
@@ -282,14 +282,14 @@ export default async function AdminAnalyticsPage() {
             </div>
             <div style={{
               fontSize: "11px",
-              color: "#1B4F8A",
+              color: "var(--camo-gunmetal)",
               textTransform: "uppercase",
               letterSpacing: "1px",
               marginBottom: "6px",
             }}>
               {s.label}
             </div>
-            <div style={{ fontSize: "11px", color: "#4A7FB5" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
               {s.sub}
             </div>
           </div>
@@ -298,8 +298,8 @@ export default async function AdminAnalyticsPage() {
 
       {/* Bid volume card */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "24px",
@@ -309,7 +309,7 @@ export default async function AdminAnalyticsPage() {
           fontWeight: 700,
           fontSize: "14px",
           letterSpacing: "1px",
-          color: "#1B4F8A",
+          color: "var(--camo-gunmetal)",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
@@ -325,7 +325,7 @@ export default async function AdminAnalyticsPage() {
         }}>
           ${(stats.totalBidVolume / 100).toLocaleString("en-US", { minimumFractionDigits: 0 })}
         </div>
-        <div style={{ fontSize: "12px", color: "#4A7FB5" }}>
+        <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
           Total value of all bids submitted through ONP
         </div>
       </div>
@@ -339,8 +339,8 @@ export default async function AdminAnalyticsPage() {
 
       {/* Revenue placeholder */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "24px",
         marginTop: "24px",
@@ -350,13 +350,13 @@ export default async function AdminAnalyticsPage() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "8px",
         }}>
           Revenue Tracking
         </h2>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "16px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "16px" }}>
           Coming soon — will track contractor subscriptions and inspector fees.
         </p>
         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
@@ -367,7 +367,7 @@ export default async function AdminAnalyticsPage() {
           ].map((r) => (
             <div key={r.label} style={{
               background: "#FFFFFF",
-              border: "1px solid #B8D0E8",
+              border: "1px solid #d9dbdb",
               borderRadius: "8px",
               padding: "16px",
               textAlign: "center",
@@ -376,14 +376,14 @@ export default async function AdminAnalyticsPage() {
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "28px",
-                color: "#4A7FB5",
+                color: "var(--camo-gunmetal)",
               }}>
                 {r.value}
               </div>
-              <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "4px" }}>
                 {r.label}
               </div>
-              <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
                 {r.note}
               </div>
             </div>

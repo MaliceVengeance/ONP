@@ -19,8 +19,8 @@ export default async function ClientProfilePage({
   const inputStyle = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
     borderRadius: "6px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
@@ -33,7 +33,7 @@ export default async function ClientProfilePage({
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#1B4F8A",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase" as const,
     letterSpacing: "1px",
     marginTop: "16px",
@@ -49,12 +49,12 @@ export default async function ClientProfilePage({
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             My Profile
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
@@ -62,8 +62,8 @@ export default async function ClientProfilePage({
           href="/dashboard/client"
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "8px 16px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -92,8 +92,8 @@ export default async function ClientProfilePage({
 
       {/* Personal info */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "24px",
         marginBottom: "20px",
@@ -103,13 +103,13 @@ export default async function ClientProfilePage({
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "4px",
         }}>
           Personal Information
         </h2>
-        <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px" }}>
           This information is kept private and is not shared with contractors.
         </p>
 
@@ -131,7 +131,7 @@ export default async function ClientProfilePage({
           />
 
           <div style={{
-            borderTop: "1px solid #B8D0E8",
+            borderTop: "1px solid #d9dbdb",
             marginTop: "24px",
             paddingTop: "20px",
           }}>
@@ -140,13 +140,13 @@ export default async function ClientProfilePage({
               fontWeight: 700,
               fontSize: "16px",
               letterSpacing: "1px",
-              color: "#1E3A8A",
+              color: "var(--camo-charcoal)",
               textTransform: "uppercase",
               marginBottom: "4px",
             }}>
               Address
             </h3>
-            <p style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "8px" }}>
+            <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px" }}>
               Used for billing and project location purposes only.
             </p>
 
@@ -201,8 +201,8 @@ export default async function ClientProfilePage({
             type="submit"
             style={{
               marginTop: "24px",
-              background: "#C8102E",
-              color: "#fff",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               border: "none",
               padding: "12px 28px",
               borderRadius: "6px",
@@ -220,18 +220,18 @@ export default async function ClientProfilePage({
 
       {/* Billing note */}
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "12px",
         padding: "20px",
         fontSize: "13px",
-        color: "#1B4F8A",
+        color: "var(--camo-gunmetal)",
       }}>
         <div style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "16px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "8px",
         }}>

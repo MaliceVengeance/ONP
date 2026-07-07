@@ -93,19 +93,19 @@ export default async function InspectorFlagsPage() {
     fontFamily: "'Barlow', sans-serif",
     fontWeight: 600,
     fontSize: "11px",
-    color: "#4A7FB5",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase",
     letterSpacing: "1px",
     padding: "8px 12px",
     textAlign: "left",
-    borderBottom: "1px solid #B8D0E8",
+    borderBottom: "1px solid #d9dbdb",
   };
 
   const cellStyle: React.CSSProperties = {
     padding: "11px 12px",
     fontSize: "13px",
-    color: "#1E3A8A",
-    borderBottom: "1px solid #EEF4FF",
+    color: "var(--camo-charcoal)",
+    borderBottom: "1px solid var(--camo-concrete)",
     verticalAlign: "middle",
   };
 
@@ -116,12 +116,12 @@ export default async function InspectorFlagsPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "32px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           margin: 0,
         }}>
           Inspector Flag Dashboard
         </h1>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "6px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
           Computed in real-time from dispute outcomes. Flags trigger at ≥5% rate (soft), ≥10% (mandatory review),
           ≥15% (suspension recommended). Minimum 10 inspections required.
         </p>
@@ -142,13 +142,13 @@ export default async function InspectorFlagsPage() {
         </div>
       )}
 
-      <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "12px", overflow: "hidden" }}>
+      <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "12px", overflow: "hidden" }}>
         {enriched.length === 0 ? (
-          <p style={{ padding: "24px", fontSize: "13px", color: "#4A7FB5", margin: 0 }}>No inspectors found.</p>
+          <p style={{ padding: "24px", fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>No inspectors found.</p>
         ) : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "#F0F6FF" }}>
+              <tr style={{ background: "var(--camo-paper)" }}>
                 <th style={tableHeaderStyle}>Inspector</th>
                 <th style={tableHeaderStyle}>Flag Status</th>
                 <th style={tableHeaderStyle}>Flags / Inspections</th>
@@ -167,7 +167,7 @@ export default async function InspectorFlagsPage() {
                   <tr key={insp.id} style={{ background: "#fff" }}>
                     <td style={cellStyle}>
                       <div style={{ fontWeight: 600 }}>{insp.full_name || "—"}</div>
-                      <div style={{ fontSize: "11px", color: "#4A7FB5" }}>{insp.email}</div>
+                      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>{insp.email}</div>
                     </td>
                     <td style={cellStyle}>
                       <span style={{
@@ -183,10 +183,10 @@ export default async function InspectorFlagsPage() {
                       </span>
                     </td>
                     <td style={cellStyle}>
-                      <span style={{ fontWeight: 600, color: insp.flags > 0 ? "#C8102E" : "#1E3A8A" }}>
+                      <span style={{ fontWeight: 600, color: insp.flags > 0 ? "var(--camo-accent)" : "var(--camo-charcoal)" }}>
                         {insp.flags}
                       </span>
-                      <span style={{ color: "#4A7FB5" }}> / {insp.inspections}</span>
+                      <span style={{ color: "var(--camo-gunmetal)" }}> / {insp.inspections}</span>
                     </td>
                     <td style={cellStyle}>{rate}</td>
                     <td style={cellStyle}>
@@ -215,7 +215,7 @@ export default async function InspectorFlagsPage() {
                                 required
                                 minLength={10}
                                 rows={2}
-                                style={{ width: "180px", fontSize: "11px", border: "1px solid #B8D0E8", borderRadius: "5px", padding: "5px 7px", resize: "vertical", display: "block", marginBottom: "5px" }}
+                                style={{ width: "180px", fontSize: "11px", border: "1px solid #d9dbdb", borderRadius: "5px", padding: "5px 7px", resize: "vertical", display: "block", marginBottom: "5px" }}
                               />
                               <button type="submit" style={{ background: "#166534", color: "#fff", border: "none", borderRadius: "5px", padding: "4px 10px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
                                 Confirm Unblock
@@ -226,7 +226,7 @@ export default async function InspectorFlagsPage() {
                         {/* Suspend */}
                         {!insp.upgrade_blocked && (
                           <details>
-                            <summary style={{ fontSize: "12px", color: "#C8102E", fontWeight: 600, cursor: "pointer", listStyle: "none" }}>
+                            <summary style={{ fontSize: "12px", color: "var(--camo-accent-dim)", fontWeight: 600, cursor: "pointer", listStyle: "none" }}>
                               Block ▾
                             </summary>
                             <form action={suspendInspector.bind(null, insp.id)} style={{ marginTop: "6px" }}>
@@ -236,9 +236,9 @@ export default async function InspectorFlagsPage() {
                                 required
                                 minLength={10}
                                 rows={2}
-                                style={{ width: "180px", fontSize: "11px", border: "1px solid #B8D0E8", borderRadius: "5px", padding: "5px 7px", resize: "vertical", display: "block", marginBottom: "5px" }}
+                                style={{ width: "180px", fontSize: "11px", border: "1px solid #d9dbdb", borderRadius: "5px", padding: "5px 7px", resize: "vertical", display: "block", marginBottom: "5px" }}
                               />
-                              <button type="submit" style={{ background: "#C8102E", color: "#fff", border: "none", borderRadius: "5px", padding: "4px 10px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
+                              <button type="submit" style={{ background: "var(--camo-accent)", color: "var(--camo-ink)", border: "none", borderRadius: "5px", padding: "4px 10px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>
                                 Confirm Block
                               </button>
                             </form>

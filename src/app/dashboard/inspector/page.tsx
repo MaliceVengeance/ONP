@@ -49,12 +49,12 @@ export default async function InspectorDashboard() {
             fontWeight: 700,
             fontSize: "36px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             margin: 0,
           }}>
             Inspector Dashboard
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {user.email}
           </p>
         </div>
@@ -64,8 +64,8 @@ export default async function InspectorDashboard() {
               href="/dashboard/inspector/disputes"
               style={{
                 background: "transparent",
-                color: "#1B4F8A",
-                border: "1px solid #B8D0E8",
+                color: "var(--camo-gunmetal)",
+                border: "1px solid #d9dbdb",
                 padding: "10px 16px",
                 borderRadius: "6px",
                 fontFamily: "'Barlow', sans-serif",
@@ -81,8 +81,8 @@ export default async function InspectorDashboard() {
           <Link
             href="/dashboard/inspector/projects"
             style={{
-              background: "#C8102E",
-              color: "#fff",
+              background: "var(--camo-accent)",
+              color: "var(--camo-ink)",
               border: "none",
               padding: "10px 20px",
               borderRadius: "6px",
@@ -106,8 +106,8 @@ export default async function InspectorDashboard() {
           { label: "Completed", count: completed.length, accent: false },
         ].map((s) => (
           <div key={s.label} style={{
-            background: "#EEF4FF",
-            border: `1px solid ${s.accent ? "#C8102E" : "#B8D0E8"}`,
+            background: "var(--camo-concrete)",
+            border: `1px solid ${s.accent ? "var(--camo-accent)" : "#d9dbdb"}`,
             borderRadius: "10px",
             padding: "16px",
             textAlign: "center",
@@ -116,11 +116,11 @@ export default async function InspectorDashboard() {
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 700,
               fontSize: "32px",
-              color: s.accent ? "#C8102E" : "#1E3A8A",
+              color: s.accent ? "var(--camo-accent)" : "var(--camo-charcoal)",
             }}>
               {s.count}
             </div>
-            <div style={{ fontSize: "11px", color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>
               {s.label}
             </div>
           </div>
@@ -134,7 +134,7 @@ export default async function InspectorDashboard() {
           fontWeight: 700,
           fontSize: "18px",
           letterSpacing: "1px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           textTransform: "uppercase",
           marginBottom: "12px",
         }}>
@@ -146,7 +146,7 @@ export default async function InspectorDashboard() {
             Failed to load assignments.
           </div>
         ) : active.length === 0 ? (
-          <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+          <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "32px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
             No active assignments.
           </div>
         ) : (
@@ -164,8 +164,8 @@ export default async function InspectorDashboard() {
                   style={{ textDecoration: "none" }}
                 >
                   <div className="mob-card-stack" style={{
-                    background: "#EEF4FF",
-                    border: "1px solid #B8D0E8",
+                    background: "var(--camo-concrete)",
+                    border: "1px solid #d9dbdb",
                     borderRadius: "10px",
                     padding: "18px",
                     display: "flex",
@@ -174,14 +174,14 @@ export default async function InspectorDashboard() {
                     cursor: "pointer",
                   }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
                         {p.title ?? "Untitled"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "3px" }}>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "3px" }}>
                         {p.category ?? "—"} • {p.city ?? "—"}
                       </div>
                       {deadline && (
-                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "#4A7FB5" }}>
+                        <div style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "var(--camo-gunmetal)" }}>
                           {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}
                         </div>
                       )}

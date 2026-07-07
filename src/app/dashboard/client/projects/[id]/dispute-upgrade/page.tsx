@@ -74,22 +74,22 @@ export default async function DisputeUpgradePage({
     return (
       <div style={{ maxWidth: "560px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "var(--camo-charcoal)", margin: 0 }}>
             Dispute Filed
           </h1>
-          <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
+          <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
             ← Back
           </Link>
         </div>
-        <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "12px", padding: "24px" }}>
-          <div style={{ fontWeight: 700, fontSize: "15px", color: "#1E3A8A", marginBottom: "6px" }}>
+        <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "12px", padding: "24px" }}>
+          <div style={{ fontWeight: 700, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "6px" }}>
             ✅ Your dispute has already been submitted.
           </div>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginBottom: "8px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "8px" }}>
             Status:{" "}
             <strong>{((existingDispute as any).status as string).replaceAll("_", " ")}</strong>
           </p>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", margin: 0 }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", margin: 0 }}>
             Filed:{" "}
             {new Date((existingDispute as any).created_at).toLocaleDateString()}
           </p>
@@ -103,10 +103,10 @@ export default async function DisputeUpgradePage({
     return (
       <div style={{ maxWidth: "560px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "var(--camo-charcoal)", margin: 0 }}>
             Review Window Closed
           </h1>
-          <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
+          <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
             ← Back
           </Link>
         </div>
@@ -115,7 +115,7 @@ export default async function DisputeUpgradePage({
             The 14-day dispute window for this upgrade closed on{" "}
             <strong>{windowExpiresAt.toLocaleDateString()}</strong>. The{" "}
             {fmt(upgradeFeeCents)} upgrade charge is now final. Please contact{" "}
-            <a href="mailto:support@ournextproject.us" style={{ color: "#C8102E" }}>
+            <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-accent-dim)" }}>
               support@ournextproject.us
             </a>{" "}
             if you have a concern.
@@ -131,28 +131,28 @@ export default async function DisputeUpgradePage({
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "28px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "var(--camo-charcoal)", margin: 0 }}>
             Dispute Upgrade
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {(project as any).title ?? "Untitled"}
           </p>
         </div>
-        <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
+        <Link href={`/dashboard/client/projects/${projectId}/inspector`} style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
           ← Back
         </Link>
       </div>
 
       {/* What this is */}
-      <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
-        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "10px" }}>
+      <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
+        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "10px" }}>
           Free Independent Review
         </h2>
-        <p style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.7, marginBottom: "10px" }}>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.7, marginBottom: "10px" }}>
           You were charged an additional{" "}
-          <strong style={{ color: "#1E3A8A" }}>{fmt(upgradeFeeCents)}</strong> when your inspector
+          <strong style={{ color: "var(--camo-charcoal)" }}>{fmt(upgradeFeeCents)}</strong> when your inspector
           upgraded to a Comprehensive Inspection on-site. If you believe that upgrade was not
-          justified, an independent <strong style={{ color: "#1E3A8A" }}>Master Inspector</strong>{" "}
+          justified, an independent <strong style={{ color: "var(--camo-charcoal)" }}>Master Inspector</strong>{" "}
           will review the case at no cost to you.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "13px", color: "#15803D" }}>
@@ -176,8 +176,8 @@ export default async function DisputeUpgradePage({
       )}
 
       {/* The form */}
-      <div style={{ background: "#FFFFFF", border: "1px solid #B8D0E8", borderRadius: "12px", padding: "24px" }}>
-        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "20px" }}>
+      <div style={{ background: "#FFFFFF", border: "1px solid #d9dbdb", borderRadius: "12px", padding: "24px" }}>
+        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "20px" }}>
           Your Dispute Statement
         </h2>
         <DisputeForm

@@ -40,8 +40,8 @@ function fmtMoney(n: number | null) {
 const noteStyle: React.CSSProperties = {
   width: "100%",
   background: "#FFFFFF",
-  border: "1px solid #B8D0E8",
-  color: "#1E3A8A",
+  border: "1px solid #d9dbdb",
+  color: "var(--camo-charcoal)",
   borderRadius: "6px",
   padding: "9px 12px",
   fontFamily: "'Barlow', sans-serif",
@@ -92,9 +92,9 @@ export default async function VetCertificationPage({
       fontSize: "13px",
       textDecoration: "none",
       display: "inline-block",
-      background: active ? "#C8102E" : "transparent",
-      color: active ? "#fff" : "#1B4F8A",
-      border: active ? "none" : "1px solid #B8D0E8",
+      background: active ? "var(--camo-accent)" : "transparent",
+      color: active ? "var(--camo-ink)" : "var(--camo-gunmetal)",
+      border: active ? "none" : "1px solid #d9dbdb",
     } as React.CSSProperties);
 
   return (
@@ -102,20 +102,20 @@ export default async function VetCertificationPage({
       {/* Header */}
       <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "#1E3A8A", margin: 0 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "36px", letterSpacing: "1px", color: "var(--camo-charcoal)", margin: 0 }}>
             Contractor Verification
           </h1>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", marginTop: "4px" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {dirPending.length} directory pending · {vetPending.length} veteran pending
           </p>
         </div>
-        <Link href="/dashboard/admin" style={{ background: "transparent", color: "#1B4F8A", border: "1px solid #B8D0E8", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
+        <Link href="/dashboard/admin" style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
           Back
         </Link>
       </div>
 
       {/* Note requirement banner */}
-      <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "10px 16px", marginBottom: "20px", fontSize: "12px", color: "#1B4F8A" }}>
+      <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "8px", padding: "10px 16px", marginBottom: "20px", fontSize: "12px", color: "var(--camo-gunmetal)" }}>
         ℹ️ <strong>A note is required</strong> for every approval and rejection. Your name is recorded automatically in the audit log shown on each contractor's admin profile.
       </div>
 
@@ -124,7 +124,7 @@ export default async function VetCertificationPage({
         <Link href="/dashboard/admin/vet-certification?tab=directory" style={tabStyle(tab === "directory")}>
           📋 Directory Verification
           {dirPending.length > 0 && (
-            <span style={{ marginLeft: "8px", background: "#C8102E", color: "#fff", borderRadius: "20px", padding: "1px 7px", fontSize: "11px" }}>
+            <span style={{ marginLeft: "8px", background: "var(--camo-accent)", color: "var(--camo-ink)", borderRadius: "20px", padding: "1px 7px", fontSize: "11px" }}>
               {dirPending.length}
             </span>
           )}
@@ -132,7 +132,7 @@ export default async function VetCertificationPage({
         <Link href="/dashboard/admin/vet-certification?tab=veteran" style={tabStyle(tab === "veteran")}>
           ★ Veteran Certification
           {vetPending.length > 0 && (
-            <span style={{ marginLeft: "8px", background: tab === "veteran" ? "#fff" : "#C8102E", color: tab === "veteran" ? "#C8102E" : "#fff", borderRadius: "20px", padding: "1px 7px", fontSize: "11px" }}>
+            <span style={{ marginLeft: "8px", background: tab === "veteran" ? "#fff" : "var(--camo-accent)", color: tab === "veteran" ? "var(--camo-accent)" : "var(--camo-ink)", borderRadius: "20px", padding: "1px 7px", fontSize: "11px" }}>
               {vetPending.length}
             </span>
           )}
@@ -143,12 +143,12 @@ export default async function VetCertificationPage({
       {tab === "directory" && (
         <div>
           <div style={{ marginBottom: "32px" }}>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
+            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
               Pending Verification ({dirPending.length})
             </h2>
 
             {dirPending.length === 0 ? (
-              <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+              <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
                 No pending directory verification requests.
               </div>
             ) : (
@@ -157,53 +157,53 @@ export default async function VetCertificationPage({
                   const licenseExpired = isExpired(p.license_expiry);
                   const coiExpired     = isExpired(p.coi_expiry);
                   return (
-                    <div key={p.contractor_id} style={{ background: "#EEF4FF", border: "1px solid #1B4F8A", borderRadius: "10px", padding: "18px" }}>
+                    <div key={p.contractor_id} style={{ background: "var(--camo-concrete)", border: "1px solid var(--camo-gunmetal)", borderRadius: "10px", padding: "18px" }}>
                       {/* Contractor name + link */}
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "2px" }}>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "2px" }}>
                         {p.business_name ?? "No business name set"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "12px" }}>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
                         {[p.city, p.state].filter(Boolean).join(", ") || "No location set"}
                       </div>
 
                       {/* License & COI details */}
-                      <div style={{ background: "#FFFFFF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px" }}>
+                      <div style={{ background: "#FFFFFF", border: "1px solid #d9dbdb", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px" }}>
                         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License #</div>
-                            <div style={{ color: "#1E3A8A" }}>{p.license_number ?? "—"}</div>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License #</div>
+                            <div style={{ color: "var(--camo-charcoal)" }}>{p.license_number ?? "—"}</div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>License Expires</div>
-                            <div style={{ color: licenseExpired ? "#991B1B" : "#1E3A8A" }}>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License Expires</div>
+                            <div style={{ color: licenseExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
                               {formatDate(p.license_expiry)}{licenseExpired && " ⚠ EXPIRED"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Insurance Provider</div>
-                            <div style={{ color: "#1E3A8A" }}>{p.coi_provider ?? "—"}</div>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Insurance Provider</div>
+                            <div style={{ color: "var(--camo-charcoal)" }}>{p.coi_provider ?? "—"}</div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Policy #</div>
-                            <div style={{ color: "#1E3A8A" }}>{p.coi_policy_number ?? "—"}</div>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Policy #</div>
+                            <div style={{ color: "var(--camo-charcoal)" }}>{p.coi_policy_number ?? "—"}</div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>COI Expires</div>
-                            <div style={{ color: coiExpired ? "#991B1B" : "#1E3A8A" }}>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
+                            <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
                               {formatDate(p.coi_expiry)}{coiExpired && " ⚠ EXPIRED"}
                             </div>
                           </div>
                           <div>
-                            <div style={{ color: "#1B4F8A", marginBottom: "2px" }}>Coverage Amount</div>
-                            <div style={{ color: "#1E3A8A" }}>{fmtMoney(p.coi_amount)}</div>
+                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Coverage Amount</div>
+                            <div style={{ color: "var(--camo-charcoal)" }}>{fmtMoney(p.coi_amount)}</div>
                           </div>
                         </div>
                       </div>
 
                       {/* Decision form — one form, approve or reject button, shared note */}
                       <form action={handleDirectoryDecision.bind(null, p.contractor_id)}>
-                        <label style={{ fontSize: "11px", fontWeight: 600, color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>
-                          Admin Note <span style={{ color: "#C8102E" }}>*</span>
+                        <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px" }}>
+                          Admin Note <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
                         </label>
                         <textarea
                           name="note"
@@ -241,18 +241,18 @@ export default async function VetCertificationPage({
           {/* Already verified */}
           {dirApproved.length > 0 && (
             <div>
-              <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1B4F8A", textTransform: "uppercase", marginBottom: "12px" }}>
+              <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
+              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-gunmetal)", textTransform: "uppercase", marginBottom: "12px" }}>
                 Verified ({dirApproved.length})
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {dirApproved.map((p) => (
-                  <div key={p.contractor_id} className="mob-card-stack" style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div key={p.contractor_id} className="mob-card-stack" style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>{p.business_name ?? "No name"}</div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A" }}>{[p.city, p.state].filter(Boolean).join(", ") || "—"}</div>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>{p.business_name ?? "No name"}</div>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>{[p.city, p.state].filter(Boolean).join(", ") || "—"}</div>
                       {p.directory_verified_at && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>Verified: {formatDate(p.directory_verified_at)}</div>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>Verified: {formatDate(p.directory_verified_at)}</div>
                       )}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
@@ -265,7 +265,7 @@ export default async function VetCertificationPage({
                           name="note"
                           required
                           placeholder="Note required to reverse…"
-                          style={{ fontSize: "12px", padding: "5px 8px", borderRadius: "4px", border: "1px solid #B8D0E8", fontFamily: "'Barlow', sans-serif", width: "200px" }}
+                          style={{ fontSize: "12px", padding: "5px 8px", borderRadius: "4px", border: "1px solid #d9dbdb", fontFamily: "'Barlow', sans-serif", width: "200px" }}
                         />
                         <button
                           type="submit"
@@ -289,31 +289,31 @@ export default async function VetCertificationPage({
       {tab === "veteran" && (
         <div>
           <div style={{ marginBottom: "32px" }}>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: vetPending.length > 0 ? "#92400E" : "#1E3A8A", textTransform: "uppercase", marginBottom: "12px" }}>
+            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: vetPending.length > 0 ? "#92400E" : "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
               Pending Review ({vetPending.length})
             </h2>
 
             {vetPending.length === 0 ? (
-              <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "24px", textAlign: "center", color: "#1B4F8A", fontSize: "14px" }}>
+              <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
                 No pending veteran applications.
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 {vetPending.map((a) => (
-                  <div key={a.contractor_id} style={{ background: "#EEF4FF", border: "1px solid #FCD34D", borderRadius: "10px", padding: "18px" }}>
-                    <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "2px" }}>
+                  <div key={a.contractor_id} style={{ background: "var(--camo-concrete)", border: "1px solid #FCD34D", borderRadius: "10px", padding: "18px" }}>
+                    <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "2px" }}>
                       {a.business_name ?? "No business name set"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#1B4F8A", marginBottom: "2px" }}>
+                    <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "2px" }}>
                       {[a.city, a.state].filter(Boolean).join(", ") || "No location set"}
                     </div>
-                    <div style={{ fontSize: "11px", color: "#4A7FB5", marginBottom: "14px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "14px" }}>
                       Applied: {formatDate(a.veteran_applied_at)}
                     </div>
 
                     <form action={handleVetCertDecision.bind(null, a.contractor_id)}>
-                      <label style={{ fontSize: "11px", fontWeight: 600, color: "#1B4F8A", textTransform: "uppercase", letterSpacing: "1px" }}>
-                        Admin Note <span style={{ color: "#C8102E" }}>*</span>
+                      <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px" }}>
+                        Admin Note <span style={{ color: "var(--camo-accent-dim)" }}>*</span>
                       </label>
                       <textarea
                         name="note"
@@ -350,18 +350,18 @@ export default async function VetCertificationPage({
           {/* Certified veterans */}
           {vetApproved.length > 0 && (
             <div>
-              <hr style={{ border: "none", borderTop: "1px solid #B8D0E8", margin: "0 0 20px" }} />
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "#1B4F8A", textTransform: "uppercase", marginBottom: "12px" }}>
+              <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
+              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-gunmetal)", textTransform: "uppercase", marginBottom: "12px" }}>
                 Certified Veteran Owned ({vetApproved.length})
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {vetApproved.map((a) => (
-                  <div key={a.contractor_id} className="mob-card-stack" style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "10px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div key={a.contractor_id} className="mob-card-stack" style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "#1E3A8A", marginBottom: "3px" }}>{a.business_name ?? "No name"}</div>
-                      <div style={{ fontSize: "12px", color: "#1B4F8A" }}>{[a.city, a.state].filter(Boolean).join(", ") || "—"}</div>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>{a.business_name ?? "No name"}</div>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>{[a.city, a.state].filter(Boolean).join(", ") || "—"}</div>
                       {a.veteran_verified_at && (
-                        <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "2px" }}>Certified: {formatDate(a.veteran_verified_at)}</div>
+                        <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>Certified: {formatDate(a.veteran_verified_at)}</div>
                       )}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
@@ -374,7 +374,7 @@ export default async function VetCertificationPage({
                           name="note"
                           required
                           placeholder="Note required to revoke…"
-                          style={{ fontSize: "12px", padding: "5px 8px", borderRadius: "4px", border: "1px solid #B8D0E8", fontFamily: "'Barlow', sans-serif", width: "200px" }}
+                          style={{ fontSize: "12px", padding: "5px 8px", borderRadius: "4px", border: "1px solid #d9dbdb", fontFamily: "'Barlow', sans-serif", width: "200px" }}
                         />
                         <button
                           type="submit"

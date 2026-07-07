@@ -11,8 +11,8 @@ type OtherBid = {
 const inputStyle = {
   width: "100%",
   background: "#FFFFFF",
-  border: "1px solid #B8D0E8",
-  color: "#1E3A8A",
+  border: "1px solid #d9dbdb",
+  color: "var(--camo-charcoal)",
   borderRadius: "6px",
   padding: "8px 12px",
   fontFamily: "'Barlow', sans-serif",
@@ -32,7 +32,7 @@ const labelStyle = {
   display: "block",
   fontSize: "11px",
   fontWeight: 600,
-  color: "#1B4F8A",
+  color: "var(--camo-gunmetal)",
   textTransform: "uppercase",
   letterSpacing: "1px",
   marginBottom: "4px",
@@ -93,8 +93,8 @@ export default function AwardButton({
         type="button"
         onClick={() => setShowConfirm(true)}
         style={{
-          background: "#C8102E",
-          color: "#fff",
+          background: "var(--camo-accent)",
+          color: "var(--camo-ink)",
           border: "none",
           padding: "10px 24px",
           borderRadius: "6px",
@@ -124,26 +124,26 @@ export default function AwardButton({
         fontWeight: 700,
         fontSize: "17px",
         letterSpacing: "1px",
-        color: "#1E3A8A",
+        color: "var(--camo-charcoal)",
         marginBottom: "10px",
       }}>
         Before You Award This Bid
       </div>
 
-      <div style={{ fontSize: "13px", color: "#1B4F8A", lineHeight: 1.6, marginBottom: "12px" }}>
+      <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "12px" }}>
         The bid you&apos;re about to accept is the contractor&apos;s best estimate based on available
-        information. <strong style={{ color: "#1E3A8A" }}>It is not a fixed-price quote</strong> unless
+        information. <strong style={{ color: "var(--camo-charcoal)" }}>It is not a fixed-price quote</strong> unless
         the contractor has explicitly agreed to one in writing with you.
       </div>
 
       <div style={{
-        background: "#EEF4FF",
-        border: "1px solid #B8D0E8",
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
         borderRadius: "8px",
         padding: "12px 14px",
         marginBottom: "14px",
         fontSize: "12px",
-        color: "#1E3A8A",
+        color: "var(--camo-charcoal)",
         lineHeight: 1.7,
       }}>
         <strong>Final pricing may be affected by:</strong>
@@ -166,9 +166,9 @@ export default function AwardButton({
           type="checkbox"
           checked={checked}
           onChange={(e) => setChecked(e.target.checked)}
-          style={{ marginTop: "2px", accentColor: "#1B4F8A", flexShrink: 0 }}
+          style={{ marginTop: "2px", accentColor: "var(--camo-gunmetal)", flexShrink: 0 }}
         />
-        <span style={{ fontSize: "13px", color: "#1E3A8A", lineHeight: 1.5 }}>
+        <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
           I understand the bid is an estimate and final cost may vary based on actual site conditions.
         </span>
       </label>
@@ -176,8 +176,8 @@ export default function AwardButton({
       {/* Ranking section — reveals after accepting disclaimer */}
       {checked && (
         <div style={{
-          background: "#F8FAFF",
-          border: "1px solid #B8D0E8",
+          background: "var(--camo-paper)",
+          border: "1px solid #d9dbdb",
           borderRadius: "8px",
           padding: "16px",
           marginBottom: "16px",
@@ -187,13 +187,13 @@ export default function AwardButton({
             fontWeight: 700,
             fontSize: "15px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "4px",
           }}>
             Rank the Top Bids
           </div>
-          <p style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "16px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px", lineHeight: 1.5 }}>
             Optional — helps contractors understand where they placed. Amounts are shared anonymously; names are never revealed to other contractors.
           </p>
 
@@ -210,7 +210,7 @@ export default function AwardButton({
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 fontSize: "14px",
-                color: "#1E3A8A",
+                color: "var(--camo-charcoal)",
                 letterSpacing: "0.5px",
               }}>
                 Rank 1 — Awarded (Bid #{bidDisplayIndex})
@@ -239,7 +239,7 @@ export default function AwardButton({
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "14px",
-                  color: "#1E3A8A",
+                  color: "var(--camo-charcoal)",
                   letterSpacing: "0.5px",
                 }}>
                   Rank 2 (optional)
@@ -286,7 +286,7 @@ export default function AwardButton({
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
                   fontSize: "14px",
-                  color: "#1E3A8A",
+                  color: "var(--camo-charcoal)",
                   letterSpacing: "0.5px",
                 }}>
                   Rank 3 (optional)
@@ -328,8 +328,8 @@ export default function AwardButton({
           disabled={!checked || submitting}
           onClick={handleAward}
           style={{
-            background: checked ? "#C8102E" : "#B8D0E8",
-            color: "#fff",
+            background: checked ? "var(--camo-accent)" : "#d9dbdb",
+            color: "var(--camo-ink)",
             border: "none",
             padding: "10px 24px",
             borderRadius: "6px",
@@ -348,8 +348,8 @@ export default function AwardButton({
           onClick={reset}
           style={{
             background: "transparent",
-            color: "#1B4F8A",
-            border: "1px solid #B8D0E8",
+            color: "var(--camo-gunmetal)",
+            border: "1px solid #d9dbdb",
             padding: "10px 20px",
             borderRadius: "6px",
             fontFamily: "'Barlow', sans-serif",
@@ -361,9 +361,9 @@ export default function AwardButton({
         </button>
       </div>
 
-      <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "10px" }}>
+      <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "10px" }}>
         Awarding reveals the contractor&apos;s identity. This action cannot be undone.{" "}
-        <a href="/bid-disclaimer" target="_blank" style={{ color: "#1B4F8A" }}>
+        <a href="/bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)" }}>
           Read full bid disclaimer →
         </a>
       </div>
