@@ -18,6 +18,8 @@ const btnPrimary: React.CSSProperties = {
   background: "var(--camo-accent)",
   color: "var(--camo-ink)",
   display: "inline-block",
+  minWidth: "270px",
+  textAlign: "center",
 };
 
 const btnGhost: React.CSSProperties = {
@@ -40,14 +42,18 @@ const differentiators = [
   { n: "02", title: "Bids stay sealed", body: "Contractors never see competitor pricing. No last-look advantage, no race to the bottom." },
   { n: "03", title: "Verified, not just listed", body: "License and insurance checked before a contractor ever appears in the directory." },
   { n: "04", title: "Disputes get reviewed", body: "On-site scope changes go to an independent Master Inspector — free to file, 5-day turnaround." },
-  { n: "05", title: "Veteran-owned, recognized", body: "Veteran status is verified and visible — clients notice, and 25% off rewards it." },
+  { n: "05", title: "Veteran contractors, recognized", body: "Your verified veteran status shows on every bid you submit — clients notice, and you get 25% off your subscription." },
 ];
 
 const categoryTiles = [
   { label: "Landscaping", photo: "/images/tile-landscaping.jpg" },
-  { label: "Roofing", photo: null },
-  { label: "Concrete", photo: null },
-  { label: "Drywall", photo: null },
+  { label: "Roofing", photo: "/images/tile-roofing.jpg" },
+  { label: "Concrete", photo: "/images/tile-concrete.jpg" },
+  { label: "Drywall", photo: "/images/tile-drywall.jpg" },
+  { label: "Painting", photo: "/images/tile-painting.jpg" },
+  { label: "Electrical", photo: "/images/tile-electrical.jpg" },
+  { label: "Plumbing", photo: "/images/tile-plumbing.jpg" },
+  { label: "Fencing", photo: "/images/tile-fencing.jpg" },
 ];
 
 export default async function HomePage() {
@@ -85,8 +91,22 @@ export default async function HomePage() {
         </div>
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: "960px", margin: "0 auto", padding: "70px 32px 90px" }}>
+          <div
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(2.4rem, 6vw, 4.2rem)",
+              lineHeight: 1,
+              letterSpacing: "0.02em",
+              textTransform: "uppercase",
+              color: "var(--camo-concrete)",
+              marginBottom: "20px",
+            }}
+          >
+            Our Next Project
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
-            <span style={{ ...eyebrow, color: "var(--camo-steel)" }}>VETERAN-OWNED · SEALED BID PLATFORM</span>
+            <span style={{ ...eyebrow, color: "var(--camo-steel)" }}>SEALED BID PLATFORM</span>
             <span
               style={{
                 fontFamily: "'IBM Plex Mono', monospace",
@@ -102,7 +122,7 @@ export default async function HomePage() {
             </span>
           </div>
 
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(2.4rem, 6vw, 4.2rem)", lineHeight: 0.98, color: "var(--camo-concrete)", margin: "0 0 22px", textTransform: "uppercase" }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 4.5vw, 3.15rem)", lineHeight: 0.98, color: "var(--camo-concrete)", margin: "0 0 22px", textTransform: "uppercase" }}>
             Bid blind.<br /><span style={{ color: "var(--camo-accent)" }}>Build honest.</span>
           </h1>
 
@@ -113,7 +133,7 @@ export default async function HomePage() {
             Your identity stays sealed until you choose a bid — no favoritism, no back-channel deals.
           </p>
 
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
             <div>
               <Link href="/signup" style={btnPrimary}>I&apos;m Hiring a Contractor</Link>
               <div style={{ fontSize: "0.78rem", color: "var(--camo-steel)", marginTop: "8px" }}>Including multi-property portfolios</div>
@@ -196,7 +216,7 @@ export default async function HomePage() {
           <h2 style={{ textAlign: "center", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "2rem", margin: "8px 0 40px", color: "var(--camo-charcoal)", textTransform: "uppercase" }}>
             The old way vs. the ONP way
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+          <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "18px" }}>
             {differentiators.map((d) => (
               <div key={d.n} style={{ background: "var(--camo-paper)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "26px 22px" }}>
                 <div style={{ width: "38px", height: "38px", borderRadius: "4px", background: "var(--camo-charcoal)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--camo-accent)", fontSize: "1.1rem", marginBottom: "16px", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600 }}>
@@ -213,7 +233,7 @@ export default async function HomePage() {
       {/* ─── Trust / stat bar ─── */}
       <div style={{ display: "flex", justifyContent: "center", gap: "60px", flexWrap: "wrap", padding: "44px 32px", background: "var(--camo-charcoal)", color: "var(--camo-concrete)" }}>
         {[
-          { num: "100%", label: "Veteran Owned" },
+          { num: "★", label: "Veteran-Owned Company" },
           { num: "2", label: "Markets Live" },
           { num: "$0", label: "Cost to Bid" },
         ].map((s) => (

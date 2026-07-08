@@ -22,20 +22,34 @@ export function MarketingHeader({ active }: { active?: "why-onp" | "contractors"
         gap: "16px",
       }}
     >
-      <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ color: "var(--camo-concrete)", fontSize: "1.1rem" }}>★</span>
-        <span
+      <Link href="/" style={{ textDecoration: "none" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ color: "var(--camo-concrete)", fontSize: "1.1rem" }}>★</span>
+          <span
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "1.3rem",
+              color: "var(--camo-concrete)",
+              textTransform: "uppercase",
+              letterSpacing: "0.01em",
+            }}
+          >
+            ONP
+          </span>
+        </div>
+        <div
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 800,
-            fontSize: "1.3rem",
-            color: "var(--camo-concrete)",
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: "0.62rem",
+            letterSpacing: "0.2em",
+            color: "var(--camo-steel)",
             textTransform: "uppercase",
-            letterSpacing: "0.01em",
+            marginTop: "2px",
           }}
         >
-          ONP
-        </span>
+          Our Next Project
+        </div>
       </Link>
       <div style={{ display: "flex", gap: "26px", flexWrap: "wrap", alignItems: "center" }}>
         <Link href="/why-onp" style={{ ...navLinkStyle, color: active === "why-onp" ? "var(--camo-accent)" : navLinkStyle.color }}>

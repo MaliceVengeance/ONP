@@ -72,7 +72,7 @@ export function SealedBidReveal({ variant = "urban" }: { variant?: CamoVariant }
               color: "var(--camo-concrete)",
               textTransform: "uppercase",
               letterSpacing: "0.1em",
-              background: "rgba(21,23,26,0.65)",
+              background: "rgba(21,23,26,0.9)",
               padding: "8px 16px",
               borderRadius: "20px",
               border: "1px solid rgba(233,234,234,0.3)",
