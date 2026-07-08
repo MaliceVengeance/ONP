@@ -20,7 +20,7 @@ const sectionHeading: React.CSSProperties = {
 
 const differentiators = [
   { icon: "🔒", title: "Blind, sealed bidding", body: "Contractors submit pricing without seeing competitors' numbers, reducing price manipulation and encouraging honest competition." },
-  { icon: "📐", title: "Independent inspections & takeoffs", body: "On-site pre-bid inspections give contractors accurate scope information and clients more realistic proposals." },
+  { icon: "📐", title: "Optional independent inspections & takeoffs", body: "Available as an add-on for any project — on-site pre-bid inspections give contractors accurate scope information and clients more realistic proposals." },
   { icon: "📝", title: "Structured RFIs, not side-channels", body: "Questions go through the system as documented Requests for Information — no off-platform negotiation, no confusion." },
 ];
 
@@ -89,6 +89,9 @@ export default function AboutPage() {
         {/* Client Trust & Protection — shortened, full detail lives on /trust */}
         <div style={{ background: "var(--camo-charcoal)", borderRadius: "10px", padding: "28px 32px", marginBottom: "40px" }}>
           <h2 style={{ ...sectionHeading, color: "var(--camo-concrete)", margin: "0 0 12px" }}>Built-In Client Protection</h2>
+          <p style={{ fontSize: "0.78rem", color: "var(--camo-steel)", fontWeight: 600, marginBottom: "8px" }}>
+            For projects where inspection services have been added:
+          </p>
           <p style={{ fontSize: "0.92rem", color: "var(--camo-steel)", lineHeight: 1.8, marginBottom: "16px" }}>
             If an inspector upgrades a project&apos;s scope on-site, that upgrade is always reviewable. An independent Master Inspector — with no connection to your original inspection — investigates at no cost and issues a written decision within 5 business days.
           </p>

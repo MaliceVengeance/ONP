@@ -22,7 +22,7 @@ const sectionHeading: React.CSSProperties = {
 const comparisonRows = [
   { traditional: "Cold calling and chasing leads", onp: "Projects come directly to you" },
   { traditional: "Unknown competition — who else is bidding?", onp: "Structured blind bidding — fair for everyone" },
-  { traditional: "Vague project scopes and unclear expectations", onp: "RFIs, file attachments, and inspector takeoffs" },
+  { traditional: "Vague project scopes and unclear expectations", onp: "RFIs, file attachments, and optional inspector takeoffs" },
   { traditional: "Race to the bottom on pricing", onp: "Sealed bids — compete on quality, not desperation" },
   { traditional: "No paper trail — disputes happen", onp: "Full documented bid and communication history" },
   { traditional: "Clients contact random unverified contractors", onp: "Only verified, licensed, and insured contractors" },
@@ -201,6 +201,9 @@ export default async function WhyOnpPage({
         <div style={{ marginBottom: "60px" }}>
           <span style={{ ...eyebrow, display: "block" }}>CLIENT PROTECTION</span>
           <h2 style={sectionHeading}>Every On-Site Upgrade Is Reviewable</h2>
+          <p style={{ fontSize: "0.8rem", color: "var(--camo-gunmetal)", fontWeight: 600, marginBottom: "10px" }}>
+            For projects where inspection services have been added:
+          </p>
           <p style={{ fontSize: "0.92rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, marginBottom: "28px", maxWidth: "700px" }}>
             If your inspector upgrades the scope of work on-site and you believe it wasn&apos;t justified, you can file a dispute at no cost — reviewed independently, decided in writing.
           </p>
