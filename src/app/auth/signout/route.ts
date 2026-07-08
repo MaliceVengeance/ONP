@@ -8,5 +8,5 @@ export async function POST(req: NextRequest) {
   // Build the redirect URL from the incoming request's origin so this
   // works correctly on both localhost and production without an env var.
   const origin = req.nextUrl.origin;
-  return NextResponse.redirect(new URL("/login", origin), { status: 303 });
+  return NextResponse.redirect(new URL("/", origin), { status: 303 });
 }
