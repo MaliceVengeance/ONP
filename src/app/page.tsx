@@ -41,7 +41,7 @@ const differentiators = [
   { n: "01", title: "No more phone-tag bidding", body: "Every project, question, and bid lives in one record — nothing verbal, nothing lost." },
   { n: "02", title: "Bids stay sealed", body: "Contractors never see competitor pricing. No last-look advantage, no race to the bottom." },
   { n: "03", title: "Verified, not just listed", body: "License and insurance checked before a contractor ever appears in the directory." },
-  { n: "04", title: "Disputes get reviewed", body: "On-site scope changes go to an independent Master Inspector — free to file, 5-day turnaround." },
+  { n: "04", title: "Concerns get a real answer", body: "Every bid and message is documented — reach out directly to ONP about a project, no cost, no runaround." },
   { n: "05", title: "Veteran contractors, recognized", body: "Your verified veteran status shows on every bid you submit — clients notice, and you get 25% off your subscription." },
 ];
 
@@ -157,7 +157,7 @@ export default async function HomePage() {
             Every bid stays concealed until it opens.
           </h2>
           <p style={{ color: "var(--camo-gunmetal)", marginBottom: "30px", lineHeight: 1.6 }}>
-            Tap the card. This is what a sealed bid looks like on ONP — hidden like cover, revealed only when the bidding window closes.
+            Tap the card. This is what a sealed bid looks like on <strong>ONP</strong> — hidden like cover, revealed only when the bidding window closes.
           </p>
           <SealedBidReveal variant={camoVariant} />
         </div>
@@ -265,7 +265,7 @@ export default async function HomePage() {
               Built by a veteran, for the trades
             </h3>
             <p style={{ fontSize: "0.95rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, margin: 0 }}>
-              ONP is veteran-owned from the ground up. Verified veteran contractors get a visible badge, a 25% discount, and featured placement in the directory — recognition that's earned, not buried in fine print.
+              <strong>ONP</strong> is veteran-owned from the ground up. Verified veteran contractors get a visible badge, a 25% discount, and featured placement in the directory — recognition that&apos;s earned, not buried in fine print.
             </p>
           </div>
         </div>

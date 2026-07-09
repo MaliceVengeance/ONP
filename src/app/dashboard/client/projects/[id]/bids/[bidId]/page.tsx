@@ -323,10 +323,10 @@ export default async function BidDetailPage({
           Estimate valid until: <strong>{formatDate(version?.estimate_valid_until)}</strong>
         </div>
         <div style={{ background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: "8px", padding: "12px 14px", fontSize: "12px", color: "#92400E", lineHeight: 1.6 }}>
-          If additional scope is discovered once work begins, this is exactly the situation our{" "}
-          <strong>Master Inspector dispute process</strong> exists to handle.{" "}
+          If additional scope is discovered once work begins, don&apos;t rely on a verbal agreement — contact{" "}
+          <strong>ONP</strong> directly and we&apos;ll review it against the documented record.{" "}
           <Link href="/trust" target="_blank" style={{ color: "#92400E", fontWeight: 600 }}>
-            How disputes work →
+            How client protection works →
           </Link>
         </div>
       </div>

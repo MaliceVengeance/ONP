@@ -76,17 +76,6 @@ export default function ForPropertyManagersPage() {
         </div>
       </section>
 
-      {/* Inspector / takeoff system */}
-      <section style={{ padding: "60px 32px", background: "var(--camo-paper)" }}>
-        <div style={{ maxWidth: "820px", margin: "0 auto" }}>
-          <span style={{ ...eyebrow, display: "block" }}>SCOPE BEFORE YOU COMMIT BUDGET</span>
-          <h2 style={sectionHeading}>Independent Inspections &amp; Takeoffs</h2>
-          <p style={{ fontSize: "0.92rem", color: "var(--camo-gunmetal)", lineHeight: 1.8 }}>
-            Before you commit budget across a portfolio, an ONP inspector can visit the site and perform a pre-bid takeoff — giving contractors accurate scope information and giving you a more realistic set of bids to compare, instead of guessing at conditions from photos alone.
-          </p>
-        </div>
-      </section>
-
       {/* Account note — honest about what's actually built today */}
       <section style={{ padding: "60px 32px", background: "var(--camo-charcoal)" }}>
         <div style={{ maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>

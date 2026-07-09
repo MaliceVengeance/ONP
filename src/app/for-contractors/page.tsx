@@ -43,7 +43,7 @@ const comparisonRows = [
   { old: "Pay to compete — per lead, every time, win or lose", onp: "One flat subscription. No per-lead fees, ever." },
   { old: "Broadcast leads to unknown numbers of competitors", onp: "Structured blind bidding — you know the rules, not who else is bidding, and neither does anyone else" },
   { old: "Unverified contractors bid alongside you", onp: "Every contractor in the directory is license + insurance verified before they can bid" },
-  { old: "No documentation if a client disputes scope", onp: "RFIs, files, and inspector takeoffs — everything lives in one documented record" },
+  { old: "No documentation if a client disputes scope", onp: "RFIs and files — everything lives in one documented record" },
 ];
 
 const disqualifiers = [
@@ -69,7 +69,7 @@ export default function ForContractorsPage() {
             Stop paying to compete blind against strangers.
           </h1>
           <p style={{ fontSize: "1.05rem", color: "var(--camo-steel)", lineHeight: 1.7, maxWidth: "620px", marginBottom: "32px" }}>
-            You already know the game: pay per lead, race unlicensed competitors to the bottom, and hope the client remembers what was verbally agreed to when something goes wrong. ONP fixes the parts of the job that have nothing to do with your craftsmanship.
+            You already know the game: pay per lead, race unlicensed competitors to the bottom, and hope the client remembers what was verbally agreed to when something goes wrong. <strong>ONP</strong> fixes the parts of the job that have nothing to do with your craftsmanship.
           </p>
           <Link href="/signup/contractor" style={btnPrimary}>Create Contractor Account</Link>
         </div>
@@ -96,7 +96,7 @@ export default function ForContractorsPage() {
           <span style={{ ...eyebrow, display: "block" }}>HONEST COMPARISON</span>
           <h2 style={sectionHeading}>ONP vs. Pay-Per-Lead Platforms</h2>
           <p style={{ fontSize: "0.9rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, marginBottom: "28px", maxWidth: "620px" }}>
-            To be direct: you already bid blind on ONP, same as anywhere else. The difference isn&apos;t lead exclusivity — it&apos;s that you&apos;re not paying per lead to find that out, and every contractor across the table is actually verified.
+            To be direct: you already bid blind on <strong>ONP</strong>, same as anywhere else. The difference isn&apos;t lead exclusivity — it&apos;s that you&apos;re not paying per lead to find that out, and every contractor across the table is actually verified.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {comparisonRows.map((row, idx) => (
@@ -121,7 +121,7 @@ export default function ForContractorsPage() {
           <span style={{ ...eyebrow, color: "var(--camo-steel)", display: "block" }}>BEFORE YOU SIGN UP</span>
           <h2 style={{ ...sectionHeading, color: "var(--camo-concrete)" }}>ONP May Not Be For You If:</h2>
           <p style={{ fontSize: "0.88rem", color: "var(--camo-steel)", lineHeight: 1.7, marginBottom: "22px" }}>
-            We&apos;d rather tell you now than waste your subscription. ONP probably isn&apos;t the right fit if:
+            We&apos;d rather tell you now than waste your subscription. <strong>ONP</strong> probably isn&apos;t the right fit if:
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {disqualifiers.map((d) => (
@@ -155,11 +155,11 @@ export default function ForContractorsPage() {
           Ready to bid on your terms?
         </h2>
         <p style={{ fontSize: "1rem", color: "var(--camo-steel)", marginBottom: "28px" }}>
-          $200/mo standard, $150/mo for verified veterans. No per-lead fees, no long-term contract.
+          One flat subscription. No per-lead fees, no long-term contract. Pricing shown when you sign up.
         </p>
         <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/signup/contractor" style={btnPrimary}>Create Contractor Account</Link>
-          <Link href="/why-onp" style={{ ...btnPrimary, background: "transparent", color: "var(--camo-concrete)", borderColor: "var(--camo-steel)" }}>See Full Pricing</Link>
+          <Link href="/why-onp" style={{ ...btnPrimary, background: "transparent", color: "var(--camo-concrete)", borderColor: "var(--camo-steel)" }}>See How It Works</Link>
         </div>
       </section>
 

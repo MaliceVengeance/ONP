@@ -142,7 +142,7 @@ export default async function LoginPage({
               Not in El Paso or Las Cruces yet?
             </div>
             <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "16px" }}>
-              We&apos;re starting local and growing intentionally. Drop your email and ZIP — we&apos;ll let you know when ONP launches in your area.
+              We&apos;re starting local and growing intentionally. Drop your email and ZIP — we&apos;ll let you know when <strong>ONP</strong> launches in your area.
             </p>
 
             {waitlistJoined ? (

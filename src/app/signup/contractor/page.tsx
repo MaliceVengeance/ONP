@@ -68,9 +68,9 @@ export default function SignupContractorPage() {
   const inputStyle: React.CSSProperties = {
     width: "100%",
     background: "#FFFFFF",
-    border: "1px solid #B8D0E8",
-    color: "#1E3A8A",
-    borderRadius: "6px",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
+    borderRadius: "4px",
     padding: "10px 14px",
     fontFamily: "'Barlow', sans-serif",
     fontSize: "14px",
@@ -81,7 +81,7 @@ export default function SignupContractorPage() {
     display: "block",
     fontSize: "11px",
     fontWeight: 500,
-    color: "#1B4F8A",
+    color: "var(--camo-gunmetal)",
     textTransform: "uppercase",
     letterSpacing: "1px",
     marginBottom: "6px",
@@ -90,11 +90,12 @@ export default function SignupContractorPage() {
   return (
     <main style={{
       minHeight: "100vh",
-      background: "#FFFFFF",
+      background: "var(--camo-paper)",
       display: "flex",
       alignItems: "flex-start",
       justifyContent: "center",
       padding: "48px 24px",
+      fontFamily: "'Barlow', sans-serif",
     }}>
       <form onSubmit={onSubmit} style={{
         width: "100%",
@@ -103,56 +104,60 @@ export default function SignupContractorPage() {
         flexDirection: "column",
         gap: "16px",
       }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+        {/* Logo — doubles as back-to-homepage */}
+        <Link href="/" style={{ textDecoration: "none", textAlign: "center", marginBottom: "8px" }}>
           <div style={{
-            display: "inline-block",
-            background: "#1E3A8A",
-            borderRadius: "12px",
-            padding: "14px 28px 10px",
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: "1.6rem",
+            letterSpacing: "0.05em",
+            color: "var(--camo-charcoal)",
+            textTransform: "uppercase",
           }}>
-            <span style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 700,
-              fontSize: "32px",
-              letterSpacing: "3px",
-              color: "#fff",
-            }}>
-              <span style={{ color: "#fff" }}>★</span> ONP <span style={{ color: "#fff" }}>★</span>
-            </span>
+            <span style={{ color: "var(--camo-accent)" }}>★</span> ONP
           </div>
-        </div>
+          <div style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: "0.62rem",
+            letterSpacing: "0.2em",
+            color: "var(--camo-gunmetal)",
+            textTransform: "uppercase",
+            marginTop: "4px",
+          }}>
+            Our Next Project
+          </div>
+        </Link>
 
         <h1 style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 700,
           fontSize: "28px",
-          color: "#1E3A8A",
+          color: "var(--camo-charcoal)",
           letterSpacing: "1px",
           textAlign: "center",
           marginBottom: "4px",
+          textTransform: "uppercase",
         }}>
           Contractor Sign Up
         </h1>
 
         {/* Service area notice */}
         <div style={{
-          background: "#DBEAFE",
-          border: "1px solid #93C5FD",
-          borderRadius: "8px",
+          background: "var(--camo-gunmetal)",
+          borderRadius: "6px",
           padding: "10px 14px",
           fontSize: "12px",
-          color: "#1E40AF",
+          color: "var(--camo-concrete)",
           lineHeight: 1.5,
         }}>
-          📍 ONP is currently serving <strong>El Paso, TX and Las Cruces, NM</strong>. Out-of-area? You can still sign up and join the waitlist.
+          📍 <strong>ONP</strong> is currently serving <strong>El Paso, TX and Las Cruces, NM</strong>. Out-of-area? You can still sign up and join the waitlist.
         </div>
 
         {/* Account fields */}
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
-          borderRadius: "12px",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
+          borderRadius: "8px",
           padding: "24px",
           display: "flex",
           flexDirection: "column",
@@ -190,7 +195,7 @@ export default function SignupContractorPage() {
               required
               minLength={8}
             />
-            <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
               Minimum 8 characters
             </div>
           </div>
@@ -205,7 +210,7 @@ export default function SignupContractorPage() {
               maxLength={10}
               placeholder="e.g. 79912"
             />
-            <div style={{ fontSize: "11px", color: "#4A7FB5", marginTop: "4px" }}>
+            <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
               Used to verify service area coverage.
             </div>
           </div>
@@ -213,9 +218,9 @@ export default function SignupContractorPage() {
 
         {/* Formal disclaimer */}
         <div style={{
-          background: "#EEF4FF",
-          border: "1px solid #B8D0E8",
-          borderRadius: "12px",
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
+          borderRadius: "8px",
           padding: "20px 24px",
         }}>
           <div style={{
@@ -223,7 +228,7 @@ export default function SignupContractorPage() {
             fontWeight: 700,
             fontSize: "16px",
             letterSpacing: "1px",
-            color: "#1E3A8A",
+            color: "var(--camo-charcoal)",
             textTransform: "uppercase",
             marginBottom: "10px",
           }}>
@@ -232,7 +237,7 @@ export default function SignupContractorPage() {
 
           <div style={{
             fontSize: "12px",
-            color: "#1B4F8A",
+            color: "var(--camo-gunmetal)",
             lineHeight: 1.7,
             marginBottom: "14px",
           }}>
@@ -240,24 +245,24 @@ export default function SignupContractorPage() {
             <ul style={{ margin: "8px 0 0 16px", padding: 0 }}>
               <li style={{ marginBottom: "6px" }}>
                 You are an independent business and will submit bids using your own professional judgment.
-                ONP does not direct, supervise, or approve bids.
+                <strong> ONP</strong> does not direct, supervise, or approve bids.
               </li>
               <li style={{ marginBottom: "6px" }}>
-                Bids are good-faith offers based on Client-provided information. ONP does not verify
+                Bids are good-faith offers based on Client-provided information. <strong>ONP</strong> does not verify
                 Client information and is not responsible for site conditions, scope changes, or payment.
               </li>
               <li style={{ marginBottom: "6px" }}>
-                Subscription fees are non-refundable. ONP makes no representation regarding the volume,
+                Subscription fees are non-refundable. <strong>ONP</strong> makes no representation regarding the volume,
                 quality, or profitability of available projects.
               </li>
               <li style={{ marginBottom: 0 }}>
-                ONP is a marketplace only — not your employer, agent, or partner.
+                <strong>ONP</strong> is a marketplace only — not your employer, agent, or partner.
               </li>
             </ul>
           </div>
 
-          <div style={{ fontSize: "12px", color: "#4A7FB5", marginBottom: "16px" }}>
-            <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "#1B4F8A", fontWeight: 600 }}>
+          <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px" }}>
+            <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)", fontWeight: 600 }}>
               Read the full Contractor Bid Acknowledgment →
             </Link>
           </div>
@@ -267,27 +272,27 @@ export default function SignupContractorPage() {
             <label style={{
               ...labelStyle,
               marginBottom: "6px",
-              color: nameMatches && typedName ? "#15803D" : "#1B4F8A",
+              color: nameMatches && typedName ? "var(--camo-good)" : "var(--camo-gunmetal)",
             }}>
               Type your business name to confirm you agree
             </label>
             <input
               style={{
                 ...inputStyle,
-                border: `1px solid ${nameMatches && typedName ? "#166534" : "#B8D0E8"}`,
-                background: nameMatches && typedName ? "#F0FDF4" : "#FFFFFF",
+                border: `1px solid ${nameMatches && typedName ? "var(--camo-good)" : "#d9dbdb"}`,
+                background: nameMatches && typedName ? "rgba(92,138,107,0.1)" : "#FFFFFF",
               }}
               value={typedName}
               onChange={(e) => setTypedName(e.target.value)}
               placeholder={businessName || "Your business name"}
             />
             {typedName && !nameMatches && (
-              <div style={{ fontSize: "11px", color: "#991B1B", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "#B45050", marginTop: "4px" }}>
                 Must match the business name above exactly.
               </div>
             )}
             {nameMatches && typedName && (
-              <div style={{ fontSize: "11px", color: "#15803D", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "var(--camo-good)", marginTop: "4px" }}>
                 ✓ Confirmed
               </div>
             )}
@@ -300,23 +305,23 @@ export default function SignupContractorPage() {
             gap: "10px",
             cursor: "pointer",
             padding: "10px 12px",
-            background: termsChecked ? "#F0FDF4" : "#FFFFFF",
-            border: `1px solid ${termsChecked ? "#166534" : "#B8D0E8"}`,
-            borderRadius: "8px",
+            background: termsChecked ? "rgba(92,138,107,0.1)" : "#FFFFFF",
+            border: `1px solid ${termsChecked ? "var(--camo-good)" : "#d9dbdb"}`,
+            borderRadius: "6px",
           }}>
             <input
               type="checkbox"
               checked={termsChecked}
               onChange={(e) => setTermsChecked(e.target.checked)}
-              style={{ marginTop: "2px", accentColor: "#1B4F8A", flexShrink: 0 }}
+              style={{ marginTop: "2px", accentColor: "var(--camo-gunmetal)", flexShrink: 0 }}
             />
-            <span style={{ fontSize: "12px", color: "#1E3A8A", lineHeight: 1.5 }}>
+            <span style={{ fontSize: "12px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
               I have read and agree to the{" "}
-              <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "#1B4F8A" }}>
+              <Link href="/contractor-bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)" }}>
                 Contractor Bid Acknowledgment
               </Link>
               {" "}and{" "}
-              <Link href="/bid-disclaimer" target="_blank" style={{ color: "#1B4F8A" }}>
+              <Link href="/bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)" }}>
                 Bid Disclaimer
               </Link>.
             </span>
@@ -325,11 +330,11 @@ export default function SignupContractorPage() {
 
         {msg && (
           <div style={{
-            background: msg.includes("Check your email") ? "#F0FDF4" : "#FEF2F2",
-            border: `1px solid ${msg.includes("Check your email") ? "#166534" : "#FCA5A5"}`,
-            color: msg.includes("Check your email") ? "#15803D" : "#991B1B",
+            background: msg.includes("Check your email") ? "rgba(92,138,107,0.1)" : "rgba(180,80,80,0.1)",
+            border: `1px solid ${msg.includes("Check your email") ? "var(--camo-good)" : "#B45050"}`,
+            color: msg.includes("Check your email") ? "var(--camo-good)" : "#943A3A",
             padding: "10px 14px",
-            borderRadius: "6px",
+            borderRadius: "4px",
             fontSize: "13px",
           }}>
             {msg}
@@ -340,13 +345,13 @@ export default function SignupContractorPage() {
           disabled={busy || !canSubmit}
           style={{
             width: "100%",
-            background: canSubmit && !busy ? "#C8102E" : "#B8D0E8",
-            color: "#fff",
+            background: canSubmit && !busy ? "var(--camo-accent)" : "#d9dbdb",
+            color: "var(--camo-ink)",
             border: "none",
             padding: "14px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontWeight: 600,
+            borderRadius: "4px",
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
             fontSize: "14px",
             letterSpacing: "1px",
             textTransform: "uppercase",
@@ -357,15 +362,15 @@ export default function SignupContractorPage() {
         </button>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", textAlign: "center" }}>
             Client?{" "}
-            <Link style={{ color: "#1E3A8A", textDecoration: "underline" }} href="/signup">
+            <Link style={{ color: "var(--camo-charcoal)", fontWeight: 600, textDecoration: "underline" }} href="/signup">
               Sign up here
             </Link>
           </p>
-          <p style={{ fontSize: "13px", color: "#1B4F8A", textAlign: "center" }}>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", textAlign: "center" }}>
             Already have an account?{" "}
-            <Link style={{ color: "#1E3A8A", textDecoration: "underline" }} href="/login">
+            <Link style={{ color: "var(--camo-charcoal)", fontWeight: 600, textDecoration: "underline" }} href="/login">
               Log in
             </Link>
           </p>

@@ -132,7 +132,7 @@ export default async function ContractorDirectoryPage({
             Contractor Directory
           </h1>
           <p style={{ fontSize: "0.95rem", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginTop: "12px", maxWidth: "600px" }}>
-            All contractors listed here have been verified by ONP — licensed, insured, and ready to bid on your project.
+            All contractors listed here have been verified by <strong>ONP</strong> — licensed, insured, and ready to bid on your project.
           </p>
         </div>
 
@@ -293,7 +293,7 @@ export default async function ContractorDirectoryPage({
                 Want to be featured here?
               </h3>
               <p style={{ fontSize: "0.85rem", color: "var(--camo-steel)", margin: "6px 0 0", maxWidth: "440px" }}>
-                ONP is actively verifying and onboarding contractors in El Paso and Las Cruces. Get listed early.
+                <strong>ONP</strong> is actively verifying and onboarding contractors in El Paso and Las Cruces. Get listed early.
               </p>
             </div>
             <Link href="/signup/contractor" style={{ background: "var(--camo-accent)", color: "var(--camo-ink)", padding: "12px 24px", borderRadius: "3px", textDecoration: "none", fontWeight: 700, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.03em", whiteSpace: "nowrap" }}>

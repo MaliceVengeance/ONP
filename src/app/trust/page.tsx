@@ -18,33 +18,25 @@ const sectionHeading: React.CSSProperties = {
   margin: "8px 0 20px",
 };
 
-const steps = [
-  { step: "01", title: "You File a Dispute", desc: "From your project dashboard, submit a dispute statement explaining why you believe the upgrade was not justified. You have 14 days from the upgrade charge to file. Filing is free." },
-  { step: "02", title: "Inspector Submits a Response", desc: "The original inspector is given 3 days to submit a written response explaining their reasoning for the upgrade. You will see their response when you log in." },
-  { step: "03", title: "A Master Inspector Is Assigned", desc: "An independent Master Inspector — a senior inspector from our network who was not involved in your project — is assigned within 24 hours of filing." },
-  { step: "04", title: "Full Review of All Evidence", desc: "The Master Inspector reviews the project description, the inspector's justification, the on-site report, your statement, and the inspector's response. No detail is left unread." },
-  { step: "05", title: "Written Decision — Within 5 Business Days", desc: "You receive a written decision with full reasoning. One of three outcomes: (1) upgrade was justified — charge stands; (2) upgrade was a reasonable call — charge stands, you receive a store credit; (3) upgrade was not justified — full $200 refund." },
-];
-
-const outcomes = [
-  { label: "Upgrade Justified", color: "var(--camo-gunmetal)", desc: "The Master Inspector finds the on-site upgrade was warranted given the scope. The $200 charge stands. You receive the decision with full written reasoning." },
-  { label: "Partial Credit", color: "var(--camo-good)", desc: "The upgrade was a borderline call. The charge stands, but you receive a store credit (typically $50–$200) applied to your ONP account for future inspections." },
-  { label: "Full Refund", color: "var(--camo-accent)", desc: "The Master Inspector finds the upgrade was not justified. You receive a full $200 refund — processed to your original payment method or as a credit if paid by credits." },
+const protections = [
+  { icon: "✓", label: "Verified contractors only", body: "Every contractor in the directory is license and insurance checked before they can ever bid." },
+  { icon: "🔒", label: "Sealed bids, no favoritism", body: "Pricing stays hidden from everyone — including ONP — until the bidding window closes." },
+  { icon: "📋", label: "Everything documented", body: "Bids, RFIs, and project communication are timestamped and kept on record from day one." },
+  { icon: "$0", label: "Direct support, no cost", body: "Questions or concerns about a project go straight to ONP — reaching out never costs you anything." },
 ];
 
 const transparencyItems = [
-  "% of inspection reports completed without any dispute",
-  "% of disputes resulting in a client refund",
-  "Average dispute resolution time (business days)",
-  "Number of active Master Inspectors on the platform",
+  "% of projects completed without a client concern",
+  "Average time to respond to a client concern",
+  "Number of verified contractors on the platform",
 ];
 
 const faqs = [
-  { q: "Does filing a dispute affect my account?", a: "No. Disputes are a protected right for all ONP clients. Filing a dispute will never result in any negative action on your account." },
-  { q: "What if I miss the 14-day window?", a: "The 14-day window begins from the date of the upgrade charge. After 14 days, the charge is final. If you have an exceptional circumstance, contact support@ournextproject.us." },
-  { q: "Can I appeal the Master Inspector's decision?", a: "The Master Inspector's decision is final in the normal course. ONP administration may review cases where there is clear evidence of procedural error — contact support for exceptional cases." },
-  { q: "How long does the process actually take?", a: "Most disputes are resolved within 3–5 business days. The SLA is 5 business days from the date the Master Inspector is assigned. If the SLA is missed, the case is automatically escalated to ONP administration." },
-  { q: "How is the inspector held accountable?", a: "ONP tracks each inspector's dispute history. Inspectors with a high rate of refund outcomes are flagged internally, placed under compliance review, and — if patterns persist — suspended from accepting new upgrade requests." },
+  { q: "Does raising a concern affect my account?", a: "No. Reaching out about a project is a protected right for all ONP clients and will never result in any negative action on your account." },
+  { q: "How do I reach ONP about a project?", a: "Contact us directly at support@ournextproject.us, or from your project dashboard once you're signed in. Include your project name and a clear description of the concern." },
+  { q: "What information will ONP use to look into it?", a: "The full documented record for the project — bids, RFIs, and communication history — so nothing relies on memory or he-said-she-said." },
+  { q: "Is there a deadline to raise a concern?", a: "No hard deadline, but the sooner you reach out, the more useful the documented record is likely to be." },
+  { q: "How are contractors held accountable?", a: "ONP tracks contractor history on the platform. Contractors with a pattern of client concerns are reviewed and, if warranted, removed from the verified directory." },
 ];
 
 export default function TrustPage() {
@@ -62,74 +54,42 @@ export default function TrustPage() {
             Client Trust &amp; Protection
           </h1>
           <p style={{ fontSize: "1rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, maxWidth: "620px" }}>
-            ONP is built on the principle that every client interaction should be transparent, documented, and — when something goes wrong — reviewable by an independent third party.
+            <strong>ONP</strong> is built on the principle that every client interaction should be transparent, documented, and — when something feels wrong — easy to raise directly with us.
           </p>
         </div>
 
         {/* The core promise */}
         <div style={{ background: "var(--camo-charcoal)", borderRadius: "10px", padding: "26px 30px", marginBottom: "40px", borderLeft: "6px solid var(--camo-accent)" }}>
           <p style={{ fontSize: "1.05rem", color: "var(--camo-concrete)", lineHeight: 1.8, margin: 0, fontStyle: "italic" }}>
-            &ldquo;Every on-site upgrade is reviewable. If you believe an upgrade was unjustified, an independent Master Inspector will review your case within 5 business days — at no cost to you. This is part of our commitment to client trust.&rdquo;
+            &ldquo;Sealed bids, verified contractors, and a fully documented record of every project. If something doesn&apos;t feel right, you can reach us directly — at no cost, any time.&rdquo;
           </p>
         </div>
 
-        {/* What is an on-site upgrade */}
+        {/* How we protect you */}
         <div style={{ marginBottom: "40px" }}>
-          <h2 style={sectionHeading}>What Is an On-Site Upgrade?</h2>
-          <p style={{ fontSize: "0.9rem", color: "var(--camo-gunmetal)", lineHeight: 1.8, marginBottom: "12px" }}>
-            When you request a Standard Inspection, an ONP inspector visits your site and performs a pre-bid takeoff to help contractors prepare accurate bids. In some cases, the inspector determines on-site that the scope of work is significantly more complex than described — and upgrades the inspection to a Comprehensive level. This upgrade carries an additional fee of $200.
-          </p>
-          <p style={{ fontSize: "0.9rem", color: "var(--camo-gunmetal)", lineHeight: 1.8 }}>
-            We recognize that an unexpected charge — especially one added at the site visit — can feel surprising. That is why every upgrade can be formally disputed.
-          </p>
-        </div>
-
-        {/* How the dispute process works — real sequence, numbering earned */}
-        <div style={{ marginBottom: "40px" }}>
-          <h2 style={sectionHeading}>How the Dispute Process Works</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-            {steps.map((s, idx) => (
-              <div key={s.step} style={{ display: "flex", gap: "0", position: "relative" }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "56px", flexShrink: 0 }}>
-                  <div style={{ width: "40px", height: "40px", borderRadius: "4px", background: "var(--camo-charcoal)", color: "var(--camo-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, fontSize: "0.95rem", flexShrink: 0, zIndex: 1 }}>
-                    {s.step}
-                  </div>
-                  {idx < 4 && <div style={{ width: "2px", flex: 1, background: "#d9dbdb", minHeight: "24px" }} />}
+          <h2 style={sectionHeading}>How We Protect You</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+            {protections.map((p) => (
+              <div key={p.label} style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "20px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "4px", background: "var(--camo-charcoal)", color: "var(--camo-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", marginBottom: "12px", fontFamily: "'IBM Plex Mono', monospace" }}>
+                  {p.icon}
                 </div>
-                <div style={{ paddingLeft: "16px", paddingBottom: idx < 4 ? "24px" : 0 }}>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "1.05rem", color: "var(--camo-charcoal)", marginBottom: "6px", marginTop: "8px", textTransform: "uppercase", letterSpacing: "0.02em" }}>
-                    {s.title}
-                  </div>
-                  <p style={{ fontSize: "0.85rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, margin: 0 }}>{s.desc}</p>
-                </div>
+                <h3 style={{ fontSize: "0.95rem", color: "var(--camo-charcoal)", marginBottom: "6px" }}>{p.label}</h3>
+                <p style={{ fontSize: "0.82rem", color: "var(--camo-gunmetal)", margin: 0, lineHeight: 1.5 }}>{p.body}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Possible outcomes */}
-        <div style={{ marginBottom: "40px" }}>
-          <h2 style={sectionHeading}>Possible Outcomes</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {outcomes.map((o) => (
-              <div key={o.label} style={{ background: "var(--camo-concrete)", border: `1px solid ${o.color}`, borderRadius: "8px", padding: "16px 20px", display: "flex", gap: "16px", alignItems: "flex-start", flexWrap: "wrap" }}>
-                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "0.82rem", color: o.color, textTransform: "uppercase", letterSpacing: "0.05em", flexShrink: 0, minWidth: "130px", paddingTop: "1px" }}>
-                  {o.label}
-                </div>
-                <p style={{ fontSize: "0.85rem", color: "var(--camo-gunmetal)", lineHeight: 1.6, margin: 0 }}>{o.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Master Inspectors */}
+        {/* Questions or concerns */}
         <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "26px 30px", marginBottom: "40px" }}>
-          <h2 style={{ ...sectionHeading, margin: "0 0 14px" }}>Who Are Master Inspectors?</h2>
+          <h2 style={{ ...sectionHeading, margin: "0 0 14px" }}>Questions or Concerns About a Project?</h2>
           <p style={{ fontSize: "0.88rem", color: "var(--camo-gunmetal)", lineHeight: 1.8, marginBottom: "12px" }}>
-            Master Inspectors are senior inspectors who have been individually vetted and approved by ONP administration to review disputes. They are selected based on experience, inspection history, and completion of an internal competency review.
+            You&apos;re never on your own. Contact <strong>ONP</strong> directly — from your dashboard once signed in, or at{" "}
+            <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-gunmetal)", fontWeight: 600 }}>support@ournextproject.us</a> — and we&apos;ll look into it using the project&apos;s full documented history.
           </p>
           <p style={{ fontSize: "0.88rem", color: "var(--camo-gunmetal)", lineHeight: 1.8 }}>
-            They are independent: the system automatically excludes the original inspector and, where possible, any inspector who has previously worked on the same project. Assignment is based on availability to ensure disputes are resolved quickly and without conflict of interest.
+            Because every bid, RFI, and message is already on record, we&apos;re working from the same facts you are — not relying on memory or a verbal he-said-she-said.
           </p>
         </div>
 
@@ -137,7 +97,7 @@ export default function TrustPage() {
         <div style={{ background: "var(--camo-charcoal)", borderRadius: "10px", padding: "26px 30px", marginBottom: "40px" }}>
           <h2 style={{ ...sectionHeading, color: "var(--camo-concrete)", margin: "0 0 14px" }}>Platform Transparency</h2>
           <p style={{ fontSize: "0.88rem", color: "var(--camo-steel)", lineHeight: 1.8, marginBottom: "14px" }}>
-            We are committed to publishing aggregate dispute statistics once our data set is large enough to be meaningful — typically after 90 days of live dispute activity and a minimum of 30 completed cases. Once available, you will see:
+            We are committed to publishing aggregate trust statistics once our data set is large enough to be meaningful. Once available, you will see:
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "18px" }}>
             {transparencyItems.map((item) => (
@@ -148,7 +108,7 @@ export default function TrustPage() {
             ))}
           </div>
           <div style={{ background: "rgba(255,158,27,0.1)", border: "1px solid var(--camo-accent)", borderRadius: "6px", padding: "12px 16px", fontSize: "0.78rem", color: "var(--camo-concrete)", fontStyle: "italic" }}>
-            Stats will appear here once the platform has accumulated sufficient dispute history. Check back after our first 90 days of live operation.
+            Stats will appear here once the platform has accumulated sufficient history. Check back as we grow.
           </div>
         </div>
 
@@ -168,14 +128,14 @@ export default function TrustPage() {
         {/* CTA */}
         <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "32px", textAlign: "center" }}>
           <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "1.5rem", color: "var(--camo-charcoal)", marginBottom: "10px", textTransform: "uppercase" }}>
-            Questions about a charge?
+            Have a Concern About a Project?
           </h3>
           <p style={{ fontSize: "0.85rem", color: "var(--camo-gunmetal)", marginBottom: "20px", lineHeight: 1.6 }}>
-            Log into your account and open a dispute from your project dashboard. It takes less than five minutes and costs nothing.
+            Sign in and reach out from your project dashboard, or email us directly. It costs nothing and takes minutes.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/login" style={{ background: "var(--camo-accent)", color: "var(--camo-ink)", padding: "12px 28px", borderRadius: "3px", textDecoration: "none", fontWeight: 700, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
-              Sign In to File a Dispute
+              Sign In
             </Link>
             <Link href="/signup" style={{ background: "transparent", color: "var(--camo-charcoal)", border: "1px solid var(--camo-gunmetal)", padding: "12px 28px", borderRadius: "3px", textDecoration: "none", fontSize: "0.85rem" }}>
               Create an Account

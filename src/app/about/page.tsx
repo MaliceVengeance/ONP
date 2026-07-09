@@ -20,7 +20,7 @@ const sectionHeading: React.CSSProperties = {
 
 const differentiators = [
   { icon: "🔒", title: "Blind, sealed bidding", body: "Contractors submit pricing without seeing competitors' numbers, reducing price manipulation and encouraging honest competition." },
-  { icon: "📐", title: "Optional independent inspections & takeoffs", body: "Available as an add-on for any project — on-site pre-bid inspections give contractors accurate scope information and clients more realistic proposals." },
+  { icon: "📋", title: "Every bid, fully documented", body: "Amounts, notes, and communication are all timestamped and kept on record — nothing relies on memory." },
   { icon: "📝", title: "Structured RFIs, not side-channels", body: "Questions go through the system as documented Requests for Information — no off-platform negotiation, no confusion." },
 ];
 
@@ -52,7 +52,7 @@ export default function AboutPage() {
             About Us
           </h1>
           <p style={{ fontSize: "1.15rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, fontStyle: "italic", marginBottom: "10px" }}>
-            Our Next Project (ONP) was built on a simple idea:
+            Our Next Project (<strong>ONP</strong>) was built on a simple idea:
           </p>
           <p style={{ fontSize: "1.25rem", color: "var(--camo-charcoal)", lineHeight: 1.6, fontWeight: 600 }}>
             Small businesses and homeowners deserve the same bidding advantages that large corporations have relied on for years.
@@ -62,7 +62,7 @@ export default function AboutPage() {
         {/* Intro */}
         <div style={{ marginBottom: "48px" }}>
           <p style={{ fontSize: "0.95rem", color: "var(--camo-gunmetal)", lineHeight: 1.8, marginBottom: "14px" }}>
-            For most people, hiring contractors is stressful and unclear. Pricing can vary wildly, and clients are often left wondering whether they&apos;re getting fair competition or accurate information. ONP was created to change that.
+            For most people, hiring contractors is stressful and unclear. Pricing can vary wildly, and clients are often left wondering whether they&apos;re getting fair competition or accurate information. <strong>ONP</strong> was created to change that.
           </p>
           <p style={{ fontSize: "0.95rem", color: "var(--camo-gunmetal)", lineHeight: 1.8 }}>
             We&apos;re an online bid depository designed to bring structure, transparency, and accountability to the project bidding process for homeowners, property owners, and small businesses.
@@ -89,11 +89,8 @@ export default function AboutPage() {
         {/* Client Trust & Protection — shortened, full detail lives on /trust */}
         <div style={{ background: "var(--camo-charcoal)", borderRadius: "10px", padding: "28px 32px", marginBottom: "40px" }}>
           <h2 style={{ ...sectionHeading, color: "var(--camo-concrete)", margin: "0 0 12px" }}>Built-In Client Protection</h2>
-          <p style={{ fontSize: "0.78rem", color: "var(--camo-steel)", fontWeight: 600, marginBottom: "8px" }}>
-            For projects where inspection services have been added:
-          </p>
           <p style={{ fontSize: "0.92rem", color: "var(--camo-steel)", lineHeight: 1.8, marginBottom: "16px" }}>
-            If an inspector upgrades a project&apos;s scope on-site, that upgrade is always reviewable. An independent Master Inspector — with no connection to your original inspection — investigates at no cost and issues a written decision within 5 business days.
+            If something about a project doesn&apos;t feel right, you&apos;re never on your own. Every project&apos;s full bid and communication history is already documented, and reaching out to <strong>ONP</strong> directly never costs you anything.
           </p>
           <Link href="/trust" style={{ display: "inline-block", fontSize: "0.85rem", color: "var(--camo-accent)", fontWeight: 600, textDecoration: "underline" }}>
             Learn more about how we protect clients →
@@ -144,7 +141,7 @@ export default function AboutPage() {
         <div style={{ background: "var(--camo-concrete)", border: "2px solid var(--camo-accent)", borderRadius: "10px", padding: "28px 32px", marginBottom: "48px" }}>
           <h2 style={{ ...sectionHeading, margin: "0 0 12px" }}>★ Our Founder</h2>
           <p style={{ fontSize: "0.92rem", color: "var(--camo-gunmetal)", lineHeight: 1.8, margin: 0 }}>
-            ONP was founded by Samuel Bravo, a CAD and infrastructure design professional with years of experience coordinating real-world project documentation, revisions, and contractor workflows. His firsthand experience with unclear scopes, field discrepancies, and communication breakdowns gave ONP its foundation — and its purpose.
+<strong>ONP</strong> was founded by Samuel Bravo, a CAD and infrastructure design professional with years of experience coordinating real-world project documentation, revisions, and contractor workflows. His firsthand experience with unclear scopes, field discrepancies, and communication breakdowns gave <strong>ONP</strong> its foundation — and its purpose.
           </p>
         </div>
 
