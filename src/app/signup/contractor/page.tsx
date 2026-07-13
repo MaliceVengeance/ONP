@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { processSignupServiceArea } from "@/lib/serviceArea/actions";
+import { BetaDisclaimerBanner } from "@/components/MarketingChrome";
 
 export default function SignupContractorPage() {
   const supabase = createSupabaseBrowserClient();
@@ -92,11 +93,18 @@ export default function SignupContractorPage() {
       minHeight: "100vh",
       background: "var(--camo-paper)",
       display: "flex",
-      alignItems: "flex-start",
-      justifyContent: "center",
-      padding: "48px 24px",
+      flexDirection: "column",
+      alignItems: "center",
       fontFamily: "'Barlow', sans-serif",
     }}>
+      <BetaDisclaimerBanner />
+
+      <div style={{
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        padding: "48px 24px",
+      }}>
       <form onSubmit={onSubmit} style={{
         width: "100%",
         maxWidth: "480px",
@@ -376,6 +384,7 @@ export default function SignupContractorPage() {
           </p>
         </div>
       </form>
+      </div>
     </main>
   );
 }

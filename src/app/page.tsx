@@ -42,7 +42,7 @@ const differentiators = [
   { n: "02", title: "Bids stay sealed", body: "Contractors never see competitor pricing. No last-look advantage, no race to the bottom." },
   { n: "03", title: "Verified, not just listed", body: "License and insurance checked before a contractor ever appears in the directory." },
   { n: "04", title: "Concerns get a real answer", body: "Every bid and message is documented — reach out directly to ONP about a project, no cost, no runaround." },
-  { n: "05", title: "Veteran contractors, recognized", body: "Your verified veteran status shows on every bid you submit — clients notice, and you get 25% off your subscription." },
+  { n: "05", title: "Veteran contractors, recognized", body: "Your verified veteran status shows on every bid you submit — clients notice, and it comes with subscription savings." },
 ];
 
 const categoryTiles = [
@@ -265,7 +265,7 @@ export default async function HomePage() {
               Built by a veteran, for the trades
             </h3>
             <p style={{ fontSize: "0.95rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, margin: 0 }}>
-              <strong>ONP</strong> is veteran-owned from the ground up. Verified veteran contractors get a visible badge, a 25% discount, and featured placement in the directory — recognition that&apos;s earned, not buried in fine print.
+              <strong>ONP</strong> is veteran-owned from the ground up. Verified veteran contractors get a visible badge, a subscription discount, and featured placement in the directory — recognition that&apos;s earned, not buried in fine print.
             </p>
           </div>
         </div>

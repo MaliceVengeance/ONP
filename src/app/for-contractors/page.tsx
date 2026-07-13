@@ -143,7 +143,7 @@ export default function ForContractorsPage() {
               Veteran-Owned? You get more.
             </h3>
             <p style={{ fontSize: "0.9rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, margin: 0 }}>
-              Verified veteran-owned businesses get 25% off the standard subscription, a Veteran Owned badge on every bid, and featured placement in the contractor directory.
+              Verified veteran-owned businesses get a discount on the standard subscription, a Veteran Owned badge on every bid, and featured placement in the contractor directory.
             </p>
           </div>
         </div>

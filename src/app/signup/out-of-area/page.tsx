@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BetaDisclaimerBanner } from "@/components/MarketingChrome";
 
 export default async function OutOfAreaPage({
   searchParams,
@@ -13,11 +14,20 @@ export default async function OutOfAreaPage({
       minHeight: "100vh",
       background: "var(--camo-paper)",
       display: "flex",
+      flexDirection: "column",
       alignItems: "center",
-      justifyContent: "center",
-      padding: "24px",
       fontFamily: "'Barlow', sans-serif",
     }}>
+      <BetaDisclaimerBanner />
+
+      <div style={{
+        flex: 1,
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px",
+      }}>
       <div style={{
         width: "100%",
         maxWidth: "480px",
@@ -107,6 +117,7 @@ export default async function OutOfAreaPage({
             Continue to Dashboard →
           </Link>
         </div>
+      </div>
       </div>
     </main>
   );
