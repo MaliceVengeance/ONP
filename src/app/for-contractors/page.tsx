@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -55,7 +56,8 @@ const disqualifiers = [
   "You already have a full pipeline and aren't looking for more work",
 ];
 
-export default function ForContractorsPage() {
+export default async function ForContractorsPage() {
+  const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader />
@@ -114,6 +116,22 @@ export default function ForContractorsPage() {
           </div>
         </div>
       </section>
+
+      {inspectorEnabled && (
+        <section style={{ padding: "60px 32px", background: "var(--camo-paper)" }}>
+          <div style={{ maxWidth: "780px", margin: "0 auto", display: "flex", gap: "20px", alignItems: "flex-start", background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "28px" }}>
+            <div style={{ fontSize: "32px", flexShrink: 0 }}>🔍</div>
+            <div>
+              <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "var(--camo-charcoal)", margin: "0 0 8px", textTransform: "uppercase" }}>
+                Bidding without a site visit?
+              </h3>
+              <p style={{ fontSize: "0.9rem", color: "var(--camo-gunmetal)", lineHeight: 1.7, margin: 0 }}>
+                Check whether the client requested a paid ONP inspection — a documented site visit with measurements, photos, and condition notes you can reference when pricing your bid.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Honest disqualifier */}
       <section style={{ padding: "60px 32px", background: "var(--camo-charcoal)" }}>

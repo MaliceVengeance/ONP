@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -39,7 +40,11 @@ const painPoints = [
   { icon: "⚖", title: "Competitive bids, no relationship favoritism", body: "Sealed bidding means the same vendor you've used ten times doesn't get a quiet edge over a better bid on property #11." },
 ];
 
-export default function ForPropertyManagersPage() {
+const inspectionPoint = { icon: "🔍", title: "On-site inspections, on demand", body: "Can't walk every property in the portfolio yourself? Request a paid ONP inspection before bids open — a documented site visit and report every bidding contractor can reference." };
+
+export default async function ForPropertyManagersPage() {
+  const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
+  const points = inspectorEnabled ? [...painPoints, inspectionPoint] : painPoints;
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader />
@@ -65,7 +70,7 @@ export default function ForPropertyManagersPage() {
           <span style={{ ...eyebrow, textAlign: "center", display: "block" }}>BUILT FOR PORTFOLIOS, NOT JUST ONE HOUSE</span>
           <h2 style={{ ...sectionHeading, textAlign: "center" }}>What Repeat Clients Actually Need</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "18px" }}>
-            {painPoints.map((p) => (
+            {points.map((p) => (
               <div key={p.title} style={{ background: "var(--camo-paper)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "24px 20px" }}>
                 <div style={{ fontSize: "1.4rem", marginBottom: "14px" }}>{p.icon}</div>
                 <h3 style={{ fontSize: "1rem", color: "var(--camo-charcoal)", marginBottom: "8px" }}>{p.title}</h3>

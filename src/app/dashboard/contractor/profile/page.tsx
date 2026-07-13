@@ -24,7 +24,7 @@ export default async function ContractorProfilePage({
   const { data: profile } = await supabase
     .from("contractor_profiles")
     .select(
-      "business_name,phone,address_line1,address_line2,city,state,address_zip,categories,description,is_listed,veteran_applied_at,veteran_verified,veteran_verified_at,military_branch,license_number,license_expiry,coi_provider,coi_policy_number,coi_expiry,coi_amount,directory_verified,directory_verified_at,has_no_license,has_no_insurance"
+      "business_name,phone,address_line1,address_line2,city,state,address_zip,categories,description,is_listed,veteran_applied_at,veteran_verified,veteran_verified_at,veteran_credential_type,veteran_credential_reference,veteran_rejection_reason,military_branch,license_number,license_expiry,coi_provider,coi_policy_number,coi_expiry,coi_amount,directory_verified,directory_verified_at,has_no_license,has_no_insurance"
     )
     .eq("contractor_id", user.id)
     .maybeSingle();
@@ -175,6 +175,11 @@ export default async function ContractorProfilePage({
               ? "Application pending"
               : "Not applied"}
           </div>
+          {!profile?.veteran_verified && !profile?.veteran_applied_at && profile?.veteran_rejection_reason && (
+            <div style={{ fontSize: "11px", color: "#991B1B", marginTop: "6px", lineHeight: 1.5 }}>
+              ✗ Previous application not approved: {profile.veteran_rejection_reason}
+            </div>
+          )}
         </div>
       </div>
 
@@ -518,8 +523,30 @@ export default async function ContractorProfilePage({
               />
               Apply for Veteran Owned Certification
             </label>
-            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
+            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px", marginBottom: "14px" }}>
               Checking this flags your account for admin review. Document upload coming in a future update.
+            </p>
+
+            <label style={labelStyle}>Verification Credential</label>
+            <select
+              name="veteran_credential_type"
+              defaultValue={profile?.veteran_credential_type ?? ""}
+              style={inputStyle}
+            >
+              <option value="">Select credential type…</option>
+              <option value="TVC_VVL">Texas Veterans Commission (TVC VVL)</option>
+              <option value="VA_VETCERT">VA VetCert (Vets First Verification)</option>
+            </select>
+
+            <label style={labelStyle}>Credential Number / Reference</label>
+            <input
+              name="veteran_credential_reference"
+              defaultValue={profile?.veteran_credential_reference ?? ""}
+              style={inputStyle}
+              placeholder="e.g. your TVC VVL ID or VA VetCert reference number"
+            />
+            <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
+              Required for admin to confirm your status against the public TVC or VA registry.
             </p>
           </div>
 

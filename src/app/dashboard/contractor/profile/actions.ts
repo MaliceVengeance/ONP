@@ -32,6 +32,8 @@ export async function saveContractorProfile(formData: FormData) {
   const has_no_insurance = formData.get("has_no_insurance") === "on";
   const apply_veteran = formData.get("apply_veteran") === "on";
   const military_branch = clean(formData.get("military_branch"));
+  const veteran_credential_type = clean(formData.get("veteran_credential_type"));
+  const veteran_credential_reference = clean(formData.get("veteran_credential_reference"));
 
   // License & COI
   const license_number = clean(formData.get("license_number"));
@@ -59,6 +61,8 @@ export async function saveContractorProfile(formData: FormData) {
     has_no_license,
     has_no_insurance,
     military_branch,
+    veteran_credential_type,
+    veteran_credential_reference,
     license_number,
     license_expiry: license_expiry || null,
     coi_provider,
@@ -69,6 +73,7 @@ export async function saveContractorProfile(formData: FormData) {
 
   if (apply_veteran) {
     payload.veteran_applied_at = new Date().toISOString();
+    payload.veteran_rejection_reason = null;
   }
 
   const { error } = await supabase.from("contractor_profiles").upsert(payload, {

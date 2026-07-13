@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -37,7 +38,8 @@ const missionPoints = [
   "Projects begin with clearer expectations for everyone involved",
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader active="about" />
@@ -92,6 +94,11 @@ export default function AboutPage() {
           <p style={{ fontSize: "0.92rem", color: "var(--camo-steel)", lineHeight: 1.8, marginBottom: "16px" }}>
             If something about a project doesn&apos;t feel right, you&apos;re never on your own. Every project&apos;s full bid and communication history is already documented, and reaching out to <strong>ONP</strong> directly never costs you anything.
           </p>
+          {inspectorEnabled && (
+            <p style={{ fontSize: "0.92rem", color: "var(--camo-steel)", lineHeight: 1.8, marginBottom: "16px" }}>
+              Want an extra layer of certainty before you award? You can request a paid <strong>ONP</strong> inspection — a documented site visit and report available for any contractor bidding on the project to reference.
+            </p>
+          )}
           <Link href="/trust" style={{ display: "inline-block", fontSize: "0.85rem", color: "var(--camo-accent)", fontWeight: 600, textDecoration: "underline" }}>
             Learn more about how we protect clients →
           </Link>

@@ -40,6 +40,7 @@ export async function handleVetCertDecision(contractorId: string, formData: Form
         veteran_verified: true,
         veteran_verified_at: new Date().toISOString(),
         veteran_verified_by: user.id,
+        veteran_rejection_reason: null,
       })
       .eq("contractor_id", contractorId);
     if (error) throw new Error(`approveVetCert failed: ${JSON.stringify(error)}`);
@@ -52,6 +53,7 @@ export async function handleVetCertDecision(contractorId: string, formData: Form
         veteran_applied_at: null,
         veteran_verified: false,
         veteran_verified_by: null,
+        veteran_rejection_reason: note,
       })
       .eq("contractor_id", contractorId);
     if (error) throw new Error(`rejectVetCert failed: ${JSON.stringify(error)}`);

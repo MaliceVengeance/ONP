@@ -11,6 +11,8 @@ type ContractorProfile = {
   veteran_applied_at: string | null;
   veteran_verified: boolean;
   veteran_verified_at: string | null;
+  veteran_credential_type: string | null;
+  veteran_credential_reference: string | null;
   license_number: string | null;
   license_expiry: string | null;
   coi_provider: string | null;
@@ -66,6 +68,7 @@ export default async function VetCertificationPage({
     .from("contractor_profiles")
     .select(
       "contractor_id, business_name, city, state, veteran_applied_at, veteran_verified, veteran_verified_at, " +
+      "veteran_credential_type, veteran_credential_reference, " +
       "license_number, license_expiry, coi_provider, coi_policy_number, coi_expiry, coi_amount, " +
       "directory_verified, directory_verified_at, is_listed"
     )
@@ -307,8 +310,20 @@ export default async function VetCertificationPage({
                     <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "2px" }}>
                       {[a.city, a.state].filter(Boolean).join(", ") || "No location set"}
                     </div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "14px" }}>
+                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginBottom: "10px" }}>
                       Applied: {formatDate(a.veteran_applied_at)}
+                    </div>
+
+                    <div style={{ background: "#FFFFFF", border: "1px solid #d9dbdb", borderRadius: "8px", padding: "10px 14px", marginBottom: "14px", fontSize: "12px" }}>
+                      <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Credential Submitted</div>
+                      <div style={{ color: "var(--camo-charcoal)" }}>
+                        {a.veteran_credential_type === "TVC_VVL"
+                          ? "Texas Veterans Commission (TVC VVL)"
+                          : a.veteran_credential_type === "VA_VETCERT"
+                          ? "VA VetCert (Vets First Verification)"
+                          : "— No credential type selected —"}
+                        {a.veteran_credential_reference ? ` — ${a.veteran_credential_reference}` : ""}
+                      </div>
                     </div>
 
                     <form action={handleVetCertDecision.bind(null, a.contractor_id)}>
@@ -322,6 +337,15 @@ export default async function VetCertificationPage({
                         placeholder="e.g. DD-214 reviewed and confirmed. Veteran status approved."
                         style={noteStyle}
                       />
+                      <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginTop: "10px", fontSize: "12px", color: "var(--camo-charcoal)", cursor: "pointer" }}>
+                        <input
+                          type="checkbox"
+                          name="registry_checked"
+                          required
+                          style={{ marginTop: "2px", accentColor: "var(--camo-accent)", flexShrink: 0 }}
+                        />
+                        I looked up this credential in the public TVC or VA VetCert registry before making this decision.
+                      </label>
                       <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
                         <button
                           type="submit"

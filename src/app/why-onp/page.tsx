@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -45,6 +46,8 @@ const supportTiles = [
   { icon: "$0", label: "No cost to ask", body: "Reaching out about a project never costs you anything." },
 ];
 
+const inspectionTile = { icon: "🔍", label: "Request a paid inspection", body: "Want an extra layer of certainty before you award? Request a documented ONP site inspection — available to reference for every contractor bidding on the project." };
+
 export default async function WhyOnpPage({
   searchParams,
 }: {
@@ -52,6 +55,8 @@ export default async function WhyOnpPage({
 }) {
   const sp = await searchParams;
   const isWelcome = sp.welcome === "1";
+  const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
+  const tiles = inspectorEnabled ? [...supportTiles, inspectionTile] : supportTiles;
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
@@ -170,7 +175,7 @@ export default async function WhyOnpPage({
             If something about a project doesn&apos;t feel right, you&apos;re never on your own. Every project&apos;s full bid and communication history is already documented, so there&apos;s always a clear record to work from.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "20px" }}>
-            {supportTiles.map((t) => (
+            {tiles.map((t) => (
               <div key={t.label} style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "20px" }}>
                 <div style={{ width: "36px", height: "36px", borderRadius: "4px", background: "var(--camo-charcoal)", color: "var(--camo-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", marginBottom: "12px", fontFamily: "'IBM Plex Mono', monospace" }}>
                   {t.icon}
