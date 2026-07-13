@@ -264,6 +264,10 @@ export default async function ContractorDirectoryPage({
                       {coiExpired && " ⚠"}
                     </span>
                   </div>
+
+                  <Link href={`/contractors/${c.contractor_id}`} style={{ position: "relative", display: "inline-block", marginTop: "14px", fontSize: "0.8rem", color: "var(--camo-charcoal)", fontWeight: 600, textDecoration: "underline" }}>
+                    View full profile →
+                  </Link>
                 </div>
               );
             })}

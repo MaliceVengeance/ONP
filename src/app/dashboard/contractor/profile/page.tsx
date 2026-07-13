@@ -75,21 +75,39 @@ export default async function ContractorProfilePage({
             Your public profile shown to clients and in the contractor directory.
           </p>
         </div>
-        <Link
-          href="/dashboard/contractor"
-          style={{
-            background: "transparent",
-            color: "var(--camo-gunmetal)",
-            border: "1px solid #d9dbdb",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            fontFamily: "'Barlow', sans-serif",
-            fontSize: "13px",
-            textDecoration: "none",
-          }}
-        >
-          Back
-        </Link>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Link
+            href="/dashboard/contractor/profile/portfolio"
+            style={{
+              background: "transparent",
+              color: "var(--camo-charcoal)",
+              border: "1px solid var(--camo-gunmetal)",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
+          >
+            📷 Portfolio Photos
+          </Link>
+          <Link
+            href="/dashboard/contractor"
+            style={{
+              background: "transparent",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
+          >
+            Back
+          </Link>
+        </div>
       </div>
 
       {/* Profile incomplete banner */}
