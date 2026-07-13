@@ -18,6 +18,7 @@ type ContractorInfo = {
   state: string | null;
   directory_verified: boolean | null;
   veteran_verified: boolean | null;
+  is_listed: boolean | null;
   license_number: string | null;
   license_expiry: string | null;
   coi_provider: string | null;
@@ -149,7 +150,7 @@ export default async function BidDetailPage({
 
   const { data: contractor } = await supabaseAdmin
     .from("contractor_profiles")
-    .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, has_no_insurance")
+    .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, is_listed, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, has_no_insurance")
     .eq("contractor_id", bidRow.contractor_id)
     .maybeSingle();
   const contractorInfo = contractor as ContractorInfo | null;
@@ -233,6 +234,16 @@ export default async function BidDetailPage({
             </span>
           )}
         </div>
+
+        {isAwarded && contractorInfo?.is_listed && contractorInfo?.directory_verified && (
+          <Link
+            href={`/contractors/${contractorInfo.contractor_id}`}
+            target="_blank"
+            style={{ display: "inline-block", fontSize: "12px", color: "var(--camo-gunmetal)", fontWeight: 600, textDecoration: "underline", marginBottom: "12px" }}
+          >
+            View full profile & portfolio →
+          </Link>
+        )}
 
         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
           <div>
