@@ -19,6 +19,7 @@ type ContractorInfo = {
   directory_verified: boolean | null;
   veteran_verified: boolean | null;
   is_listed: boolean | null;
+  bbb_url: string | null;
   license_number: string | null;
   license_expiry: string | null;
   coi_provider: string | null;
@@ -150,7 +151,7 @@ export default async function BidDetailPage({
 
   const { data: contractor } = await supabaseAdmin
     .from("contractor_profiles")
-    .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, is_listed, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, has_no_insurance")
+    .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, is_listed, bbb_url, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, has_no_insurance")
     .eq("contractor_id", bidRow.contractor_id)
     .maybeSingle();
   const contractorInfo = contractor as ContractorInfo | null;
@@ -172,7 +173,10 @@ export default async function BidDetailPage({
     taxCents += lineSubtotal * (Number(li.tax_pct) / 100);
   });
   const hasLineItems = lineItems.length > 0;
-  const totalCents = hasLineItems ? subtotalCents + taxCents : Number(version?.amount_cents ?? 0);
+  // The contractor's submitted bid amount is always the source of truth — it's entered
+  // independently from any itemized line items (which are optional supplementary detail),
+  // so it must never be silently replaced by a computed line-item subtotal.
+  const totalCents = Number(version?.amount_cents ?? 0);
 
   const licenseExpired = isExpired(contractorInfo?.license_expiry ?? null);
   const coiExpired = isExpired(contractorInfo?.coi_expiry ?? null);
@@ -245,6 +249,21 @@ export default async function BidDetailPage({
           </Link>
         )}
 
+        {/* BBB — sealed pre-award along with the rest of contractor identity, since a BBB
+            profile would typically name the business and defeat the sealed-bid promise. */}
+        {isAwarded && (
+          <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
+            <span style={{ fontWeight: 600, color: "var(--camo-charcoal)" }}>BBB: </span>
+            {contractorInfo?.bbb_url ? (
+              <a href={contractorInfo.bbb_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
+                View BBB Profile →
+              </a>
+            ) : (
+              "No BBB report on file"
+            )}
+          </div>
+        )}
+
         <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
           <div>
             <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License Expires</div>
@@ -289,10 +308,10 @@ export default async function BidDetailPage({
               })}
             </div>
             <div style={{ marginTop: "14px", paddingTop: "14px", borderTop: "1px solid #d9dbdb", display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-end" }}>
-              <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Subtotal: {centsToMoney(subtotalCents)}</div>
-              <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Tax: {centsToMoney(taxCents)}</div>
+              <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Itemized Subtotal: {centsToMoney(subtotalCents)}</div>
+              <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>Itemized Tax: {centsToMoney(taxCents)}</div>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "24px", color: "var(--camo-charcoal)" }}>
-                Total: {centsToMoney(totalCents)}
+                Submitted Bid Amount: {centsToMoney(totalCents)}
               </div>
             </div>
           </>

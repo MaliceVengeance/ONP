@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { handleVetCertDecision, handleDirectoryDecision } from "./actions";
+import { handleVetCertDecision, handleDirectoryDecision, updateBbbLink } from "./actions";
 
 type ContractorProfile = {
   contractor_id: string;
@@ -22,6 +22,7 @@ type ContractorProfile = {
   directory_verified: boolean | null;
   directory_verified_at: string | null;
   is_listed: boolean | null;
+  bbb_url: string | null;
 };
 
 function formatDate(d: string | null) {
@@ -70,7 +71,7 @@ export default async function VetCertificationPage({
       "contractor_id, business_name, city, state, veteran_applied_at, veteran_verified, veteran_verified_at, " +
       "veteran_credential_type, veteran_credential_reference, " +
       "license_number, license_expiry, coi_provider, coi_policy_number, coi_expiry, coi_amount, " +
-      "directory_verified, directory_verified_at, is_listed"
+      "directory_verified, directory_verified_at, is_listed, bbb_url"
     )
     .order("veteran_applied_at", { ascending: true });
 
@@ -203,6 +204,23 @@ export default async function VetCertificationPage({
                         </div>
                       </div>
 
+                      {/* BBB link — independent of the approve/reject decision; presence of a URL is itself the verification */}
+                      <form action={updateBbbLink.bind(null, p.contractor_id)} style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
+                        <input
+                          name="bbb_url"
+                          type="url"
+                          defaultValue={p.bbb_url ?? ""}
+                          placeholder="https://www.bbb.org/us/..."
+                          style={{ flex: 1, fontSize: "12px", padding: "8px 10px", borderRadius: "4px", border: "1px solid #d9dbdb", fontFamily: "'Barlow', sans-serif" }}
+                        />
+                        <button
+                          type="submit"
+                          style={{ fontSize: "12px", padding: "8px 14px", borderRadius: "4px", border: "1px solid #d9dbdb", background: "#FFFFFF", color: "var(--camo-charcoal)", fontFamily: "'Barlow', sans-serif", fontWeight: 600, cursor: "pointer" }}
+                        >
+                          Save BBB Link
+                        </button>
+                      </form>
+
                       {/* Decision form — one form, approve or reject button, shared note */}
                       <form action={handleDirectoryDecision.bind(null, p.contractor_id)}>
                         <label style={{ fontSize: "11px", fontWeight: 600, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px" }}>
@@ -257,6 +275,22 @@ export default async function VetCertificationPage({
                       {p.directory_verified_at && (
                         <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>Verified: {formatDate(p.directory_verified_at)}</div>
                       )}
+                      {/* BBB link — editable any time, independent of directory verification status */}
+                      <form action={updateBbbLink.bind(null, p.contractor_id)} style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
+                        <input
+                          name="bbb_url"
+                          type="url"
+                          defaultValue={p.bbb_url ?? ""}
+                          placeholder="BBB profile URL"
+                          style={{ fontSize: "11px", padding: "5px 8px", borderRadius: "4px", border: "1px solid #d9dbdb", fontFamily: "'Barlow', sans-serif", width: "200px" }}
+                        />
+                        <button
+                          type="submit"
+                          style={{ fontSize: "11px", padding: "4px 10px", borderRadius: "4px", border: "1px solid #d9dbdb", background: "#FFFFFF", color: "var(--camo-charcoal)", fontFamily: "'Barlow', sans-serif", cursor: "pointer" }}
+                        >
+                          Save
+                        </button>
+                      </form>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
                       <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" }}>

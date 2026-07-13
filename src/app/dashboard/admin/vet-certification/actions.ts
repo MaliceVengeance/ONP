@@ -64,6 +64,22 @@ export async function handleVetCertDecision(contractorId: string, formData: Form
   revalidatePath("/dashboard/admin/vet-certification");
 }
 
+// ── BBB Link (independent of the license/insurance approve-reject decision) ──
+
+export async function updateBbbLink(contractorId: string, formData: FormData) {
+  await requireRole(["ADMIN"]);
+
+  const bbb_url = (formData.get("bbb_url") as string | null)?.trim() || null;
+
+  const { error } = await supabaseAdmin
+    .from("contractor_profiles")
+    .update({ bbb_url })
+    .eq("contractor_id", contractorId);
+  if (error) throw new Error(`updateBbbLink failed: ${JSON.stringify(error)}`);
+
+  revalidatePath("/dashboard/admin/vet-certification");
+}
+
 // ── Directory Verification (License & Insurance) ─────────────────────────────
 
 export async function handleDirectoryDecision(contractorId: string, formData: FormData) {

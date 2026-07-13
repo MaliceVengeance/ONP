@@ -37,7 +37,7 @@ export default async function ContractorProfilePage({
 
   const { data: profile } = await supabase
     .from("contractor_profiles")
-    .select("contractor_id, business_name, city, state, categories, description, veteran_verified, directory_verified, is_listed")
+    .select("contractor_id, business_name, city, state, categories, description, veteran_verified, directory_verified, is_listed, bbb_url")
     .eq("contractor_id", id)
     .eq("is_listed", true)
     .eq("directory_verified", true)
@@ -82,6 +82,16 @@ export default async function ContractorProfilePage({
             </span>
           </div>
           <span style={eyebrow}>{[profile.city, profile.state].filter(Boolean).join(", ") || "Service area not listed"}</span>
+          <div style={{ fontSize: "0.82rem", color: "var(--camo-gunmetal)", marginTop: "8px" }}>
+            <span style={{ fontWeight: 600, color: "var(--camo-charcoal)" }}>BBB: </span>
+            {profile.bbb_url ? (
+              <a href={profile.bbb_url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
+                View BBB Profile →
+              </a>
+            ) : (
+              "No BBB report on file"
+            )}
+          </div>
         </div>
 
         {/* Categories */}
