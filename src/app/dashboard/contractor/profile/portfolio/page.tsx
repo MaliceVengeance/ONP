@@ -127,11 +127,13 @@ export default async function ContractorPortfolioPage() {
                 required
                 style={{ marginTop: "2px", accentColor: "var(--camo-accent)", flexShrink: 0 }}
               />
-              I own the rights to this photo, or have permission to share it, and agree it may be published on my
-              public {" "}<strong>ONP</strong> directory profile in accordance with the{" "}
-              <Link href="/terms" target="_blank" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
-                Terms of Service
-              </Link>.
+              <span>
+                I own the rights to this photo, or have permission to share it, and agree it may be published on my
+                public <strong>ONP</strong> directory profile in accordance with the{" "}
+                <Link href="/terms" target="_blank" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
+                  Terms of Service
+                </Link>.
+              </span>
             </label>
 
             <button
