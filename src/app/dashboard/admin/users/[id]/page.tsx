@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
+import { updateContractorVerification } from "./actions";
 
 type Project = {
   id: string;
@@ -70,7 +71,7 @@ export default async function AdminUserProfilePage({
       .select(
         "business_name, phone, address_line1, address_line2, city, state, address_zip, categories, description, is_listed, " +
         "veteran_applied_at, veteran_verified, veteran_verified_at, military_branch, " +
-        "license_number, license_expiry, coi_provider, coi_policy_number, coi_expiry, coi_amount, " +
+        "license_number, license_expiry, coi_provider, coi_policy_number, coi_expiry, coi_amount, bbb_url, " +
         "directory_verified, directory_verified_at, has_no_license, has_no_insurance"
       )
       .eq("contractor_id", userId)
@@ -182,6 +183,28 @@ export default async function AdminUserProfilePage({
     textTransform: "uppercase" as const,
     marginBottom: "14px",
     marginTop: 0,
+  };
+
+  const editLabelStyle = {
+    display: "block" as const,
+    fontSize: "11px",
+    color: "var(--camo-gunmetal)",
+    textTransform: "uppercase" as const,
+    letterSpacing: "1px",
+    marginBottom: "4px",
+  };
+
+  const editInputStyle = {
+    width: "100%",
+    background: "#FFFFFF",
+    border: "1px solid #d9dbdb",
+    color: "var(--camo-charcoal)",
+    borderRadius: "6px",
+    padding: "8px 10px",
+    fontFamily: "'Barlow', sans-serif",
+    fontSize: "13px",
+    outline: "none",
+    boxSizing: "border-box" as const,
   };
 
   function ProjectRow({ project }: { project: Project }) {
@@ -514,52 +537,65 @@ export default async function AdminUserProfilePage({
                     : "⏳ Not Yet Verified"}
                 </div>
 
-                <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>License Number</div>
-                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
-                      {(contractorProfile as any).has_no_license
-                        ? <span style={{ color: "#991B1B", fontStyle: "italic" }}>No license disclosed</span>
-                        : (contractorProfile as any).license_number || "—"}
+                {(contractorProfile as any).has_no_license && (
+                  <div style={{ fontSize: "12px", color: "#991B1B", fontStyle: "italic", marginBottom: "10px" }}>
+                    Contractor disclosed: no license
+                  </div>
+                )}
+                {(contractorProfile as any).has_no_insurance && (
+                  <div style={{ fontSize: "12px", color: "#991B1B", fontStyle: "italic", marginBottom: "10px" }}>
+                    Contractor disclosed: no insurance
+                  </div>
+                )}
+
+                <form action={updateContractorVerification.bind(null, userId)}>
+                  <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                    <div>
+                      <label style={editLabelStyle}>License Number</label>
+                      <input name="license_number" defaultValue={(contractorProfile as any).license_number ?? ""} style={editInputStyle} />
+                    </div>
+                    <div>
+                      <label style={editLabelStyle}>License Expiry</label>
+                      <input type="date" name="license_expiry" defaultValue={(contractorProfile as any).license_expiry ?? ""} style={editInputStyle} />
+                    </div>
+                    <div>
+                      <label style={editLabelStyle}>Insurance Provider</label>
+                      <input name="coi_provider" defaultValue={(contractorProfile as any).coi_provider ?? ""} style={editInputStyle} />
+                    </div>
+                    <div>
+                      <label style={editLabelStyle}>COI Policy #</label>
+                      <input name="coi_policy_number" defaultValue={(contractorProfile as any).coi_policy_number ?? ""} style={editInputStyle} />
+                    </div>
+                    <div>
+                      <label style={editLabelStyle}>COI Expiry</label>
+                      <input type="date" name="coi_expiry" defaultValue={(contractorProfile as any).coi_expiry ?? ""} style={editInputStyle} />
+                    </div>
+                    <div>
+                      <label style={editLabelStyle}>Coverage Amount ($)</label>
+                      <input type="number" name="coi_amount" defaultValue={(contractorProfile as any).coi_amount ?? ""} style={editInputStyle} />
+                    </div>
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <label style={editLabelStyle}>BBB Profile Link</label>
+                      <input type="url" name="bbb_url" defaultValue={(contractorProfile as any).bbb_url ?? ""} placeholder="https://www.bbb.org/us/..." style={editInputStyle} />
                     </div>
                   </div>
-                  <div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>License Expiry</div>
-                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
-                      {(contractorProfile as any).license_expiry
-                        ? new Date((contractorProfile as any).license_expiry).toLocaleDateString()
-                        : "—"}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Insurance Provider</div>
-                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
-                      {(contractorProfile as any).has_no_insurance
-                        ? <span style={{ color: "#991B1B", fontStyle: "italic" }}>No insurance disclosed</span>
-                        : (contractorProfile as any).coi_provider || "—"}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>COI Policy #</div>
-                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>{(contractorProfile as any).coi_policy_number || "—"}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>COI Expiry</div>
-                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
-                      {(contractorProfile as any).coi_expiry
-                        ? new Date((contractorProfile as any).coi_expiry).toLocaleDateString()
-                        : "—"}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Coverage Amount</div>
-                    <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>
-                      {(contractorProfile as any).coi_amount
-                        ? `$${Number((contractorProfile as any).coi_amount).toLocaleString()}`
-                        : "—"}
-                    </div>
-                  </div>
-                </div>
+                  <button
+                    type="submit"
+                    style={{
+                      background: "var(--camo-accent)",
+                      color: "var(--camo-ink)",
+                      border: "none",
+                      padding: "9px 20px",
+                      borderRadius: "6px",
+                      fontFamily: "'Barlow', sans-serif",
+                      fontWeight: 600,
+                      fontSize: "13px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Save Changes
+                  </button>
+                </form>
               </div>
             </div>
           ) : (
