@@ -200,46 +200,51 @@ export default async function BidDetailPage({
         </div>
       )}
 
-      {/* Contractor identity — sealed until this bid is awarded, matching the sealed-bid promise site-wide */}
+      {/* Contractor identity — sealed until the bidding window closes (revealed to the client
+          for every bid at that point, so bids can actually be compared and awarded), not gated
+          on award itself. Award-gating only applies to the reverse direction: the client's
+          identity being revealed to the awarded contractor, handled separately. */}
       <div style={card}>
         <div style={sectionLabel}>Contractor</div>
         <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "22px", color: "var(--camo-charcoal)", marginBottom: "4px" }}>
-          {isAwarded ? (contractorInfo?.business_name ?? "Unnamed business") : "Sealed until awarded"}
+          {unlocked ? (contractorInfo?.business_name ?? "Unnamed business") : "Sealed until bidding closes"}
         </div>
-        {isAwarded && (
+        {unlocked && (
           <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginBottom: "10px" }}>
             {[contractorInfo?.city, contractorInfo?.state].filter(Boolean).join(", ") || "Location not listed"}
           </div>
         )}
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px", marginBottom: "12px" }}>
-          {contractorInfo?.directory_verified ? (
-            <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" }}>
-              ✅ ONP Verified
-            </span>
-          ) : (
-            <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" }}>
-              ⏳ Verification Pending
-            </span>
-          )}
-          {contractorInfo?.veteran_verified && (
-            <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FFF7ED", color: "#B45309", border: "1px solid #D97706" }}>
-              ★ Veteran Owned
-            </span>
-          )}
-          {contractorInfo?.has_no_license && (
-            <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" }}>
-              ⚠ No License
-            </span>
-          )}
-          {contractorInfo?.has_no_insurance && (
-            <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" }}>
-              ⚠ No Insurance
-            </span>
-          )}
-        </div>
+        {unlocked && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "8px", marginBottom: "12px" }}>
+            {contractorInfo?.directory_verified ? (
+              <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" }}>
+                ✅ ONP Verified
+              </span>
+            ) : (
+              <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" }}>
+                ⏳ Verification Pending
+              </span>
+            )}
+            {contractorInfo?.veteran_verified && (
+              <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FFF7ED", color: "#B45309", border: "1px solid #D97706" }}>
+                ★ Veteran Owned
+              </span>
+            )}
+            {contractorInfo?.has_no_license && (
+              <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" }}>
+                ⚠ No License
+              </span>
+            )}
+            {contractorInfo?.has_no_insurance && (
+              <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" }}>
+                ⚠ No Insurance
+              </span>
+            )}
+          </div>
+        )}
 
-        {isAwarded && contractorInfo?.is_listed && contractorInfo?.directory_verified && (
+        {unlocked && contractorInfo?.is_listed && contractorInfo?.directory_verified && (
           <Link
             href={`/contractors/${contractorInfo.contractor_id}`}
             target="_blank"
@@ -249,9 +254,9 @@ export default async function BidDetailPage({
           </Link>
         )}
 
-        {/* BBB — sealed pre-award along with the rest of contractor identity, since a BBB
-            profile would typically name the business and defeat the sealed-bid promise. */}
-        {isAwarded && (
+        {/* BBB — revealed to the client alongside the rest of contractor identity once the
+            bidding window closes, same gate as everything else in this card. */}
+        {unlocked && (
           <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
             <span style={{ fontWeight: 600, color: "var(--camo-charcoal)" }}>BBB: </span>
             {contractorInfo?.bbb_url ? (
