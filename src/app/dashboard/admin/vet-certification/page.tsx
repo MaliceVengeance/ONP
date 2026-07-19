@@ -2,6 +2,14 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { handleVetCertDecision, handleDirectoryDecision, updateBbbLink } from "./actions";
+import { setCredentialVerified, deleteCredentialAdmin } from "../users/[id]/actions";
+
+const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
+  STATE_LICENSE: "State License",
+  CITY_REGISTRATION: "City Registration",
+  TRADE_LICENSE: "Trade-Specific License",
+  BOND: "Surety Bond",
+};
 
 type ContractorProfile = {
   contractor_id: string;
@@ -61,7 +69,7 @@ export default async function VetCertificationPage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const sp = await searchParams;
-  const tab = sp.tab === "directory" ? "directory" : "veteran";
+  const tab = sp.tab === "directory" ? "directory" : sp.tab === "credentials" ? "credentials" : "veteran";
 
   await requireRole(["ADMIN"]);
 
@@ -87,6 +95,22 @@ export default async function VetCertificationPage({
   );
   const dirApproved = profiles.filter((p) => p.directory_verified);
 
+  const { data: credData, error: credError } = await supabaseAdmin
+    .from("contractor_credentials")
+    .select("id, contractor_id, credential_type, state, city, credential_number, issuing_authority, trade, expiration_date, bond_amount_cents, bonding_company, verified, created_at")
+    .order("created_at", { ascending: true });
+
+  if (credError) throw credError;
+
+  const profileLookup = new Map(profiles.map((p) => [p.contractor_id, p]));
+  const credentials = (credData ?? []).map((c) => ({
+    ...c,
+    business_name: profileLookup.get(c.contractor_id)?.business_name ?? null,
+  }));
+
+  const credPending  = credentials.filter((c) => !c.verified);
+  const credApproved = credentials.filter((c) => c.verified);
+
   const tabStyle = (active: boolean) =>
     ({
       padding: "10px 20px",
@@ -110,7 +134,7 @@ export default async function VetCertificationPage({
             Contractor Verification
           </h1>
           <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
-            {dirPending.length} directory pending · {vetPending.length} veteran pending
+            {dirPending.length} directory pending · {vetPending.length} veteran pending · {credPending.length} credentials pending
           </p>
         </div>
         <Link href="/dashboard/admin" style={{ background: "transparent", color: "var(--camo-gunmetal)", border: "1px solid #d9dbdb", padding: "8px 16px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontSize: "13px", textDecoration: "none" }}>
@@ -138,6 +162,14 @@ export default async function VetCertificationPage({
           {vetPending.length > 0 && (
             <span style={{ marginLeft: "8px", background: tab === "veteran" ? "#fff" : "var(--camo-accent)", color: tab === "veteran" ? "var(--camo-accent)" : "var(--camo-ink)", borderRadius: "20px", padding: "1px 7px", fontSize: "11px" }}>
               {vetPending.length}
+            </span>
+          )}
+        </Link>
+        <Link href="/dashboard/admin/vet-certification?tab=credentials" style={tabStyle(tab === "credentials")}>
+          📜 Licenses & Bonding
+          {credPending.length > 0 && (
+            <span style={{ marginLeft: "8px", background: tab === "credentials" ? "#fff" : "var(--camo-accent)", color: tab === "credentials" ? "var(--camo-accent)" : "var(--camo-ink)", borderRadius: "20px", padding: "1px 7px", fontSize: "11px" }}>
+              {credPending.length}
             </span>
           )}
         </Link>
@@ -441,6 +473,120 @@ export default async function VetCertificationPage({
                           style={{ fontSize: "11px", padding: "4px 10px", borderRadius: "4px", border: "1px solid #FCA5A5", background: "#FEF2F2", color: "#991B1B", fontFamily: "'Barlow', sans-serif", cursor: "pointer" }}
                         >
                           Revoke Certification
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Licenses & Bonding Tab ──────────────────────────────────────── */}
+      {tab === "credentials" && (
+        <div>
+          <div style={{ marginBottom: "32px" }}>
+            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: credPending.length > 0 ? "#92400E" : "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "12px" }}>
+              Pending Review ({credPending.length})
+            </h2>
+
+            {credPending.length === 0 ? (
+              <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "24px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
+                No pending credential submissions.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {credPending.map((c) => (
+                  <div key={c.id} style={{ background: "var(--camo-concrete)", border: "1px solid #FCD34D", borderRadius: "10px", padding: "18px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "10px", flexWrap: "wrap" }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)" }}>
+                          {c.business_name ?? "No business name set"}
+                        </div>
+                        <Link href={`/dashboard/admin/users/${c.contractor_id}`} style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
+                          View full contractor profile →
+                        </Link>
+                      </div>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <form action={setCredentialVerified.bind(null, c.contractor_id, c.id)}>
+                          <input type="hidden" name="verify" value="true" />
+                          <button type="submit" style={{ background: "#F0FDF4", color: "#15803D", border: "1px solid #166534", padding: "6px 14px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}>
+                            ✅ Verify
+                          </button>
+                        </form>
+                        <form action={deleteCredentialAdmin.bind(null, c.contractor_id, c.id)}>
+                          <button type="submit" style={{ background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5", padding: "6px 14px", borderRadius: "6px", fontFamily: "'Barlow', sans-serif", fontWeight: 600, fontSize: "12px", cursor: "pointer" }}>
+                            ✗ Delete
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                    <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", fontSize: "12px" }}>
+                      <div>
+                        <div style={{ color: "var(--camo-gunmetal)" }}>Type</div>
+                        <div style={{ color: "var(--camo-charcoal)" }}>
+                          {CREDENTIAL_TYPE_LABELS[c.credential_type] ?? c.credential_type}
+                          {c.trade && ` · ${c.trade}`}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--camo-gunmetal)" }}>State/City</div>
+                        <div style={{ color: "var(--camo-charcoal)" }}>{[c.state, c.city].filter(Boolean).join(" / ") || "—"}</div>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--camo-gunmetal)" }}>Number</div>
+                        <div style={{ color: "var(--camo-charcoal)" }}>{c.credential_number || "—"}</div>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--camo-gunmetal)" }}>Authority</div>
+                        <div style={{ color: "var(--camo-charcoal)" }}>{c.issuing_authority || "—"}</div>
+                      </div>
+                      <div>
+                        <div style={{ color: "var(--camo-gunmetal)" }}>Expires</div>
+                        <div style={{ color: "var(--camo-charcoal)" }}>{formatDate(c.expiration_date)}</div>
+                      </div>
+                      {c.credential_type === "BOND" && (
+                        <div>
+                          <div style={{ color: "var(--camo-gunmetal)" }}>Bond</div>
+                          <div style={{ color: "var(--camo-charcoal)" }}>
+                            {c.bond_amount_cents ? fmtMoney(c.bond_amount_cents / 100) : "—"}
+                            {c.bonding_company && ` via ${c.bonding_company}`}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {credApproved.length > 0 && (
+            <div>
+              <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
+              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "18px", letterSpacing: "1px", color: "var(--camo-gunmetal)", textTransform: "uppercase", marginBottom: "12px" }}>
+                Verified ({credApproved.length})
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {credApproved.map((c) => (
+                  <div key={c.id} className="mob-card-stack" style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>{c.business_name ?? "No name"}</div>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
+                        {CREDENTIAL_TYPE_LABELS[c.credential_type] ?? c.credential_type}
+                        {c.trade && ` · ${c.trade}`} · {[c.state, c.city].filter(Boolean).join(", ") || "—"}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+                      <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" }}>
+                        ✅ Verified
+                      </span>
+                      <form action={setCredentialVerified.bind(null, c.contractor_id, c.id)}>
+                        <input type="hidden" name="verify" value="false" />
+                        <button type="submit" style={{ fontSize: "11px", padding: "4px 10px", borderRadius: "4px", border: "1px solid #FCA5A5", background: "#FEF2F2", color: "#991B1B", fontFamily: "'Barlow', sans-serif", cursor: "pointer" }}>
+                          Unverify
                         </button>
                       </form>
                     </div>

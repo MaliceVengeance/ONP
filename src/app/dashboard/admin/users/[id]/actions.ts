@@ -55,6 +55,7 @@ export async function setCredentialVerified(contractorId: string, credentialId: 
   if (error) throw new Error(`setCredentialVerified failed: ${JSON.stringify(error)}`);
 
   revalidatePath(`/dashboard/admin/users/${contractorId}`);
+  revalidatePath("/dashboard/admin/vet-certification");
 }
 
 export async function deleteCredentialAdmin(contractorId: string, credentialId: string) {
@@ -64,4 +65,5 @@ export async function deleteCredentialAdmin(contractorId: string, credentialId: 
   if (error) throw new Error(`deleteCredentialAdmin failed: ${JSON.stringify(error)}`);
 
   revalidatePath(`/dashboard/admin/users/${contractorId}`);
+  revalidatePath("/dashboard/admin/vet-certification");
 }
