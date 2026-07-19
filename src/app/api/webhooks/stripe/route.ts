@@ -11,6 +11,32 @@ import {
   sendInspectorUpgradeConfirmedEmail,
 } from "@/lib/email";
 
+/**
+ * Derives billing display fields from a Stripe subscription's current item.
+ * interval_count distinguishes a committed-term phase (month, interval_count
+ * 3/6/12 — one upfront charge covering the whole term) from plain monthly
+ * billing (month, interval_count 1) — Stripe's `interval` string alone can't
+ * tell them apart, both are "month".
+ */
+function getBillingFields(sub: any) {
+  const item = sub.items?.data?.[0];
+  const intervalRaw = item?.price?.recurring?.interval ?? "month";
+  const intervalCount = item?.price?.recurring?.interval_count ?? 1;
+  const intervalMap: Record<string, string> = {
+    month: "MONTHLY",
+    quarter: "QUARTERLY",
+    year: "YEARLY",
+  };
+  const planInterval = intervalMap[intervalRaw] ?? "MONTHLY";
+  const priceCents = item?.price?.unit_amount ?? 0;
+  const termMonths = intervalRaw === "month" && [3, 6, 12].includes(intervalCount) ? intervalCount : null;
+  const commitmentEndsAt = termMonths && item?.current_period_end
+    ? new Date(item.current_period_end * 1000).toISOString()
+    : null;
+
+  return { priceCents, planInterval, termMonths, commitmentEndsAt };
+}
+
 function getPeriodEnd(sub: any): string {
   const raw =
     sub.current_period_end ??
@@ -386,6 +412,7 @@ export async function POST(req: NextRequest) {
         // ── Contractor subscription ───────────────────────────
         const contractorId = session.metadata?.contractor_id;
         const planType = session.metadata?.plan_type;
+        const term = session.metadata?.term;
         const customerId = session.customer;
         const subscriptionId = session.subscription;
 
@@ -397,15 +424,7 @@ export async function POST(req: NextRequest) {
         const sub = await stripe.subscriptions.retrieve(subscriptionId) as any;
         console.log("SUB OBJECT:", JSON.stringify(sub, null, 2));
 
-        const item = sub.items?.data?.[0];
-        const intervalRaw = item?.price?.recurring?.interval ?? "month";
-        const intervalMap: Record<string, string> = {
-          month: "MONTHLY",
-          quarter: "QUARTERLY",
-          year: "YEARLY",
-        };
-        const planInterval = intervalMap[intervalRaw] ?? "MONTHLY";
-        const priceCents = item?.price?.unit_amount ?? 0;
+        const { priceCents, planInterval, termMonths, commitmentEndsAt } = getBillingFields(sub);
         const currency = (sub.currency ?? "usd").toUpperCase();
         const periodStart = sub.current_period_start
           ? new Date(sub.current_period_start * 1000).toISOString()
@@ -426,6 +445,8 @@ export async function POST(req: NextRequest) {
               status: "ACTIVE",
               current_period_start: periodStart,
               current_period_end: periodEnd,
+              term_months: termMonths,
+              commitment_ends_at: commitmentEndsAt,
               updated_at: new Date().toISOString(),
             },
             { onConflict: "contractor_id" }
@@ -434,6 +455,46 @@ export async function POST(req: NextRequest) {
         if (upsertError) {
           console.error("Supabase upsert error:", JSON.stringify(upsertError));
           throw new Error(`Supabase upsert failed: ${upsertError.message}`);
+        }
+
+        // Term commitment (3/6/12mo) — attach a Subscription Schedule so the
+        // subscription auto-transitions, after this committed phase completes,
+        // into ongoing monthly billing at the standard rate (not a re-
+        // commitment to the same term, and not the discounted per-month-
+        // equivalent rate — the discount was a reward for the upfront
+        // commitment and doesn't carry forward).
+        if (term === "3" || term === "6" || term === "12") {
+          try {
+            const schedule = await stripe.subscriptionSchedules.create({
+              from_subscription: subscriptionId,
+            });
+            const currentPhase = schedule.phases[0];
+            const monthlyPriceId = planType === "veteran" ? process.env.STRIPE_VETERAN_PRICE_ID! : process.env.STRIPE_STANDARD_PRICE_ID!;
+
+            await stripe.subscriptionSchedules.update(schedule.id, {
+              end_behavior: "release",
+              phases: [
+                {
+                  items: currentPhase.items.map((i: any) => ({
+                    price: typeof i.price === "string" ? i.price : i.price.id,
+                    quantity: i.quantity,
+                  })),
+                  start_date: currentPhase.start_date,
+                  end_date: currentPhase.end_date,
+                },
+                {
+                  items: [{ price: monthlyPriceId, quantity: 1 }],
+                },
+              ],
+            });
+            console.log(`Subscription schedule created for contractor ${contractorId}: ${term}mo term -> monthly standard rate`);
+          } catch (scheduleErr) {
+            // Non-fatal — the term charge already succeeded and the subscription
+            // is active either way; a failed schedule just means it won't
+            // auto-transition and needs manual follow-up rather than silently
+            // over- or under-charging anyone.
+            console.error("Subscription schedule creation failed (non-fatal, needs manual follow-up):", scheduleErr);
+          }
         }
 
         console.log(`Subscription activated for contractor ${contractorId}`);
@@ -452,11 +513,23 @@ export async function POST(req: NextRequest) {
 
         if (!existing?.contractor_id) break;
 
+        // Refresh price/term fields too, not just status/period — this is what
+        // picks up a Subscription Schedule's phase transition (term commitment
+        // -> ongoing standard-rate monthly), which fires this same event since
+        // the underlying subscription's price changes when the schedule
+        // advances phases. term_months naturally clears back to null once the
+        // item's interval_count returns to 1 (plain monthly).
+        const { priceCents, planInterval, termMonths, commitmentEndsAt } = getBillingFields(sub);
+
         await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
             status: sub.status.toUpperCase(),
             current_period_end: getPeriodEnd(sub),
+            price_cents: priceCents,
+            plan_interval: planInterval,
+            term_months: termMonths,
+            commitment_ends_at: commitmentEndsAt,
             updated_at: new Date().toISOString(),
           })
           .eq("stripe_customer_id", customerId);

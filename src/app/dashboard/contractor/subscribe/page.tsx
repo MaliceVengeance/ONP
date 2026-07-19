@@ -33,7 +33,7 @@ export default async function ContractorSubscribePage({
 
   const { data: subscription } = await supabase
   .from("contractor_subscriptions")
-  .select("status, plan_type, current_period_end, price_cents, plan_interval, cancel_at_period_end")
+  .select("status, plan_type, current_period_end, price_cents, plan_interval, cancel_at_period_end, term_months, commitment_ends_at")
   .eq("contractor_id", user.id)
   .maybeSingle();
 
@@ -180,9 +180,16 @@ export default async function ContractorSubscribePage({
               </div>
               <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
                 {subscription.price_cents
-                  ? `$${(subscription.price_cents / 100).toFixed(0)}/month`
+                  ? subscription.term_months
+                    ? `$${(subscription.price_cents / 100).toFixed(2)} for ${subscription.term_months} months`
+                    : `$${(subscription.price_cents / 100).toFixed(0)}/month`
                   : "—"}
               </div>
+              {subscription.term_months && subscription.commitment_ends_at && (
+                <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
+                  Commitment ends {fmtDate(subscription.commitment_ends_at)}, then auto-renews monthly at the standard rate.
+                </div>
+              )}
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{
@@ -365,6 +372,24 @@ export default async function ContractorSubscribePage({
             </div>
             <form action={createCheckoutSession.bind(null, "standard")}>
               <input type="hidden" name="coupon_code" defaultValue="" />
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "14px" }}>
+                {[
+                  { value: "monthly", label: "Monthly", detail: "$200/mo, no commitment" },
+                  { value: "3", label: "3-Month Term", detail: "$570 total (~$190/mo — 5% off)" },
+                  { value: "6", label: "6-Month Term", detail: "$1,080 total (~$180/mo — 10% off)" },
+                  { value: "12", label: "12-Month Term", detail: "$2,000 total (~$166/mo — ~17% off, 2 months free)" },
+                ].map((opt, idx) => (
+                  <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "var(--camo-charcoal)", cursor: "pointer" }}>
+                    <input type="radio" name="term" value={opt.value} defaultChecked={idx === 0} style={{ accentColor: "var(--camo-accent)" }} />
+                    <strong>{opt.label}</strong> — {opt.detail}
+                  </label>
+                ))}
+              </div>
+              <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "14px", background: "var(--camo-paper)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "8px 10px" }}>
+                After a 3/6/12-month commitment ends, your subscription automatically renews monthly at the standard rate ($200) until you cancel. No refunds for the prepaid commitment period.
+              </div>
+
               <button type="submit" style={{
                 width: "100%",
                 background: "var(--camo-accent)",
@@ -378,7 +403,7 @@ export default async function ContractorSubscribePage({
                 cursor: "pointer",
                 letterSpacing: "0.5px",
               }}>
-                Subscribe — $200/month
+                Subscribe
               </button>
             </form>
           </div>
@@ -446,6 +471,24 @@ export default async function ContractorSubscribePage({
               </div>
               <form action={createCheckoutSession.bind(null, "veteran")}>
                 <input type="hidden" name="coupon_code" defaultValue="" />
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "14px" }}>
+                  {[
+                    { value: "monthly", label: "Monthly", detail: "$150/mo, no commitment" },
+                    { value: "3", label: "3-Month Term", detail: "$427.50 total (~$142.50/mo — 5% off)" },
+                    { value: "6", label: "6-Month Term", detail: "$810 total (~$135/mo — 10% off)" },
+                    { value: "12", label: "12-Month Term", detail: "$1,500 total (~$125/mo — ~17% off, 2 months free)" },
+                  ].map((opt, idx) => (
+                    <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#92400E", cursor: "pointer" }}>
+                      <input type="radio" name="term" value={opt.value} defaultChecked={idx === 0} style={{ accentColor: "#D97706" }} />
+                      <strong>{opt.label}</strong> — {opt.detail}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ fontSize: "11px", color: "#92400E", lineHeight: 1.6, marginBottom: "14px", background: "#FFFFFF", border: "1px solid #FCD34D", borderRadius: "6px", padding: "8px 10px" }}>
+                  After a 3/6/12-month commitment ends, your subscription automatically renews monthly at the standard rate ($150) until you cancel. No refunds for the prepaid commitment period.
+                </div>
+
                 <button type="submit" style={{
                   width: "100%",
                   background: "#D97706",
@@ -459,7 +502,7 @@ export default async function ContractorSubscribePage({
                   cursor: "pointer",
                   letterSpacing: "0.5px",
                 }}>
-                  ★ Subscribe — $150/month
+                  ★ Subscribe
                 </button>
               </form>
             </div>

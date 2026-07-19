@@ -2,12 +2,16 @@
 
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
-import { stripe, PRICES } from "@/lib/stripe";
+import { stripe, PRICES, TERM_PRICES, type SubscriptionTerm } from "@/lib/stripe";
 
 export async function createCheckoutSession(planType: "standard" | "veteran", formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
-  // Security check — verify veteran status server-side
+  // Security check — verify veteran status server-side. This gate covers every
+  // veteran-tier price (monthly and all three term options below), since it's
+  // keyed on planType rather than the specific price chosen — a longer-term
+  // veteran price can't be purchased without verification any more than the
+  // monthly one could.
   const { data: profile } = await supabase
     .from("contractor_profiles")
     .select("veteran_verified, business_name")
@@ -18,7 +22,10 @@ export async function createCheckoutSession(planType: "standard" | "veteran", fo
     throw new Error("Veteran plan requires verified veteran status.");
   }
 
-  const priceId = planType === "veteran" ? PRICES.veteran : PRICES.standard;
+  const termRaw = String(formData.get("term") ?? "monthly");
+  const term: SubscriptionTerm = termRaw === "3" || termRaw === "6" || termRaw === "12" ? termRaw : "monthly";
+
+  const priceId = term === "monthly" ? PRICES[planType] : TERM_PRICES[planType][term];
 
   // Optional coupon code
   const couponCodeRaw = String(formData.get("coupon_code") ?? "").trim().toUpperCase();
@@ -76,6 +83,7 @@ export async function createCheckoutSession(planType: "standard" | "veteran", fo
     metadata: {
       contractor_id: user.id,
       plan_type: planType,
+      term,
     },
   });
 
@@ -102,10 +110,41 @@ export async function cancelSubscription() {
     throw new Error("Subscription is not active.");
   }
 
-  // Cancel at period end in Stripe — contractor keeps access until renewal date
-  await stripe.subscriptions.update(sub.stripe_subscription_id, {
-    cancel_at_period_end: true,
-  });
+  // Cancel at period end — contractor keeps access through the already-paid
+  // period, auto-renewal simply turns off. If a term (3/6/12mo) commitment is
+  // still in its committed phase, that phase is billed as ONE upfront charge
+  // covering the whole term, managed by a Subscription Schedule rather than
+  // plain cancel_at_period_end — cancelling there means removing the
+  // already-scheduled phase 2 (the post-term monthly auto-renewal) and letting
+  // the current, already-paid phase run out on its own, not truncating access
+  // early. Once a term's committed phase completes, Stripe releases the
+  // subscription from its schedule automatically (schedule field goes null),
+  // at which point it's a plain monthly subscription and the normal
+  // cancel_at_period_end path below applies.
+  const currentSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+
+  if (currentSub.schedule) {
+    const scheduleId = typeof currentSub.schedule === "string" ? currentSub.schedule : currentSub.schedule.id;
+    const schedule = await stripe.subscriptionSchedules.retrieve(scheduleId);
+    const currentPhase = schedule.phases.find(
+      (p) => p.start_date <= Math.floor(Date.now() / 1000) && (!p.end_date || p.end_date > Math.floor(Date.now() / 1000))
+    ) ?? schedule.phases[0];
+
+    await stripe.subscriptionSchedules.update(scheduleId, {
+      end_behavior: "cancel",
+      phases: [
+        {
+          items: currentPhase.items.map((i) => ({ price: typeof i.price === "string" ? i.price : i.price.id, quantity: i.quantity })),
+          start_date: currentPhase.start_date,
+          end_date: currentPhase.end_date ?? undefined,
+        },
+      ],
+    });
+  } else {
+    await stripe.subscriptions.update(sub.stripe_subscription_id, {
+      cancel_at_period_end: true,
+    });
+  }
 
   // Mark as pending cancellation — keep ACTIVE so bidding still works
   // Stripe webhook will flip to CANCELED when it actually expires
