@@ -644,6 +644,57 @@ export async function sendAdminInspectorRequestEmail({
   });
 }
 
+export async function sendCredentialSubmittedAdminEmail({
+  adminEmail,
+  businessName,
+  credentialType,
+  trade,
+  state,
+  city,
+  contractorId,
+}: {
+  adminEmail: string;
+  businessName: string;
+  credentialType: string;
+  trade: string | null;
+  state: string | null;
+  city: string | null;
+  contractorId: string;
+}) {
+  const location = [city, state].filter(Boolean).join(", ") || "location not set";
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[ACTION REQUIRED] New Credential Submitted — ${businessName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">📜 New License/Bonding Credential Pending Review</h2>
+          <p style="color: #FDE68A;">A contractor submitted a credential that needs verification.</p>
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin: 16px 0;">
+            <h3 style="color: #fff; margin: 0 0 8px;">${businessName}</h3>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 ${location}</p>
+            <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📄 ${credentialType}${trade ? ` · ${trade}` : ""}</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/vet-certification?tab=credentials"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Review Credential
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          ONP Admin · Contractor ID: ${contractorId}
+        </p>
+      </div>
+    `,
+  });
+}
+
 // ── Dispute emails ────────────────────────────────────────────────────────────
 
 export async function sendDisputeSubmittedClientEmail({

@@ -18,6 +18,7 @@ export default async function AdminDashboard() {
     { count: masterInspectorCount },
     { count: flaggedInspectorCount },
     { count: waitlistCount },
+    { count: credCount },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
     supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
@@ -30,6 +31,7 @@ export default async function AdminDashboard() {
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).eq("is_master_inspector", true),
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).eq("upgrade_blocked", true).eq("role", "INSPECTOR"),
     supabaseAdmin.from("service_area_waitlist").select("id", { count: "exact", head: true }).is("notified_at", null),
+    supabaseAdmin.from("contractor_credentials").select("id", { count: "exact", head: true }).eq("verified", false),
   ]);
 
   const inspectorFeatureEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
@@ -58,6 +60,14 @@ export default async function AdminDashboard() {
       stat: vetCount ?? 0,
       statLabel: "pending reviews",
       accent: (vetCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
+    },
+    {
+      title: "Licenses & Bonding",
+      description: "Review state licenses, city registrations, trade licenses, and bonds submitted by contractors.",
+      href: "/dashboard/admin/vet-certification?tab=credentials",
+      stat: credCount ?? 0,
+      statLabel: "pending reviews",
+      accent: (credCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Support Requests",
