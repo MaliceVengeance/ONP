@@ -19,6 +19,7 @@ export default async function AdminDashboard() {
     { count: flaggedInspectorCount },
     { count: waitlistCount },
     { count: credCount },
+    { data: dirCandidates },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
     supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
@@ -32,7 +33,14 @@ export default async function AdminDashboard() {
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).eq("upgrade_blocked", true).eq("role", "INSPECTOR"),
     supabaseAdmin.from("service_area_waitlist").select("id", { count: "exact", head: true }).is("notified_at", null),
     supabaseAdmin.from("contractor_credentials").select("id", { count: "exact", head: true }).eq("verified", false),
+    // Directory pending has no simple column filter (mirrors contractor-verification page's
+    // JS-side logic: not yet verified, listed, and has submitted license or COI info).
+    supabaseAdmin.from("contractor_profiles").select("directory_verified, is_listed, license_number, coi_provider"),
   ]);
+
+  const dirPendingCount = (dirCandidates ?? []).filter(
+    (p) => !p.directory_verified && p.is_listed && (p.license_number || p.coi_provider)
+  ).length;
 
   const inspectorFeatureEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
 
@@ -62,12 +70,12 @@ export default async function AdminDashboard() {
       accent: (vetCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
-      title: "Licenses & Bonding",
-      description: "Review state licenses, city registrations, trade licenses, and bonds submitted by contractors.",
-      href: "/dashboard/admin/vet-certification?tab=credentials",
-      stat: credCount ?? 0,
+      title: "Contractor Verification",
+      description: "Directory (license & insurance) and licenses/bonding review for contractors.",
+      href: "/dashboard/admin/contractor-verification",
+      stat: dirPendingCount + (credCount ?? 0),
       statLabel: "pending reviews",
-      accent: (credCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
+      accent: dirPendingCount + (credCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Support Requests",
