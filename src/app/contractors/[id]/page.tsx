@@ -12,6 +12,13 @@ const eyebrow: React.CSSProperties = {
   color: "var(--camo-gunmetal)",
 };
 
+const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
+  STATE_LICENSE: "State License",
+  CITY_REGISTRATION: "City Registration",
+  TRADE_LICENSE: "Trade-Specific License",
+  BOND: "Surety Bond",
+};
+
 export default async function ContractorProfilePage({
   params,
 }: {
@@ -55,6 +62,14 @@ export default async function ContractorProfilePage({
     ...p,
     url: supabase.storage.from("contractor-portfolio").getPublicUrl(p.storage_path).data.publicUrl,
   }));
+
+  const { data: credentialRows } = await supabase
+    .from("contractor_credentials")
+    .select("id, credential_type, state, city, credential_number, issuing_authority, trade, expiration_date")
+    .eq("contractor_id", id)
+    .eq("verified", true)
+    .order("created_at", { ascending: false });
+  const credentials = credentialRows ?? [];
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
@@ -123,6 +138,30 @@ export default async function ContractorProfilePage({
                   {p.caption && (
                     <div style={{ padding: "8px 10px", fontSize: "0.78rem", color: "var(--camo-gunmetal)" }}>{p.caption}</div>
                   )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Licenses, registrations & bonding */}
+        {credentials.length > 0 && (
+          <div style={{ marginBottom: "40px" }}>
+            <span style={{ ...eyebrow, display: "block", marginBottom: "12px" }}>LICENSES &amp; BONDING</span>
+            <div style={{ background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: "6px", padding: "12px 14px", marginBottom: "14px", fontSize: "0.78rem", color: "#92400E", lineHeight: 1.6 }}>
+              Insurance protects you if something goes wrong on the job. A bond guarantees the contractor will follow through on their obligations, and gives you recourse if they don&apos;t.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {credentials.map((c) => (
+                <div key={c.id} style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "10px 14px", fontSize: "0.82rem" }}>
+                  <div style={{ fontWeight: 700, color: "var(--camo-charcoal)" }}>
+                    {CREDENTIAL_TYPE_LABELS[c.credential_type] ?? c.credential_type}
+                    {c.trade && ` · ${c.trade}`}
+                  </div>
+                  <div style={{ color: "var(--camo-gunmetal)" }}>
+                    {[c.city, c.state].filter(Boolean).join(", ")}
+                    {c.issuing_authority && ` · ${c.issuing_authority}`}
+                  </div>
                 </div>
               ))}
             </div>

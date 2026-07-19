@@ -2,6 +2,13 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
+const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
+  STATE_LICENSE: "State License",
+  CITY_REGISTRATION: "City Registration",
+  TRADE_LICENSE: "Trade-Specific License",
+  BOND: "Surety Bond",
+};
+
 type LineItem = {
   id: string;
   description: string;
@@ -156,6 +163,13 @@ export default async function BidDetailPage({
     .maybeSingle();
   const contractorInfo = contractor as ContractorInfo | null;
 
+  const { data: credentialRows } = await supabaseAdmin
+    .from("contractor_credentials")
+    .select("id, credential_type, state, city, credential_number, issuing_authority, trade, expiration_date, bond_amount_cents, bonding_company, verified")
+    .eq("contractor_id", bidRow.contractor_id)
+    .order("created_at", { ascending: false });
+  const credentials = credentialRows ?? [];
+
   const { data: awardRows } = await supabaseAdmin
     .from("project_awards")
     .select("bid_id, awarded_at")
@@ -178,7 +192,6 @@ export default async function BidDetailPage({
   // so it must never be silently replaced by a computed line-item subtotal.
   const totalCents = Number(version?.amount_cents ?? 0);
 
-  const licenseExpired = isExpired(contractorInfo?.license_expiry ?? null);
   const coiExpired = isExpired(contractorInfo?.coi_expiry ?? null);
   const displayIndex = sp.index ? `#${sp.index}` : null;
 
@@ -269,13 +282,7 @@ export default async function BidDetailPage({
           </div>
         )}
 
-        <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px" }}>
-          <div>
-            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>License Expires</div>
-            <div style={{ color: licenseExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
-              {formatDate(contractorInfo?.license_expiry)}{licenseExpired && " ⚠ Expired"}
-            </div>
-          </div>
+        <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px", marginBottom: unlocked && credentials.length > 0 ? "16px" : 0 }}>
           <div>
             <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
             <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
@@ -283,6 +290,56 @@ export default async function BidDetailPage({
             </div>
           </div>
         </div>
+
+        {/* Licenses, registrations & bonding — flexible per-credential list, since a single
+            license field can't represent either El Paso or Las Cruces requirements correctly. */}
+        {unlocked && credentials.length > 0 && (
+          <div style={{ borderTop: "1px solid #d9dbdb", paddingTop: "12px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>
+              Licenses, Registrations & Bonding
+            </div>
+            <div style={{ background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: "6px", padding: "10px 12px", marginBottom: "10px", fontSize: "11px", color: "#92400E", lineHeight: 1.6 }}>
+              Insurance protects you if something goes wrong on the job. A bond guarantees the contractor will follow through on their obligations, and gives you recourse if they don&apos;t.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {credentials.map((c) => {
+                const expired = c.expiration_date ? new Date(c.expiration_date).getTime() < Date.now() : false;
+                return (
+                  <div key={c.id} style={{ background: "#FFFFFF", border: "1px solid #d9dbdb", borderRadius: "6px", padding: "10px 12px", fontSize: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "4px" }}>
+                      <span style={{ fontWeight: 700, color: "var(--camo-charcoal)" }}>
+                        {CREDENTIAL_TYPE_LABELS[c.credential_type] ?? c.credential_type}
+                      </span>
+                      {c.trade && <span style={{ color: "var(--camo-gunmetal)" }}>· {c.trade}</span>}
+                      {c.verified ? (
+                        <span style={{ fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "20px", background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" }}>
+                          ✅ Verified
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: "10px", fontWeight: 600, padding: "2px 8px", borderRadius: "20px", background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" }}>
+                          ⏳ Pending Review
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ color: "var(--camo-gunmetal)" }}>
+                      {[c.city, c.state].filter(Boolean).join(", ")}
+                      {c.issuing_authority && ` · ${c.issuing_authority}`}
+                      {c.credential_number && ` · #${c.credential_number}`}
+                      {c.expiration_date && ` · Expires ${formatDate(c.expiration_date)}`}
+                      {expired && <span style={{ color: "#991B1B" }}> ⚠ Expired</span>}
+                    </div>
+                    {c.credential_type === "BOND" && (c.bond_amount_cents || c.bonding_company) && (
+                      <div style={{ color: "var(--camo-gunmetal)", marginTop: "2px" }}>
+                        {c.bond_amount_cents && `$${(c.bond_amount_cents / 100).toLocaleString()} bond`}
+                        {c.bonding_company && ` via ${c.bonding_company}`}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Itemized line items */}

@@ -196,9 +196,8 @@ export default async function ContractorDirectoryPage({
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: filtered.length > 0 ? "16px" : 0 }}>
             {filtered.map((c) => {
-              const licenseExpired = isExpired(c.license_expiry);
               const coiExpired = isExpired(c.coi_expiry);
-              const hasIssues = licenseExpired || coiExpired;
+              const hasIssues = coiExpired;
 
               return (
                 <div key={c.contractor_id} style={{ position: "relative", overflow: "hidden", background: "var(--camo-concrete)", border: `1px solid ${c.veteran_verified ? "var(--camo-accent)" : "#d9dbdb"}`, borderRadius: "8px", padding: "24px" }}>
@@ -255,10 +254,6 @@ export default async function ContractorDirectoryPage({
                   )}
 
                   <div style={{ position: "relative", display: "flex", gap: "16px", fontSize: "0.72rem", color: "var(--camo-gunmetal)", flexWrap: "wrap" }}>
-                    <span style={{ color: licenseExpired ? "#B45050" : "var(--camo-gunmetal)" }}>
-                      License: {c.license_expiry ? new Date(c.license_expiry).toLocaleDateString() : "—"}
-                      {licenseExpired && " ⚠"}
-                    </span>
                     <span style={{ color: coiExpired ? "#B45050" : "var(--camo-gunmetal)" }}>
                       COI: {c.coi_expiry ? new Date(c.coi_expiry).toLocaleDateString() : "—"}
                       {coiExpired && " ⚠"}

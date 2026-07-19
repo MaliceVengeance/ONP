@@ -93,6 +93,22 @@ export default async function ContractorProfilePage({
             📷 Portfolio Photos
           </Link>
           <Link
+            href="/dashboard/contractor/profile/credentials"
+            style={{
+              background: "transparent",
+              color: "var(--camo-charcoal)",
+              border: "1px solid var(--camo-gunmetal)",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+            }}
+          >
+            📜 Licenses & Bonding
+          </Link>
+          <Link
             href="/dashboard/contractor"
             style={{
               background: "transparent",

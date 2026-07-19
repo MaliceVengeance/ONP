@@ -37,3 +37,31 @@ export async function updateContractorVerification(contractorId: string, formDat
 
   revalidatePath(`/dashboard/admin/users/${contractorId}`);
 }
+
+export async function setCredentialVerified(contractorId: string, credentialId: string, formData: FormData) {
+  const { user } = await requireRole(["ADMIN"]);
+
+  const verify = formData.get("verify") === "true";
+
+  const { error } = await supabaseAdmin
+    .from("contractor_credentials")
+    .update(
+      verify
+        ? { verified: true, verified_at: new Date().toISOString(), verified_by: user.id }
+        : { verified: false, verified_at: null, verified_by: null }
+    )
+    .eq("id", credentialId);
+
+  if (error) throw new Error(`setCredentialVerified failed: ${JSON.stringify(error)}`);
+
+  revalidatePath(`/dashboard/admin/users/${contractorId}`);
+}
+
+export async function deleteCredentialAdmin(contractorId: string, credentialId: string) {
+  await requireRole(["ADMIN"]);
+
+  const { error } = await supabaseAdmin.from("contractor_credentials").delete().eq("id", credentialId);
+  if (error) throw new Error(`deleteCredentialAdmin failed: ${JSON.stringify(error)}`);
+
+  revalidatePath(`/dashboard/admin/users/${contractorId}`);
+}
