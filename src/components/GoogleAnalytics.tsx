@@ -48,13 +48,14 @@ export default function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          // Google Consent Mode v2 — default every storage type to denied.
-          // GA4 falls back to cookieless, non-identifying pings until a
-          // cookie-consent banner calls gtag('consent','update', ...) to
-          // grant analytics_storage. No persistent client-id cookie is set
-          // until then.
+          // Google Consent Mode v2 — analytics_storage defaults to granted
+          // (ONP is US-only, El Paso/Las Cruces, no GDPR exposure, and CCPA
+          // doesn't require opt-in consent for basic analytics), so real
+          // pageview data flows immediately with no consent banner in place
+          // yet. Ad-related storage stays denied by default until there's an
+          // actual reason to use it.
           gtag('consent', 'default', {
-            'analytics_storage': 'denied',
+            'analytics_storage': 'granted',
             'ad_storage': 'denied',
             'ad_user_data': 'denied',
             'ad_personalization': 'denied'
