@@ -250,40 +250,8 @@ export default async function AdminInspectorPricingPage() {
         }}
       >
         All edits are recorded in the <code>admin_actions</code> audit log with before/after
-        values.{" "}
-        <strong style={{ color: "#6B7280" }}>
-          Run the SQL below in Supabase to enable audit logging if you haven&apos;t already:
-        </strong>
+        values.
       </p>
-      <pre
-        style={{
-          background: "var(--camo-paper)",
-          border: "1px solid #E5E7EB",
-          borderRadius: "6px",
-          padding: "12px 16px",
-          fontSize: "11px",
-          color: "#374151",
-          overflowX: "auto",
-          marginTop: "8px",
-          lineHeight: 1.6,
-        }}
-      >
-        {`create table if not exists public.admin_actions (
-  id uuid primary key default gen_random_uuid(),
-  admin_id uuid not null references auth.users(id),
-  action_type text not null,
-  target_id text,
-  details jsonb,
-  created_at timestamptz not null default now()
-);
-alter table public.admin_actions enable row level security;
-create policy "admins can read admin_actions"
-  on public.admin_actions for select
-  using (exists (
-    select 1 from public.profiles
-    where id = auth.uid() and role = 'ADMIN'
-  ));`}
-      </pre>
     </div>
   );
 }
