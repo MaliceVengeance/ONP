@@ -36,13 +36,36 @@ export async function POST(req: NextRequest) {
     }
   );
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return NextResponse.redirect(
       new URL(`/login?error=${encodeURIComponent(error.message)}`, req.url),
       { status: 303 }
     );
+  }
+
+  // Block deactivated accounts right at login, rather than letting them
+  // briefly authenticate and bounce off the first dashboard page's own check.
+  if (signInData.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("deactivated")
+      .eq("id", signInData.user.id)
+      .single();
+
+    if (profile?.deactivated) {
+      // Sign-out cookie clearing is written via the setAll callback above,
+      // which targets `res` specifically — reuse that same response object
+      // (just redirected elsewhere) rather than returning a fresh one, or
+      // the cleared-session cookies would never actually reach the browser.
+      await supabase.auth.signOut();
+      res.headers.set(
+        "Location",
+        new URL(`/login?error=${encodeURIComponent("Your account has been deactivated. Contact support if you believe this is a mistake.")}`, req.url).toString()
+      );
+      return res;
+    }
   }
 
   // Return the redirect response that now includes auth cookies

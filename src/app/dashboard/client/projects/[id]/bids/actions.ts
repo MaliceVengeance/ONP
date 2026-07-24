@@ -1,9 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth/requireRole";
-import { sendBidAwardedEmail } from "@/lib/email";
+import { sendBidAwardedEmail, sendBidDismissedEmail } from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { moderateDismissalText } from "@/lib/contentModeration";
 
 function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
@@ -102,4 +104,138 @@ export async function awardBid(
   }
 
   redirect(`/dashboard/client/projects/${projectId}/bids?award=ok`);
+}
+
+const DISMISSAL_REASON_LABELS: Record<string, string> = {
+  OVER_BUDGET: "Over Budget",
+  UNDER_BUDGET: "Under Budget",
+  TIMELINE: "Timeline doesn't work",
+  PROPOSAL_UNCLEAR: "Proposal incomplete or unclear",
+  MISSING_CREDENTIALS: "Missing license/insurance/bond info",
+  PORTFOLIO_MISMATCH: "Portfolio/experience didn't match project needs",
+  WENT_ANOTHER: "Went with another contractor",
+  OTHER: "Other",
+};
+
+async function dismissSingleBid(
+  projectId: string,
+  bidId: string,
+  clientId: string,
+  reasonCode: string | null,
+  reasonOtherTextRaw: string | null
+) {
+  const { data: bid } = await supabaseAdmin
+    .from("bids")
+    .select("id, contractor_id, project_id")
+    .eq("id", bidId)
+    .eq("project_id", projectId)
+    .maybeSingle();
+
+  if (!bid) return; // not this project's bid — silently skip in batch context
+
+  const isOtherReason = reasonCode === "OTHER";
+  const reasonOtherText = isOtherReason ? (reasonOtherTextRaw?.trim() || null) : null;
+  const { containsProfanity: hasProfanity, moderationStatus } = moderateDismissalText(reasonOtherText);
+
+  const { error: insertErr } = await supabaseAdmin.from("bid_dismissals").insert({
+    project_id: projectId,
+    contractor_id: bid.contractor_id,
+    bid_id: bidId,
+    reason_code: reasonCode || null,
+    reason_other_text: reasonOtherText,
+    dismissed_by: clientId,
+    contains_profanity: hasProfanity,
+    moderation_status: moderationStatus,
+  });
+  if (insertErr) throw wrapErr("bid_dismissals.insert", insertErr);
+
+  const { error: statusErr } = await supabaseAdmin
+    .from("bids")
+    .update({ status: "DISMISSED" })
+    .eq("id", bidId);
+  if (statusErr) throw wrapErr("bids.update(status=DISMISSED)", statusErr);
+
+  // Immediate notification, regardless of moderation hold — the contractor
+  // needs to know their bid was dismissed right away. Only the free-text
+  // "Other" reason is ever held back; reason codes are fixed labels, never
+  // subject to moderation.
+  const deliverReasonNow = !isOtherReason || (!hasProfanity && moderationStatus !== "pending_review");
+  const reasonLabel = deliverReasonNow
+    ? (isOtherReason ? reasonOtherText : reasonCode ? DISMISSAL_REASON_LABELS[reasonCode] ?? reasonCode : null)
+    : null;
+
+  try {
+    const { data: project } = await supabaseAdmin
+      .from("projects")
+      .select("title")
+      .eq("id", projectId)
+      .single();
+    const { data: contractorProfile } = await supabaseAdmin
+      .from("contractor_profiles")
+      .select("business_name")
+      .eq("contractor_id", bid.contractor_id)
+      .maybeSingle();
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(bid.contractor_id);
+
+    if (authUser?.user?.email) {
+      await sendBidDismissedEmail({
+        contractorEmail: authUser.user.email,
+        contractorName: contractorProfile?.business_name ?? "Contractor",
+        projectTitle: project?.title ?? "Project",
+        reasonLabel,
+      });
+    }
+  } catch (e) {
+    console.error(`Failed to send dismissal email for bid ${bidId}:`, e);
+  }
+}
+
+export async function dismissBid(
+  projectId: string,
+  bidId: string,
+  reasonCode: string | null,
+  reasonOtherText: string | null
+) {
+  const { supabase, user, role } = await requireRole(["CLIENT", "ADMIN"]);
+
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, client_id")
+    .eq("id", projectId)
+    .single();
+  if (!project) throw new Error("Project not found.");
+  if (project.client_id !== user.id && role !== "ADMIN") {
+    throw new Error("Not authorized to dismiss bids on this project.");
+  }
+
+  await dismissSingleBid(projectId, bidId, user.id, reasonCode, reasonOtherText);
+
+  revalidatePath(`/dashboard/client/projects/${projectId}/bids`);
+  redirect(`/dashboard/client/projects/${projectId}/bids?dismissed=1`);
+}
+
+export async function batchDismissBids(
+  projectId: string,
+  bidIds: string[],
+  reasonCode: string | null,
+  reasonOtherText: string | null
+) {
+  const { supabase, user, role } = await requireRole(["CLIENT", "ADMIN"]);
+
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, client_id")
+    .eq("id", projectId)
+    .single();
+  if (!project) throw new Error("Project not found.");
+  if (project.client_id !== user.id && role !== "ADMIN") {
+    throw new Error("Not authorized to dismiss bids on this project.");
+  }
+
+  for (const bidId of bidIds) {
+    await dismissSingleBid(projectId, bidId, user.id, reasonCode, reasonOtherText);
+  }
+
+  revalidatePath(`/dashboard/client/projects/${projectId}/bids`);
+  redirect(`/dashboard/client/projects/${projectId}/bids?dismissed=${bidIds.length}`);
 }

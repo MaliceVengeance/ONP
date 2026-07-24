@@ -3,6 +3,8 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { stateBadge } from "@/lib/ui";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import AwardButton from "./AwardButton";
+import DismissBidButton from "./DismissBidButton";
+import BatchDismissPanel from "./BatchDismissPanel";
 
 type BidRow = {
   bid_id: string;
@@ -11,6 +13,14 @@ type BidRow = {
   submitted_at: string;
   notes: string | null;
   review_rank: number | null;
+};
+
+type DismissalInfo = {
+  bid_id: string;
+  reason_code: string | null;
+  reason_other_text: string | null;
+  moderation_status: string;
+  dismissed_at: string;
 };
 
 type ContractorInfo = {
@@ -64,7 +74,7 @@ export default async function ClientProjectBidsPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ min?: string; max?: string; sort?: string; award?: string }>;
+  searchParams: Promise<{ min?: string; max?: string; sort?: string; award?: string; dismissed?: string }>;
 }) {
   const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
   const { id: projectId } = await params;
@@ -211,6 +221,28 @@ export default async function ClientProjectBidsPage({
     }
   }
 
+  // Dismissal reasons (DB-backed taxonomy) + which bids on this project are
+  // already dismissed, so they can be split out of the active comparison list.
+  const { data: reasonRows } = await supabaseAdmin
+    .from("bid_dismissal_reasons")
+    .select("code, label")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+  const reasons = reasonRows ?? [];
+
+  const dismissalMap = new Map<string, DismissalInfo>();
+  if (unlocked && bids.length > 0) {
+    const { data: dismissalRows } = await supabaseAdmin
+      .from("bid_dismissals")
+      .select("bid_id, reason_code, reason_other_text, moderation_status, dismissed_at")
+      .eq("project_id", projectId);
+    (dismissalRows ?? []).forEach((d) => dismissalMap.set(d.bid_id, d as DismissalInfo));
+  }
+
+  const activeBids = bids.filter((b) => !dismissalMap.has(b.bid_id));
+  const dismissedBids = bids.filter((b) => dismissalMap.has(b.bid_id));
+  const reasonLabelMap = new Map(reasons.map((r) => [r.code, r.label]));
+
   const inputStyle = {
     background: "#FFFFFF",
     border: "1px solid #d9dbdb",
@@ -347,6 +379,21 @@ export default async function ClientProjectBidsPage({
           marginBottom: "20px",
         }}>
           ✅ Award saved successfully.
+        </div>
+      )}
+
+      {/* Dismissal saved banner */}
+      {sp.dismissed && (
+        <div style={{
+          background: "#F0FDF4",
+          border: "1px solid #166534",
+          color: "#15803D",
+          padding: "14px 18px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "20px",
+        }}>
+          ✅ {sp.dismissed === "1" ? "Bid dismissed." : `${sp.dismissed} bids dismissed.`} The contractor{sp.dismissed !== "1" ? "s were" : " was"} notified.
         </div>
       )}
 
@@ -522,8 +569,21 @@ export default async function ClientProjectBidsPage({
             </a>
           </div>
 
-          {/* Bid cards */}
-          {bids.length === 0 ? (
+          {/* Batch dismiss */}
+          <BatchDismissPanel
+            projectId={projectId}
+            reasons={reasons}
+            candidates={activeBids
+              .filter((b) => award?.bid_id !== b.bid_id)
+              .map((b) => ({
+                bidId: b.bid_id,
+                displayIndex: bids.indexOf(b) + 1,
+                amountLabel: centsToMoney(b.amount_cents),
+              }))}
+          />
+
+          {/* Bid cards — dismissed bids are shown separately below, not in the active comparison list */}
+          {activeBids.length === 0 ? (
             <div style={{
               background: "var(--camo-concrete)",
               border: "1px solid #d9dbdb",
@@ -537,7 +597,8 @@ export default async function ClientProjectBidsPage({
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {bids.map((b, idx) => {
+              {activeBids.map((b) => {
+                const idx = bids.indexOf(b);
                 const isAwarded = award?.bid_id === b.bid_id;
                 const contractor = contractorMap.get(b.bid_id);
                 const licenseExpired = isExpired(contractor?.license_expiry ?? null);
@@ -798,9 +859,65 @@ export default async function ClientProjectBidsPage({
                         </div>
                       )}
                     </div>
+
+                    {!isAwarded && (
+                      <div style={{ marginTop: "10px" }}>
+                        <DismissBidButton
+                          projectId={projectId}
+                          bidId={b.bid_id}
+                          bidDisplayIndex={idx + 1}
+                          reasons={reasons}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Dismissed bids — read-only, no undo */}
+          {dismissedBids.length > 0 && (
+            <div style={{ marginTop: "28px" }}>
+              <h2 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "16px",
+                letterSpacing: "1px",
+                color: "var(--camo-gunmetal)",
+                textTransform: "uppercase",
+                marginBottom: "12px",
+              }}>
+                Dismissed ({dismissedBids.length})
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {dismissedBids.map((b) => {
+                  const idx = bids.indexOf(b);
+                  const d = dismissalMap.get(b.bid_id)!;
+                  const reasonDelivered = d.reason_code === "OTHER"
+                    ? (d.moderation_status === "not_applicable" || d.moderation_status === "approved" ? d.reason_other_text : null)
+                    : (d.reason_code ? reasonLabelMap.get(d.reason_code) ?? d.reason_code : null);
+                  return (
+                    <div key={b.bid_id} style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "16px 20px", opacity: 0.75 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+                        <div>
+                          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "14px", color: "var(--camo-gunmetal)", textTransform: "uppercase" }}>
+                            Bid #{idx + 1} — Dismissed
+                          </div>
+                          <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>
+                            {new Date(d.dismissed_at).toLocaleDateString()}
+                            {reasonDelivered && ` · ${reasonDelivered}`}
+                            {d.reason_code === "OTHER" && d.moderation_status === "pending_review" && " · Reason under review"}
+                          </div>
+                        </div>
+                        <div style={{ fontSize: "18px", color: "var(--camo-gunmetal)" }}>
+                          {centsToMoney(b.amount_cents)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </>

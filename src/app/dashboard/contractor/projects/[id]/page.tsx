@@ -128,6 +128,35 @@ export default async function ContractorProjectDetail({
     if (versionRow) existingBid = versionRow as ExistingBid;
   }
 
+  // Dismissal — shown immediately regardless of whether the project itself
+  // has been awarded yet, so the contractor doesn't have to wait to move on.
+  let dismissal: {
+    reason_code: string | null;
+    reason_other_text: string | null;
+    moderation_status: string;
+    dismissed_at: string;
+  } | null = null;
+
+  if (bidRow?.id) {
+    const { data: dismissalRow } = await supabase
+      .from("bid_dismissals")
+      .select("reason_code, reason_other_text, moderation_status, dismissed_at")
+      .eq("bid_id", bidRow.id)
+      .maybeSingle();
+    dismissal = dismissalRow ?? null;
+  }
+
+  const DISMISSAL_REASON_LABELS: Record<string, string> = {
+    OVER_BUDGET: "Over Budget",
+    UNDER_BUDGET: "Under Budget",
+    TIMELINE: "Timeline doesn't work",
+    PROPOSAL_UNCLEAR: "Proposal incomplete or unclear",
+    MISSING_CREDENTIALS: "Missing license/insurance/bond info",
+    PORTFOLIO_MISMATCH: "Portfolio/experience didn't match project needs",
+    WENT_ANOTHER: "Went with another contractor",
+    OTHER: "Other",
+  };
+
   const [{ data: rfiData }, { data: catalogData }] = await Promise.all([
     supabase.from("rfis").select("id, catalog_id, response").eq("project_id", projectId),
     supabase.from("rfi_catalog").select("id, code, prompt").order("code"),
@@ -888,6 +917,32 @@ export default async function ContractorProjectDetail({
           ✅ Your bid was submitted successfully.
         </div>
       )}
+
+      {/* Dismissal notice — shown immediately, independent of project award state */}
+      {dismissal && (() => {
+        const reasonDelivered = dismissal.reason_code === "OTHER"
+          ? (dismissal.moderation_status === "not_applicable" || dismissal.moderation_status === "approved" ? dismissal.reason_other_text : null)
+          : (dismissal.reason_code ? DISMISSAL_REASON_LABELS[dismissal.reason_code] ?? dismissal.reason_code : null);
+        return (
+          <div style={{
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            borderRadius: "10px",
+            padding: "18px 20px",
+            marginBottom: "16px",
+          }}>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "16px", color: "#991B1B", textTransform: "uppercase", marginBottom: "6px" }}>
+              Bid Dismissed
+            </div>
+            <p style={{ fontSize: "13px", color: "#991B1B", lineHeight: 1.6, margin: 0 }}>
+              The client has decided not to move forward with your bid on this project
+              ({new Date(dismissal.dismissed_at).toLocaleDateString()}).
+              {reasonDelivered && <> Reason given: <strong>{reasonDelivered}</strong>.</>}
+              {dismissal.reason_code === "OTHER" && dismissal.moderation_status === "pending_review" && " The client's stated reason is under review and will follow up if cleared."}
+            </p>
+          </div>
+        );
+      })()}
 
       {/* Existing bid summary */}
       {existingBid && (

@@ -145,6 +145,83 @@ export async function sendBidAwardedEmail({
   });
 }
 
+export async function sendBidDismissedEmail({
+  contractorEmail,
+  contractorName,
+  projectTitle,
+  reasonLabel,
+}: {
+  contractorEmail: string;
+  contractorName: string;
+  projectTitle: string;
+  reasonLabel: string | null;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `Update on your bid for "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #1B2942; border: 1px solid #3A5A7A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #B0C4DE; margin-top: 0;">Bid Update</h2>
+          <p style="color: #B0C4DE;">Hi ${contractorName},</p>
+          <p style="color: #B0C4DE;">The client has decided not to move forward with your bid on <strong style="color: #fff;">"${projectTitle}"</strong>.</p>
+          ${reasonLabel ? `<p style="color: #B0C4DE;">Reason given: <strong style="color: #fff;">${reasonLabel}</strong></p>` : `<p style="color: #7A9CC4; font-size: 13px;">No reason was given.</p>`}
+          <p style="color: #B0C4DE;">This project is no longer available to you, but there are always new projects posting on ONP.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink("/dashboard/contractor/projects")}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Browse Open Projects
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendDismissalReasonFollowUpEmail({
+  contractorEmail,
+  contractorName,
+  projectTitle,
+  reasonText,
+}: {
+  contractorEmail: string;
+  contractorName: string;
+  projectTitle: string;
+  reasonText: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `Additional detail on your dismissed bid — "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #1B2942; border: 1px solid #3A5A7A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #B0C4DE; margin-top: 0;">Additional Detail</h2>
+          <p style="color: #B0C4DE;">Hi ${contractorName},</p>
+          <p style="color: #B0C4DE;">Following up on your dismissed bid for <strong style="color: #fff;">"${projectTitle}"</strong> — the client provided this additional detail:</p>
+          <p style="background: #14213D; border-radius: 6px; padding: 14px 16px; color: #fff; font-style: italic;">"${reasonText}"</p>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendNewProjectEmail({
   contractorEmail,
   projectTitle,

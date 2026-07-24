@@ -20,6 +20,7 @@ export default async function AdminDashboard() {
     { count: waitlistCount },
     { count: credCount },
     { data: dirCandidates },
+    { count: dismissalPendingCount },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
     supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
@@ -36,6 +37,7 @@ export default async function AdminDashboard() {
     // Directory pending has no simple column filter (mirrors contractor-verification page's
     // JS-side logic: not yet verified, listed, and has submitted license or COI info).
     supabaseAdmin.from("contractor_profiles").select("directory_verified, is_listed, license_number, coi_provider"),
+    supabaseAdmin.from("bid_dismissals").select("id", { count: "exact", head: true }).eq("moderation_status", "pending_review"),
   ]);
 
   const dirPendingCount = (dirCandidates ?? []).filter(
@@ -76,6 +78,22 @@ export default async function AdminDashboard() {
       stat: dirPendingCount + (credCount ?? 0),
       statLabel: "pending reviews",
       accent: dirPendingCount + (credCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
+    },
+    {
+      title: "Dismissal Content Review",
+      description: "Review held reason text for discriminatory/sensitive language, and track flagged-content patterns by client.",
+      href: "/dashboard/admin/dismissals",
+      stat: dismissalPendingCount ?? 0,
+      statLabel: "pending review",
+      accent: (dismissalPendingCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
+    },
+    {
+      title: "Dismissal Analytics",
+      description: "Bid dismissal reason patterns by trade/region/time — separate from contractor-pass data.",
+      href: "/dashboard/admin/dismissal-analytics",
+      stat: null,
+      statLabel: "patterns & insights",
+      accent: "var(--camo-gunmetal)",
     },
     {
       title: "Support Requests",

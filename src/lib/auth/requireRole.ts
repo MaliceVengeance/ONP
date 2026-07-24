@@ -14,11 +14,19 @@ export async function requireRole(allowed: AppRole[]) {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, deactivated")
     .eq("id", user.id)
     .single();
 
   if (error || !profile?.role) redirect("/login");
+
+  // Deactivated accounts are signed out on their very next protected request —
+  // this is the only place that check happens, since every dashboard page and
+  // mutating action routes through requireRole.
+  if (profile.deactivated) {
+    await supabase.auth.signOut();
+    redirect("/login?error=Your%20account%20has%20been%20deactivated.%20Contact%20support%20if%20you%20believe%20this%20is%20a%20mistake.");
+  }
 
   const role = profile.role as AppRole;
 
