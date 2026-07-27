@@ -59,7 +59,7 @@ export default function PrivacyPage() {
           <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "48px", color: "#1E3A8A", marginBottom: "8px", lineHeight: 1.1 }}>Privacy Policy</h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", marginBottom: "20px" }} />
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}><strong>Our Next Project, LLC</strong></p>
-          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Effective: [EFFECTIVE DATE]</p>
+          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Effective: June 3, 2026</p>
           <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "14px", color: "#1B4F8A", lineHeight: 1.7 }}>
             This is the plain English version of how we handle your information. There&apos;s also a{" "}
             <Link href="/privacy/legal" style={{ color: "#C8102E", fontWeight: 600 }}>full legal version</Link>
@@ -216,7 +216,7 @@ export default function PrivacyPage() {
           <div style={dividerStyle} />
           <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#1E3A8A", lineHeight: 1.9 }}>
             <strong>Our Next Project, LLC</strong><br />
-            [BUSINESS ADDRESS]<br />
+            11820 Flor Del Rio, Socorro, TX 79927<br />
             <a href="mailto:support@ournextproject.us" style={{ color: "#1B4F8A" }}>support@ournextproject.us</a>
           </div>
         </div>

@@ -626,20 +626,6 @@ export default async function ContractorSubscribePage({
         </div>
       )}
 
-      {/* Beta notice */}
-      <div style={{
-        background: "var(--camo-concrete)",
-        border: "1px solid #d9dbdb",
-        borderRadius: "8px",
-        padding: "14px 16px",
-        marginTop: "20px",
-        fontSize: "12px",
-        color: "var(--camo-gunmetal)",
-        lineHeight: 1.6,
-      }}>
-        ⚠ Subscriptions are currently in test mode. No real charges will be made during beta testing. Use Stripe test card{" "}
-        <strong style={{ color: "var(--camo-gunmetal)" }}>4242 4242 4242 4242</strong> to test.
-      </div>
     </div>
   );
 }

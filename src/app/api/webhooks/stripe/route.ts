@@ -9,6 +9,7 @@ import {
   sendAdminInspectorRequestEmail,
   sendInspectorUpgradeChargedEmail,
   sendInspectorUpgradeConfirmedEmail,
+  sendSubscriptionDisputeAdminEmail,
 } from "@/lib/email";
 
 /**
@@ -567,21 +568,84 @@ export async function POST(req: NextRequest) {
           .eq("stripe_payment_intent_id", paymentIntentId)
           .maybeSingle();
 
-        if (!logRow) break; // Not an emergency payment dispute
+        if (logRow) {
+          // Mark as DISPUTED in log
+          await supabaseAdmin
+            .from("emergency_request_log")
+            .update({ payment_status: "DISPUTED" })
+            .eq("id", (logRow as any).id);
 
-        // Mark as DISPUTED in log
-        await supabaseAdmin
-          .from("emergency_request_log")
-          .update({ payment_status: "DISPUTED" })
-          .eq("id", (logRow as any).id);
+          // Auto-suspend the client account
+          await supabaseAdmin
+            .from("profiles")
+            .update({ suspended: true, suspended_reason: "emergency_chargeback" })
+            .eq("id", (logRow as any).client_id);
 
-        // Auto-suspend the client account
-        await supabaseAdmin
-          .from("profiles")
-          .update({ suspended: true, suspended_reason: "emergency_chargeback" })
-          .eq("id", (logRow as any).client_id);
+          console.log(`Client ${(logRow as any).client_id} suspended for emergency chargeback on project ${(logRow as any).project_id}`);
+          break;
+        }
 
-        console.log(`Client ${(logRow as any).client_id} suspended for emergency chargeback on project ${(logRow as any).project_id}`);
+        // Not an emergency payment dispute — check if it's a subscription
+        // charge dispute instead (previously did nothing at all in this case).
+        try {
+          const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+          const customerId = typeof paymentIntent.customer === "string" ? paymentIntent.customer : paymentIntent.customer?.id;
+
+          let contractorId: string | null = null;
+          let businessName = "Unknown contractor";
+
+          if (customerId) {
+            const { data: subRow } = await supabaseAdmin
+              .from("contractor_subscriptions")
+              .select("contractor_id")
+              .eq("stripe_customer_id", customerId)
+              .maybeSingle();
+            contractorId = subRow?.contractor_id ?? null;
+
+            if (contractorId) {
+              const { data: profile } = await supabaseAdmin
+                .from("contractor_profiles")
+                .select("business_name")
+                .eq("contractor_id", contractorId)
+                .maybeSingle();
+              businessName = profile?.business_name ?? businessName;
+            }
+          }
+
+          const { error: disputeInsertErr } = await supabaseAdmin.from("subscription_disputes").insert({
+            stripe_dispute_id: dispute.id,
+            stripe_payment_intent_id: paymentIntentId,
+            stripe_customer_id: customerId ?? null,
+            contractor_id: contractorId,
+            amount_cents: dispute.amount ?? null,
+            currency: (dispute.currency ?? "usd").toUpperCase(),
+            reason: dispute.reason ?? null,
+            stripe_status: dispute.status ?? null,
+          });
+          if (disputeInsertErr) {
+            // Unique constraint on stripe_dispute_id — Stripe can resend this
+            // event; a conflict here just means it's already logged.
+            console.error("subscription_disputes insert (may be duplicate, non-fatal):", disputeInsertErr);
+          }
+
+          const { data: adminProfiles } = await supabaseAdmin.from("profiles").select("id").eq("role", "ADMIN");
+          for (const admin of adminProfiles ?? []) {
+            const { data: adminAuth } = await supabaseAdmin.auth.admin.getUserById(admin.id);
+            const adminEmail = adminAuth?.user?.email;
+            if (adminEmail) {
+              sendSubscriptionDisputeAdminEmail({
+                adminEmail,
+                businessName,
+                amountCents: dispute.amount ?? null,
+                reason: dispute.reason ?? null,
+              }).catch((e) => console.error("Subscription dispute admin email failed:", e));
+            }
+          }
+
+          console.log(`Subscription dispute logged for payment intent ${paymentIntentId}`);
+        } catch (subDisputeErr) {
+          console.error("Subscription dispute handling failed:", subDisputeErr);
+        }
         break;
       }
 

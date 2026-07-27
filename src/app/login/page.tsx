@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { joinWaitlist } from "@/lib/serviceArea/actions";
-import { ServiceAreaBanner, BetaDisclaimerBanner, MarketingFooter } from "@/components/MarketingChrome";
+import { ServiceAreaBanner, MarketingFooter } from "@/components/MarketingChrome";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -44,7 +44,6 @@ export default async function LoginPage({
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif", display: "flex", flexDirection: "column" }}>
-      <BetaDisclaimerBanner />
       <ServiceAreaBanner />
 
       {/* Centered content */}

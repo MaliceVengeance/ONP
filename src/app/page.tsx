@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { SealedBidReveal } from "@/components/SealedBidReveal";
-import { MarketingHeader, MarketingFooter, ServiceAreaBanner, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { MarketingHeader, MarketingFooter, ServiceAreaBanner } from "@/components/MarketingChrome";
 import { getCamoVariant } from "@/lib/camo/session";
 
 const btnPrimary: React.CSSProperties = {
@@ -62,7 +62,6 @@ export default async function HomePage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader />
-      <BetaDisclaimerBanner />
       <ServiceAreaBanner />
 
       {/* ─── Hero ─── */}

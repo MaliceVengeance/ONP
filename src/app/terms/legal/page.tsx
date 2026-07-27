@@ -68,8 +68,8 @@ export default function TermsLegalPage() {
           <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "44px", color: "#1E3A8A", marginBottom: "8px", lineHeight: 1.1 }}>Terms of Service</h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", marginBottom: "20px" }} />
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}><strong>Our Next Project, LLC</strong></p>
-          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}>Effective Date: [EFFECTIVE DATE]</p>
-          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Last Updated: [LAST UPDATED DATE]</p>
+          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}>Effective Date: June 3, 2026</p>
+          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Last Updated: June 3, 2026</p>
           <p style={pStyle}>These Terms of Service (the &ldquo;<strong>Terms</strong>&rdquo;) constitute a binding legal agreement between you and <strong>Our Next Project, LLC</strong>, a Texas limited liability company (&ldquo;<strong>ONP</strong>&rdquo;), governing your access to and use of the website at ournextproject.us and related services (the &ldquo;<strong>Platform</strong>&rdquo;).</p>
           <p style={pStyle}>A plain-English summary is available <Link href="/terms" style={{ color: "#C8102E" }}>here</Link>. In the event of any conflict, <strong>these Terms control.</strong></p>
           <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "16px 20px", fontSize: "13px", color: "#FFFFFF", fontWeight: 600, lineHeight: 1.7, marginBottom: "12px" }}>
@@ -306,12 +306,12 @@ export default function TermsLegalPage() {
           <p style={pStyle}><strong>20.2 Severability.</strong> If any provision is unenforceable, the remaining provisions continue in full force.</p>
           <p style={pStyle}><strong>20.3 No Waiver.</strong> Failure to enforce any provision is not a waiver of that provision.</p>
           <p style={pStyle}><strong>20.4 Assignment.</strong> ONP may assign these Terms. You may not assign without ONP&apos;s prior written consent.</p>
-          <p style={pStyle}><strong>20.5 Notices.</strong> ONP may provide notice via your registered email or via the Platform. Legal notices to ONP: support@ournextproject.us / [BUSINESS ADDRESS].</p>
+          <p style={pStyle}><strong>20.5 Notices.</strong> ONP may provide notice via your registered email or via the Platform. Legal notices to ONP: support@ournextproject.us / 11820 Flor Del Rio, Socorro, TX 79927.</p>
           <p style={pStyle}><strong>20.6 Force Majeure.</strong> ONP is not liable for delays or failures caused by events beyond its reasonable control.</p>
           <h3 style={h3Style}>20.8 Contact</h3>
           <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#1E3A8A", lineHeight: 1.9 }}>
             <strong>Our Next Project, LLC</strong><br />
-            [BUSINESS ADDRESS]<br />
+            11820 Flor Del Rio, Socorro, TX 79927<br />
             <a href="mailto:support@ournextproject.us" style={{ color: "#1B4F8A" }}>support@ournextproject.us</a>
           </div>
         </div>

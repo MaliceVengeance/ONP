@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 const eyebrow: React.CSSProperties = {
@@ -61,7 +61,6 @@ export default async function WhyOnpPage({
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader active="why-onp" />
-      <BetaDisclaimerBanner />
 
       <main style={{ maxWidth: "1040px", margin: "0 auto", padding: "40px 24px" }}>
 

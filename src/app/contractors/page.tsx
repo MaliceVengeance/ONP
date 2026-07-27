@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { getCamoVariant } from "@/lib/camo/session";
 
@@ -122,7 +122,6 @@ export default async function ContractorDirectoryPage({
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader active="contractors" />
-      <BetaDisclaimerBanner />
 
       <main style={{ maxWidth: "1040px", margin: "0 auto", padding: "40px 24px" }}>
         {/* Page title */}

@@ -86,28 +86,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      {/* Beta banner */}
-      <div style={{
-        background: "var(--camo-gunmetal)",
-        padding: "6px 16px",
-        textAlign: "center",
-        fontSize: "11px",
-        color: "var(--camo-concrete)",
-        lineHeight: 1.5,
-        flexShrink: 0,
-      }}>
-        <span style={{
-          fontWeight: 700,
-          color: "var(--camo-accent)",
-          textTransform: "uppercase",
-          letterSpacing: "1px",
-          marginRight: "6px",
-        }}>
-          ⚠ Beta:
-        </span>
-        For testing only — not legitimate business transactions.
-      </div>
-
       {/* Page content */}
       <main style={{
         maxWidth: "900px",

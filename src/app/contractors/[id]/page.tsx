@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -74,7 +74,6 @@ export default async function ContractorProfilePage({
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader active="contractors" />
-      <BetaDisclaimerBanner />
 
       <main style={{ maxWidth: "780px", margin: "0 auto", padding: "48px 24px" }}>
         <Link href="/contractors" style={{ fontSize: "0.82rem", color: "var(--camo-gunmetal)", textDecoration: "underline" }}>

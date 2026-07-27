@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import ReportProblemButton from "@/components/ReportProblemButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
       >
         <GoogleAnalytics />
         {children}
+        <ReportProblemButton />
       </body>
     </html>
   );

@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 export const metadata = {
   title: "Understanding Bids — ONP Help",
   description: "Why contractor bids may not be the final price, and how to get more accurate bids.",
 };
 
-export default function HelpBidsPage() {
+export default async function HelpBidsPage() {
+  const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
   const sectionStyle = {
     background: "#EEF4FF",
     border: "1px solid #B8D0E8",
@@ -92,45 +94,47 @@ export default function HelpBidsPage() {
         </ul>
       </div>
 
-      {/* Q2 */}
-      <div style={sectionStyle}>
-        <h2 style={h2Style}>How can I get more accurate bids?</h2>
-        <p style={bodyStyle}>
-          <strong style={{ color: "#1E3A8A" }}>Request an ONP Inspector.</strong> For a flat fee, a
-          qualified inspector visits the property and prepares a detailed report — measurements,
-          photos, condition notes, and any issues a contractor should know about. This report is
-          shared with bidding contractors and almost always results in:
-        </p>
-        <ul style={{ ...bodyStyle, paddingLeft: "20px", marginTop: "8px" }}>
-          <li style={liStyle}>Tighter, more competitive bids (less padding needed)</li>
-          <li style={liStyle}>Fewer surprises after work begins</li>
-          <li style={{ ...liStyle, marginBottom: 0 }}>
-            A stronger basis for holding a contractor to their number
-          </li>
-        </ul>
-        <p style={{ ...bodyStyle, marginTop: "12px" }}>
-          For larger projects, the inspection fee typically pays for itself many times over in
-          bid accuracy.
-        </p>
-        <div style={{ marginTop: "16px" }}>
-          <Link
-            href="/dashboard/inspector"
-            style={{
-              background: "#C8102E",
-              color: "#fff",
-              padding: "10px 24px",
-              borderRadius: "6px",
-              fontFamily: "'Barlow', sans-serif",
-              fontWeight: 600,
-              fontSize: "13px",
-              textDecoration: "none",
-              display: "inline-block",
-            }}
-          >
-            Request an ONP Inspector →
-          </Link>
+      {/* Q2 — inspection is a real, toggle-gated feature; hide this section entirely while it's off */}
+      {inspectorEnabled && (
+        <div style={sectionStyle}>
+          <h2 style={h2Style}>How can I get more accurate bids?</h2>
+          <p style={bodyStyle}>
+            <strong style={{ color: "#1E3A8A" }}>Request an ONP Inspector.</strong> For a flat fee, a
+            qualified inspector visits the property and prepares a detailed report — measurements,
+            photos, condition notes, and any issues a contractor should know about. This report is
+            shared with bidding contractors and almost always results in:
+          </p>
+          <ul style={{ ...bodyStyle, paddingLeft: "20px", marginTop: "8px" }}>
+            <li style={liStyle}>Tighter, more competitive bids (less padding needed)</li>
+            <li style={liStyle}>Fewer surprises after work begins</li>
+            <li style={{ ...liStyle, marginBottom: 0 }}>
+              A stronger basis for holding a contractor to their number
+            </li>
+          </ul>
+          <p style={{ ...bodyStyle, marginTop: "12px" }}>
+            For larger projects, the inspection fee typically pays for itself many times over in
+            bid accuracy.
+          </p>
+          <div style={{ marginTop: "16px" }}>
+            <Link
+              href="/dashboard/inspector"
+              style={{
+                background: "#C8102E",
+                color: "#fff",
+                padding: "10px 24px",
+                borderRadius: "6px",
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              Request an ONP Inspector →
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Q3 */}
       <div style={sectionStyle}>

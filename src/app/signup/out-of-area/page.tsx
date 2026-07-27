@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BetaDisclaimerBanner } from "@/components/MarketingChrome";
 
 export default async function OutOfAreaPage({
   searchParams,
@@ -18,8 +17,6 @@ export default async function OutOfAreaPage({
       alignItems: "center",
       fontFamily: "'Barlow', sans-serif",
     }}>
-      <BetaDisclaimerBanner />
-
       <div style={{
         flex: 1,
         width: "100%",

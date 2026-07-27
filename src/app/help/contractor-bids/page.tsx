@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 export const metadata = {
   title: "Contractor Bidding Guide — ONP Help",
   description: "How to price your bids, use RFIs, and understand your obligations on the ONP platform.",
 };
 
-export default function HelpContractorBidsPage() {
+export default async function HelpContractorBidsPage() {
+  const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);
   const sectionStyle = {
     background: "#EEF4FF",
     border: "1px solid #B8D0E8",
@@ -62,8 +64,8 @@ export default function HelpContractorBidsPage() {
       <div style={sectionStyle}>
         <h2 style={h2Style}>How should I price my bid?</h2>
         <p style={bodyStyle}>
-          You're submitting a bid based on what the Client has posted — description, photos, files,
-          and any inspector report. You have not visited the site unless you've arranged one independently.
+          You're submitting a bid based on what the Client has posted — description, photos, files
+          {inspectorEnabled ? ", and any inspector report" : ""}. You have not visited the site unless you've arranged one independently.
         </p>
         <p style={{ ...bodyStyle, marginTop: "12px" }}>A few things to keep in mind:</p>
         <ul style={{ ...bodyStyle, paddingLeft: "20px", marginTop: "8px" }}>
@@ -77,12 +79,14 @@ export default function HelpContractorBidsPage() {
             feature lets you ask the Client clarifying questions before submitting. Use it. A
             5-minute RFI can save you thousands.
           </li>
-          <li style={liStyle}>
-            <strong style={{ color: "#1E3A8A" }}>Check for an inspector report.</strong> Projects
-            with an ONP Inspector report give you measurements, photos, and condition notes that
-            dramatically improve your accuracy. Bid more confidently — and more competitively —
-            on those.
-          </li>
+          {inspectorEnabled && (
+            <li style={liStyle}>
+              <strong style={{ color: "#1E3A8A" }}>Check for an inspector report.</strong> Projects
+              with an ONP Inspector report give you measurements, photos, and condition notes that
+              dramatically improve your accuracy. Bid more confidently — and more competitively —
+              on those.
+            </li>
+          )}
           <li style={{ ...liStyle, marginBottom: 0 }}>
             <strong style={{ color: "#1E3A8A" }}>Request a site visit if needed.</strong> For larger
             or complex projects, you can message the Client to arrange a walkthrough before submitting

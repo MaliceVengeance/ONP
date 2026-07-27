@@ -9,6 +9,51 @@ function loginLink(destination: string) {
   return `${BASE}/login?next=${encodeURIComponent(destination)}`;
 }
 
+export async function sendProblemReportEmail({
+  adminEmail,
+  pageUrl,
+  description,
+  userEmail,
+  userRole,
+  hasScreenshot,
+}: {
+  adminEmail: string;
+  pageUrl: string;
+  description: string;
+  userEmail: string | null;
+  userRole: string | null;
+  hasScreenshot: boolean;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[Report a Problem] ${pageUrl}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">🐞 Problem Reported</h2>
+          <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📍 Page: <strong style="color: #fff;">${pageUrl}</strong></p>
+          <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">👤 Reported by: <strong style="color: #fff;">${userEmail ?? "Not logged in"}${userRole ? ` (${userRole})` : ""}</strong></p>
+          ${hasScreenshot ? `<p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📎 Screenshot attached — view in the admin queue</p>` : ""}
+          <div style="background: #1E3A8A; border-radius: 8px; padding: 16px; margin-top: 16px;">
+            <p style="color: #fff; margin: 0; white-space: pre-wrap;">${description}</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/problem-reports"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View in Admin Queue
+          </a>
+        </div>
+      </div>
+    `,
+  });
+}
+
 export async function sendRfiSubmittedEmail({
   clientEmail,
   clientName,
@@ -716,6 +761,45 @@ export async function sendAdminInspectorRequestEmail({
         <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
           ONP Admin · Assignment ID: ${assignmentId}
         </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendSubscriptionDisputeAdminEmail({
+  adminEmail,
+  businessName,
+  amountCents,
+  reason,
+}: {
+  adminEmail: string;
+  businessName: string;
+  amountCents: number | null;
+  reason: string | null;
+}) {
+  const amountFormatted = amountCents ? `$${(amountCents / 100).toFixed(2)}` : "unknown amount";
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[ACTION REQUIRED] Subscription Charge Disputed — ${businessName}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Admin Notification</p>
+        </div>
+        <div style="background: #2D1B00; border: 1px solid #FBBF24; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">⚠ Subscription Charge Disputed</h2>
+          <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">🏢 Contractor: <strong style="color: #fff;">${businessName}</strong></p>
+          <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">💰 Amount: <strong style="color: #fff;">${amountFormatted}</strong></p>
+          <p style="color: #7A9CC4; margin: 4px 0; font-size: 13px;">📋 Reason: <strong style="color: #fff;">${reason ?? "not specified"}</strong></p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${BASE}/dashboard/admin/subscription-disputes"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            View in Admin Queue
+          </a>
+        </div>
       </div>
     `,
   });

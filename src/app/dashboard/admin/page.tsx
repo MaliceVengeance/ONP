@@ -21,6 +21,8 @@ export default async function AdminDashboard() {
     { count: credCount },
     { data: dirCandidates },
     { count: dismissalPendingCount },
+    { count: problemReportOpenCount },
+    { count: subscriptionDisputeOpenCount },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
     supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
@@ -38,6 +40,8 @@ export default async function AdminDashboard() {
     // JS-side logic: not yet verified, listed, and has submitted license or COI info).
     supabaseAdmin.from("contractor_profiles").select("directory_verified, is_listed, license_number, coi_provider"),
     supabaseAdmin.from("bid_dismissals").select("id", { count: "exact", head: true }).eq("moderation_status", "pending_review"),
+    supabaseAdmin.from("problem_reports").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
+    supabaseAdmin.from("subscription_disputes").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
   ]);
 
   const dirPendingCount = (dirCandidates ?? []).filter(
@@ -94,6 +98,22 @@ export default async function AdminDashboard() {
       stat: null,
       statLabel: "patterns & insights",
       accent: "var(--camo-gunmetal)",
+    },
+    {
+      title: "Problem Reports",
+      description: "User-submitted problem reports from the site-wide Report a Problem link.",
+      href: "/dashboard/admin/problem-reports",
+      stat: problemReportOpenCount ?? 0,
+      statLabel: "open reports",
+      accent: (problemReportOpenCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
+    },
+    {
+      title: "Subscription Disputes",
+      description: "Contractor subscription-charge disputes from Stripe — different from the emergency-payment chargeback flow.",
+      href: "/dashboard/admin/subscription-disputes",
+      stat: subscriptionDisputeOpenCount ?? 0,
+      statLabel: "open disputes",
+      accent: (subscriptionDisputeOpenCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Support Requests",

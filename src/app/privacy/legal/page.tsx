@@ -61,8 +61,8 @@ export default function PrivacyLegalPage() {
           <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "44px", color: "#1E3A8A", marginBottom: "8px", lineHeight: 1.1 }}>Privacy Policy</h1>
           <div style={{ width: "60px", height: "3px", background: "#C8102E", marginBottom: "20px" }} />
           <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}><strong>Our Next Project, LLC</strong></p>
-          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}>Effective Date: [EFFECTIVE DATE]</p>
-          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Last Updated: [LAST UPDATED DATE]</p>
+          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "4px" }}>Effective Date: June 3, 2026</p>
+          <p style={{ fontSize: "14px", color: "#4A7FB5", marginBottom: "20px" }}>Last Updated: June 3, 2026</p>
           <p style={pStyle}>This Privacy Policy (the &ldquo;<strong>Policy</strong>&rdquo;) describes how <strong>Our Next Project, LLC</strong> (&ldquo;<strong>ONP</strong>&rdquo;) collects, uses, discloses, and otherwise processes personal information about Users of the website located at ournextproject.us and any related subdomains, applications, features, content, and services (collectively, the &ldquo;<strong>Platform</strong>&rdquo; or &ldquo;<strong>Services</strong>&rdquo;).</p>
           <p style={pStyle}>A plain-English summary is available <Link href="/privacy" style={{ color: "#C8102E" }}>here</Link>. In the event of any conflict, <strong>this Policy controls</strong>. This Policy is incorporated into our <Link href="/terms/legal" style={{ color: "#C8102E" }}>Terms of Service</Link>.</p>
           <div style={{ background: "#1E3A8A", borderRadius: "8px", padding: "16px 20px", fontSize: "13px", color: "#FFFFFF", fontWeight: 600, lineHeight: 1.7 }}>
@@ -170,10 +170,10 @@ export default function PrivacyLegalPage() {
             <li style={liStyle}><strong>Payment Processing:</strong> Stripe, Inc.</li>
             <li style={liStyle}><strong>Hosting and Infrastructure:</strong> Vercel, Inc.</li>
             <li style={liStyle}><strong>Database, Authentication, and Storage:</strong> Supabase, Inc.</li>
-            <li style={liStyle}><strong>Email Delivery:</strong> [EMAIL SERVICE PROVIDER]</li>
+            <li style={liStyle}><strong>Email Delivery:</strong> Resend, used to send account notifications, password resets, and other transactional emails.</li>
             <li style={liStyle}><strong>Verification Partners:</strong> state licensing portals, insurance verification services, BBB, CVOB registry.</li>
-            <li style={liStyle}><strong>Analytics and Performance:</strong> [ANALYTICS PROVIDER(S), IF ANY]</li>
-            <li style={liStyle}><strong>Customer Support Tools:</strong> [SUPPORT PROVIDER(S), IF ANY]</li>
+            <li style={liStyle}><strong>Analytics and Performance:</strong> Google Analytics 4 (GA4), used to understand site usage and improve the platform.</li>
+            <li style={liStyle}><strong>Customer Support Tools:</strong> ONP does not currently use a third-party support platform. Support requests are handled directly via email at support@ournextproject.us. This section will be updated if a third-party support tool is adopted in the future.</li>
           </ul>
           <h3 style={h3Style}>4.2 Other Users</h3>
           <ul style={{ paddingLeft: "24px", marginBottom: "12px" }}>
@@ -284,7 +284,7 @@ export default function PrivacyLegalPage() {
           <div style={{ background: "#EEF4FF", border: "1px solid #B8D0E8", borderRadius: "8px", padding: "16px 20px", fontSize: "15px", color: "#1E3A8A", lineHeight: 1.9 }}>
             <strong>Our Next Project, LLC</strong><br />
             Attn: Privacy<br />
-            [BUSINESS ADDRESS]<br />
+            11820 Flor Del Rio, Socorro, TX 79927<br />
             <a href="mailto:support@ournextproject.us" style={{ color: "#1B4F8A" }}>support@ournextproject.us</a>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MarketingHeader, MarketingFooter, BetaDisclaimerBanner } from "@/components/MarketingChrome";
+import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
 const eyebrow: React.CSSProperties = {
@@ -43,7 +43,6 @@ export default async function AboutPage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader active="about" />
-      <BetaDisclaimerBanner />
 
       <main style={{ maxWidth: "840px", margin: "0 auto", padding: "60px 24px" }}>
 

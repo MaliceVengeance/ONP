@@ -102,25 +102,6 @@ export function ServiceAreaBanner() {
   );
 }
 
-export function BetaDisclaimerBanner() {
-  return (
-    <div
-      style={{
-        background: "var(--camo-gunmetal)",
-        padding: "8px 32px",
-        textAlign: "center",
-        fontSize: "0.72rem",
-        color: "var(--camo-concrete)",
-        lineHeight: 1.5,
-      }}
-    >
-      <span style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--camo-accent)", marginRight: "6px" }}>
-        ⚠ Experimental Beta —
-      </span>
-      This platform is currently in beta testing. All projects, bids, and contractor profiles are for testing purposes only and should not be considered legitimate business transactions.
-    </div>
-  );
-}
 
 export function MarketingFooter() {
   return (
