@@ -36,10 +36,10 @@ function Track({ track }: { track: Track }) {
       );
     case "horseshoe":
       return (
-        <g fill="none" stroke="currentColor" strokeWidth="5">
-          <ellipse cx="20" cy="24" rx="9.5" ry="11.5" />
-          <polygon points="20,20 16.5,27 23.5,27" fill="currentColor" stroke="none" />
-        </g>
+        <path
+          d="M 20 3 C 11 3 7 9 7 16 C 7 20 8 22 9 25 C 12 24 14 22 15 19 C 17 24 18 29 20 33 C 22 29 23 24 25 19 C 26 22 28 24 31 25 C 32 22 33 20 33 16 C 33 9 29 3 20 3 Z"
+          fill="currentColor"
+        />
       );
     case "talon":
       return (
