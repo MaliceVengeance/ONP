@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 
@@ -51,15 +52,20 @@ export default async function ForPropertyManagersPage() {
 
       {/* Hero */}
       <section style={{ padding: "70px 32px 60px", background: "var(--camo-charcoal)", color: "var(--camo-concrete)" }}>
-        <div style={{ maxWidth: "780px", margin: "0 auto" }}>
-          <span style={{ ...eyebrow, color: "var(--camo-steel)", display: "block", marginBottom: "12px" }}>FOR PROPERTY MANAGERS &amp; DEVELOPERS</span>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 5vw, 3.4rem)", lineHeight: 1.05, margin: "0 0 20px", textTransform: "uppercase", color: "var(--camo-concrete)" }}>
-            Run competitive bids across every property, not just this one.
-          </h1>
-          <p style={{ fontSize: "1.05rem", color: "var(--camo-steel)", lineHeight: 1.7, maxWidth: "620px", marginBottom: "32px" }}>
-            One account, as many projects and properties as you need to bid out. Documented bid history for audit and compliance purposes, and an RFI system that keeps every contractor conversation on the record — not buried in someone&apos;s inbox.
-          </p>
-          <Link href="/signup" style={btnPrimary}>Create a Client Account</Link>
+        <div className="mob-grid-1" style={{ maxWidth: "1040px", margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "40px", alignItems: "center" }}>
+          <div>
+            <span style={{ ...eyebrow, color: "var(--camo-steel)", display: "block", marginBottom: "12px" }}>FOR PROPERTY MANAGERS &amp; DEVELOPERS</span>
+            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 5vw, 3.4rem)", lineHeight: 1.05, margin: "0 0 20px", textTransform: "uppercase", color: "var(--camo-concrete)" }}>
+              Run competitive bids across every property, not just this one.
+            </h1>
+            <p style={{ fontSize: "1.05rem", color: "var(--camo-steel)", lineHeight: 1.7, marginBottom: "32px" }}>
+              One account, as many projects and properties as you need to bid out. Documented bid history for audit and compliance purposes, and an RFI system that keeps every contractor conversation on the record — not buried in someone&apos;s inbox.
+            </p>
+            <Link href="/signup" style={btnPrimary}>Create a Client Account</Link>
+          </div>
+          <div style={{ position: "relative", borderRadius: "8px", overflow: "hidden", aspectRatio: "3/4" }}>
+            <Image src="/images/tile-multifamily.jpg" alt="Multifamily residential building exterior" fill sizes="(max-width: 768px) 100vw, 460px" style={{ objectFit: "cover" }} />
+          </div>
         </div>
       </section>
 

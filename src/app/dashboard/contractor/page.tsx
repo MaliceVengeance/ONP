@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 import { SERVICE_AREA_LABEL } from "@/lib/serviceArea/launchZips";
+import { BranchIcon } from "@/components/icons/BranchIcon";
 
 type AwardedRow = {
   project_id: string;
@@ -35,14 +36,14 @@ type OpenProject = {
 
 function getBranchInfo(branch: string | null) {
   switch (branch) {
-    case "army": return { label: "U.S. Army", emoji: "🪖" };
-    case "navy": return { label: "U.S. Navy", emoji: "⚓" };
-    case "marines": return { label: "U.S. Marine Corps", emoji: "🦅" };
-    case "air_force": return { label: "U.S. Air Force", emoji: "✈️" };
-    case "space_force": return { label: "U.S. Space Force", emoji: "🚀" };
-    case "coast_guard": return { label: "U.S. Coast Guard", emoji: "⚓" };
-    case "national_guard": return { label: "National Guard", emoji: "🛡️" };
-    default: return { label: "Veteran", emoji: "★" };
+    case "army": return { label: "U.S. Army" };
+    case "navy": return { label: "U.S. Navy" };
+    case "marines": return { label: "U.S. Marine Corps" };
+    case "air_force": return { label: "U.S. Air Force" };
+    case "space_force": return { label: "U.S. Space Force" };
+    case "coast_guard": return { label: "U.S. Coast Guard" };
+    case "national_guard": return { label: "National Guard" };
+    default: return { label: "Veteran" };
   }
 }
 
@@ -380,9 +381,7 @@ export default async function ContractorDashboard({
             alignItems: "center",
             gap: "16px",
           }}>
-            <div style={{ fontSize: "40px", flexShrink: 0 }}>
-              {branch.emoji}
-            </div>
+            <BranchIcon branch={militaryBranch} size={44} />
             <div>
               <div style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
