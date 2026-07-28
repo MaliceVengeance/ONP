@@ -381,7 +381,12 @@ export default async function ContractorDashboard({
             alignItems: "center",
             gap: "16px",
           }}>
-            <BranchIcon branch={militaryBranch} size={44} />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+              <BranchIcon branch={militaryBranch} size={44} />
+              <div style={{ fontSize: "10px", fontWeight: 600, color: "#92400E", textAlign: "center", whiteSpace: "nowrap" }}>
+                {branch.label} Veteran
+              </div>
+            </div>
             <div>
               <div style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
