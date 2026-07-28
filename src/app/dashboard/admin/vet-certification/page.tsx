@@ -2,6 +2,17 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { handleVetCertDecision } from "./actions";
+import { BranchIcon } from "@/components/icons/BranchIcon";
+
+const BRANCH_REFERENCE = [
+  { value: "army", label: "U.S. Army" },
+  { value: "navy", label: "U.S. Navy" },
+  { value: "marines", label: "U.S. Marine Corps" },
+  { value: "air_force", label: "U.S. Air Force" },
+  { value: "space_force", label: "U.S. Space Force" },
+  { value: "coast_guard", label: "U.S. Coast Guard" },
+  { value: "national_guard", label: "National Guard" },
+];
 
 type ContractorProfile = {
   contractor_id: string;
@@ -73,6 +84,26 @@ export default async function VetCertificationPage() {
       {/* Note requirement banner */}
       <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "8px", padding: "10px 16px", marginBottom: "20px", fontSize: "12px", color: "var(--camo-gunmetal)" }}>
         ℹ️ <strong>A note is required</strong> for every approval and rejection. Your name is recorded automatically in the audit log shown on each contractor's admin profile.
+      </div>
+
+      {/* Branch badge reference (Punch List 9 redesign) */}
+      <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "18px 20px", marginBottom: "24px" }}>
+        <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "var(--camo-charcoal)", textTransform: "uppercase", marginBottom: "4px" }}>
+          Branch Badge Reference
+        </h2>
+        <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px" }}>
+          Current badge set shown to contractors on their veteran banner. Edit <code>src/components/icons/BranchIcon.tsx</code> to change any of these.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+          {BRANCH_REFERENCE.map((b) => (
+            <div key={b.value} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "90px" }}>
+              <BranchIcon branch={b.value} size={48} />
+              <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textAlign: "center", lineHeight: 1.3 }}>
+                {b.label}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div style={{ marginBottom: "32px" }}>
