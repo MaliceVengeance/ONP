@@ -165,6 +165,7 @@ export default function TermsLegalPage() {
           <p style={pStyle}><strong>7.2</strong> Award decisions are the Client&apos;s sole responsibility. ONP does not select Contractors or recommend Bid amounts.</p>
           <p style={pStyle}><strong>7.3</strong> All Project performance, payment, change orders, and dispute resolution occur <strong>between the Client and Contractor directly</strong>, outside the Platform.</p>
           <p style={pStyle}><strong>7.4</strong> Users may not circumvent Platform fees by conducting on-Platform-initiated transactions off-Platform.</p>
+          <p style={pStyle}><strong>7.5 Circumventing an Active Sealed-Bid Process is Prohibited.</strong> Contractors may not use information obtained through participation in an active Project bid on ONP, including but not limited to client photographs or project details revealed as part of that bidding process, to attempt to identify, locate, or contact the Client outside of ONP for the purpose of circumventing that Project&apos;s sealed-bid process or ONP&apos;s fee structure. This provision does not restrict a Client&apos;s ability to browse the public contractor directory and contact a listed Contractor directly, which is an intended use of the Platform. Violation of this provision is grounds for immediate account suspension or termination, without refund of any subscription fees paid.</p>
         </div>
 
         {/* Section 8 */}
@@ -196,11 +197,12 @@ export default function TermsLegalPage() {
             <li style={liStyle}>(c) misrepresent your identity, license, insurance, qualifications, or veteran status;</li>
             <li style={liStyle}>(d) manipulate reviews, ratings, or Bids;</li>
             <li style={liStyle}>(e) circumvent Platform fees by conducting on-Platform-initiated transactions off-Platform;</li>
-            <li style={liStyle}>(f) interfere with or attempt to gain unauthorized access to any part of the Platform;</li>
-            <li style={liStyle}>(g) use automated means to access the Platform except as expressly permitted;</li>
-            <li style={liStyle}>(h) reverse engineer or decompile any part of the Platform;</li>
-            <li style={liStyle}>(i) use the Platform to send spam or malware; or</li>
-            <li style={liStyle}>(j) use the Platform for any purpose other than its intended use.</li>
+            <li style={liStyle}>(f) use information obtained through an active sealed-bid process — including client photographs or project details — to identify, locate, or contact a Client outside the Platform in order to circumvent that Project&apos;s bidding process or ONP&apos;s fee structure (this does not restrict browsing the public contractor directory or contacting a listed Contractor directly, which is an intended use of the Platform);</li>
+            <li style={liStyle}>(g) interfere with or attempt to gain unauthorized access to any part of the Platform;</li>
+            <li style={liStyle}>(h) use automated means to access the Platform except as expressly permitted;</li>
+            <li style={liStyle}>(i) reverse engineer or decompile any part of the Platform;</li>
+            <li style={liStyle}>(j) use the Platform to send spam or malware; or</li>
+            <li style={liStyle}>(k) use the Platform for any purpose other than its intended use.</li>
           </ul>
         </div>
 

@@ -31,11 +31,50 @@ export default async function ContractorOpenProjectsPage({
 }: {
   searchParams: Promise<{ sort?: string; category?: string; location?: string }>;
 }) {
-  const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
+  const { supabase, user, role } = await requireRole(["CONTRACTOR", "ADMIN"]);
   const sp = await searchParams;
   const sort = sp.sort === "newest" ? "newest" : "deadline";
   const categoryFilter = sp.category ?? "";
   const locationFilter = sp.location ?? "";
+
+  // Browsing open projects requires an active (or trialing) subscription.
+  // Enforced here at the data layer — an unsubscribed contractor's request
+  // never reaches list_open_projects at all, not just a hidden UI section.
+  if (role === "CONTRACTOR") {
+    const { data: subData } = await supabase
+      .from("contractor_subscriptions")
+      .select("status")
+      .eq("contractor_id", user.id)
+      .maybeSingle();
+    const isSubscribed = subData?.status === "ACTIVE" || subData?.status === "TRIALING";
+
+    if (!isSubscribed) {
+      return (
+        <div style={{ maxWidth: "600px", margin: "60px auto", textAlign: "center" }}>
+          <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔒</div>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "28px", letterSpacing: "1px", color: "var(--camo-charcoal)", marginBottom: "10px" }}>
+            Subscription Required
+          </h1>
+          <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", marginBottom: "24px", lineHeight: 1.6 }}>
+            An active ONP subscription is required to browse open projects. Plans start at $150/month.
+          </p>
+          <Link href="/dashboard/contractor/subscribe" style={{
+            background: "var(--camo-accent)",
+            color: "var(--camo-ink)",
+            padding: "12px 28px",
+            borderRadius: "6px",
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 600,
+            fontSize: "14px",
+            textDecoration: "none",
+            display: "inline-block",
+          }}>
+            View Subscription Plans →
+          </Link>
+        </div>
+      );
+    }
+  }
 
   const { data, error } = await supabase.rpc("list_open_projects", {
     p_sort: sort,

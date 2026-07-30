@@ -1,5 +1,6 @@
 "use server";
 
+import sharp from "sharp";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -38,10 +39,15 @@ export async function uploadPortfolioPhoto(formData: FormData) {
 
   const caption = String(formData.get("caption") ?? "").trim().slice(0, 200) || null;
 
+  // Strip EXIF/GPS metadata universally — same as project photo uploads.
+  // .rotate() auto-orients from the EXIF tag before it's discarded.
+  const inputBuffer = Buffer.from(await photo.arrayBuffer());
+  const outputBuffer = await sharp(inputBuffer).rotate().toBuffer();
+
   const path = `${user.id}/${Date.now()}_${photo.name}`;
   const { error: uploadErr } = await supabaseAdmin.storage
     .from("contractor-portfolio")
-    .upload(path, photo, { contentType: photo.type });
+    .upload(path, outputBuffer, { contentType: photo.type });
   if (uploadErr) throw new Error(`storage.upload(portfolio_photo) failed: ${JSON.stringify(uploadErr)}`);
 
   const { error: insertErr } = await supabaseAdmin.from("contractor_portfolio_photos").insert({

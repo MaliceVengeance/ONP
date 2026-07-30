@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -51,6 +52,15 @@ export default async function ContractorProfilePage({
     .maybeSingle();
 
   if (!profile) notFound();
+
+  // Directory visibility requires an active (or trialing) subscription —
+  // checked via service role since this is a public, unauthenticated page.
+  const { data: subRow } = await supabaseAdmin
+    .from("contractor_subscriptions")
+    .select("status")
+    .eq("contractor_id", id)
+    .maybeSingle();
+  if (subRow?.status !== "ACTIVE" && subRow?.status !== "TRIALING") notFound();
 
   const { data: photoRows } = await supabase
     .from("contractor_portfolio_photos")

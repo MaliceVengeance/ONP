@@ -142,6 +142,7 @@ export default function TermsPage() {
           <ul style={{ paddingLeft: "24px" }}>
             <li style={liStyle}>Post false, misleading, defamatory, or illegal content</li>
             <li style={liStyle}>Try to do deals off-platform to dodge fees</li>
+            <li style={liStyle}>Use photos or details from an active bid to track down and contact a client outside ONP to dodge the bidding process or fees (this doesn&apos;t apply to the public contractor directory — contacting a listed contractor directly is exactly what it&apos;s there for)</li>
             <li style={liStyle}>Misrepresent your license, insurance, or veteran status</li>
             <li style={liStyle}>Manipulate reviews (fake reviews, paid reviews, review trading)</li>
             <li style={liStyle}>Scrape, hack, reverse engineer, or break the platform</li>

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { uploadProjectFile } from "./actions";
 
 type FileObject = {
   name: string;
@@ -55,13 +56,12 @@ export default function FileUploader({
         return;
       }
 
-      const filePath = `${projectId}/${Date.now()}_${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("project-files")
-        .upload(filePath, file);
-
-      if (uploadError) {
-        setError(`Failed to upload ${file.name}: ${uploadError.message}`);
+      try {
+        const fd = new FormData();
+        fd.set("file", file);
+        await uploadProjectFile(projectId, fd);
+      } catch (err) {
+        setError(`Failed to upload ${file.name}: ${err instanceof Error ? err.message : "Unknown error"}`);
         setUploading(false);
         return;
       }

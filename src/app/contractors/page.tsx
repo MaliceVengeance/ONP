@@ -4,6 +4,19 @@ import { cookies } from "next/headers";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { getCamoVariant } from "@/lib/camo/session";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+
+// Directory listing requires an active (or trialing) subscription — a
+// contractor can build a full profile for free, but nothing about them is
+// public without paying. Resolved via service role since anon RLS on
+// contractor_subscriptions doesn't (and shouldn't) allow public reads.
+async function getActivelySubscribedContractorIds(): Promise<string[]> {
+  const { data } = await supabaseAdmin
+    .from("contractor_subscriptions")
+    .select("contractor_id")
+    .in("status", ["ACTIVE", "TRIALING"]);
+  return (data ?? []).map((r) => r.contractor_id as string);
+}
 
 type ContractorListing = {
   contractor_id: string;
@@ -64,23 +77,30 @@ export default async function ContractorDirectoryPage({
     }
   );
 
-  let query = supabase
-    .from("contractor_profiles")
-    .select("contractor_id, business_name, city, state, categories, description, veteran_verified, directory_verified, license_expiry, coi_expiry")
-    .eq("is_listed", true)
-    .eq("directory_verified", true)
-    .order("business_name", { ascending: true });
+  const activeIds = await getActivelySubscribedContractorIds();
 
-  if (sp.state) {
-    query = query.eq("state", sp.state.toUpperCase());
+  let contractors: ContractorListing[] = [];
+
+  if (activeIds.length > 0) {
+    let query = supabase
+      .from("contractor_profiles")
+      .select("contractor_id, business_name, city, state, categories, description, veteran_verified, directory_verified, license_expiry, coi_expiry")
+      .eq("is_listed", true)
+      .eq("directory_verified", true)
+      .in("contractor_id", activeIds)
+      .order("business_name", { ascending: true });
+
+    if (sp.state) {
+      query = query.eq("state", sp.state.toUpperCase());
+    }
+
+    if (sp.veteran === "1") {
+      query = query.eq("veteran_verified", true);
+    }
+
+    const { data } = await query;
+    contractors = (data ?? []) as ContractorListing[];
   }
-
-  if (sp.veteran === "1") {
-    query = query.eq("veteran_verified", true);
-  }
-
-  const { data } = await query;
-  const contractors = (data ?? []) as ContractorListing[];
 
   // Filter by category client-side since categories is an array
   const filtered = sp.category

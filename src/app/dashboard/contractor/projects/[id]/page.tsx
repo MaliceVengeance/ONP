@@ -38,7 +38,7 @@ export default async function ContractorProjectDetail({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ bid?: string; completion?: string }>;
 }) {
-  const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
+  const { supabase, user, role } = await requireRole(["CONTRACTOR", "ADMIN"]);
   const { id: projectId } = await params;
   const sp = await searchParams;
   const bidSubmitted = sp.bid === "ok";
@@ -52,6 +52,53 @@ export default async function ContractorProjectDetail({
     .maybeSingle();
 
   const isSubscribed = subData?.status === "ACTIVE" || subData?.status === "TRIALING";
+
+  // Fetched once, early — used both for the view gate below and later for
+  // existing-bid display, so we don't query it twice.
+  const { data: bidRow } = await supabase
+    .from("bids")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("contractor_id", user.id)
+    .maybeSingle();
+
+  // Viewing project details requires an active subscription — UNLESS this
+  // contractor already has a bid relationship with this specific project
+  // (submitted, or previously awarded). A subscription lapsing after a bid
+  // is submitted doesn't retract that bid (see Punch List 10, item 3), so
+  // it can't retract their ability to see the project they bid on either —
+  // this gate is about blocking cold browsing, not punishing existing bidders.
+  if (role === "CONTRACTOR" && !isSubscribed && !bidRow?.id) {
+    return (
+      <div style={{ maxWidth: "600px", margin: "60px auto", textAlign: "center" }}>
+        <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔒</div>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "28px", letterSpacing: "1px", color: "var(--camo-charcoal)", marginBottom: "10px" }}>
+          Subscription Required
+        </h1>
+        <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", marginBottom: "24px", lineHeight: 1.6 }}>
+          An active ONP subscription is required to view project details. Plans start at $150/month.
+        </p>
+        <Link href="/dashboard/contractor/subscribe" style={{
+          background: "var(--camo-accent)",
+          color: "var(--camo-ink)",
+          padding: "12px 28px",
+          borderRadius: "6px",
+          fontFamily: "'Barlow', sans-serif",
+          fontWeight: 600,
+          fontSize: "14px",
+          textDecoration: "none",
+          display: "inline-block",
+        }}>
+          View Subscription Plans →
+        </Link>
+        <div style={{ marginTop: "16px" }}>
+          <Link href="/dashboard/contractor/projects" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline", fontSize: "13px" }}>
+            ← Back to Open Projects
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch contractor's own credential expiry for warnings
   const { data: contractorProfile } = await supabase
@@ -106,13 +153,6 @@ export default async function ContractorProjectDetail({
       </div>
     );
   }
-
-  const { data: bidRow } = await supabase
-    .from("bids")
-    .select("id")
-    .eq("project_id", projectId)
-    .eq("contractor_id", user.id)
-    .maybeSingle();
 
   let existingBid: ExistingBid | null = null;
 
