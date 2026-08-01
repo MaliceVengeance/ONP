@@ -5,8 +5,9 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
 import { updateDraftProject, publishProject, repostProject, updateProjectRfis } from "../actions";
 import DeleteProjectButton from "./DeleteProjectButton";
+import ArchiveProjectButton from "./ArchiveProjectButton";
 import CountdownTimer from "@/components/CountdownTimer";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 import { sendClientMessage } from "./messages/actions";
 import { confirmCompletion, dismissCompletionRequest } from "./completion/actions";
@@ -102,10 +103,21 @@ export default async function EditProjectPage({
   const isDraft = project.state === "DRAFT";
   const isPendingPayment = project.state === "PENDING_PAYMENT";
   const isPublished = !isDraft && !isPendingPayment;
-  const canDelete =
-    project.state === "DRAFT" ||
-    project.state === "PENDING_PAYMENT" ||
-    (project.state === "OPEN" && (bidCount ?? 0) === 0);
+
+  // Punch List 11: a project can never be removed while its bidding window
+  // is open. DRAFT/PENDING_PAYMENT never had a window, so they're always
+  // eligible for a hard delete. Once published (OPEN), removal only opens
+  // up after the deadline passes — and then splits by activity: zero bids
+  // ever means nothing to lose (hard delete); any real bid activity, or an
+  // award, means the record is preserved (archive) instead.
+  const biddingWindowClosed = !!project.deadline_at && new Date(project.deadline_at).getTime() <= Date.now();
+  const isTerminalAwarded = project.state === "AWARDED" || project.state === "COMPLETED";
+  const windowClosedNeverAwarded = project.state === "OPEN" && biddingWindowClosed;
+
+  const canHardDelete =
+    isDraft || isPendingPayment || (windowClosedNeverAwarded && (bidCount ?? 0) === 0);
+  const canArchive =
+    isTerminalAwarded || (windowClosedNeverAwarded && (bidCount ?? 0) > 0);
 
   // Mark messages as read when client visits this page (AWARDED or COMPLETED)
   if (["AWARDED", "COMPLETED"].includes(project.state)) {
@@ -226,7 +238,7 @@ export default async function EditProjectPage({
             {isDraft ? "Edit Draft" : project.title ?? "Project"}
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px", flexWrap: "wrap" }}>
-            <span style={stateBadge(project.state)}>{project.state}</span>
+            <span style={stateBadge(project.state)}>{projectStateLabel(project.state)}</span>
             {isPublished && (project as any).inspector_hold_started_at ? (
               <span style={{
                 fontSize: "12px",
@@ -267,7 +279,8 @@ export default async function EditProjectPage({
             </button>
           </form>
 
-          {canDelete && <DeleteProjectButton projectId={id} />}
+          {canArchive && <ArchiveProjectButton projectId={id} />}
+          {canHardDelete && <DeleteProjectButton projectId={id} />}
 
           <Link
             href="/dashboard/client/projects"

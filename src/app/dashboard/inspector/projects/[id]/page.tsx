@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { submitTakeoffReport, requestUpgrade, submitDisputeResponse } from "./actions";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 
 export default async function InspectorProjectDetailPage({
   params,
@@ -106,7 +106,7 @@ export default async function InspectorProjectDetailPage({
             <span style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
               {project?.category ?? "—"} • {project?.city ?? "—"}
             </span>
-            {project && <span style={stateBadge(project.state)}>{project.state}</span>}
+            {project && <span style={stateBadge(project.state)}>{projectStateLabel(project.state)}</span>}
           </div>
         </div>
         <Link

@@ -232,6 +232,45 @@ export async function sendBidDismissedEmail({
   });
 }
 
+export async function sendProjectArchivedEmail({
+  contractorEmail,
+  contractorName,
+  projectTitle,
+}: {
+  contractorEmail: string;
+  contractorName: string;
+  projectTitle: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `"${projectTitle}" was closed out without an award`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #1B2942; border: 1px solid #3A5A7A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #B0C4DE; margin-top: 0;">Project Closed Out</h2>
+          <p style="color: #B0C4DE;">Hi ${contractorName},</p>
+          <p style="color: #B0C4DE;">The bidding window for <strong style="color: #fff;">"${projectTitle}"</strong> has closed, and the client has closed the project out without awarding it.</p>
+          <p style="color: #B0C4DE;">Your bid record is retained, but this project is no longer active. There are always new projects posting on ONP.</p>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink("/dashboard/contractor/projects")}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Browse Open Projects
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendDismissalReasonFollowUpEmail({
   contractorEmail,
   contractorName,

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sendProjectArchivedEmail } from "@/lib/email";
 import type { ProjectCategory } from "@/lib/projects/categories";
 
 function clean(v: FormDataEntryValue | null) {
@@ -163,8 +164,12 @@ export async function publishProject(projectId: string, formData: FormData) {
 }
 
 /**
- * Delete a project — only allowed if it's a DRAFT,
- * or OPEN with zero bids submitted
+ * Permanently delete a project. Punch List 11: a project can never be
+ * deleted while its bidding window is open — DRAFT/PENDING_PAYMENT never
+ * had a window at all (always eligible), but an OPEN project is only
+ * eligible once its deadline has passed, and only if it never received a
+ * single bid. Anything with real bid activity goes through archiveProject
+ * instead, never a hard delete.
  */
 export async function deleteProject(projectId: string) {
   const supabase = await createSupabaseServerClient();
@@ -177,7 +182,7 @@ export async function deleteProject(projectId: string) {
   // Confirm ownership and fetch state
   const { data: project, error: readErr } = await supabase
     .from("projects")
-    .select("id, state, client_id")
+    .select("id, state, client_id, deadline_at")
     .eq("id", projectId)
     .eq("client_id", user.id)
     .single();
@@ -186,8 +191,16 @@ export async function deleteProject(projectId: string) {
     throw new Error("Project not found or you do not have permission to delete it.");
   }
 
-  if (!["DRAFT", "OPEN", "PENDING_PAYMENT"].includes(project.state)) {
-    throw new Error("Only draft or open projects can be removed.");
+  const neverPublished = project.state === "DRAFT" || project.state === "PENDING_PAYMENT";
+  const deadlinePassed = !!project.deadline_at && new Date(project.deadline_at).getTime() <= Date.now();
+
+  if (!neverPublished) {
+    if (project.state !== "OPEN") {
+      throw new Error("This project can't be permanently deleted. Awarded or bid-on projects are archived instead, to preserve the record.");
+    }
+    if (!deadlinePassed) {
+      throw new Error("This project's bidding window is still open — it can't be deleted or archived until the deadline passes.");
+    }
   }
 
   // If PENDING_PAYMENT, cancel the emergency log row first (avoids FK constraint)
@@ -204,7 +217,7 @@ export async function deleteProject(projectId: string) {
       .eq("payment_status", "PENDING");
   }
 
-  // If OPEN, block deletion if any bids exist
+  // If OPEN (deadline already confirmed passed above), block deletion if any bids exist
   if (project.state === "OPEN") {
     const { count } = await supabase
       .from("bids")
@@ -212,7 +225,7 @@ export async function deleteProject(projectId: string) {
       .eq("project_id", projectId);
 
     if ((count ?? 0) > 0) {
-      throw new Error("Cannot remove a project that already has bids submitted.");
+      throw new Error("This project has submitted bids — archive it instead of deleting, to preserve that record.");
     }
   }
 
@@ -223,6 +236,97 @@ export async function deleteProject(projectId: string) {
     .eq("client_id", user.id);
 
   if (delErr) throw delErr;
+
+  redirect("/dashboard/client/projects");
+}
+
+/**
+ * Soft-delete / archive a project — for AWARDED or COMPLETED projects, or an
+ * OPEN project past its deadline that has real bid activity. Nothing is
+ * deleted; state flips to CANCELED (the app's existing, previously-unused
+ * archive marker — already styled and bucketed as "closed" everywhere in
+ * the UI, so no new enum value or migration was needed). If the project was
+ * never awarded, every contractor who bid gets notified immediately, same
+ * pattern as bid dismissal notifications.
+ */
+export async function archiveProject(projectId: string) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: project, error: readErr } = await supabase
+    .from("projects")
+    .select("id, title, state, client_id, deadline_at")
+    .eq("id", projectId)
+    .eq("client_id", user.id)
+    .single();
+
+  if (readErr || !project) {
+    throw new Error("Project not found or you do not have permission to archive it.");
+  }
+
+  const isTerminalAwarded = project.state === "AWARDED" || project.state === "COMPLETED";
+  const deadlinePassed = !!project.deadline_at && new Date(project.deadline_at).getTime() <= Date.now();
+
+  if (!isTerminalAwarded) {
+    if (project.state !== "OPEN") {
+      throw new Error("This project can't be archived from its current state.");
+    }
+    if (!deadlinePassed) {
+      throw new Error("This project's bidding window is still open — it can't be archived until the deadline passes.");
+    }
+  }
+
+  const { data: bidderRows } = await supabase
+    .from("bids")
+    .select("contractor_id")
+    .eq("project_id", projectId);
+
+  const hasBids = (bidderRows ?? []).length > 0;
+
+  if (!isTerminalAwarded && !hasBids) {
+    throw new Error("This project never received a bid — delete it instead of archiving, since there's nothing to preserve.");
+  }
+
+  const { error: updErr } = await supabase
+    .from("projects")
+    .update({ state: "CANCELED", updated_at: new Date().toISOString() })
+    .eq("id", projectId)
+    .eq("client_id", user.id);
+
+  if (updErr) throw updErr;
+
+  // Notify every contractor who bid — only meaningful when the project
+  // never reached an award (an awarded/completed project's contractors
+  // already know the outcome; this is specifically for "closed out with no
+  // winner"). Each send is independently try/caught so one failure can't
+  // block the others, matching the dismissal-notification pattern.
+  if (!isTerminalAwarded && hasBids) {
+    const contractorIds = [...new Set((bidderRows ?? []).map((b) => b.contractor_id))];
+    const { data: profileRows } = await supabaseAdmin
+      .from("contractor_profiles")
+      .select("contractor_id, business_name")
+      .in("contractor_id", contractorIds);
+    const nameMap = new Map((profileRows ?? []).map((p) => [p.contractor_id, p.business_name]));
+
+    for (const contractorId of contractorIds) {
+      try {
+        const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(contractorId);
+        if (authUser?.user?.email) {
+          await sendProjectArchivedEmail({
+            contractorEmail: authUser.user.email,
+            contractorName: nameMap.get(contractorId) ?? "Contractor",
+            projectTitle: project.title ?? "Project",
+          });
+        }
+      } catch (e) {
+        console.error(`Failed to send project-archived email for contractor ${contractorId}:`, e);
+      }
+    }
+  }
 
   redirect("/dashboard/client/projects");
 }

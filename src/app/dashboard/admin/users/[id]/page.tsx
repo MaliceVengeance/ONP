@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import { updateContractorVerification, setCredentialVerified, deleteCredentialAdmin } from "./actions";
 
 const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
@@ -253,7 +253,7 @@ export default async function AdminUserProfilePage({
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-            <span style={stateBadge(project.state)}>{project.state}</span>
+            <span style={stateBadge(project.state)}>{projectStateLabel(project.state)}</span>
             <Link
               href={`/dashboard/admin/projects/${project.id}`}
               style={{

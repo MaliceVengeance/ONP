@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 
 type Project = {
@@ -94,7 +94,7 @@ export default async function AdminProjectsPage() {
                   )}
                 </div>
               </div>
-              <span style={stateBadge(p.state)}>{p.state}</span>
+              <span style={stateBadge(p.state)}>{projectStateLabel(p.state)}</span>
             </HoverCard>
             </Link>
           ))

@@ -105,7 +105,7 @@ export const ui = {
   } as React.CSSProperties,
 };
 
-export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "canceled" | "completed" | "emergency" | "pending_payment") {
+export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "canceled" | "archived" | "completed" | "emergency" | "pending_payment") {
   const base: React.CSSProperties = {
     fontSize: "11px",
     fontWeight: 600,
@@ -121,6 +121,7 @@ export function badge(type: "open" | "draft" | "awarded" | "closed" | "vet" | "c
     case "closed": return { ...base, background: "#2D1A00", color: "#FBBF24", border: "1px solid #92400E" };
     case "vet": return { ...base, background: "#1e1a00", color: "#FBBF24", border: "1px solid #92400E" };
     case "canceled": return { ...base, background: "#3D0A0A", color: "#F87171", border: "1px solid #991B1B" };
+    case "archived": return { ...base, background: "#1F2937", color: "#9CA3AF", border: "1px solid #4B5563" };
     case "completed": return { ...base, background: "#0D2D1A", color: "#34D399", border: "1px solid #065F46" };
     case "emergency": return { ...base, background: "#7C1A00", color: "#FDBA74", border: "1px solid #C2410C" };
     case "pending_payment": return { ...base, background: "#1A1000", color: "#FBBF24", border: "1px solid #D97706" };
@@ -135,12 +136,22 @@ export function stateBadge(state: string) {
     case "AWARDED": return badge("awarded");
     case "BIDDING_CLOSED": return badge("closed");
     case "BIDS_UNLOCKED": return badge("closed");
-    case "CANCELED": return badge("canceled");
+    // CANCELED is reused as the project-archive marker (Punch List 11) —
+    // styled neutral/gray rather than red, since archiving isn't an error
+    // state: the data is retained, not lost.
+    case "CANCELED": return badge("archived");
     case "COMPLETED": return badge("completed");
     case "PENDING_PAYMENT": return badge("pending_payment");
     case "EMERGENCY_EXPIRED": return badge("canceled");
     default: return badge("draft");
   }
+}
+
+// Display label for a raw project_state value. CANCELED is repurposed as
+// the archive marker, so it's shown to users as "ARCHIVED" rather than the
+// literal (and misleading — nothing was actually cancelled) enum name.
+export function projectStateLabel(state: string): string {
+  return state === "CANCELED" ? "ARCHIVED" : state;
 }
 
 /** Inline emergency badge — rendered next to a project title */

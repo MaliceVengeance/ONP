@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 
 type Project = {
@@ -388,7 +388,7 @@ function ProjectCard({ p, urgent, bidCount, unreadCount = 0 }: { p: Project; urg
           )}
         </div>
         <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
-          <span style={stateBadge(p.state)}>{p.state}</span>
+          <span style={stateBadge(p.state)}>{projectStateLabel(p.state)}</span>
           {unreadCount > 0 && (
             <span style={{
               fontSize: "11px",

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import { sendAdminMessage } from "./messages/actions";
 
 export default async function AdminProjectDetailPage({
@@ -136,7 +136,7 @@ export default async function AdminProjectDetailPage({
             {project.title ?? "Untitled Project"}
           </h1>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px" }}>
-            <span style={stateBadge(project.state)}>{project.state}</span>
+            <span style={stateBadge(project.state)}>{projectStateLabel(project.state)}</span>
             <span style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
               {project.category ?? "—"} • {project.city ?? "—"}
             </span>

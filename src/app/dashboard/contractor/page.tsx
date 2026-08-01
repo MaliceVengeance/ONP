@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 import { SERVICE_AREA_LABEL } from "@/lib/serviceArea/launchZips";
 import { BranchIcon } from "@/components/icons/BranchIcon";
@@ -592,7 +592,7 @@ export default async function ContractorDashboard({
                     <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>v{b.version_number}</div>
                     <div style={{ marginTop: "6px" }}>
                       <span style={stateBadge(b.project_state)}>
-                        {b.project_state}
+                        {projectStateLabel(b.project_state)}
                       </span>
                     </div>
                   </div>

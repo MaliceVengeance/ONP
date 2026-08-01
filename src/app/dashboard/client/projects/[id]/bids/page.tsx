@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import AwardButton from "./AwardButton";
 import DismissBidButton from "./DismissBidButton";
@@ -273,7 +273,7 @@ export default async function ClientProjectBidsPage({
             <span style={{ fontSize: "14px", color: "var(--camo-gunmetal)" }}>
               {project.title ?? "Untitled"}
             </span>
-            <span style={stateBadge(project.state)}>{project.state}</span>
+            <span style={stateBadge(project.state)}>{projectStateLabel(project.state)}</span>
           </div>
         </div>
         <Link

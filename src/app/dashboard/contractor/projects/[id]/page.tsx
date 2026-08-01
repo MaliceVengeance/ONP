@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import CountdownTimer from "@/components/CountdownTimer";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import ProjectFileLink from "./ProjectFileLink";
 import ProjectMap from "@/components/ProjectMap";
 import BidForm from "./BidForm";
@@ -350,7 +350,7 @@ export default async function ContractorProjectDetail({
             <span style={{ fontSize: "13px", color: "var(--camo-gunmetal)" }}>
               {project.category ?? "—"} • {project.location_general ?? "—"}{zipCode ? ` ${zipCode}` : ""}
             </span>
-            <span style={stateBadge(project.state)}>{project.state}</span>
+            <span style={stateBadge(project.state)}>{projectStateLabel(project.state)}</span>
           </div>
         </div>
         <div className="mob-wrap" style={{ display: "flex", gap: "8px", flexShrink: 0 }}>

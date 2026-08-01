@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
 
 type MyBidRow = {
@@ -341,7 +341,7 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
               {b.category ?? "—"} • {b.location_general ?? "—"}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-              <span style={stateBadge(b.project_state)}>{b.project_state}</span>
+              <span style={stateBadge(b.project_state)}>{projectStateLabel(b.project_state)}</span>
               {deadline && (
                 <span style={{ fontSize: "11px", color: deadlinePassed ? "#991B1B" : "var(--camo-gunmetal)" }}>
                   {deadlinePassed ? "Deadline passed" : `Deadline: ${deadline.toLocaleDateString()}`}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { stateBadge } from "@/lib/ui";
+import { stateBadge, projectStateLabel } from "@/lib/ui";
 
 export default async function InspectorProjectsPage() {
   const { supabase, user } = await requireRole(["INSPECTOR", "ADMIN"]);
@@ -124,7 +124,7 @@ export default async function InspectorProjectsPage() {
                         </div>
                       )}
                     </div>
-                    {p && <span style={stateBadge(p.state)}>{p.state}</span>}
+                    {p && <span style={stateBadge(p.state)}>{projectStateLabel(p.state)}</span>}
                   </div>
                 </Link>
               );
