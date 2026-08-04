@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { changeUserRole, deactivateUser, reactivateUser } from "./actions";
+import { changeUserRole, deactivateUser } from "./actions";
+import DeactivatedUsersPanel from "./DeactivatedUsersPanel";
 
 type Profile = {
   id: string;
@@ -340,87 +341,17 @@ export default async function AdminUsersPage({
         )}
       </div>
 
-      {/* Deactivated users */}
+      {/* Deactivated users — selectable for permanent deletion (Punch List 12) */}
       {deactivated.length > 0 && (
-        <div>
-          <hr style={{ border: "none", borderTop: "1px solid #d9dbdb", margin: "0 0 20px" }} />
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700,
-            fontSize: "16px",
-            letterSpacing: "1px",
-            color: "#991B1B",
-            textTransform: "uppercase",
-            marginBottom: "12px",
-          }}>
-            Deactivated ({deactivated.length})
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {deactivated.map((p) => {
-              const auth = authMap.get(p.id);
-              return (
-                <div key={p.id} style={{
-                  background: "#FEF2F2",
-                  border: "1px solid #FCA5A5",
-                  borderRadius: "10px",
-                  padding: "18px",
-                  opacity: 0.8,
-                }}>
-                  <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "3px" }}>
-                        {p.display_name ?? p.company_name ?? "No name set"}
-                      </div>
-                      <div style={{ fontSize: "13px", color: "#991B1B", marginBottom: "2px" }}>
-                        {auth?.email ?? "No email found"}
-                      </div>
-                      <span style={{
-                        fontSize: "11px",
-                        fontWeight: 600,
-                        padding: "3px 8px",
-                        borderRadius: "20px",
-                        ...roleColor(p.role),
-                      }}>
-                        {p.role}
-                      </span>
-                    </div>
-                    <div className="mob-wrap" style={{ display: "flex", gap: "8px" }}>
-                      <Link
-                        href={`/dashboard/admin/users/${p.id}`}
-                        style={{
-                          background: "transparent",
-                          color: "var(--camo-gunmetal)",
-                          border: "1px solid #d9dbdb",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          fontFamily: "'Barlow', sans-serif",
-                          fontSize: "12px",
-                          textDecoration: "none",
-                        }}
-                      >
-                        View
-                      </Link>
-                      <form action={reactivateUser.bind(null, p.id)}>
-                        <button style={{
-                          background: "#F0FDF4",
-                          color: "#15803D",
-                          border: "1px solid #166534",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          fontFamily: "'Barlow', sans-serif",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}>
-                          Reactivate
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <DeactivatedUsersPanel
+          users={deactivated.map((p) => ({
+            id: p.id,
+            display_name: p.display_name,
+            company_name: p.company_name,
+            role: p.role,
+            email: authMap.get(p.id)?.email ?? null,
+          }))}
+        />
       )}
     </div>
   );
