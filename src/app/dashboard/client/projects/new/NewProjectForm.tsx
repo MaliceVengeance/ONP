@@ -252,10 +252,10 @@ export default function NewProjectForm({ categories, rateLimit, rfiCatalog }: Pr
             <span style={{ fontSize: "20px", flexShrink: 0 }}>📁</span>
             <div>
               <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--camo-charcoal)", marginBottom: "3px" }}>
-                You can add photos and documents after creating your draft
+                Next step: add photos and documents
               </div>
               <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", lineHeight: 1.5 }}>
-                Once your draft is saved you'll be able to upload blueprints, photos, and files to help contractors understand the scope.
+                Right after this, you'll be able to upload blueprints, photos, and files to help contractors understand the scope — no separate trip needed.
               </div>
             </div>
           </div>

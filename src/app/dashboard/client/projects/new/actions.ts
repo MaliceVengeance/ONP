@@ -94,7 +94,9 @@ export async function createProject(formData: FormData) {
 
     if (error) throw error;
     await insertPreAnsweredRfis(data.id, formData);
-    redirect(`/dashboard/client/projects/${data.id}`);
+    // Land straight on the file-upload step as part of one continuous
+    // creation flow, rather than a separate trip back in later.
+    redirect(`/dashboard/client/projects/${data.id}/files?new=1`);
   }
 
   // ── Emergency project ─────────────────────────────────────────
