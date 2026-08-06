@@ -145,11 +145,13 @@ BEGIN
   END IF;
 END $$;
 
--- Only admins can update (notified_at, notes) -- narrower than a broad
--- policy would allow, since there is no legitimate client-facing update
--- case today. Matches the design review's recommendation to prefer the
--- narrowest policy that supports the actual admin UI (bulk-notify,
--- edit-notes), rather than a generic "admins can do anything" grant.
+-- Only admins can update rows on this table. This is a row-level policy,
+-- not a column-level restriction -- RLS governs which ROWS an admin may
+-- update (here: all of them, since eligibility doesn't depend on row
+-- content), not which COLUMNS. The application currently only ever writes
+-- notified_at and notes (see notifyWaitlistByZips / updateWaitlistNotes),
+-- but that's an application-layer choice, not something this policy
+-- itself enforces or restricts.
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -178,6 +180,26 @@ ALTER TABLE public.profiles
 
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS service_area_status text NOT NULL DEFAULT 'UNKNOWN';
+
+-- profiles already exists in production, so this constraint can't be
+-- declared inline the way it could on a brand-new table -- ALTER TABLE has
+-- no native ADD CONSTRAINT IF NOT EXISTS, so it's guarded via the same
+-- pg_constraint existence-check pattern used for foreign keys in 016.
+-- Safe by construction: the column above is added (existing rows filled
+-- with the 'UNKNOWN' default) in the same migration file, before this
+-- constraint is ever added, so no existing or newly-defaulted row can
+-- violate it -- verified directly against production (see validation
+-- results) rather than assumed.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'profiles_service_area_status_check' AND conrelid = 'public.profiles'::regclass
+  ) THEN
+    ALTER TABLE public.profiles
+      ADD CONSTRAINT profiles_service_area_status_check
+      CHECK (service_area_status IN ('UNKNOWN', 'IN_AREA', 'OUT_OF_AREA'));
+  END IF;
+END $$;
 
 -- ============================================================================
 -- SECTION: FUNCTIONS
@@ -217,7 +239,10 @@ $function$;
 --   1 function replaced in place (handle_new_user -- same identity, extended body)
 --   3 RLS policies on service_area_waitlist (insert/select/update)
 --   4 indexes on service_area_waitlist (1 unique normalized dedup index + 3 lookup indexes)
---   2 CHECK constraints inline (intended_role, source) + 1 inline CHECK (zip format)
+--   2 CHECK constraints inline on service_area_waitlist (intended_role, source)
+--     + 1 inline CHECK on service_area_waitlist (zip format)
+--   1 guarded CHECK constraint added to profiles (service_area_status IN
+--     ('UNKNOWN','IN_AREA','OUT_OF_AREA'))
 --
 -- NOT created by this migration: any HISTORICAL_SIGNUP_BACKFILL rows, any
 -- backfilled service_area_status value on existing profiles, any
