@@ -6,51 +6,98 @@
 --   Captures the live production database schema in full: all tables,
 --   enums, constraints, functions, triggers, RLS policies, indexes, and
 --   storage bucket configuration, as it exists in production as of the
---   snapshot below. This closes the gap identified in the Priority 1.1
---   schema audit -- 26 of 41 tables (plus every enum, function, trigger,
---   and RLS policy) had never been captured in any tracked migration.
+--   snapshot below. Snapshot taken via direct pg_catalog/information_schema
+--   introspection on 2026-08-05 (revised 2026-08-06 after independent
+--   review -- see REVISION NOTES below).
 --
---   Snapshot taken via direct pg_catalog/information_schema introspection
---   (not the partial PostgREST API) on 2026-08-05.
+-- FRESH-REBUILD PATH -- READ BEFORE APPLYING TO A NEW ENVIRONMENT
+--   For a genuine from-scratch rebuild, run THIS FILE ALONE. Do not also
+--   run 001 through 015 afterward -- this file is a COMPLETE baseline
+--   (every table, enum, constraint, function, trigger, policy, index, and
+--   storage bucket as they exist in production today, i.e. the end state
+--   AFTER 001-015 were applied), so 001-015 have nothing left to add.
+--
+--   This was verified empirically, not assumed, in two stages:
+--     1. Running 001 through 016 in literal ascending filename order
+--        against a genuinely empty database fails immediately in
+--        001_emergency_bid.sql with "relation projects does not exist" --
+--        migrations 001-015 all assume a pre-existing base schema
+--        (profiles, projects, contractor_profiles, bids, etc.) that, in
+--        this project's real history, was created directly in the
+--        Supabase dashboard before migration 001 was ever written. 016 is
+--        the first migration to ever create those tables.
+--     2. Running 016 FIRST and then 001-015 also fails -- not on table
+--        creation (016 already created everything), but because most of
+--        001-015 (002, 003, 005, 006, 008, 010, 012 confirmed) create
+--        policies with a bare CREATE POLICY and no DROP POLICY IF EXISTS
+--        or other guard. They were written as one-time "run this once in
+--        the SQL Editor" scripts, not idempotent/repeatable migrations --
+--        so once 016 has already created the policy they're about to
+--        create, they fail on "policy already exists" rather than no-op.
+--
+--   Conclusion: 016 is self-sufficient. Verified by running it alone,
+--   twice in a row, against a genuinely separate, empty Postgres database
+--   (not just a schema within the same database as production, which
+--   would let production's own catalog rows leak into unqualified system
+--   catalog lookups and mask certain classes of bug) -- see the companion
+--   validation report for exact commands and results.
+--
+--   Against PRODUCTION, none of this matters -- every statement in this
+--   file is a guarded no-op against objects that already exist, regardless
+--   of run order relative to 001-015.
 --
 -- SCOPE / WHAT THIS MIGRATION DELIBERATELY DOES NOT DO
---   This is a documentary baseline capture only. Per explicit instruction:
---     - Does NOT repair, refactor, optimize, rename, or remove anything.
---     - Does NOT add new behavior.
---     - Every quirk found in production (duplicate-looking columns,
---       dead tables, zero-policy tables, etc.) is captured exactly as-is,
---       unexplained beyond a factual note, not "fixed."
+--   Documentary baseline capture only: no repair, no refactor, no
+--   optimization, no renames, no removals, no new behavior. Every quirk
+--   found in production is captured exactly as-is.
 --
---   EXCLUDED ON PURPOSE: "service_area_waitlist" and the
---   "profiles.service_area_zip" / "profiles.service_area_status" columns.
---   These have a tracked migration (005_service_area.sql) but were
---   confirmed, via direct evidence (the live handle_new_user() function
---   body still matches the pre-005 version byte-for-byte), to have never
---   actually been applied to production. Including them here would make
---   this "baseline capture" migration silently also a behavior-changing
---   repair, which contradicts its own purpose. See the dedicated
---   investigation report for full evidence; the fix belongs in its own
---   later migration (proposed as 017), not here.
+--   EXCLUDED ON PURPOSE: "service_area_waitlist" and
+--   "profiles.service_area_zip" / "profiles.service_area_status" --
+--   confirmed absent from production (migration 005 was never actually
+--   applied). See the dedicated investigation report. Fix belongs in a
+--   later, separate migration -- not started here.
 --
--- IDEMPOTENCY STRATEGY (see design review for full reasoning)
+-- IDEMPOTENCY STRATEGY
 --   - Extensions:  CREATE EXTENSION IF NOT EXISTS               (native)
 --   - Enums:       DO block guarded by a pg_type existence check (no native IF NOT EXISTS for CREATE TYPE)
---   - Tables:      CREATE TABLE IF NOT EXISTS, constraints inline (native)
+--   - Tables:      CREATE TABLE IF NOT EXISTS, PK/UNIQUE/CHECK inline (native)
+--   - Foreign keys: DO block guarded by a pg_constraint existence check, added
+--                   AFTER every table exists (see REVISION NOTES -- this is new)
 --   - Functions:   CREATE OR REPLACE FUNCTION                   (native, safe to re-run verbatim)
---   - Triggers:    DO block guarded by a pg_trigger existence check (no DROP -- purely additive)
+--   - Triggers:    DO block guarded by a pg_trigger existence check  (no DROP -- purely additive)
 --   - RLS enable:  ALTER TABLE ... ENABLE ROW LEVEL SECURITY     (native no-op if already enabled)
 --   - RLS policies: DO block guarded by a pg_policies existence check (no DROP -- purely additive)
 --   - Indexes:     CREATE [UNIQUE] INDEX IF NOT EXISTS           (native)
---   - Storage buckets:  INSERT ... ON CONFLICT (id) DO NOTHING   (never overwrites a live config change)
---   - Storage policies: same DO-block guard pattern as RLS policies, scoped to storage.objects
+--   - Storage buckets:  INSERT ... ON CONFLICT (id) DO NOTHING
+--   - Storage policies: same DO-block guard pattern, scoped to storage.objects
 --
 --   CREATE POLICY IF NOT EXISTS and CREATE TRIGGER IF NOT EXISTS were
---   verified empirically against this database (PostgreSQL 17.6) to NOT
---   be valid syntax -- the DO-block catalog-guard pattern below was
---   chosen specifically so this migration never has to DROP anything to
---   achieve idempotency, per explicit instruction to stay purely additive.
+--   verified empirically to be invalid syntax on this Postgres version
+--   (17.6) -- confirmed by direct test, not assumed.
 --
--- OBJECT COUNTS (cross-check against the design review before applying)
+-- REVISION NOTES (this version)
+--   Independent review correctly identified that inline foreign keys
+--   inside alphabetically-ordered CREATE TABLE statements would fail a
+--   genuine fresh-rebuild test (e.g. bid_dismissals, created before
+--   "bids" and "projects" alphabetically, inline-references both).
+--   Fixed by moving all 65 foreign keys out of CREATE TABLE and into a
+--   new SECTION: CONSTRAINTS block that runs after every table exists,
+--   each one individually guarded so re-running is always safe and nothing
+--   is ever dropped. Table creation order no longer matters at all.
+--
+--   Also fixed: the enum-existence guard checked pg_type.typname with no
+--   namespace filter, which is unsafe in general (not just a test
+--   artifact) -- now properly joins pg_namespace and filters on
+--   nspname = 'public'.
+--
+--   Also determined, via a genuinely separate empty database (not just an
+--   isolated schema, which would let production's own pg_type catalog
+--   rows leak into unqualified lookups): 016 is self-sufficient for a
+--   fresh rebuild on its own. Running 001-015 afterward is unnecessary
+--   and fails, since most of them create policies with no idempotency
+--   guard. See FRESH-REBUILD PATH above.
+--
+-- OBJECT COUNTS (cross-check before applying)
 --   41 tables · 9 enums · 65 foreign keys · 11 unique constraints ·
 --   8 check constraints · 53 secondary indexes · 20 functions ·
 --   3 triggers · 82 RLS policies · 4 storage buckets · 6 storage policies
@@ -60,11 +107,9 @@
 -- ============================================================================
 -- SECTION: EXTENSIONS
 -- ============================================================================
--- All 5 confirmed present in pg_available_extensions on this Supabase
--- Postgres instance. supabase_vault is Supabase-platform-specific and will
--- only succeed on a Supabase-hosted project (consistent with this
--- migration's target: "a brand-new Supabase project", per the original
--- task framing) -- it would fail on vanilla self-hosted Postgres.
+-- Confirmed present in pg_available_extensions on this Supabase Postgres
+-- instance. supabase_vault is Supabase-platform-specific and will only
+-- succeed on a Supabase-hosted project.
 
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -75,61 +120,85 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================================================
 -- SECTION: ENUMS
 -- ============================================================================
--- No native CREATE TYPE IF NOT EXISTS in PostgreSQL -- guarded via pg_type
--- existence check, matching the pattern already established in this
--- repo's own 011/015 migrations.
 
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'bid_status') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'bid_status'
+  ) THEN
     CREATE TYPE public.bid_status AS ENUM ('IN_PROGRESS', 'SUBMITTED_CURRENT', 'REVIEW_REQUIRED', 'LOCKED_FINAL', 'DISQUALIFIED_SUBSCRIPTION');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'dispute_status') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'dispute_status'
+  ) THEN
     CREATE TYPE public.dispute_status AS ENUM ('SUBMITTED', 'UNDER_REVIEW', 'RESOLVED_UPGRADE_JUSTIFIED', 'RESOLVED_PARTIAL_CREDIT', 'RESOLVED_REFUND', 'WITHDRAWN');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'project_category') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'project_category'
+  ) THEN
     CREATE TYPE public.project_category AS ENUM ('GENERAL_CONSTRUCTION', 'ELECTRICAL', 'PLUMBING', 'HVAC', 'ROOFING', 'CONCRETE', 'LANDSCAPING', 'PAINTING', 'FENCING', 'FLOORING', 'RENOVATION', 'OTHER');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'project_state') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'project_state'
+  ) THEN
     CREATE TYPE public.project_state AS ENUM ('DRAFT', 'OPEN', 'BIDDING_CLOSED', 'BIDS_UNLOCKED', 'AWARDED', 'CANCELED', 'COMPLETED', 'PENDING_PAYMENT', 'EMERGENCY_EXPIRED');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'role_type') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'role_type'
+  ) THEN
     CREATE TYPE public.role_type AS ENUM ('ADMIN', 'CLIENT', 'CONTRACTOR', 'INSPECTOR');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_type') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'service_type'
+  ) THEN
     CREATE TYPE public.service_type AS ENUM ('INSPECTOR_TAKEOFF');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'subscription_status') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'subscription_status'
+  ) THEN
     CREATE TYPE public.subscription_status AS ENUM ('ACTIVE', 'PAST_DUE', 'CANCELED', 'EXPIRED', 'TRIALING');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'support_status') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'support_status'
+  ) THEN
     CREATE TYPE public.support_status AS ENUM ('OPEN', 'ASSIGNED', 'WAITING_ON_USER', 'CLOSED');
   END IF;
 END $$;
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'vet_cert_status') THEN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE n.nspname = 'public' AND t.typname = 'vet_cert_status'
+  ) THEN
     CREATE TYPE public.vet_cert_status AS ENUM ('NOT_APPLIED', 'PENDING_REVIEW', 'APPROVED', 'REJECTED', 'RECHECK_REQUIRED');
   END IF;
 END $$;
@@ -137,14 +206,19 @@ END $$;
 -- ============================================================================
 -- SECTION: TABLES
 -- ============================================================================
--- All 41 live tables, included in full (not just the 26 previously
--- untracked ones) so this file is a true standalone baseline -- safe and
--- idempotent either way, since CREATE TABLE IF NOT EXISTS no-ops entirely
--- against the 15 tables that already have a dedicated earlier migration.
--- Constraints (PK/FK/UNIQUE/CHECK) are defined inline, since that's the
--- only way to make them idempotent without a per-constraint catalog guard
--- -- inline constraints are automatically skipped along with the rest of
--- the CREATE TABLE statement whenever the table already exists.
+-- All 41 live tables. PRIMARY KEY and CHECK constraints are inline -- no
+-- cross-table ordering dependency, safely idempotent as part of the
+-- CREATE TABLE IF NOT EXISTS guard. FOREIGN KEY constraints are deferred
+-- to SECTION: CONSTRAINTS so table creation order never matters. A UNIQUE
+-- constraint is ALSO deferred whenever its column set exactly matches the
+-- table's own PRIMARY KEY -- verified empirically that PostgreSQL silently
+-- merges a same-column PK + UNIQUE declared together in one CREATE TABLE
+-- into a single object (keeping the UNIQUE constraint's name but the PK's
+-- type), which would silently lose one of two genuinely distinct
+-- constraint objects that exist separately in production today (e.g.
+-- contractor_directory_public, whose PK and UNIQUE constraint were
+-- evidently added at different times historically). All other UNIQUE
+-- constraints (distinct columns from the PK) stay inline as before.
 
 
 CREATE TABLE IF NOT EXISTS public."admin_actions" (
@@ -155,9 +229,7 @@ CREATE TABLE IF NOT EXISTS public."admin_actions" (
   "target_entity_id" uuid,
   "notes" text,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "admin_actions_admin_id_fkey" FOREIGN KEY (admin_id) REFERENCES auth.users(id),
-  CONSTRAINT "admin_actions_target_user_id_fkey" FOREIGN KEY (target_user_id) REFERENCES auth.users(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."audit_log" (
@@ -168,8 +240,7 @@ CREATE TABLE IF NOT EXISTS public."audit_log" (
   "entity_id" uuid NOT NULL,
   "details" jsonb,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "audit_log_actor_id_fkey" FOREIGN KEY (actor_id) REFERENCES profiles(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."bid_acknowledgments" (
@@ -209,9 +280,6 @@ CREATE TABLE IF NOT EXISTS public."bid_dismissals" (
   "reviewed_at" timestamptz,
   "reviewed_by" uuid,
   PRIMARY KEY (id),
-  CONSTRAINT "bid_dismissals_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT "bid_dismissals_bid_id_fkey" FOREIGN KEY (bid_id) REFERENCES bids(id) ON DELETE CASCADE,
-  CONSTRAINT "bid_dismissals_reason_code_fkey" FOREIGN KEY (reason_code) REFERENCES bid_dismissal_reasons(code),
   CONSTRAINT "bid_dismissals_bid_id_key" UNIQUE (bid_id),
   CONSTRAINT "bid_dismissals_moderation_status_check" CHECK ((moderation_status = ANY (ARRAY['not_applicable'::text, 'pending_review'::text, 'approved'::text, 'rejected'::text])))
 );
@@ -225,8 +293,7 @@ CREATE TABLE IF NOT EXISTS public."bid_line_items" (
   "tax_pct" numeric DEFAULT 0 NOT NULL,
   "sort_order" integer DEFAULT 0 NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "bid_line_items_bid_version_id_fkey" FOREIGN KEY (bid_version_id) REFERENCES bid_versions(id) ON DELETE CASCADE
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."bid_versions" (
@@ -248,8 +315,7 @@ CREATE TABLE IF NOT EXISTS public."bid_versions" (
   "estimate_valid_until" date,
   "quote_pdf_path" text,
   "quote_pdf_filename" text,
-  PRIMARY KEY (id),
-  CONSTRAINT "bid_versions_bid_id_fkey" FOREIGN KEY (bid_id) REFERENCES bids(id) ON DELETE CASCADE
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."bids" (
@@ -265,8 +331,6 @@ CREATE TABLE IF NOT EXISTS public."bids" (
   "review_note" text,
   "review_amount_cents" bigint,
   PRIMARY KEY (id),
-  CONSTRAINT "bids_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT "bids_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id),
   CONSTRAINT "bids_project_id_contractor_id_key" UNIQUE (project_id, contractor_id)
 );
 
@@ -282,8 +346,7 @@ CREATE TABLE IF NOT EXISTS public."client_credits" (
   "used_for_reference_id" uuid,
   "created_at" timestamptz DEFAULT now() NOT NULL,
   "expiry_reminder_sent_at" timestamptz,
-  PRIMARY KEY (id),
-  CONSTRAINT "client_credits_client_id_fkey" FOREIGN KEY (client_id) REFERENCES auth.users(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."contractor_credentials" (
@@ -303,7 +366,6 @@ CREATE TABLE IF NOT EXISTS public."contractor_credentials" (
   "verified_by" uuid,
   "created_at" timestamptz DEFAULT now() NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT "contractor_credentials_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES contractor_profiles(contractor_id) ON DELETE CASCADE,
   CONSTRAINT "contractor_credentials_credential_type_check" CHECK ((credential_type = ANY (ARRAY['STATE_LICENSE'::text, 'CITY_REGISTRATION'::text, 'TRADE_LICENSE'::text, 'BOND'::text])))
 );
 
@@ -326,9 +388,7 @@ CREATE TABLE IF NOT EXISTS public."contractor_directory_public" (
   "city" text,
   "state" text,
   "veteran_verified" boolean,
-  PRIMARY KEY (contractor_id),
-  CONSTRAINT "contractor_directory_public_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id) ON DELETE CASCADE,
-  CONSTRAINT "contractor_directory_public_contractor_id_key" UNIQUE (contractor_id)
+  PRIMARY KEY (contractor_id)
 );
 
 CREATE TABLE IF NOT EXISTS public."contractor_portfolio_photos" (
@@ -338,8 +398,7 @@ CREATE TABLE IF NOT EXISTS public."contractor_portfolio_photos" (
   "caption" text,
   "display_order" integer DEFAULT 0 NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "contractor_portfolio_photos_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES contractor_profiles(contractor_id) ON DELETE CASCADE
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."contractor_profiles" (
@@ -377,8 +436,6 @@ CREATE TABLE IF NOT EXISTS public."contractor_profiles" (
   "veteran_rejection_reason" text,
   "bbb_url" text,
   PRIMARY KEY (contractor_id),
-  CONSTRAINT "contractor_profiles_veteran_verified_by_fkey" FOREIGN KEY (veteran_verified_by) REFERENCES profiles(id),
-  CONSTRAINT "contractor_profiles_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id) ON DELETE CASCADE,
   CONSTRAINT "contractor_profiles_veteran_credential_type_check" CHECK ((veteran_credential_type = ANY (ARRAY['TVC_VVL'::text, 'VA_VETCERT'::text])))
 );
 
@@ -387,8 +444,7 @@ CREATE TABLE IF NOT EXISTS public."contractor_settings" (
   "emergency_notifications_enabled" boolean DEFAULT true NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
   "updated_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (contractor_id),
-  CONSTRAINT "contractor_settings_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES auth.users(id)
+  PRIMARY KEY (contractor_id)
 );
 
 CREATE TABLE IF NOT EXISTS public."contractor_subscriptions" (
@@ -414,7 +470,6 @@ CREATE TABLE IF NOT EXISTS public."contractor_subscriptions" (
   "term_months" integer,
   "commitment_ends_at" timestamptz,
   PRIMARY KEY (id),
-  CONSTRAINT "contractor_subscriptions_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id),
   CONSTRAINT "contractor_subscriptions_contractor_id_key" UNIQUE (contractor_id),
   CONSTRAINT "contractor_subscriptions_plan_interval_check" CHECK ((plan_interval = ANY (ARRAY['MONTHLY'::text, 'QUARTERLY'::text, 'SEMIANNUAL'::text, 'YEARLY'::text])))
 );
@@ -427,8 +482,7 @@ CREATE TABLE IF NOT EXISTS public."contractor_verification_log" (
   "action_type" text NOT NULL,
   "note" text NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "contractor_verification_log_admin_id_fkey" FOREIGN KEY (admin_id) REFERENCES auth.users(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."coupon_codes" (
@@ -441,7 +495,6 @@ CREATE TABLE IF NOT EXISTS public."coupon_codes" (
   "created_at" timestamptz DEFAULT now(),
   "is_active" boolean DEFAULT true,
   PRIMARY KEY (id),
-  CONSTRAINT "coupon_codes_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id),
   CONSTRAINT "coupon_codes_code_key" UNIQUE (code)
 );
 
@@ -453,9 +506,7 @@ CREATE TABLE IF NOT EXISTS public."disclaimer_acknowledgments" (
   "acknowledged_at" timestamptz DEFAULT now() NOT NULL,
   "context" jsonb,
   "project_id" uuid,
-  PRIMARY KEY (id),
-  CONSTRAINT "disclaimer_acknowledgments_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id),
-  CONSTRAINT "disclaimer_acknowledgments_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."emergency_request_log" (
@@ -471,10 +522,7 @@ CREATE TABLE IF NOT EXISTS public."emergency_request_log" (
   "created_at" timestamptz DEFAULT now() NOT NULL,
   "closed_at" timestamptz,
   "close_reason" text,
-  PRIMARY KEY (id),
-  CONSTRAINT "emergency_request_log_client_id_fkey" FOREIGN KEY (client_id) REFERENCES auth.users(id),
-  CONSTRAINT "emergency_request_log_admin_granted_by_fkey" FOREIGN KEY (admin_granted_by) REFERENCES auth.users(id),
-  CONSTRAINT "emergency_request_log_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."inspector_flags" (
@@ -483,9 +531,7 @@ CREATE TABLE IF NOT EXISTS public."inspector_flags" (
   "dispute_id" uuid NOT NULL,
   "flag_reason" text DEFAULT 'UPGRADE_NOT_JUSTIFIED'::text NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "inspector_flags_inspector_id_fkey" FOREIGN KEY (inspector_id) REFERENCES auth.users(id),
-  CONSTRAINT "inspector_flags_dispute_id_fkey" FOREIGN KEY (dispute_id) REFERENCES inspector_upgrade_disputes(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."inspector_price_list" (
@@ -510,10 +556,7 @@ CREATE TABLE IF NOT EXISTS public."inspector_responses" (
   "revision_id" uuid,
   "attachment_id" uuid,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "inspector_responses_revision_id_fkey" FOREIGN KEY (revision_id) REFERENCES project_revisions(id) ON DELETE SET NULL,
-  CONSTRAINT "inspector_responses_inspector_rfi_id_fkey" FOREIGN KEY (inspector_rfi_id) REFERENCES inspector_rfis(id) ON DELETE CASCADE,
-  CONSTRAINT "inspector_responses_attachment_id_fkey" FOREIGN KEY (attachment_id) REFERENCES project_attachments(id) ON DELETE SET NULL
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."inspector_rfi_catalog" (
@@ -533,11 +576,7 @@ CREATE TABLE IF NOT EXISTS public."inspector_rfis" (
   "catalog_id" uuid NOT NULL,
   "status" text DEFAULT 'SENT'::text NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "inspector_rfis_catalog_id_fkey" FOREIGN KEY (catalog_id) REFERENCES inspector_rfi_catalog(id),
-  CONSTRAINT "inspector_rfis_inspector_id_fkey" FOREIGN KEY (inspector_id) REFERENCES profiles(id),
-  CONSTRAINT "inspector_rfis_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id),
-  CONSTRAINT "inspector_rfis_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."inspector_upgrade_disputes" (
@@ -568,12 +607,7 @@ CREATE TABLE IF NOT EXISTS public."inspector_upgrade_disputes" (
   "updated_at" timestamptz DEFAULT now() NOT NULL,
   "sla_day3_sent_at" timestamptz,
   "sla_day5_sent_at" timestamptz,
-  PRIMARY KEY (id),
-  CONSTRAINT "inspector_upgrade_disputes_inspector_request_id_fkey" FOREIGN KEY (inspector_request_id) REFERENCES project_inspector_assignments(id),
-  CONSTRAINT "inspector_upgrade_disputes_master_inspector_id_fkey" FOREIGN KEY (master_inspector_id) REFERENCES auth.users(id),
-  CONSTRAINT "inspector_upgrade_disputes_original_inspector_id_fkey" FOREIGN KEY (original_inspector_id) REFERENCES auth.users(id),
-  CONSTRAINT "inspector_upgrade_disputes_client_id_fkey" FOREIGN KEY (client_id) REFERENCES auth.users(id),
-  CONSTRAINT "inspector_upgrade_disputes_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."master_inspector_reviews_log" (
@@ -586,9 +620,7 @@ CREATE TABLE IF NOT EXISTS public."master_inspector_reviews_log" (
   "payout_cents" integer DEFAULT 5000 NOT NULL,
   "payout_status" text DEFAULT 'PENDING'::text NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "master_inspector_reviews_log_master_inspector_id_fkey" FOREIGN KEY (master_inspector_id) REFERENCES auth.users(id),
-  CONSTRAINT "master_inspector_reviews_log_dispute_id_fkey" FOREIGN KEY (dispute_id) REFERENCES inspector_upgrade_disputes(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."platform_settings" (
@@ -644,8 +676,7 @@ CREATE TABLE IF NOT EXISTS public."profiles" (
   "master_inspector_regions" text[],
   "upgrade_blocked" boolean DEFAULT false NOT NULL,
   "upgrade_stripe_payment_intent_id" text,
-  PRIMARY KEY (id),
-  CONSTRAINT "profiles_vet_cert_verified_by_fkey" FOREIGN KEY (vet_cert_verified_by) REFERENCES profiles(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."project_attachments" (
@@ -656,10 +687,7 @@ CREATE TABLE IF NOT EXISTS public."project_attachments" (
   "storage_path" text NOT NULL,
   "file_type" text,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "project_attachments_uploaded_by_fkey" FOREIGN KEY (uploaded_by) REFERENCES profiles(id),
-  CONSTRAINT "project_attachments_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT "project_attachments_revision_id_fkey" FOREIGN KEY (revision_id) REFERENCES project_revisions(id) ON DELETE SET NULL
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."project_awards" (
@@ -673,10 +701,6 @@ CREATE TABLE IF NOT EXISTS public."project_awards" (
   "contractor_id" uuid,
   "awarded_by" uuid,
   PRIMARY KEY (id),
-  CONSTRAINT "project_awards_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id),
-  CONSTRAINT "project_awards_awarded_bid_version_id_fkey" FOREIGN KEY (awarded_bid_version_id) REFERENCES bid_versions(id),
-  CONSTRAINT "project_awards_awarded_contractor_id_fkey" FOREIGN KEY (awarded_contractor_id) REFERENCES profiles(id),
-  CONSTRAINT "project_awards_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
   CONSTRAINT "project_awards_project_id_key" UNIQUE (project_id)
 );
 
@@ -706,18 +730,14 @@ CREATE TABLE IF NOT EXISTS public."project_inspector_assignments" (
   "upgrade_fee_cents" integer,
   "upgrade_stripe_session_id" text,
   "upgrade_stripe_payment_intent_id" text,
-  PRIMARY KEY (id),
-  CONSTRAINT "project_inspector_assignments_pricing_key_fkey" FOREIGN KEY (pricing_key) REFERENCES inspector_price_list(pricing_key),
-  CONSTRAINT "project_inspector_assignments_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT "project_inspector_assignments_inspector_id_fkey" FOREIGN KEY (inspector_id) REFERENCES profiles(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."project_message_reads" (
   "project_id" uuid NOT NULL,
   "user_id" uuid NOT NULL,
   "last_read_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (project_id, user_id),
-  CONSTRAINT "project_message_reads_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+  PRIMARY KEY (project_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS public."project_messages" (
@@ -729,7 +749,6 @@ CREATE TABLE IF NOT EXISTS public."project_messages" (
   "created_at" timestamptz DEFAULT now() NOT NULL,
   "notification_sent" boolean DEFAULT false NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT "project_messages_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
   CONSTRAINT "project_messages_body_check" CHECK ((length(TRIM(BOTH FROM body)) > 0)),
   CONSTRAINT "project_messages_sender_role_check" CHECK ((sender_role = ANY (ARRAY['CLIENT'::text, 'CONTRACTOR'::text, 'ADMIN'::text])))
 );
@@ -744,9 +763,7 @@ CREATE TABLE IF NOT EXISTS public."project_revisions" (
   "is_scope_change" boolean DEFAULT true NOT NULL,
   "deadline_extension_applied" boolean DEFAULT false NOT NULL,
   "new_deadline_at" timestamptz,
-  PRIMARY KEY (id),
-  CONSTRAINT "project_revisions_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT "project_revisions_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."project_services" (
@@ -758,8 +775,7 @@ CREATE TABLE IF NOT EXISTS public."project_services" (
   "purchased_at" timestamptz,
   "provider_payment_id" text,
   "created_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "project_services_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."projects" (
@@ -798,9 +814,7 @@ CREATE TABLE IF NOT EXISTS public."projects" (
   "inspector_hold_started_at" timestamptz,
   "target_start_date" date,
   "completion_requested_at" timestamptz,
-  PRIMARY KEY (id),
-  CONSTRAINT "projects_urgent_set_by_fkey" FOREIGN KEY (urgent_set_by) REFERENCES profiles(id),
-  CONSTRAINT "projects_client_id_fkey" FOREIGN KEY (client_id) REFERENCES profiles(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."rfi_catalog" (
@@ -824,10 +838,7 @@ CREATE TABLE IF NOT EXISTS public."rfis" (
   "response" text,
   "responded_at" timestamptz,
   "responded_by" uuid,
-  PRIMARY KEY (id),
-  CONSTRAINT "rfis_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT "rfis_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id),
-  CONSTRAINT "rfis_catalog_id_fkey" FOREIGN KEY (catalog_id) REFERENCES rfi_catalog(id)
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public."subscription_disputes" (
@@ -861,34 +872,573 @@ CREATE TABLE IF NOT EXISTS public."support_requests" (
   "description" text NOT NULL,
   "created_at" timestamptz DEFAULT now() NOT NULL,
   "updated_at" timestamptz DEFAULT now() NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT "support_requests_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
-  CONSTRAINT "support_requests_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id),
-  CONSTRAINT "support_requests_assigned_to_fkey" FOREIGN KEY (assigned_to) REFERENCES profiles(id)
+  PRIMARY KEY (id)
 );
 
 -- ============================================================================
 -- SECTION: CONSTRAINTS
 -- ============================================================================
--- All primary key, foreign key, unique, and check constraints are defined
--- inline within their table's CREATE TABLE IF NOT EXISTS block above (see
--- SECTION: TABLES) -- this is the only idempotent approach available,
--- since PostgreSQL has no ALTER TABLE ... ADD CONSTRAINT IF NOT EXISTS.
--- This section exists as a labeled marker per the requested file
--- structure; no additional DDL runs here.
---
--- Foreign key ON DELETE behavior was preserved exactly as captured live
--- (65 total: most NO ACTION, a deliberate subset CASCADE where the child
--- row's entire purpose is to belong to the parent -- e.g.
--- bid_versions -> bids, project_awards -> projects, rfis -> projects).
+-- All 65 foreign keys, added here (after every table in SECTION: TABLES
+-- already exists) rather than inline, so table-creation order never
+-- matters. Also includes the 1 UNIQUE constraint(s) whose
+-- columns exactly duplicate their table's own PRIMARY KEY (see SECTION:
+-- TABLES for why those can't be declared inline). Each statement here is
+-- individually guarded via a pg_constraint existence check -- purely
+-- additive, nothing is ever dropped or replaced, and this can never alter
+-- an existing production constraint's behavior since it only runs when
+-- the named constraint doesn't already exist.
 
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'admin_actions_admin_id_fkey' AND conrelid = 'public.admin_actions'::regclass
+  ) THEN
+    ALTER TABLE public."admin_actions" ADD CONSTRAINT "admin_actions_admin_id_fkey" FOREIGN KEY (admin_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'admin_actions_target_user_id_fkey' AND conrelid = 'public.admin_actions'::regclass
+  ) THEN
+    ALTER TABLE public."admin_actions" ADD CONSTRAINT "admin_actions_target_user_id_fkey" FOREIGN KEY (target_user_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'audit_log_actor_id_fkey' AND conrelid = 'public.audit_log'::regclass
+  ) THEN
+    ALTER TABLE public."audit_log" ADD CONSTRAINT "audit_log_actor_id_fkey" FOREIGN KEY (actor_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bid_dismissals_project_id_fkey' AND conrelid = 'public.bid_dismissals'::regclass
+  ) THEN
+    ALTER TABLE public."bid_dismissals" ADD CONSTRAINT "bid_dismissals_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bid_dismissals_bid_id_fkey' AND conrelid = 'public.bid_dismissals'::regclass
+  ) THEN
+    ALTER TABLE public."bid_dismissals" ADD CONSTRAINT "bid_dismissals_bid_id_fkey" FOREIGN KEY (bid_id) REFERENCES bids(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bid_dismissals_reason_code_fkey' AND conrelid = 'public.bid_dismissals'::regclass
+  ) THEN
+    ALTER TABLE public."bid_dismissals" ADD CONSTRAINT "bid_dismissals_reason_code_fkey" FOREIGN KEY (reason_code) REFERENCES bid_dismissal_reasons(code);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bid_line_items_bid_version_id_fkey' AND conrelid = 'public.bid_line_items'::regclass
+  ) THEN
+    ALTER TABLE public."bid_line_items" ADD CONSTRAINT "bid_line_items_bid_version_id_fkey" FOREIGN KEY (bid_version_id) REFERENCES bid_versions(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bid_versions_bid_id_fkey' AND conrelid = 'public.bid_versions'::regclass
+  ) THEN
+    ALTER TABLE public."bid_versions" ADD CONSTRAINT "bid_versions_bid_id_fkey" FOREIGN KEY (bid_id) REFERENCES bids(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bids_project_id_fkey' AND conrelid = 'public.bids'::regclass
+  ) THEN
+    ALTER TABLE public."bids" ADD CONSTRAINT "bids_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'bids_contractor_id_fkey' AND conrelid = 'public.bids'::regclass
+  ) THEN
+    ALTER TABLE public."bids" ADD CONSTRAINT "bids_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'client_credits_client_id_fkey' AND conrelid = 'public.client_credits'::regclass
+  ) THEN
+    ALTER TABLE public."client_credits" ADD CONSTRAINT "client_credits_client_id_fkey" FOREIGN KEY (client_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_credentials_contractor_id_fkey' AND conrelid = 'public.contractor_credentials'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_credentials" ADD CONSTRAINT "contractor_credentials_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES contractor_profiles(contractor_id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_directory_public_contractor_id_fkey' AND conrelid = 'public.contractor_directory_public'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_directory_public" ADD CONSTRAINT "contractor_directory_public_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_portfolio_photos_contractor_id_fkey' AND conrelid = 'public.contractor_portfolio_photos'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_portfolio_photos" ADD CONSTRAINT "contractor_portfolio_photos_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES contractor_profiles(contractor_id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_profiles_veteran_verified_by_fkey' AND conrelid = 'public.contractor_profiles'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_profiles" ADD CONSTRAINT "contractor_profiles_veteran_verified_by_fkey" FOREIGN KEY (veteran_verified_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_profiles_contractor_id_fkey' AND conrelid = 'public.contractor_profiles'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_profiles" ADD CONSTRAINT "contractor_profiles_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_settings_contractor_id_fkey' AND conrelid = 'public.contractor_settings'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_settings" ADD CONSTRAINT "contractor_settings_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_subscriptions_contractor_id_fkey' AND conrelid = 'public.contractor_subscriptions'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_subscriptions" ADD CONSTRAINT "contractor_subscriptions_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_verification_log_admin_id_fkey' AND conrelid = 'public.contractor_verification_log'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_verification_log" ADD CONSTRAINT "contractor_verification_log_admin_id_fkey" FOREIGN KEY (admin_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'coupon_codes_created_by_fkey' AND conrelid = 'public.coupon_codes'::regclass
+  ) THEN
+    ALTER TABLE public."coupon_codes" ADD CONSTRAINT "coupon_codes_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'disclaimer_acknowledgments_user_id_fkey' AND conrelid = 'public.disclaimer_acknowledgments'::regclass
+  ) THEN
+    ALTER TABLE public."disclaimer_acknowledgments" ADD CONSTRAINT "disclaimer_acknowledgments_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'emergency_request_log_client_id_fkey' AND conrelid = 'public.emergency_request_log'::regclass
+  ) THEN
+    ALTER TABLE public."emergency_request_log" ADD CONSTRAINT "emergency_request_log_client_id_fkey" FOREIGN KEY (client_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'emergency_request_log_admin_granted_by_fkey' AND conrelid = 'public.emergency_request_log'::regclass
+  ) THEN
+    ALTER TABLE public."emergency_request_log" ADD CONSTRAINT "emergency_request_log_admin_granted_by_fkey" FOREIGN KEY (admin_granted_by) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'emergency_request_log_project_id_fkey' AND conrelid = 'public.emergency_request_log'::regclass
+  ) THEN
+    ALTER TABLE public."emergency_request_log" ADD CONSTRAINT "emergency_request_log_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_flags_inspector_id_fkey' AND conrelid = 'public.inspector_flags'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_flags" ADD CONSTRAINT "inspector_flags_inspector_id_fkey" FOREIGN KEY (inspector_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_flags_dispute_id_fkey' AND conrelid = 'public.inspector_flags'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_flags" ADD CONSTRAINT "inspector_flags_dispute_id_fkey" FOREIGN KEY (dispute_id) REFERENCES inspector_upgrade_disputes(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_responses_revision_id_fkey' AND conrelid = 'public.inspector_responses'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_responses" ADD CONSTRAINT "inspector_responses_revision_id_fkey" FOREIGN KEY (revision_id) REFERENCES project_revisions(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_responses_inspector_rfi_id_fkey' AND conrelid = 'public.inspector_responses'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_responses" ADD CONSTRAINT "inspector_responses_inspector_rfi_id_fkey" FOREIGN KEY (inspector_rfi_id) REFERENCES inspector_rfis(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_responses_attachment_id_fkey' AND conrelid = 'public.inspector_responses'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_responses" ADD CONSTRAINT "inspector_responses_attachment_id_fkey" FOREIGN KEY (attachment_id) REFERENCES project_attachments(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_rfis_catalog_id_fkey' AND conrelid = 'public.inspector_rfis'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_rfis" ADD CONSTRAINT "inspector_rfis_catalog_id_fkey" FOREIGN KEY (catalog_id) REFERENCES inspector_rfi_catalog(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_rfis_inspector_id_fkey' AND conrelid = 'public.inspector_rfis'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_rfis" ADD CONSTRAINT "inspector_rfis_inspector_id_fkey" FOREIGN KEY (inspector_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_rfis_contractor_id_fkey' AND conrelid = 'public.inspector_rfis'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_rfis" ADD CONSTRAINT "inspector_rfis_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_rfis_project_id_fkey' AND conrelid = 'public.inspector_rfis'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_rfis" ADD CONSTRAINT "inspector_rfis_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_upgrade_disputes_inspector_request_id_fkey' AND conrelid = 'public.inspector_upgrade_disputes'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_upgrade_disputes" ADD CONSTRAINT "inspector_upgrade_disputes_inspector_request_id_fkey" FOREIGN KEY (inspector_request_id) REFERENCES project_inspector_assignments(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_upgrade_disputes_master_inspector_id_fkey' AND conrelid = 'public.inspector_upgrade_disputes'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_upgrade_disputes" ADD CONSTRAINT "inspector_upgrade_disputes_master_inspector_id_fkey" FOREIGN KEY (master_inspector_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_upgrade_disputes_original_inspector_id_fkey' AND conrelid = 'public.inspector_upgrade_disputes'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_upgrade_disputes" ADD CONSTRAINT "inspector_upgrade_disputes_original_inspector_id_fkey" FOREIGN KEY (original_inspector_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_upgrade_disputes_client_id_fkey' AND conrelid = 'public.inspector_upgrade_disputes'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_upgrade_disputes" ADD CONSTRAINT "inspector_upgrade_disputes_client_id_fkey" FOREIGN KEY (client_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'inspector_upgrade_disputes_project_id_fkey' AND conrelid = 'public.inspector_upgrade_disputes'::regclass
+  ) THEN
+    ALTER TABLE public."inspector_upgrade_disputes" ADD CONSTRAINT "inspector_upgrade_disputes_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'master_inspector_reviews_log_master_inspector_id_fkey' AND conrelid = 'public.master_inspector_reviews_log'::regclass
+  ) THEN
+    ALTER TABLE public."master_inspector_reviews_log" ADD CONSTRAINT "master_inspector_reviews_log_master_inspector_id_fkey" FOREIGN KEY (master_inspector_id) REFERENCES auth.users(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'master_inspector_reviews_log_dispute_id_fkey' AND conrelid = 'public.master_inspector_reviews_log'::regclass
+  ) THEN
+    ALTER TABLE public."master_inspector_reviews_log" ADD CONSTRAINT "master_inspector_reviews_log_dispute_id_fkey" FOREIGN KEY (dispute_id) REFERENCES inspector_upgrade_disputes(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'profiles_vet_cert_verified_by_fkey' AND conrelid = 'public.profiles'::regclass
+  ) THEN
+    ALTER TABLE public."profiles" ADD CONSTRAINT "profiles_vet_cert_verified_by_fkey" FOREIGN KEY (vet_cert_verified_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_attachments_uploaded_by_fkey' AND conrelid = 'public.project_attachments'::regclass
+  ) THEN
+    ALTER TABLE public."project_attachments" ADD CONSTRAINT "project_attachments_uploaded_by_fkey" FOREIGN KEY (uploaded_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_attachments_project_id_fkey' AND conrelid = 'public.project_attachments'::regclass
+  ) THEN
+    ALTER TABLE public."project_attachments" ADD CONSTRAINT "project_attachments_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_attachments_revision_id_fkey' AND conrelid = 'public.project_attachments'::regclass
+  ) THEN
+    ALTER TABLE public."project_attachments" ADD CONSTRAINT "project_attachments_revision_id_fkey" FOREIGN KEY (revision_id) REFERENCES project_revisions(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_awards_created_by_fkey' AND conrelid = 'public.project_awards'::regclass
+  ) THEN
+    ALTER TABLE public."project_awards" ADD CONSTRAINT "project_awards_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_awards_awarded_bid_version_id_fkey' AND conrelid = 'public.project_awards'::regclass
+  ) THEN
+    ALTER TABLE public."project_awards" ADD CONSTRAINT "project_awards_awarded_bid_version_id_fkey" FOREIGN KEY (awarded_bid_version_id) REFERENCES bid_versions(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_awards_awarded_contractor_id_fkey' AND conrelid = 'public.project_awards'::regclass
+  ) THEN
+    ALTER TABLE public."project_awards" ADD CONSTRAINT "project_awards_awarded_contractor_id_fkey" FOREIGN KEY (awarded_contractor_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_awards_project_id_fkey' AND conrelid = 'public.project_awards'::regclass
+  ) THEN
+    ALTER TABLE public."project_awards" ADD CONSTRAINT "project_awards_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_inspector_assignments_pricing_key_fkey' AND conrelid = 'public.project_inspector_assignments'::regclass
+  ) THEN
+    ALTER TABLE public."project_inspector_assignments" ADD CONSTRAINT "project_inspector_assignments_pricing_key_fkey" FOREIGN KEY (pricing_key) REFERENCES inspector_price_list(pricing_key);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_inspector_assignments_project_id_fkey' AND conrelid = 'public.project_inspector_assignments'::regclass
+  ) THEN
+    ALTER TABLE public."project_inspector_assignments" ADD CONSTRAINT "project_inspector_assignments_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_inspector_assignments_inspector_id_fkey' AND conrelid = 'public.project_inspector_assignments'::regclass
+  ) THEN
+    ALTER TABLE public."project_inspector_assignments" ADD CONSTRAINT "project_inspector_assignments_inspector_id_fkey" FOREIGN KEY (inspector_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_message_reads_project_id_fkey' AND conrelid = 'public.project_message_reads'::regclass
+  ) THEN
+    ALTER TABLE public."project_message_reads" ADD CONSTRAINT "project_message_reads_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_messages_project_id_fkey' AND conrelid = 'public.project_messages'::regclass
+  ) THEN
+    ALTER TABLE public."project_messages" ADD CONSTRAINT "project_messages_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_revisions_project_id_fkey' AND conrelid = 'public.project_revisions'::regclass
+  ) THEN
+    ALTER TABLE public."project_revisions" ADD CONSTRAINT "project_revisions_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_revisions_created_by_fkey' AND conrelid = 'public.project_revisions'::regclass
+  ) THEN
+    ALTER TABLE public."project_revisions" ADD CONSTRAINT "project_revisions_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'project_services_project_id_fkey' AND conrelid = 'public.project_services'::regclass
+  ) THEN
+    ALTER TABLE public."project_services" ADD CONSTRAINT "project_services_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'projects_urgent_set_by_fkey' AND conrelid = 'public.projects'::regclass
+  ) THEN
+    ALTER TABLE public."projects" ADD CONSTRAINT "projects_urgent_set_by_fkey" FOREIGN KEY (urgent_set_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'projects_client_id_fkey' AND conrelid = 'public.projects'::regclass
+  ) THEN
+    ALTER TABLE public."projects" ADD CONSTRAINT "projects_client_id_fkey" FOREIGN KEY (client_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'rfis_project_id_fkey' AND conrelid = 'public.rfis'::regclass
+  ) THEN
+    ALTER TABLE public."rfis" ADD CONSTRAINT "rfis_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'rfis_contractor_id_fkey' AND conrelid = 'public.rfis'::regclass
+  ) THEN
+    ALTER TABLE public."rfis" ADD CONSTRAINT "rfis_contractor_id_fkey" FOREIGN KEY (contractor_id) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'rfis_catalog_id_fkey' AND conrelid = 'public.rfis'::regclass
+  ) THEN
+    ALTER TABLE public."rfis" ADD CONSTRAINT "rfis_catalog_id_fkey" FOREIGN KEY (catalog_id) REFERENCES rfi_catalog(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'support_requests_project_id_fkey' AND conrelid = 'public.support_requests'::regclass
+  ) THEN
+    ALTER TABLE public."support_requests" ADD CONSTRAINT "support_requests_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'support_requests_created_by_fkey' AND conrelid = 'public.support_requests'::regclass
+  ) THEN
+    ALTER TABLE public."support_requests" ADD CONSTRAINT "support_requests_created_by_fkey" FOREIGN KEY (created_by) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'support_requests_assigned_to_fkey' AND conrelid = 'public.support_requests'::regclass
+  ) THEN
+    ALTER TABLE public."support_requests" ADD CONSTRAINT "support_requests_assigned_to_fkey" FOREIGN KEY (assigned_to) REFERENCES profiles(id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'contractor_directory_public_contractor_id_key' AND conrelid = 'public.contractor_directory_public'::regclass
+  ) THEN
+    ALTER TABLE public."contractor_directory_public" ADD CONSTRAINT "contractor_directory_public_contractor_id_key" UNIQUE (contractor_id);
+  END IF;
+END $$;
+
+-- ============================================================================
+-- SECTION: EARLIER-MIGRATION BACKFILL
+-- ============================================================================
+-- Found during an independent-review comparison of migrations 001-015
+-- against live captured truth: disclaimer_acknowledgments.project_id
+-- exists in production but is not created by 001_emergency_bid.sql (the
+-- only migration that otherwise defines this table). This means if 001
+-- alone were ever (re-)applied to a database that doesn't already have
+-- this column, the table would be missing it, since 016's own
+-- CREATE TABLE IF NOT EXISTS above no-ops once the table already exists
+-- from 001. Backfilled here defensively, via native idempotent
+-- ADD COLUMN IF NOT EXISTS -- this never touches production (which
+-- already has the column) and never overwrites or removes anything.
+ALTER TABLE public.disclaimer_acknowledgments
+  ADD COLUMN IF NOT EXISTS project_id uuid;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'disclaimer_acknowledgments_project_id_fkey' AND conrelid = 'public.disclaimer_acknowledgments'::regclass
+  ) THEN
+    ALTER TABLE public.disclaimer_acknowledgments ADD CONSTRAINT "disclaimer_acknowledgments_project_id_fkey" FOREIGN KEY (project_id) REFERENCES projects(id);
+  END IF;
+END $$;
 
 -- ============================================================================
 -- SECTION: FUNCTIONS
 -- ============================================================================
--- CREATE OR REPLACE FUNCTION is natively idempotent -- re-running with an
--- identical body is a no-op in effect. Bodies below are verbatim from
--- pg_get_functiondef(), not retyped by hand.
+-- CREATE OR REPLACE FUNCTION is natively idempotent. Bodies below are
+-- verbatim from pg_get_functiondef(), not retyped by hand.
 
 CREATE OR REPLACE FUNCTION public.auth_uid_owns_project(p_project_id uuid)
  RETURNS boolean
@@ -1561,9 +2111,8 @@ $function$
 -- ============================================================================
 -- SECTION: TRIGGERS
 -- ============================================================================
--- No native CREATE TRIGGER IF NOT EXISTS (verified empirically against
--- this database -- see design review). Guarded via a pg_trigger existence
--- check so this stays purely additive; nothing is ever dropped.
+-- No native CREATE TRIGGER IF NOT EXISTS (verified empirically). Guarded
+-- via a pg_trigger existence check -- purely additive.
 
 DO $$
 BEGIN
@@ -1603,8 +2152,8 @@ END $$;
 -- SECTION: RLS
 -- ============================================================================
 -- Enabling RLS is natively idempotent. Policies use the same catalog-guard
--- DO-block pattern as triggers, for the same reason (CREATE POLICY IF NOT
--- EXISTS was verified empirically to not be valid syntax on this server).
+-- DO-block pattern as triggers (CREATE POLICY IF NOT EXISTS verified
+-- empirically to not be valid syntax on this server).
 
 ALTER TABLE public."admin_actions" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public."audit_log" ENABLE ROW LEVEL SECURITY;
@@ -2381,10 +2930,8 @@ END $$;
 -- SECTION: INDEXES
 -- ============================================================================
 -- Primary-key indexes are created automatically by their inline PRIMARY
--- KEY constraint in SECTION: TABLES and are not repeated here. Only the
--- 53 secondary indexes are listed, using their live indexdef verbatim
--- (already valid CREATE INDEX / CREATE UNIQUE INDEX syntax, and
--- CREATE INDEX IF NOT EXISTS is natively idempotent).
+-- KEY constraint in SECTION: TABLES. Only the 53 secondary indexes are
+-- listed here, using their live indexdef verbatim.
 
 CREATE UNIQUE INDEX IF NOT EXISTS bid_dismissal_reasons_code_key ON public.bid_dismissal_reasons USING btree (code);
 CREATE UNIQUE INDEX IF NOT EXISTS bid_dismissals_bid_id_key ON public.bid_dismissals USING btree (bid_id);
@@ -2443,10 +2990,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS subscription_disputes_stripe_dispute_id_key ON
 -- ============================================================================
 -- SECTION: STORAGE
 -- ============================================================================
--- Bucket rows use ON CONFLICT DO NOTHING (not DO UPDATE) so this migration
--- can never silently overwrite a bucket config that's been intentionally
--- changed live since this snapshot was taken. Storage object-level RLS
--- policies use the same catalog-guard pattern as SECTION: RLS above.
+-- Bucket rows use ON CONFLICT DO NOTHING (never overwrites a live config
+-- change). Storage object-level RLS policies use the same catalog-guard
+-- pattern as SECTION: RLS.
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES ('bid-quotes', 'bid-quotes', false, NULL, NULL)
@@ -2525,8 +3071,7 @@ END $$;
 -- ============================================================================
 -- SECTION: FINAL VALIDATION NOTES
 -- ============================================================================
--- Expected object counts in this migration, for cross-check against the
--- design review before applying:
+-- Expected object counts, for cross-check before applying:
 --
 --   Tables ............... 41
 --   Enums ................ 9
@@ -2540,11 +3085,13 @@ END $$;
 --   Storage buckets ........ 4
 --   Storage policies ....... 6
 --
--- Deliberately excluded (see header + dedicated investigation report):
---   service_area_waitlist, profiles.service_area_zip, profiles.service_area_status
+-- Deliberately excluded: service_area_waitlist, profiles.service_area_zip,
+-- profiles.service_area_status (see header + investigation report).
 --
--- Recommended before running against production: apply this file once
--- against an empty scratch schema (proves the fresh-rebuild path) and
--- once against a schema that already matches production (proves the
--- no-op/idempotent path), per the design review's success criteria.
+-- FRESH REBUILD: run this file ALONE. It is a complete, self-sufficient
+-- baseline -- running 001-015 afterward is unnecessary (016 already
+-- created everything they would) and will fail (most of 001-015 create
+-- policies with no idempotency guard, verified empirically).
+-- Run order is irrelevant when applying to an existing database
+-- (production) -- every statement here is a guarded no-op there.
 -- ============================================================================
