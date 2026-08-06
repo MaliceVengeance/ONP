@@ -1,54 +1,15 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { isInServiceArea } from "./launchZips";
-
-// ============================================================================
-// Normalization helpers
-// ============================================================================
-
-function normalizeEmail(raw: string | null | undefined): string {
-  return (raw ?? "").trim().toLowerCase();
-}
-
-/**
- * Strips non-digits and requires exactly 5 digits. ZIP+4 input (9 digits,
- * with or without the dash — the dash is stripped along with other
- * non-digits) is accepted by taking the first 5. Anything shorter than 5
- * digits is rejected rather than silently padded/truncated, since the DB
- * CHECK constraint requires exactly 5 digits and a short ZIP is more likely
- * a typo than a valid partial value.
- */
-function normalizeZip(raw: string | null | undefined): string | null {
-  const digits = (raw ?? "").replace(/\D/g, "");
-  if (digits.length === 5) return digits;
-  if (digits.length > 5) return digits.slice(0, 5);
-  return null;
-}
-
-const VALID_INTENDED_ROLES = ["CLIENT", "CONTRACTOR", "BOTH", "UNKNOWN"] as const;
-type IntendedRole = (typeof VALID_INTENDED_ROLES)[number];
-
-// Soft categorization data with a safe DB default — an invalid/missing value
-// just falls back to UNKNOWN rather than rejecting the caller's request.
-function normalizeIntendedRole(raw: string | null | undefined): IntendedRole {
-  const value = (raw ?? "").trim().toUpperCase();
-  return (VALID_INTENDED_ROLES as readonly string[]).includes(value) ? (value as IntendedRole) : "UNKNOWN";
-}
-
-const VALID_SOURCES = ["HOMEPAGE", "SIGNUP_BLOCKED", "PROJECT_POST_BLOCKED", "HISTORICAL_SIGNUP_BACKFILL"] as const;
-type WaitlistSource = (typeof VALID_SOURCES)[number];
-
-// source is always a hardcoded literal supplied by calling code, never raw
-// user input — an invalid value here means a programming bug and should
-// throw loudly rather than silently default.
-function assertValidSource(source: string): asserts source is WaitlistSource {
-  if (!(VALID_SOURCES as readonly string[]).includes(source)) {
-    throw new Error(
-      `Invalid waitlist source: "${source}". source must be a hardcoded literal supplied by the caller, not user input.`
-    );
-  }
-}
+import {
+  normalizeEmail,
+  normalizeZip,
+  normalizeIntendedRole,
+  assertValidSource,
+  type IntendedRole,
+  type WaitlistSource,
+} from "./normalize";
+import { classifySignupMetadata, interpretWaitlistInsertError } from "./classify";
 
 function logServiceAreaError(
   operation: string,
@@ -87,54 +48,76 @@ async function insertWaitlistRow(row: {
     user_id: row.userId,
   });
 
-  if (!error) return { ok: true, deduped: false };
-
-  if (error.code === "23505") return { ok: true, deduped: true };
-
-  logServiceAreaError("insertWaitlistRow", {
-    userId: row.userId,
-    zip: row.zip,
-    code: error.code,
-    message: error.message,
-  });
-  return { ok: false };
+  const interpreted = interpretWaitlistInsertError(error);
+  if (!interpreted.ok) {
+    logServiceAreaError("insertWaitlistRow", {
+      userId: row.userId,
+      zip: row.zip,
+      code: error?.code ?? null,
+      message: error?.message ?? null,
+    });
+    return { ok: false };
+  }
+  return { ok: true, deduped: interpreted.deduped };
 }
 
 // ============================================================================
-// processSignupServiceArea
+// processSignupServiceArea — authoritative, server-derived signup metadata
 // ============================================================================
 
 export type ProcessSignupServiceAreaResult =
-  | { status: "in_area"; zip: string }
-  | { status: "out_of_area_waitlisted"; zip: string }
-  | { status: "out_of_area_waitlist_failed"; zip: string }
-  | { status: "profile_update_failed"; zip: string; inArea: boolean }
-  | { status: "invalid_zip" };
+  | { status: "user_not_found" }
+  | { status: "invalid_metadata"; reason: "missing_email" | "missing_or_invalid_zip" }
+  | { status: "in_area"; zip: string; profileUpdated: boolean }
+  | { status: "out_of_area"; zip: string; profileUpdated: boolean; waitlisted: boolean };
 
 /**
- * Called right after a successful signup to set service_area_status and,
- * for out-of-area signups, enroll the new account on the waitlist.
+ * Called right after a successful signup (with or without an active
+ * session — email confirmation may mean there isn't one yet) to set
+ * service_area_status and, for out-of-area signups, enroll the account on
+ * the waitlist.
  *
- * If the profiles update fails, this returns immediately without attempting
- * the waitlist insert — a failing write to profiles likely indicates a
- * broader DB issue that would probably also fail the waitlist insert, so
- * there's no benefit to trying. `inArea` is still included on that result so
- * the calling signup page can route correctly (dashboard vs. out-of-area
- * page) without a second isInServiceArea() call.
+ * SECURITY: takes only userId. email, ZIP, and role are never accepted as
+ * parameters — they're read back from the authoritative auth.users record
+ * via supabaseAdmin.auth.admin.getUserById(), the same source
+ * handle_new_user() itself reads from. A caller can target any userId, but
+ * doing so only re-derives that user's own already-true state from their
+ * own metadata — it cannot inject a different email/zip/role, and the
+ * profiles update + waitlist insert are both idempotent, so reprocessing a
+ * genuine user is harmless. This forecloses the "supply an arbitrary UUID
+ * and pass in whatever email/zip/role you want" attack the previous
+ * signature was vulnerable to.
+ *
+ * The profiles update and the waitlist insert are attempted independently —
+ * a failed profiles write must never suppress lead capture, and vice versa.
  */
-export async function processSignupServiceArea(
-  userId: string,
-  rawZip: string,
-  rawEmail: string,
-  role: "CLIENT" | "CONTRACTOR"
-): Promise<ProcessSignupServiceAreaResult> {
-  const zip = normalizeZip(rawZip);
-  if (!zip) {
-    logServiceAreaError("processSignupServiceArea:invalidZip", { userId, zip: rawZip });
-    return { status: "invalid_zip" };
+export async function processSignupServiceArea(userId: string): Promise<ProcessSignupServiceAreaResult> {
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
+
+  if (authError || !authData?.user) {
+    if (authError) {
+      logServiceAreaError("processSignupServiceArea:authLookup", {
+        userId,
+        code: (authError as any).code ?? null,
+        message: authError.message,
+      });
+    }
+    return { status: "user_not_found" };
   }
 
-  const inArea = isInServiceArea(zip);
+  const authUser = authData.user;
+  const classification = classifySignupMetadata({
+    email: authUser.email,
+    rawZip: (authUser.user_metadata as Record<string, unknown> | null)?.service_area_zip as string | undefined,
+    rawRole: (authUser.user_metadata as Record<string, unknown> | null)?.signup_role as string | undefined,
+  });
+
+  if (!classification.ok) {
+    logServiceAreaError("processSignupServiceArea:invalidMetadata", { userId, zip: null });
+    return { status: "invalid_metadata", reason: classification.reason };
+  }
+
+  const { email, zip, role, inArea } = classification;
   const status = inArea ? "IN_AREA" : "OUT_OF_AREA";
 
   const { error: profileError } = await supabaseAdmin
@@ -142,6 +125,7 @@ export async function processSignupServiceArea(
     .update({ service_area_zip: zip, service_area_status: status })
     .eq("id", userId);
 
+  const profileUpdated = !profileError;
   if (profileError) {
     logServiceAreaError("processSignupServiceArea:profileUpdate", {
       userId,
@@ -149,16 +133,13 @@ export async function processSignupServiceArea(
       code: profileError.code,
       message: profileError.message,
     });
-    return { status: "profile_update_failed", zip, inArea };
   }
 
   if (inArea) {
-    return { status: "in_area", zip };
+    return { status: "in_area", zip, profileUpdated };
   }
 
-  const email = normalizeEmail(rawEmail);
   const intendedRole = normalizeIntendedRole(role);
-
   const insertResult = await insertWaitlistRow({
     email,
     zip,
@@ -167,11 +148,7 @@ export async function processSignupServiceArea(
     userId,
   });
 
-  if (!insertResult.ok) {
-    return { status: "out_of_area_waitlist_failed", zip };
-  }
-
-  return { status: "out_of_area_waitlisted", zip };
+  return { status: "out_of_area", zip, profileUpdated, waitlisted: insertResult.ok };
 }
 
 // ============================================================================

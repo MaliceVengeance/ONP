@@ -1,9 +1,10 @@
 import Link from "next/link";
+import WaitlistForm from "@/components/WaitlistForm";
 
 export default async function OutOfAreaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ zip?: string; waitlist?: string }>;
+  searchParams: Promise<{ zip?: string; waitlist?: string; role?: string }>;
 }) {
   const sp = await searchParams;
   const zip = sp.zip ?? "your area";
@@ -13,6 +14,8 @@ export default async function OutOfAreaPage({
   // waitlist entry is actually confirmed to exist.
   const waitlistState: "joined" | "failed" | "unknown" =
     sp.waitlist === "joined" ? "joined" : sp.waitlist === "failed" ? "failed" : "unknown";
+
+  const intendedRole: "CLIENT" | "CONTRACTOR" = sp.role === "CONTRACTOR" ? "CONTRACTOR" : "CLIENT";
 
   return (
     <main style={{
@@ -107,33 +110,47 @@ export default async function OutOfAreaPage({
           )}
 
           {waitlistState === "failed" && (
-            <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "20px" }}>
-              Your account was created, but we ran into a problem adding you to our expansion waitlist.
-              You can{" "}
-              <Link href="/login#waitlist" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
-                try joining the waitlist again here
-              </Link>
-              , or{" "}
-              <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
-                contact support
-              </a>{" "}
-              and we&apos;ll add you manually.
-            </p>
+            <>
+              <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "12px" }}>
+                Your account was created, but we ran into a problem adding you to our expansion waitlist.
+                You can try again below, or{" "}
+                <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                  contact support
+                </a>{" "}
+                and we&apos;ll add you manually.
+              </p>
+              <div style={{ marginBottom: "20px" }}>
+                <WaitlistForm
+                  source="SIGNUP_BLOCKED"
+                  intendedRole={intendedRole}
+                  defaultZip={sp.zip}
+                  lockZip={!!sp.zip}
+                  theme="amber"
+                />
+              </div>
+            </>
           )}
 
           {waitlistState === "unknown" && (
-            <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "20px" }}>
-              Your account was created, but we couldn&apos;t confirm whether you were added to our expansion waitlist.
-              You can{" "}
-              <Link href="/login#waitlist" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
-                join the waitlist here
-              </Link>
-              , or{" "}
-              <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
-                contact support
-              </a>{" "}
-              if you&apos;d like to confirm your status.
-            </p>
+            <>
+              <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "12px" }}>
+                Your account was created, but we couldn&apos;t confirm whether you were added to our expansion waitlist.
+                You can join below, or{" "}
+                <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                  contact support
+                </a>{" "}
+                if you&apos;d like to confirm your status.
+              </p>
+              <div style={{ marginBottom: "20px" }}>
+                <WaitlistForm
+                  source="SIGNUP_BLOCKED"
+                  intendedRole={intendedRole}
+                  defaultZip={sp.zip}
+                  lockZip={!!sp.zip}
+                  theme="amber"
+                />
+              </div>
+            </>
           )}
 
           <Link

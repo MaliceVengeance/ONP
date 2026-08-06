@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { processSignupServiceArea } from "@/lib/serviceArea/actions";
+import { normalizeZip, ZIP_INPUT_PATTERN } from "@/lib/serviceArea/normalize";
+import { emailConfirmationServiceAreaMessage, routeForSignupResult } from "@/lib/serviceArea/signupResultMessages";
 
 export default function SignupContractorPage() {
   const supabase = createSupabaseBrowserClient();
@@ -20,12 +22,19 @@ export default function SignupContractorPage() {
   const [busy, setBusy] = useState(false);
 
   const nameMatches = typedName.trim().toLowerCase() === businessName.trim().toLowerCase();
-  const canSubmit = businessName.trim() && email && password.length >= 8 && zip.trim().length >= 5 && nameMatches && termsChecked;
+  const canSubmit = businessName.trim() && email && password.length >= 8 && !!normalizeZip(zip) && nameMatches && termsChecked;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit) return;
     setMsg(null);
+
+    const normalizedZip = normalizeZip(zip);
+    if (!normalizedZip) {
+      setMsg("Enter a valid ZIP code — either 5 digits (12345) or ZIP+4 (12345-6789).");
+      return;
+    }
+    if (!canSubmit) return;
+
     setBusy(true);
 
     try {
@@ -36,7 +45,7 @@ export default function SignupContractorPage() {
           data: {
             display_name: businessName.trim() || "Contractor",
             signup_role: "CONTRACTOR",
-            service_area_zip: zip.trim().slice(0, 5),
+            service_area_zip: normalizedZip,
             bid_disclaimer_agreed: true,
             bid_disclaimer_version: "v1.0-2026-05-25",
           },
@@ -45,37 +54,26 @@ export default function SignupContractorPage() {
 
       if (error) throw error;
 
-      if (!data.session) {
-        setMsg("Check your email to confirm your account, then log in.");
+      if (!data.user) {
+        // signUp() reported no error but also returned no user — there is no
+        // id to process service-area/waitlist enrollment with, and nothing
+        // known to roll back. Surface a recoverable error rather than
+        // silently treating this as success.
+        setMsg("Something went wrong creating your account. Please try again or contact support@ournextproject.us.");
         return;
       }
 
-      // Set service_area_status and auto-enroll waitlist if out-of-area. The
-      // account is already created at this point regardless of how this
-      // step goes — it only affects routing/messaging, never signup success.
-      const result = await processSignupServiceArea(data.user!.id, zip, email, "CONTRACTOR");
+      // Runs regardless of whether a session came back — production has
+      // email confirmation enabled, so most signups won't have one yet, and
+      // that must not block service-area processing or waitlist capture.
+      const result = await processSignupServiceArea(data.user.id);
 
-      switch (result.status) {
-        case "in_area":
-          router.push("/dashboard");
-          break;
-        case "out_of_area_waitlisted":
-          router.push(`/signup/out-of-area?zip=${encodeURIComponent(result.zip)}&waitlist=joined`);
-          break;
-        case "out_of_area_waitlist_failed":
-          router.push(`/signup/out-of-area?zip=${encodeURIComponent(result.zip)}&waitlist=failed`);
-          break;
-        case "profile_update_failed":
-          if (result.inArea) {
-            router.push("/dashboard");
-          } else {
-            router.push(`/signup/out-of-area?zip=${encodeURIComponent(result.zip)}&waitlist=unknown`);
-          }
-          break;
-        case "invalid_zip":
-          router.push("/signup/out-of-area?waitlist=unknown");
-          break;
+      if (!data.session) {
+        setMsg(emailConfirmationServiceAreaMessage(result));
+        return;
       }
+
+      router.push(routeForSignupResult(result, "CONTRACTOR"));
     } catch (err: any) {
       setMsg(err?.message ?? "Signup failed");
     } finally {
@@ -231,6 +229,8 @@ export default function SignupContractorPage() {
               onChange={(e) => setZip(e.target.value)}
               required
               maxLength={10}
+              pattern={ZIP_INPUT_PATTERN}
+              title="5-digit ZIP (12345) or ZIP+4 (12345-6789)"
               placeholder="e.g. 79912"
             />
             <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { joinWaitlist, type JoinWaitlistResult } from "@/lib/serviceArea/actions";
+import { ZIP_INPUT_PATTERN } from "@/lib/serviceArea/normalize";
 
 type Props = {
-  source: "HOMEPAGE" | "PROJECT_POST_BLOCKED";
+  source: "HOMEPAGE" | "PROJECT_POST_BLOCKED" | "SIGNUP_BLOCKED";
   intendedRole: "CLIENT" | "CONTRACTOR" | "BOTH" | "UNKNOWN";
   defaultZip?: string;
   lockZip?: boolean;
@@ -116,6 +117,8 @@ export default function WaitlistForm({ source, intendedRole, defaultZip, lockZip
             onChange={(e) => setZip(e.target.value)}
             required
             maxLength={10}
+            pattern={ZIP_INPUT_PATTERN}
+            title="5-digit ZIP (12345) or ZIP+4 (12345-6789)"
             placeholder="ZIP code"
             style={{ ...inputStyle, flex: "0 0 100px" }}
           />
