@@ -3,13 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { processSignupServiceArea } from "@/lib/serviceArea/actions";
+import { signupContractor } from "./actions";
 import { normalizeZip, ZIP_INPUT_PATTERN } from "@/lib/serviceArea/normalize";
-import { emailConfirmationServiceAreaMessage, routeForSignupResult } from "@/lib/serviceArea/signupResultMessages";
+import { emailConfirmationMessage, routeForSignupResult } from "@/lib/serviceArea/signupResultMessages";
 
 export default function SignupContractorPage() {
-  const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
   const [businessName, setBusinessName] = useState("");
@@ -38,38 +36,30 @@ export default function SignupContractorPage() {
     setBusy(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            display_name: businessName.trim() || "Contractor",
-            signup_role: "CONTRACTOR",
-            service_area_zip: normalizedZip,
-            bid_disclaimer_agreed: true,
-            bid_disclaimer_version: "v1.0-2026-05-25",
-          },
-        },
-      });
+      const formData = new FormData();
+      formData.set("email", email);
+      formData.set("password", password);
+      formData.set("zip", normalizedZip);
+      formData.set("business_name", businessName);
+      formData.set("terms_agreed", termsChecked ? "true" : "false");
 
-      if (error) throw error;
+      // The trusted server action re-validates business name and terms
+      // agreement authoritatively rather than trusting canSubmit — a
+      // modified client could otherwise skip the typed-name/checkbox gate
+      // entirely and POST directly.
+      const result = await signupContractor(formData);
 
-      if (!data.user) {
-        // signUp() reported no error but also returned no user — there is no
-        // id to process service-area/waitlist enrollment with, and nothing
-        // known to roll back. Surface a recoverable error rather than
-        // silently treating this as success.
+      if (result.status === "auth_failed") {
+        setMsg(result.message);
+        return;
+      }
+      if (result.status === "no_auth_user") {
         setMsg("Something went wrong creating your account. Please try again or contact support@ournextproject.us.");
         return;
       }
 
-      // Runs regardless of whether a session came back — production has
-      // email confirmation enabled, so most signups won't have one yet, and
-      // that must not block service-area processing or waitlist capture.
-      const result = await processSignupServiceArea(data.user.id);
-
-      if (!data.session) {
-        setMsg(emailConfirmationServiceAreaMessage(result));
+      if (!result.hasSession) {
+        setMsg(emailConfirmationMessage(result));
         return;
       }
 

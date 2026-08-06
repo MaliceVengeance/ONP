@@ -7,11 +7,12 @@ import { isInServiceArea } from "./launchZips";
 import { normalizeEmail, normalizeZip } from "./normalize";
 
 /**
- * Given the raw fields pulled from an authoritative auth.users lookup,
- * decides whether the signup has valid, usable metadata and — if so —
- * whether it's in area. Never trusts anything the caller of
- * processSignupServiceArea passed in directly; this only ever sees data
- * already read back from auth.users.
+ * Given the raw fields pulled from the auth user object returned by the
+ * server-side auth.signUp() call, decides whether the signup has valid,
+ * usable metadata and — if so — whether it's in area. Never sees anything
+ * client-supplied directly; the caller (processServiceAreaForNewUser in
+ * signupProcessing.ts) only ever passes in fields already read back from
+ * that authoritative auth response.
  */
 export function classifySignupMetadata(authFields: {
   email: string | null | undefined;
