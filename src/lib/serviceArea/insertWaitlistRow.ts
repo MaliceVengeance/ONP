@@ -1,5 +1,10 @@
 // Plain module (no "use server") — shared by joinWaitlist (public action)
 // and the internal trusted-signup path, so both dedupe the same way.
+//
+// "server-only" fails the build if this ever gets imported from client
+// code — it holds the service-role Supabase client and performs a
+// privileged write, so it has no legitimate client-side use.
+import "server-only";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { interpretWaitlistInsertError } from "./classify";

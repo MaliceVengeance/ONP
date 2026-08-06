@@ -1,5 +1,10 @@
 // Plain module (no "use server") — shared by every service-area module that
 // needs to log a failure without exposing it to the caller.
+//
+// "server-only" guard: this has no legitimate client-side use (it logs
+// internal operation names, user ids, ZIPs, and DB error codes), even
+// though nothing here directly touches Supabase or secrets.
+import "server-only";
 
 export function logServiceAreaError(
   operation: string,

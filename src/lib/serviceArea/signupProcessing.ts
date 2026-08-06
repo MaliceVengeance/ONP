@@ -5,6 +5,13 @@
 // matter what a caller supplies. It is imported only by the trusted signup
 // Server Actions in src/app/signup/actions.ts and
 // src/app/signup/contractor/actions.ts.
+//
+// "server-only" is additional, independent protection: it makes any attempt
+// to import this file from client code fail at build time, rather than
+// relying solely on the absence of "use server" — belt-and-suspenders, since
+// this module also handles raw signup passwords and the service-role
+// Supabase client.
+import "server-only";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
