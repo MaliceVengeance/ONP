@@ -18,13 +18,23 @@ type Project = {
 export default async function ClientDashboard() {
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
 
-  // Service area status
-  const { data: profileStatus } = await supabaseAdmin
+  // Service area status. Query errors and UNKNOWN both fall through to "no
+  // banner" — a failure here must never be presented as confirmed in-area,
+  // but it also shouldn't block the dashboard, so we degrade to silence
+  // rather than an error state on this page.
+  const { data: profileStatus, error: serviceAreaError } = await supabaseAdmin
     .from("profiles")
     .select("service_area_status, service_area_zip")
     .eq("id", user.id)
     .single();
-  const isOutOfArea = profileStatus?.service_area_status === "OUT_OF_AREA";
+
+  if (serviceAreaError) {
+    console.error(
+      `[serviceArea:clientDashboard] failed to load service area status userId=${user.id} code=${serviceAreaError.code ?? "unknown"} message=${serviceAreaError.message}`
+    );
+  }
+
+  const isOutOfArea = !serviceAreaError && profileStatus?.service_area_status === "OUT_OF_AREA";
 
   const { data, error } = await supabaseAdmin
     .from("projects")

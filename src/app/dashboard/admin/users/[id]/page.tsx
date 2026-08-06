@@ -50,13 +50,18 @@ export default async function AdminUserProfilePage({
     .eq("id", userId)
     .single() as { data: Record<string, any> | null; error: any };
 
-  // Separately fetch service area columns (added by migration 005 — may not exist yet)
-  const { data: saData } = await supabaseAdmin
+  // Separately fetch service area columns (added by Migration 017)
+  const { data: saData, error: saError } = await supabaseAdmin
     .from("profiles")
     .select("service_area_zip, service_area_status")
     .eq("id", userId)
-    .maybeSingle()
-    .then((res) => res.error ? { data: null } : res);
+    .maybeSingle();
+
+  if (saError) {
+    console.error(
+      `[serviceArea:adminUserDetail] failed to load service area data userId=${userId} code=${saError.code ?? "unknown"} message=${saError.message}`
+    );
+  }
 
   if (!profile) {
     return (
@@ -175,6 +180,7 @@ export default async function AdminUserProfilePage({
     switch (status) {
       case "IN_AREA": return { background: "#F0FDF4", color: "#15803D", border: "1px solid #166534" };
       case "OUT_OF_AREA": return { background: "#FFFBEB", color: "#92400E", border: "1px solid #FCD34D" };
+      case "ERROR": return { background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" };
       default: return { background: "#F1F5F9", color: "#475569", border: "1px solid #CBD5E1" };
     }
   }
@@ -398,7 +404,9 @@ export default async function AdminUserProfilePage({
           </div>
           <div>
             <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Service Area ZIP</div>
-            <div style={{ fontSize: "13px", color: "var(--camo-charcoal)" }}>{saData?.service_area_zip ?? "—"}</div>
+            <div style={{ fontSize: "13px", color: saError ? "#991B1B" : "var(--camo-charcoal)" }}>
+              {saError ? "Error loading" : saData?.service_area_zip ?? "Not set"}
+            </div>
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "3px" }}>Address</div>
@@ -416,7 +424,18 @@ export default async function AdminUserProfilePage({
           </div>
           <div>
             <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>Service Area Status</div>
-            {saData?.service_area_status ? (
+            {saError ? (
+              <span style={{
+                fontSize: "11px",
+                fontWeight: 600,
+                padding: "4px 10px",
+                borderRadius: "20px",
+                letterSpacing: "0.3px",
+                ...serviceAreaBadge("ERROR"),
+              }}>
+                ERROR LOADING
+              </span>
+            ) : saData?.service_area_status ? (
               <span style={{
                 fontSize: "11px",
                 fontWeight: 600,

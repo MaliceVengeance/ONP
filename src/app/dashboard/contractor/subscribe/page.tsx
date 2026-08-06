@@ -14,13 +14,30 @@ export default async function ContractorSubscribePage({
   const sp = await searchParams;
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
-  // Service area gate
-  const { data: profileStatus } = await supabaseAdmin
+  // Service area gate — fails closed. Checkout is only offered when status is
+  // definitively IN_AREA; UNKNOWN and query-error both block checkout too,
+  // just with different messaging (see below), since neither one confirms
+  // eligibility.
+  const { data: profileStatus, error: serviceAreaError } = await supabaseAdmin
     .from("profiles")
     .select("service_area_status, service_area_zip")
     .eq("id", user.id)
     .single();
-  const isOutOfArea = profileStatus?.service_area_status === "OUT_OF_AREA";
+
+  if (serviceAreaError) {
+    console.error(
+      `[serviceArea:subscribePage] failed to load service area status userId=${user.id} code=${serviceAreaError.code ?? "unknown"} message=${serviceAreaError.message}`
+    );
+  }
+
+  const areaStatus: "IN_AREA" | "OUT_OF_AREA" | "UNKNOWN" | "ERROR" = serviceAreaError
+    ? "ERROR"
+    : (profileStatus?.service_area_status as "IN_AREA" | "OUT_OF_AREA" | "UNKNOWN" | undefined) ?? "UNKNOWN";
+
+  const isInArea = areaStatus === "IN_AREA";
+  const isOutOfArea = areaStatus === "OUT_OF_AREA";
+  const isAreaUnknown = areaStatus === "UNKNOWN";
+  const isAreaCheckError = areaStatus === "ERROR";
 
   const { data: profile } = await supabase
     .from("contractor_profiles")
@@ -293,8 +310,10 @@ export default async function ContractorSubscribePage({
         </div>
       )}
 
-      {/* Plans — show if no active sub AND profile is complete */}
-      {!hasActiveSub && profileComplete && (
+      {/* Plans — show only if no active sub, profile is complete, AND service
+          area is definitively IN_AREA. UNKNOWN/OUT_OF_AREA/ERROR all block
+          checkout — see the messaging blocks below. */}
+      {!hasActiveSub && profileComplete && isInArea && (
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
           {/* Coupon code section */}
@@ -579,7 +598,7 @@ export default async function ContractorSubscribePage({
       )}
 
       {/* Out-of-area gate — blocks subscription */}
-      {isOutOfArea && (
+      {isOutOfArea && !hasActiveSub && (
         <div style={{
           background: "#FFFBEB",
           border: "1px solid #FCD34D",
@@ -623,6 +642,66 @@ export default async function ContractorSubscribePage({
           >
             Join the Expansion Waitlist →
           </Link>
+        </div>
+      )}
+
+      {/* Service area not yet verified — blocks checkout, no charge, no false promise */}
+      {isAreaUnknown && !hasActiveSub && profileComplete && (
+        <div style={{
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
+          borderRadius: "12px",
+          padding: "24px",
+          marginBottom: "24px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            color: "var(--camo-charcoal)",
+            marginBottom: "10px",
+          }}>
+            Service area not yet verified
+          </div>
+          <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "16px" }}>
+            We haven't confirmed whether your business is inside ONP's current service area
+            ({SERVICE_AREA_LABEL}) yet, so we can't activate a subscription until that's verified.
+            No charge has been made.{" "}
+            <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-gunmetal)", fontWeight: 600 }}>
+              Contact support
+            </a>{" "}
+            to verify your service area.
+          </p>
+        </div>
+      )}
+
+      {/* Service area check failed — recoverable, no charge, no false promise */}
+      {isAreaCheckError && !hasActiveSub && profileComplete && (
+        <div style={{
+          background: "#FEF2F2",
+          border: "1px solid #FCA5A5",
+          borderRadius: "12px",
+          padding: "24px",
+          marginBottom: "24px",
+        }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700,
+            fontSize: "20px",
+            color: "#991B1B",
+            marginBottom: "10px",
+          }}>
+            Couldn't verify service area eligibility
+          </div>
+          <p style={{ fontSize: "13px", color: "#991B1B", lineHeight: 1.6, marginBottom: "16px" }}>
+            We ran into a problem checking your service area eligibility, so we can't activate a
+            subscription right now. No charge has been made. Please refresh this page to try again,
+            or{" "}
+            <a href="mailto:support@ournextproject.us" style={{ color: "#991B1B", fontWeight: 600 }}>
+              contact support
+            </a>{" "}
+            if this keeps happening.
+          </p>
         </div>
       )}
 

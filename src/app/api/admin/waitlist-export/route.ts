@@ -9,10 +9,17 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from("service_area_waitlist")
     .select("email, zip, city, state, intended_role, source, notes, notified_at, created_at")
     .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(
+      `[serviceArea:waitlistExport] failed to load waitlist rows code=${error.code ?? "unknown"} message=${error.message}`
+    );
+    return NextResponse.json({ error: "Failed to generate export. Please try again." }, { status: 500 });
+  }
 
   const rows = data ?? [];
 

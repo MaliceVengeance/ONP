@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { joinWaitlist } from "@/lib/serviceArea/actions";
 import { ServiceAreaBanner, MarketingFooter } from "@/components/MarketingChrome";
+import WaitlistForm from "@/components/WaitlistForm";
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
@@ -35,12 +35,11 @@ const labelStyle: React.CSSProperties = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string; waitlist?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const sp = await searchParams;
   const next = sp.next ?? "/dashboard";
   const error = sp.error;
-  const waitlistJoined = sp.waitlist === "joined";
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif", display: "flex", flexDirection: "column" }}>
@@ -144,46 +143,7 @@ export default async function LoginPage({
               We&apos;re starting local and growing intentionally. Drop your email and ZIP — we&apos;ll let you know when <strong>ONP</strong> launches in your area.
             </p>
 
-            {waitlistJoined ? (
-              <div style={{ background: "rgba(92,138,107,0.12)", border: "1px solid var(--camo-good)", borderRadius: "4px", padding: "14px 16px", fontSize: "13px", color: "var(--camo-good)", textAlign: "center" }}>
-                ✓ Thanks — we&apos;ll be in touch when ONP launches near you.
-              </div>
-            ) : (
-              <form
-                action={async (formData: FormData) => {
-                  "use server";
-                  await joinWaitlist(formData);
-                }}
-                style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-              >
-                <input type="hidden" name="source" value="HOMEPAGE" />
-                <input type="hidden" name="intended_role" value="UNKNOWN" />
-
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <input name="zip" required maxLength={10} placeholder="ZIP code" style={{ ...inputStyle, flex: "0 0 100px" }} />
-                  <input name="email" type="email" required placeholder="your@email.com" style={{ ...inputStyle, flex: 1 }} />
-                </div>
-                <button
-                  type="submit"
-                  style={{
-                    width: "100%",
-                    background: "var(--camo-charcoal)",
-                    color: "var(--camo-concrete)",
-                    border: "none",
-                    padding: "11px",
-                    borderRadius: "4px",
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 700,
-                    fontSize: "13px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.03em",
-                    cursor: "pointer",
-                  }}
-                >
-                  Join Waitlist
-                </button>
-              </form>
-            )}
+            <WaitlistForm source="HOMEPAGE" intendedRole="UNKNOWN" theme="dark" />
           </div>
         </div>
 

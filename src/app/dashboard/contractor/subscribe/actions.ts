@@ -7,6 +7,30 @@ import { stripe, PRICES, TERM_PRICES, type SubscriptionTerm } from "@/lib/stripe
 export async function createCheckoutSession(planType: "standard" | "veteran", formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
+  // Security check — re-verify service area server-side, fail closed. This is
+  // defense-in-depth alongside the page-level gate (which already hides the
+  // checkout form unless service_area_status is definitively IN_AREA) — this
+  // action can in principle be invoked directly, so it must not trust that
+  // the page-level gate was actually enforced. UNKNOWN and query errors are
+  // treated the same as OUT_OF_AREA: no session is created unless status is
+  // definitively IN_AREA.
+  const { data: areaProfile, error: areaError } = await supabase
+    .from("profiles")
+    .select("service_area_status")
+    .eq("id", user.id)
+    .single();
+
+  if (areaError) {
+    console.error(
+      `[serviceArea:createCheckoutSession] failed to verify service area userId=${user.id} code=${areaError.code ?? "unknown"} message=${areaError.message}`
+    );
+    throw new Error("We couldn't verify your service area eligibility right now. Please try again in a moment or contact support@ournextproject.us.");
+  }
+
+  if (areaProfile?.service_area_status !== "IN_AREA") {
+    throw new Error("Your account isn't confirmed as inside ONP's current service area, so a subscription can't be activated yet. Contact support@ournextproject.us if you believe this is incorrect.");
+  }
+
   // Security check — verify veteran status server-side. This gate covers every
   // veteran-tier price (monthly and all three term options below), since it's
   // keyed on planType rather than the specific price chosen — a longer-term

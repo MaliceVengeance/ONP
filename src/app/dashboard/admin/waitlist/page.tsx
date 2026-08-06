@@ -32,6 +32,7 @@ export default async function AdminWaitlistPage({
     filter_state?: string;
     filter_source?: string;
     notified?: string;
+    failed?: string;
     notify_error?: string;
   }>;
 }) {
@@ -46,8 +47,14 @@ export default async function AdminWaitlistPage({
   if (sp.filter_state) query = query.eq("state", sp.filter_state.toUpperCase());
   if (sp.filter_source) query = query.eq("source", sp.filter_source.toUpperCase());
 
-  const { data } = await query;
+  const { data, error: waitlistError } = await query;
   const rows = (data ?? []) as WaitlistRow[];
+
+  if (waitlistError) {
+    console.error(
+      `[serviceArea:adminWaitlistPage] failed to load waitlist rows code=${waitlistError.code ?? "unknown"} message=${waitlistError.message}`
+    );
+  }
 
   // Aggregate stats
   const total = rows.length;
@@ -68,6 +75,7 @@ export default async function AdminWaitlistPage({
   const topStates = [...stateCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
 
   const notifiedCount = sp.notified ? parseInt(sp.notified) : null;
+  const failedCount = sp.failed ? parseInt(sp.failed) : 0;
 
   return (
     <div>
@@ -124,6 +132,7 @@ export default async function AdminWaitlistPage({
       {notifiedCount !== null && (
         <div style={{ background: "#F0FDF4", border: "1px solid #166534", color: "#15803D", padding: "12px 16px", borderRadius: "8px", fontSize: "13px", marginBottom: "20px" }}>
           ✅ Notified {notifiedCount} waitlist {notifiedCount === 1 ? "entry" : "entries"} successfully.
+          {failedCount > 0 && ` ${failedCount} ${failedCount === 1 ? "entry" : "entries"} failed and were not marked as notified — check server logs.`}
         </div>
       )}
       {sp.notify_error && (
@@ -310,7 +319,11 @@ export default async function AdminWaitlistPage({
       </div>
 
       {/* Table */}
-      {rows.length === 0 ? (
+      {waitlistError ? (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: "10px", padding: "32px", textAlign: "center", color: "#991B1B", fontSize: "14px" }}>
+          Couldn&apos;t load waitlist entries due to a server error. The stats above may be incomplete or zero as a result — please refresh to try again.
+        </div>
+      ) : rows.length === 0 ? (
         <div style={{ background: "var(--camo-concrete)", border: "1px solid #d9dbdb", borderRadius: "10px", padding: "32px", textAlign: "center", color: "var(--camo-gunmetal)", fontSize: "14px" }}>
           No waitlist entries yet.
         </div>

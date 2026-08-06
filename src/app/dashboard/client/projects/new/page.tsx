@@ -2,8 +2,8 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { PROJECT_CATEGORIES } from "@/lib/projects/categories";
 import { getEmergencyRequestStatus } from "@/lib/emergency/rateLimit";
 import NewProjectForm from "./NewProjectForm";
-import { joinWaitlist } from "@/lib/serviceArea/actions";
 import { SERVICE_AREA_LABEL } from "@/lib/serviceArea/launchZips";
+import WaitlistForm from "@/components/WaitlistForm";
 import Link from "next/link";
 
 type RfiCatalogItem = { id: string; code: string; prompt: string };
@@ -17,12 +17,11 @@ const CLIENT_EXCLUDED_KEYWORDS = [
 export default async function NewDraftProjectPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area_error?: string; zip?: string; waitlist?: string }>;
+  searchParams: Promise<{ area_error?: string; zip?: string }>;
 }) {
   const sp = await searchParams;
   const areaError = sp.area_error === "1";
   const blockedZip = sp.zip ?? "";
-  const waitlistJoined = sp.waitlist === "joined";
 
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
   const rateLimit = await getEmergencyRequestStatus(user.id);
@@ -78,97 +77,27 @@ export default async function NewDraftProjectPage({
           </p>
         </div>
 
-        {waitlistJoined ? (
-          <div style={{
-            background: "#F0FDF4",
-            border: "1px solid #166534",
-            borderRadius: "8px",
-            padding: "14px 16px",
-            fontSize: "13px",
-            color: "#15803D",
-            marginBottom: "20px",
-          }}>
-            ✅ You're on the waitlist — we'll notify you when ONP expands to your area.
+        <div style={{
+          background: "var(--camo-concrete)",
+          border: "1px solid #d9dbdb",
+          borderRadius: "12px",
+          padding: "20px",
+          marginBottom: "20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+        }}>
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--camo-charcoal)" }}>
+            Join the Expansion Waitlist
           </div>
-        ) : (
-          <form
-            action={async (formData: FormData) => {
-              "use server";
-              await joinWaitlist(formData);
-            }}
-            style={{
-              background: "var(--camo-concrete)",
-              border: "1px solid #d9dbdb",
-              borderRadius: "12px",
-              padding: "20px",
-              marginBottom: "20px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-            }}
-          >
-            <input type="hidden" name="source" value="PROJECT_POST_BLOCKED" />
-            <input type="hidden" name="intended_role" value="CLIENT" />
-            {blockedZip && <input type="hidden" name="zip" value={blockedZip} />}
-
-            <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--camo-charcoal)" }}>
-              Join the Expansion Waitlist
-            </div>
-
-            {!blockedZip && (
-              <input
-                name="zip"
-                required
-                maxLength={10}
-                placeholder="Project ZIP code"
-                style={{
-                  background: "#FFFFFF",
-                  border: "1px solid #d9dbdb",
-                  color: "var(--camo-charcoal)",
-                  borderRadius: "6px",
-                  padding: "10px 14px",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontSize: "14px",
-                  outline: "none",
-                }}
-              />
-            )}
-
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="your@email.com"
-              style={{
-                background: "#FFFFFF",
-                border: "1px solid #d9dbdb",
-                color: "var(--camo-charcoal)",
-                borderRadius: "6px",
-                padding: "10px 14px",
-                fontFamily: "'Barlow', sans-serif",
-                fontSize: "14px",
-                outline: "none",
-              }}
-            />
-
-            <button
-              type="submit"
-              style={{
-                background: "var(--camo-charcoal)",
-                color: "#fff",
-                border: "none",
-                padding: "11px",
-                borderRadius: "6px",
-                fontFamily: "'Barlow', sans-serif",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
-            >
-              Join Waitlist
-            </button>
-          </form>
-        )}
+          <WaitlistForm
+            source="PROJECT_POST_BLOCKED"
+            intendedRole="CLIENT"
+            defaultZip={blockedZip || undefined}
+            lockZip={!!blockedZip}
+            theme="amber"
+          />
+        </div>
 
         <Link
           href="/dashboard/client/projects"

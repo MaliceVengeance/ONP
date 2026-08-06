@@ -63,13 +63,23 @@ export default async function ContractorDashboard({
 
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
 
-  // Service area status
-  const { data: profileStatus } = await supabaseAdmin
+  // Service area status. Query errors and UNKNOWN both fall through to "no
+  // banner" — a failure here must never be presented as confirmed in-area,
+  // but it also shouldn't block the dashboard, so we degrade to silence
+  // rather than an error state on this page.
+  const { data: profileStatus, error: serviceAreaError } = await supabaseAdmin
     .from("profiles")
     .select("service_area_status, service_area_zip")
     .eq("id", user.id)
     .single();
-  const isOutOfArea = profileStatus?.service_area_status === "OUT_OF_AREA";
+
+  if (serviceAreaError) {
+    console.error(
+      `[serviceArea:contractorDashboard] failed to load service area status userId=${user.id} code=${serviceAreaError.code ?? "unknown"} message=${serviceAreaError.message}`
+    );
+  }
+
+  const isOutOfArea = !serviceAreaError && profileStatus?.service_area_status === "OUT_OF_AREA";
 
   const [
     { data: awardedData },
@@ -153,11 +163,8 @@ export default async function ContractorDashboard({
         }}>
           📍 <strong>You're on the waitlist for your area ({profileStatus?.service_area_zip ?? "unknown ZIP"}).</strong>{" "}
           ONP currently serves {SERVICE_AREA_LABEL} only. We'll notify you when we expand to your region.
-          Subscription activation is unavailable until then. If you operate in El Paso or Las Cruces,{" "}
-          <Link href="/dashboard/contractor/profile" style={{ color: "#92400E", fontWeight: 600 }}>
-            update your ZIP in your profile
-          </Link>{" "}
-          or <a href="mailto:support@ournextproject.us" style={{ color: "#92400E", fontWeight: 600 }}>contact support</a> for manual verification.
+          Subscription activation is unavailable until then. If you actually operate in El Paso or Las Cruces,{" "}
+          <a href="mailto:support@ournextproject.us" style={{ color: "#92400E", fontWeight: 600 }}>contact support</a> so we can verify your service area manually.
         </div>
       )}
 

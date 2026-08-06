@@ -42,13 +42,31 @@ export default function SignupClientPage() {
         return;
       }
 
-      // Set service_area_status and auto-enroll waitlist if out-of-area
-      const { inArea } = await processSignupServiceArea(data.user!.id, zip, email, "CLIENT");
+      // Set service_area_status and auto-enroll waitlist if out-of-area. The
+      // account is already created at this point regardless of how this
+      // step goes — it only affects routing/messaging, never signup success.
+      const result = await processSignupServiceArea(data.user!.id, zip, email, "CLIENT");
 
-      if (!inArea) {
-        router.push(`/signup/out-of-area?zip=${encodeURIComponent(zip.trim().slice(0, 5))}`);
-      } else {
-        router.push("/dashboard");
+      switch (result.status) {
+        case "in_area":
+          router.push("/dashboard");
+          break;
+        case "out_of_area_waitlisted":
+          router.push(`/signup/out-of-area?zip=${encodeURIComponent(result.zip)}&waitlist=joined`);
+          break;
+        case "out_of_area_waitlist_failed":
+          router.push(`/signup/out-of-area?zip=${encodeURIComponent(result.zip)}&waitlist=failed`);
+          break;
+        case "profile_update_failed":
+          if (result.inArea) {
+            router.push("/dashboard");
+          } else {
+            router.push(`/signup/out-of-area?zip=${encodeURIComponent(result.zip)}&waitlist=unknown`);
+          }
+          break;
+        case "invalid_zip":
+          router.push("/signup/out-of-area?waitlist=unknown");
+          break;
       }
     } catch (err: any) {
       setMsg(err?.message ?? "Signup failed");

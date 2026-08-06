@@ -3,10 +3,16 @@ import Link from "next/link";
 export default async function OutOfAreaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ zip?: string }>;
+  searchParams: Promise<{ zip?: string; waitlist?: string }>;
 }) {
   const sp = await searchParams;
   const zip = sp.zip ?? "your area";
+
+  // Reflects the real result of the waitlist enrollment attempt made during
+  // signup — never assume success. "joined" is the only state where a
+  // waitlist entry is actually confirmed to exist.
+  const waitlistState: "joined" | "failed" | "unknown" =
+    sp.waitlist === "joined" ? "joined" : sp.waitlist === "failed" ? "failed" : "unknown";
 
   return (
     <main style={{
@@ -89,9 +95,46 @@ export default async function OutOfAreaPage({
             You can explore the platform, but you won&apos;t be able to post projects or activate a contractor subscription until we expand to your area.
           </div>
 
-          <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "20px" }}>
-            We&apos;ve automatically added you to our expansion waitlist — we&apos;ll notify you when <strong>ONP</strong> launches near you. If you operate in El Paso or Las Cruces, <Link href="/dashboard/client/profile" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>update your ZIP in your profile</Link> to unlock full access.
-          </p>
+          {waitlistState === "joined" && (
+            <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "20px" }}>
+              You&apos;ve been added to our expansion waitlist — we&apos;ll email you when <strong>ONP</strong> launches near you.
+              If you actually operate in El Paso or Las Cruces but your ZIP was entered incorrectly,{" "}
+              <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                contact support
+              </a>{" "}
+              to have it corrected.
+            </p>
+          )}
+
+          {waitlistState === "failed" && (
+            <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "20px" }}>
+              Your account was created, but we ran into a problem adding you to our expansion waitlist.
+              You can{" "}
+              <Link href="/login#waitlist" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                try joining the waitlist again here
+              </Link>
+              , or{" "}
+              <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                contact support
+              </a>{" "}
+              and we&apos;ll add you manually.
+            </p>
+          )}
+
+          {waitlistState === "unknown" && (
+            <p style={{ fontSize: "14px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginBottom: "20px" }}>
+              Your account was created, but we couldn&apos;t confirm whether you were added to our expansion waitlist.
+              You can{" "}
+              <Link href="/login#waitlist" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                join the waitlist here
+              </Link>
+              , or{" "}
+              <a href="mailto:support@ournextproject.us" style={{ color: "var(--camo-charcoal)", fontWeight: 600 }}>
+                contact support
+              </a>{" "}
+              if you&apos;d like to confirm your status.
+            </p>
+          )}
 
           <Link
             href="/dashboard"
