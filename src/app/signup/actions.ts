@@ -1,8 +1,7 @@
 "use server";
 
-import { performTrustedSignup, type SignupResult } from "@/lib/serviceArea/signupProcessing";
-
-export type { SignupResult };
+import { performTrustedSignup } from "@/lib/serviceArea/signupProcessing";
+import type { SignupResult } from "@/lib/serviceArea/signupProcessing";
 
 /**
  * Trusted client signup. Extracts and forwards raw form fields to
