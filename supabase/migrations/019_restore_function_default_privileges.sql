@@ -1,0 +1,55 @@
+-- ============================================================================
+-- Migration 019: Restore Function Default Privileges
+-- ============================================================================
+--
+-- PURPOSE
+--   A follow-up to Migration 018's privilege-parity work. That audit flagged
+--   an unresolved discrepancy: two reads of production's postgres/public
+--   FUNCTION default ACL, taken about an hour apart, returned different
+--   results. A dedicated re-verification (2026-08-08) resolved it:
+--
+--     - Three independent connections to production, read fresh each time,
+--       returned byte-identical results:
+--         {postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}
+--       pg_current_wal_lsn() was identical across all three reads, proving
+--       zero writes occurred to production during or between them -- this
+--       was not drift.
+--     - aclexplode() of that entry confirmed 4 explicit rows (postgres,
+--       anon, authenticated, service_role), each EXECUTE.
+--     - Staging's equivalent entry, by contrast, aclexplode()s to exactly
+--       1 row (postgres only).
+--     - All 20 existing public functions were checked individually in both
+--       environments: same 20 names, same owner (postgres), and identical
+--       EFFECTIVE EXECUTE access for anon/authenticated/service_role/
+--       postgres today -- production via 20 explicit per-function ACLs,
+--       staging via Postgres's built-in "NULL proacl -> PUBLIC gets
+--       EXECUTE" fallback (every role is implicitly a PUBLIC member).
+--
+--   Conclusion: production's default DOES grant EXECUTE to
+--   anon/authenticated/service_role for future postgres-owned functions in
+--   public; staging's does not. There is no CURRENT functional gap (the 20
+--   existing functions already behave identically), but any function
+--   created in staging after this point would receive staging's
+--   (incomplete) default as its initial explicit ACL, silently losing the
+--   NULL-proacl/PUBLIC-EXECUTE fallback the moment it becomes a real
+--   object. This migration closes that forward-looking gap.
+--
+-- SCOPE
+--   Exactly one statement: the ALTER DEFAULT PRIVILEGES rule for future
+--   functions, matching production's verified state.
+--
+--   Deliberately does NOT touch the 20 existing functions -- their
+--   effective EXECUTE access already matches production exactly, confirmed
+--   function-by-function, not just in aggregate. Their proacl stays NULL;
+--   no GRANT EXECUTE ON EXISTING FUNCTIONS statement is included.
+--
+-- SAFETY / IDEMPOTENCY
+--   ALTER DEFAULT PRIVILEGES is idempotent in PostgreSQL -- re-declaring an
+--   identical default-privilege rule is a no-op, never an error. Safe to
+--   run repeatedly, and safe if accidentally run against production, where
+--   this exact default already exists.
+-- ============================================================================
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT EXECUTE ON FUNCTIONS
+  TO anon, authenticated, service_role;
