@@ -51,6 +51,69 @@ function getPeriodEnd(sub: any): string {
   return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 }
 
+type ConditionalUpdateOutcome = "applied" | "already-done";
+
+/**
+ * Applies a conditional UPDATE that must succeed for the Stripe event to be
+ * considered processed. If no row matches the guard condition, re-reads the
+ * row to distinguish a safe idempotent retry (state already reflects the
+ * target write — a prior delivery of this same event already applied it, or
+ * a value in `alreadyDoneValues`) from a genuine failure (row missing, or in
+ * an unexpected state). Genuine failures throw, which the route-level
+ * handler turns into a non-2xx response so Stripe retries the event.
+ */
+async function applyRequiredConditionalUpdate(opts: {
+  table: string;
+  update: Record<string, unknown>;
+  matchColumn: string;
+  matchValue: string;
+  conditionColumn: string;
+  conditionValue: string;
+  alreadyDoneValues: string[];
+  context: string;
+}): Promise<ConditionalUpdateOutcome> {
+  const { table, update, matchColumn, matchValue, conditionColumn, conditionValue, alreadyDoneValues, context } = opts;
+
+  const { data, error } = await supabaseAdmin
+    .from(table)
+    .update(update)
+    .eq(matchColumn, matchValue)
+    .eq(conditionColumn, conditionValue)
+    .select(conditionColumn);
+
+  if (error) {
+    throw new Error(`${context}: update failed (${table}.${matchColumn}=${matchValue}) — ${error.message}`);
+  }
+  if (data && data.length > 0) {
+    return "applied";
+  }
+
+  // Nothing matched the conditional update — read current state to tell an
+  // already-applied retry apart from a genuine problem.
+  const { data: current, error: lookupErr } = await supabaseAdmin
+    .from(table)
+    .select(conditionColumn)
+    .eq(matchColumn, matchValue)
+    .maybeSingle();
+
+  if (lookupErr) {
+    throw new Error(`${context}: post-update lookup failed (${table}.${matchColumn}=${matchValue}) — ${lookupErr.message}`);
+  }
+  if (!current) {
+    throw new Error(`${context}: no ${table} row found for ${matchColumn}=${matchValue}`);
+  }
+
+  const currentValue = String((current as unknown as Record<string, unknown>)[conditionColumn]);
+  if (alreadyDoneValues.includes(currentValue)) {
+    console.log(`${context}: already applied (${table}.${conditionColumn}=${currentValue}) — treating retry as idempotent no-op`);
+    return "already-done";
+  }
+
+  throw new Error(
+    `${context}: expected ${table}.${matchColumn}=${matchValue} to have ${conditionColumn}=${conditionValue}, found ${currentValue} — refusing to overwrite unexpected state`
+  );
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -92,10 +155,13 @@ export async function POST(req: NextRequest) {
           const now = new Date();
           const autoCloseAt = new Date(now.getTime() + 48 * 60 * 60 * 1000); // +48 hours
 
-          // Activate the project
-          const { error: projErr } = await supabaseAdmin
-            .from("projects")
-            .update({
+          // Activate the project. REQUIRED: failure here means the client
+          // paid but the project never went live — must fail non-2xx so
+          // Stripe retries. A retry that finds state already advanced past
+          // PENDING_PAYMENT is treated as an idempotent no-op, not a failure.
+          const activationOutcome = await applyRequiredConditionalUpdate({
+            table: "projects",
+            update: {
               state: "OPEN",
               published_at: now.toISOString(),
               deadline_at: autoCloseAt.toISOString(),
@@ -103,26 +169,37 @@ export async function POST(req: NextRequest) {
               emergency_payment_id: paymentIntentId ?? null,
               emergency_auto_close_at: autoCloseAt.toISOString(),
               updated_at: now.toISOString(),
-            })
-            .eq("id", projectId)
-            .eq("state", "PENDING_PAYMENT");
+            },
+            matchColumn: "id",
+            matchValue: projectId,
+            conditionColumn: "state",
+            conditionValue: "PENDING_PAYMENT",
+            alreadyDoneValues: ["OPEN", "BIDDING_CLOSED", "BIDS_UNLOCKED", "AWARDED", "CANCELED", "COMPLETED", "EMERGENCY_EXPIRED"],
+            context: `Emergency project activation (project ${projectId})`,
+          });
 
-          if (projErr) {
-            console.error("Emergency project activation failed:", projErr);
-            break;
-          }
-
-          // Update log row to PAID
-          await supabaseAdmin
+          // Update log row to PAID. REQUIRED: this is the payment-status
+          // record of record for the emergency fee — must not silently fail.
+          const { data: logData, error: logErr } = await supabaseAdmin
             .from("emergency_request_log")
             .update({
               payment_status: "PAID",
               stripe_payment_intent_id: paymentIntentId ?? null,
             })
-            .eq("id", logId);
+            .eq("id", logId)
+            .select("id");
 
-          // Notify eligible contractors
-          try {
+          if (logErr) {
+            throw new Error(`Emergency log update failed (log ${logId}): ${logErr.message}`);
+          }
+          if (!logData || logData.length === 0) {
+            throw new Error(`Emergency log update matched no row (log ${logId})`);
+          }
+
+          // Notify eligible contractors. Skipped on an idempotent retry
+          // (activation already happened on a prior delivery) to avoid
+          // re-emailing every matching contractor on each Stripe retry.
+          if (activationOutcome === "applied") try {
             const { data: projectData } = await supabaseAdmin
               .from("projects")
               .select("title, category, city, location_general")
@@ -191,23 +268,26 @@ export async function POST(req: NextRequest) {
             break;
           }
 
-          // Mark assignment as PAID
-          const { error: updateErr } = await supabaseAdmin
-            .from("project_inspector_assignments")
-            .update({
+          // Mark assignment as PAID. REQUIRED: failure means the client paid
+          // but the assignment never left PENDING — must fail non-2xx.
+          const inspectorPaidOutcome = await applyRequiredConditionalUpdate({
+            table: "project_inspector_assignments",
+            update: {
               payment_status: "PAID",
               stripe_payment_intent_id: paymentIntentId ?? null,
-            })
-            .eq("id", assignmentId)
-            .eq("payment_status", "PENDING");
+            },
+            matchColumn: "id",
+            matchValue: assignmentId,
+            conditionColumn: "payment_status",
+            conditionValue: "PENDING",
+            alreadyDoneValues: ["PAID"],
+            context: `Inspector assignment payment (assignment ${assignmentId})`,
+          });
 
-          if (updateErr) {
-            console.error("Inspector assignment update failed:", updateErr);
-            break;
-          }
-
-          // Fetch assignment + project details for notifications
-          try {
+          // Fetch assignment + project details for notifications. Skipped
+          // on an idempotent retry to avoid re-emailing the client, every
+          // admin, and every inspector on each Stripe retry.
+          if (inspectorPaidOutcome === "applied") try {
             const { data: asgn } = await supabaseAdmin
               .from("project_inspector_assignments")
               .select("pricing_key, fee_charged_cents, inspector_share_cents, client_id")
@@ -303,12 +383,21 @@ export async function POST(req: NextRequest) {
             console.error("Inspector notification error (non-fatal):", notifyErr);
           }
 
-          // Pause the project bidding timer while inspector works
-          await supabaseAdmin
+          // Pause the project bidding timer while inspector works.
+          // OPTIONAL/BEST-EFFORT: the payment itself is already durably
+          // recorded above; if this stamp fails the bidding timer just
+          // won't pause and needs manual follow-up rather than blocking the
+          // payment confirmation. Idempotent by construction (.is(...,
+          // null) — only stamps once).
+          const { error: holdErr } = await supabaseAdmin
             .from("projects")
             .update({ inspector_hold_started_at: new Date().toISOString() })
             .eq("id", inspProjectId)
             .is("inspector_hold_started_at", null); // only stamp once
+
+          if (holdErr) {
+            console.error(`Inspector hold timestamp update failed (non-fatal, needs manual follow-up; project ${inspProjectId}):`, holdErr);
+          }
 
           console.log(`Inspector assignment ${assignmentId} marked PAID`);
           break;
@@ -339,10 +428,12 @@ export async function POST(req: NextRequest) {
           const inspShareCents  = Math.round((totalFeeCents * sharePercent) / 100);
           const onpShareCents   = totalFeeCents - inspShareCents;
 
-          // Mark upgrade PAID and update assignment to Comprehensive pricing
-          const { error: upgradeErr } = await supabaseAdmin
-            .from("project_inspector_assignments")
-            .update({
+          // Mark upgrade PAID and update assignment to Comprehensive pricing.
+          // REQUIRED: failure means the client paid for the upgrade but the
+          // assignment never reflects it — must fail non-2xx.
+          const upgradePaidOutcome = await applyRequiredConditionalUpdate({
+            table: "project_inspector_assignments",
+            update: {
               upgrade_payment_status: "PAID",
               upgrade_charged_at: now,
               upgrade_stripe_payment_intent_id: paymentIntentId ?? null,
@@ -350,17 +441,18 @@ export async function POST(req: NextRequest) {
               fee_charged_cents: totalFeeCents,
               inspector_share_cents: inspShareCents,
               onp_share_cents: onpShareCents,
-            })
-            .eq("id", assignmentId)
-            .eq("upgrade_payment_status", "PENDING");
+            },
+            matchColumn: "id",
+            matchValue: assignmentId,
+            conditionColumn: "upgrade_payment_status",
+            conditionValue: "PENDING",
+            alreadyDoneValues: ["PAID"],
+            context: `Inspector upgrade payment (assignment ${assignmentId})`,
+          });
 
-          if (upgradeErr) {
-            console.error("Inspector upgrade update failed:", upgradeErr);
-            break;
-          }
-
-          // Send notifications
-          try {
+          // Send notifications. Skipped on an idempotent retry to avoid
+          // re-emailing the client and inspector on each Stripe retry.
+          if (upgradePaidOutcome === "applied") try {
             const { data: asgn } = await supabaseAdmin
               .from("project_inspector_assignments")
               .select("client_id, inspector_id, upgrade_fee_cents")
@@ -506,13 +598,21 @@ export async function POST(req: NextRequest) {
         const sub = event.data.object as any;
         const customerId = sub.customer;
 
-        const { data: existing } = await supabaseAdmin
+        const { data: existing, error: existingErr } = await supabaseAdmin
           .from("contractor_subscriptions")
           .select("contractor_id")
           .eq("stripe_customer_id", customerId)
           .maybeSingle();
 
-        if (!existing?.contractor_id) break;
+        if (existingErr) {
+          throw new Error(`Subscription lookup failed for customer ${customerId}: ${existingErr.message}`);
+        }
+        if (!existing?.contractor_id) {
+          // EXPECTED NO-OP: no local subscription record for this Stripe
+          // customer — nothing for us to update.
+          console.log(`Subscription update for unknown customer ${customerId} — no local record, skipping`);
+          break;
+        }
 
         // Refresh price/term fields too, not just status/period — this is what
         // picks up a Subscription Schedule's phase transition (term commitment
@@ -522,7 +622,9 @@ export async function POST(req: NextRequest) {
         // item's interval_count returns to 1 (plain monthly).
         const { priceCents, planInterval, termMonths, commitmentEndsAt } = getBillingFields(sub);
 
-        await supabaseAdmin
+        // REQUIRED: we already confirmed a local record exists for this
+        // customer above, so the update must affect it.
+        const { data: subUpdated, error: subUpdateErr } = await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
             status: sub.status.toUpperCase(),
@@ -533,7 +635,15 @@ export async function POST(req: NextRequest) {
             commitment_ends_at: commitmentEndsAt,
             updated_at: new Date().toISOString(),
           })
-          .eq("stripe_customer_id", customerId);
+          .eq("stripe_customer_id", customerId)
+          .select("contractor_id");
+
+        if (subUpdateErr) {
+          throw new Error(`Subscription update failed for customer ${customerId}: ${subUpdateErr.message}`);
+        }
+        if (!subUpdated || subUpdated.length === 0) {
+          throw new Error(`Subscription update matched no row for customer ${customerId} despite existing record`);
+        }
 
         console.log(`Subscription updated for customer ${customerId}`);
         break;
@@ -543,13 +653,25 @@ export async function POST(req: NextRequest) {
         const sub = event.data.object as any;
         const customerId = sub.customer;
 
-        await supabaseAdmin
+        // REQUIRED if a local record exists; EXPECTED NO-OP if it doesn't
+        // (customer outside ONP's contractor-subscription flow). Idempotent
+        // either way — re-setting CANCELED on a retry is a harmless no-op.
+        const { data: canceledRows, error: cancelErr } = await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
             status: "CANCELED",
             updated_at: new Date().toISOString(),
           })
-          .eq("stripe_customer_id", customerId);
+          .eq("stripe_customer_id", customerId)
+          .select("contractor_id");
+
+        if (cancelErr) {
+          throw new Error(`Subscription cancellation failed for customer ${customerId}: ${cancelErr.message}`);
+        }
+        if (!canceledRows || canceledRows.length === 0) {
+          console.log(`Subscription deletion for unknown customer ${customerId} — no local record, skipping`);
+          break;
+        }
 
         console.log(`Subscription canceled for customer ${customerId}`);
         break;
@@ -569,65 +691,101 @@ export async function POST(req: NextRequest) {
           .maybeSingle();
 
         if (logRow) {
-          // Mark as DISPUTED in log
-          await supabaseAdmin
+          const disputeLogId = (logRow as any).id;
+          const disputeClientId = (logRow as any).client_id;
+          const disputeProjectId = (logRow as any).project_id;
+
+          // REQUIRED: dispute-status record of record. Idempotent — repeated
+          // delivery just re-sets DISPUTED, harmless.
+          const { data: disputeLogData, error: disputeLogErr } = await supabaseAdmin
             .from("emergency_request_log")
             .update({ payment_status: "DISPUTED" })
-            .eq("id", (logRow as any).id);
+            .eq("id", disputeLogId)
+            .select("id");
 
-          // Auto-suspend the client account
-          await supabaseAdmin
+          if (disputeLogErr) {
+            throw new Error(`Emergency dispute log update failed (log ${disputeLogId}): ${disputeLogErr.message}`);
+          }
+          if (!disputeLogData || disputeLogData.length === 0) {
+            throw new Error(`Emergency dispute log update matched no row (log ${disputeLogId})`);
+          }
+
+          // REQUIRED — fraud/suspension action. A failure here must not be
+          // logged as success: this is the account-suspension write that
+          // stops further activity from a client who charged back an
+          // emergency payment. Idempotent — re-setting suspended=true on a
+          // retry is harmless.
+          const { data: suspendData, error: suspendErr } = await supabaseAdmin
             .from("profiles")
             .update({ suspended: true, suspended_reason: "emergency_chargeback" })
-            .eq("id", (logRow as any).client_id);
+            .eq("id", disputeClientId)
+            .select("id");
 
-          console.log(`Client ${(logRow as any).client_id} suspended for emergency chargeback on project ${(logRow as any).project_id}`);
+          if (suspendErr) {
+            throw new Error(`Client suspension failed for chargeback (client ${disputeClientId}, project ${disputeProjectId}): ${suspendErr.message}`);
+          }
+          if (!suspendData || suspendData.length === 0) {
+            throw new Error(`Client suspension matched no profile row (client ${disputeClientId}, project ${disputeProjectId})`);
+          }
+
+          console.log(`Client ${disputeClientId} suspended for emergency chargeback on project ${disputeProjectId}`);
           break;
         }
 
         // Not an emergency payment dispute — check if it's a subscription
         // charge dispute instead (previously did nothing at all in this case).
-        try {
-          const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-          const customerId = typeof paymentIntent.customer === "string" ? paymentIntent.customer : paymentIntent.customer?.id;
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        const disputeCustomerId = typeof paymentIntent.customer === "string" ? paymentIntent.customer : paymentIntent.customer?.id;
 
-          let contractorId: string | null = null;
-          let businessName = "Unknown contractor";
+        let disputeContractorId: string | null = null;
+        let disputeBusinessName = "Unknown contractor";
 
-          if (customerId) {
-            const { data: subRow } = await supabaseAdmin
-              .from("contractor_subscriptions")
-              .select("contractor_id")
-              .eq("stripe_customer_id", customerId)
+        if (disputeCustomerId) {
+          const { data: subRow } = await supabaseAdmin
+            .from("contractor_subscriptions")
+            .select("contractor_id")
+            .eq("stripe_customer_id", disputeCustomerId)
+            .maybeSingle();
+          disputeContractorId = subRow?.contractor_id ?? null;
+
+          if (disputeContractorId) {
+            const { data: profile } = await supabaseAdmin
+              .from("contractor_profiles")
+              .select("business_name")
+              .eq("contractor_id", disputeContractorId)
               .maybeSingle();
-            contractorId = subRow?.contractor_id ?? null;
-
-            if (contractorId) {
-              const { data: profile } = await supabaseAdmin
-                .from("contractor_profiles")
-                .select("business_name")
-                .eq("contractor_id", contractorId)
-                .maybeSingle();
-              businessName = profile?.business_name ?? businessName;
-            }
+            disputeBusinessName = profile?.business_name ?? disputeBusinessName;
           }
+        }
 
-          const { error: disputeInsertErr } = await supabaseAdmin.from("subscription_disputes").insert({
-            stripe_dispute_id: dispute.id,
-            stripe_payment_intent_id: paymentIntentId,
-            stripe_customer_id: customerId ?? null,
-            contractor_id: contractorId,
-            amount_cents: dispute.amount ?? null,
-            currency: (dispute.currency ?? "usd").toUpperCase(),
-            reason: dispute.reason ?? null,
-            stripe_status: dispute.status ?? null,
-          });
-          if (disputeInsertErr) {
-            // Unique constraint on stripe_dispute_id — Stripe can resend this
-            // event; a conflict here just means it's already logged.
-            console.error("subscription_disputes insert (may be duplicate, non-fatal):", disputeInsertErr);
+        // REQUIRED unless the failure is specifically a unique-constraint
+        // violation on stripe_dispute_id (Postgres code 23505), which means
+        // Stripe redelivered an event we already recorded — an EXPECTED
+        // NO-OP, not a failure. Any other error is a genuine persistence
+        // failure and must not be logged as success.
+        const { error: disputeInsertErr } = await supabaseAdmin.from("subscription_disputes").insert({
+          stripe_dispute_id: dispute.id,
+          stripe_payment_intent_id: paymentIntentId,
+          stripe_customer_id: disputeCustomerId ?? null,
+          contractor_id: disputeContractorId,
+          amount_cents: dispute.amount ?? null,
+          currency: (dispute.currency ?? "usd").toUpperCase(),
+          reason: dispute.reason ?? null,
+          stripe_status: dispute.status ?? null,
+        });
+
+        if (disputeInsertErr) {
+          if (disputeInsertErr.code === "23505") {
+            console.log(`Subscription dispute ${dispute.id} already recorded — duplicate delivery, skipping re-notification`);
+            break;
           }
+          throw new Error(`Subscription dispute insert failed (dispute ${dispute.id}): ${disputeInsertErr.message}`);
+        }
 
+        // Admin notification — best-effort, non-fatal: the dispute is
+        // already durably recorded above regardless of whether admins get
+        // emailed about it.
+        try {
           const { data: adminProfiles } = await supabaseAdmin.from("profiles").select("id").eq("role", "ADMIN");
           for (const admin of adminProfiles ?? []) {
             const { data: adminAuth } = await supabaseAdmin.auth.admin.getUserById(admin.id);
@@ -635,17 +793,17 @@ export async function POST(req: NextRequest) {
             if (adminEmail) {
               sendSubscriptionDisputeAdminEmail({
                 adminEmail,
-                businessName,
+                businessName: disputeBusinessName,
                 amountCents: dispute.amount ?? null,
                 reason: dispute.reason ?? null,
               }).catch((e) => console.error("Subscription dispute admin email failed:", e));
             }
           }
-
-          console.log(`Subscription dispute logged for payment intent ${paymentIntentId}`);
-        } catch (subDisputeErr) {
-          console.error("Subscription dispute handling failed:", subDisputeErr);
+        } catch (notifyErr) {
+          console.error("Subscription dispute admin notification error (non-fatal):", notifyErr);
         }
+
+        console.log(`Subscription dispute logged for payment intent ${paymentIntentId}`);
         break;
       }
 
@@ -653,13 +811,25 @@ export async function POST(req: NextRequest) {
         const invoice = event.data.object as any;
         const customerId = invoice.customer;
 
-        await supabaseAdmin
+        // REQUIRED if a local record exists; EXPECTED NO-OP if it doesn't
+        // (customer outside ONP's contractor-subscription flow). Idempotent
+        // — re-setting PAST_DUE on a retry is harmless.
+        const { data: pastDueRows, error: pastDueErr } = await supabaseAdmin
           .from("contractor_subscriptions")
           .update({
             status: "PAST_DUE",
             updated_at: new Date().toISOString(),
           })
-          .eq("stripe_customer_id", customerId);
+          .eq("stripe_customer_id", customerId)
+          .select("contractor_id");
+
+        if (pastDueErr) {
+          throw new Error(`Payment-failed status update failed for customer ${customerId}: ${pastDueErr.message}`);
+        }
+        if (!pastDueRows || pastDueRows.length === 0) {
+          console.log(`Payment failed for unknown customer ${customerId} — no local subscription record, skipping`);
+          break;
+        }
 
         console.log(`Payment failed for customer ${customerId}`);
         break;
@@ -678,24 +848,39 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // Original inspector checkout abandoned → mark FAILED so client can restart
+        // Original inspector checkout abandoned → mark FAILED so client can
+        // restart. REQUIRED: if this fails, the assignment is stuck PENDING
+        // forever with no way for the client to retry. A prior successful
+        // FAILED reset, or a race where the matching checkout.session.
+        // completed already marked it PAID, are both safe no-ops.
         if (expiredType === "inspector" && expiredAssignId) {
-          await supabaseAdmin
-            .from("project_inspector_assignments")
-            .update({ payment_status: "FAILED" })
-            .eq("id", expiredAssignId)
-            .eq("payment_status", "PENDING");
+          await applyRequiredConditionalUpdate({
+            table: "project_inspector_assignments",
+            update: { payment_status: "FAILED" },
+            matchColumn: "id",
+            matchValue: expiredAssignId,
+            conditionColumn: "payment_status",
+            conditionValue: "PENDING",
+            alreadyDoneValues: ["FAILED", "PAID"],
+            context: `Inspector checkout expiry reset (assignment ${expiredAssignId})`,
+          });
 
           console.log(`Inspector assignment ${expiredAssignId} marked FAILED (checkout expired)`);
         }
 
-        // Upgrade checkout abandoned → reset to NONE so client can retry
+        // Upgrade checkout abandoned → reset to NONE so client can retry.
+        // REQUIRED for the same reason as above.
         if (expiredType === "inspector_upgrade" && expiredAssignId) {
-          await supabaseAdmin
-            .from("project_inspector_assignments")
-            .update({ upgrade_payment_status: "NONE", upgrade_stripe_session_id: null })
-            .eq("id", expiredAssignId)
-            .eq("upgrade_payment_status", "PENDING");
+          await applyRequiredConditionalUpdate({
+            table: "project_inspector_assignments",
+            update: { upgrade_payment_status: "NONE", upgrade_stripe_session_id: null },
+            matchColumn: "id",
+            matchValue: expiredAssignId,
+            conditionColumn: "upgrade_payment_status",
+            conditionValue: "PENDING",
+            alreadyDoneValues: ["NONE", "PAID"],
+            context: `Inspector upgrade checkout expiry reset (assignment ${expiredAssignId})`,
+          });
 
           console.log(`Inspector upgrade ${expiredAssignId} reset to NONE (checkout expired)`);
         }
