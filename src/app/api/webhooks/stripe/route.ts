@@ -114,6 +114,42 @@ async function applyRequiredConditionalUpdate(opts: {
   );
 }
 
+type OwnershipCheck = "onp" | "not-onp" | "unknown";
+
+/**
+ * Determines whether a Stripe Customer was created by ONP's own
+ * subscribe flow, using the contractor_id metadata that
+ * src/app/dashboard/contractor/subscribe/actions.ts sets on every Stripe
+ * Customer it creates. Used only to decide whether a missing
+ * contractor_subscriptions row is real state drift (fail, so Stripe
+ * retries) or an unrelated/synthetic Stripe object (safe no-op).
+ *
+ * "unknown" (the lookup itself failed) is deliberately NOT the same as
+ * "not-onp" — a transient Stripe API failure must not be silently
+ * classified as "not ours," since that could swallow a real ONP event.
+ */
+async function isKnownOnpCustomer(customerId: string): Promise<OwnershipCheck> {
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    if ((customer as any).deleted) {
+      console.log(`Ownership check: customer is deleted — not provably ONP`);
+      return "not-onp";
+    }
+    const contractorId = (customer as any).metadata?.contractor_id;
+    if (typeof contractorId === "string" && contractorId.length > 0) {
+      return "onp";
+    }
+    console.log(`Ownership check: customer has no contractor_id metadata — not provably ONP`);
+    return "not-onp";
+  } catch (err) {
+    console.error(
+      `Ownership check: Stripe customer retrieval failed — cannot determine ONP ownership:`,
+      err instanceof Error ? err.message : err
+    );
+    return "unknown";
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -608,9 +644,21 @@ export async function POST(req: NextRequest) {
           throw new Error(`Subscription lookup failed for customer ${customerId}: ${existingErr.message}`);
         }
         if (!existing?.contractor_id) {
-          // EXPECTED NO-OP: no local subscription record for this Stripe
-          // customer — nothing for us to update.
-          console.log(`Subscription update for unknown customer ${customerId} — no local record, skipping`);
+          const ownership = await isKnownOnpCustomer(customerId);
+          if (ownership === "onp") {
+            throw new Error(
+              `Subscription update: no local contractor_subscriptions row for provably-ONP customer ${customerId} — state drift or checkout.session.completed delivery-order race`
+            );
+          }
+          if (ownership === "unknown") {
+            throw new Error(
+              `Subscription update: could not determine ONP ownership for customer ${customerId} (Stripe lookup failed) — failing closed for retry`
+            );
+          }
+          // EXPECTED NO-OP: customer is not provably ONP-owned (no local
+          // record, no contractor_id metadata) — likely an unrelated or
+          // synthetic Stripe object.
+          console.log(`Subscription update for customer ${customerId} — no local record, not provably ONP, skipping`);
           break;
         }
 
@@ -669,7 +717,18 @@ export async function POST(req: NextRequest) {
           throw new Error(`Subscription cancellation failed for customer ${customerId}: ${cancelErr.message}`);
         }
         if (!canceledRows || canceledRows.length === 0) {
-          console.log(`Subscription deletion for unknown customer ${customerId} — no local record, skipping`);
+          const ownership = await isKnownOnpCustomer(customerId);
+          if (ownership === "onp") {
+            throw new Error(
+              `Subscription deletion: no local contractor_subscriptions row for provably-ONP customer ${customerId} — state drift or checkout.session.completed delivery-order race`
+            );
+          }
+          if (ownership === "unknown") {
+            throw new Error(
+              `Subscription deletion: could not determine ONP ownership for customer ${customerId} (Stripe lookup failed) — failing closed for retry`
+            );
+          }
+          console.log(`Subscription deletion for customer ${customerId} — no local record, not provably ONP, skipping`);
           break;
         }
 
@@ -827,7 +886,18 @@ export async function POST(req: NextRequest) {
           throw new Error(`Payment-failed status update failed for customer ${customerId}: ${pastDueErr.message}`);
         }
         if (!pastDueRows || pastDueRows.length === 0) {
-          console.log(`Payment failed for unknown customer ${customerId} — no local subscription record, skipping`);
+          const ownership = await isKnownOnpCustomer(customerId);
+          if (ownership === "onp") {
+            throw new Error(
+              `Payment-failed status update: no local contractor_subscriptions row for provably-ONP customer ${customerId} — state drift or checkout.session.completed delivery-order race`
+            );
+          }
+          if (ownership === "unknown") {
+            throw new Error(
+              `Payment-failed status update: could not determine ONP ownership for customer ${customerId} (Stripe lookup failed) — failing closed for retry`
+            );
+          }
+          console.log(`Payment failed for customer ${customerId} — no local subscription record, not provably ONP, skipping`);
           break;
         }
 

@@ -80,6 +80,59 @@ flipped to `PAID`). This confirms requirement 4 — "0 rows updated" is never
 blindly treated as success when the business logic requires a matching
 record in a specific state.
 
+## 6. Missing-local-row ownership semantics (isKnownOnpCustomer)
+
+Covers the follow-up patch on top of `2ce4e90` for `customer.subscription.
+updated`, `customer.subscription.deleted`, and `invoice.payment_failed`
+when no matching `contractor_subscriptions` row exists.
+
+### A. Missing local row + provably-ONP customer → non-2xx
+
+Create a real Stripe Customer in staging test mode with `metadata:
+{ contractor_id: "<any uuid>" }` (e.g. via the Stripe Dashboard or
+`stripe customers create --metadata contractor_id=<uuid>`), attach a
+subscription to it (`stripe subscriptions create` or a real Checkout
+Session), but do **not** let `contractor_subscriptions` gain a row for it
+(e.g. create the customer/subscription out-of-band, not through ONP's own
+subscribe flow). Fire `customer.subscription.updated` for that
+subscription. Expect: HTTP 500, log line containing `no local
+contractor_subscriptions row for provably-ONP customer ... — state drift or
+checkout.session.completed delivery-order race`. Repeat for
+`customer.subscription.deleted` and `invoice.payment_failed` against the
+same customer.
+
+### B. Missing local row + synthetic/non-ONP customer → 200
+
+Run `stripe trigger customer.subscription.updated` (a synthetic CLI
+fixture — its customer carries no `contractor_id` metadata and has no
+local row). Expect: HTTP 200, log line containing `no local record, not
+provably ONP, skipping`. Repeat for `customer.subscription.deleted` and
+`invoice.payment_failed` via their respective `stripe trigger` fixtures.
+This confirms CLI testing remains safe and does not trigger retry storms.
+
+### C. Stripe Customer retrieval transient failure → non-2xx
+
+Fire `customer.subscription.updated` for a `customer` id that does not
+exist in the current Stripe account/mode at all (e.g. hand-edit a captured
+event's `customer` field to a made-up `cus_...` id before replaying it with
+`stripe events resend`, or point staging's Stripe secret key at a
+mismatched mode temporarily). `stripe.customers.retrieve` should throw
+(Stripe returns a "No such customer" API error, which `isKnownOnpCustomer`
+treats the same as any other lookup failure — ownership `"unknown"`).
+Expect: HTTP 500, log line containing `could not determine ONP ownership
+for customer ... (Stripe lookup failed) — failing closed for retry`. This
+confirms a transient/lookup failure is never silently downgraded to "not
+ONP."
+
+### D. Local row exists + successful update → 200
+
+Run the normal subscribe flow in staging (real Checkout Session through
+`/dashboard/contractor/subscribe`) so `contractor_subscriptions` has a row,
+then fire `customer.subscription.updated` for that same customer. Expect:
+HTTP 200, normal `Subscription updated for customer ...` log line, updated
+fields reflected in `contractor_subscriptions`. Confirms the existing-row
+path from `2ce4e90` is unchanged by this patch.
+
 ## Sign-off checklist
 
 - [ ] Section 1 passes (required failure → non-2xx, no false "success" log)
@@ -88,3 +141,10 @@ record in a specific state.
       no duplicate emails)
 - [ ] Section 4 passes for both dispute branches
 - [ ] Section 5 passes (unexpected state is refused, not overwritten)
+- [ ] Section 6A passes (provably-ONP missing row → non-2xx, for all three
+      event types)
+- [ ] Section 6B passes (synthetic/non-ONP missing row → 200, for all three
+      event types, CLI triggers remain safe)
+- [ ] Section 6C passes (Stripe lookup failure → non-2xx, not silently
+      treated as "not ONP")
+- [ ] Section 6D passes (existing-row path unchanged)
