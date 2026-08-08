@@ -10,8 +10,9 @@ import {
   sendAdminInspectorRequestEmail,
   sendInspectorRequestAvailableEmail,
 } from "@/lib/email";
+import { SITE_URL } from "@/lib/siteUrl";
 
-const BASE_URL = "https://www.ournextproject.us";
+const BASE_URL = SITE_URL;
 
 /** Fire-and-forget email notifications after inspector payment (mirrors webhook logic). */
 async function dispatchInspectorPaidEmails(

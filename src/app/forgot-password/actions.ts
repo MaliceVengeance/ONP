@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { siteUrl } from "@/lib/siteUrl";
 
 export async function forgotPassword(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
@@ -28,7 +29,7 @@ export async function forgotPassword(formData: FormData) {
   );
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://www.ournextproject.us/reset-password",
+    redirectTo: siteUrl("/reset-password"),
   });
 
   if (error) {

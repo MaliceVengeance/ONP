@@ -10,8 +10,9 @@ import {
   sendInspectorUpgradeConfirmedEmail,
   sendInspectorUpgradeDeclinedEmail,
 } from "@/lib/email";
+import { SITE_URL } from "@/lib/siteUrl";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ournextproject.us";
+const BASE_URL = SITE_URL;
 
 export async function createUpgradeCheckout(projectId: string, formData: FormData) {
   const { user } = await requireRole(["CLIENT", "ADMIN"]);

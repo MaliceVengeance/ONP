@@ -1,9 +1,10 @@
 import { Resend } from "resend";
+import { SITE_URL } from "./siteUrl";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = "ONP Notifications <support@ournextproject.us>";
-const BASE = "https://www.ournextproject.us";
+const BASE = SITE_URL;
 
 function loginLink(destination: string) {
   return `${BASE}/login?next=${encodeURIComponent(destination)}`;

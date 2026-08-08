@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { stripe, PRICES, TERM_PRICES, type SubscriptionTerm } from "@/lib/stripe";
+import { siteUrl } from "@/lib/siteUrl";
 
 export async function createCheckoutSession(planType: "standard" | "veteran", formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
@@ -102,8 +103,8 @@ export async function createCheckoutSession(planType: "standard" | "veteran", fo
     ],
     mode: "subscription",
     ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
-    success_url: `https://www.ournextproject.us/dashboard/contractor?welcome=1`,
-    cancel_url: `https://www.ournextproject.us/dashboard/contractor/subscribe?canceled=1`,
+    success_url: siteUrl("/dashboard/contractor?welcome=1"),
+    cancel_url: siteUrl("/dashboard/contractor/subscribe?canceled=1"),
     metadata: {
       contractor_id: user.id,
       plan_type: planType,

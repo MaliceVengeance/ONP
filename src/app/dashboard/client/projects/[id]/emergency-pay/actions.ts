@@ -6,8 +6,9 @@ import { stripe, EMERGENCY_FEE_CENTS } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getTotalAvailableCredits, applyCredits } from "@/lib/credits";
 import { sendEmergencyProjectEmail } from "@/lib/email";
+import { SITE_URL } from "@/lib/siteUrl";
 
-const BASE_URL = "https://www.ournextproject.us";
+const BASE_URL = SITE_URL;
 
 /** Notify eligible contractors about an emergency project (mirrors webhook logic). */
 async function dispatchEmergencyNotifications(
