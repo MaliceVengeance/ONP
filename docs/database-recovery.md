@@ -3,6 +3,7 @@
 **Baseline snapshot date:** 2026-08-05 (revised/validated 2026-08-06)
 **Baseline commit:** `96288ac55900f71e992d99b2f36de1d8ce19897d`
 **Baseline file:** `supabase/migrations/016_complete_schema_baseline.sql`
+**Recovery chain as of 2026-08-08:** `016` → `017` → `018` (see §2a and §6 — 016 alone is no longer sufficient; a genuine from-scratch recovery was validated against a separate staging project and required all three).
 
 This document explains how to rebuild the ONP database schema from nothing — disaster recovery, a new environment, or a fresh Supabase project — and why the recovery procedure is not "run every migration file in order."
 
@@ -32,7 +33,19 @@ Because 016 is a complete end-state snapshot, running 001–015 afterward is not
 
 This was validated, not assumed: 016 was applied alone against a genuinely empty, separate Postgres database (not merely an isolated schema in the same database — that distinction mattered in practice, since production's own system-catalog rows leaked into unqualified lookups when testing inside a shared database, masking a real bug). It succeeded, twice in a row from empty (proving both the fresh-create path and idempotency), and a full content diff against the production snapshot showed zero discrepancies across every category.
 
-**016 is the entire recovery migration. Nothing else needs to run alongside it.**
+**016 was originally believed to be the entire recovery migration.** That held for schema *structure* — tables, enums, constraints, functions, triggers, indexes, RLS policies, storage. It does not hold for two things discovered afterward: the `service_area_waitlist` feature (see §5, closed by migration 017) and table/sequence *privilege* state (see §2a, closed by migration 018).
+
+## 2a. Migration 016 did not capture privilege/default-ACL state — migration 018 restores it
+
+A privilege-parity audit (2026-08-08) comparing production against a staging project rebuilt purely from `016` + `017` found that every one of the 42 public tables in staging was missing `SELECT`/`INSERT`/`UPDATE`/`DELETE` for `anon`, `authenticated`, and `service_role` — present on production, absent on staging, uniformly across the whole schema (confirmed with zero per-table exceptions in either environment).
+
+**Root cause:** `016`'s introspection captured tables, enums, foreign keys, constraints, functions, triggers, indexes, RLS policies, and storage — it was never designed to capture `GRANT`/`REVOKE`/`ALTER DEFAULT PRIVILEGES` state at all. Confirmed directly: zero `GRANT`, `REVOKE`, or `ALTER DEFAULT PRIVILEGES` statements exist anywhere in migrations 001–017. Production's tables have their privileges because of an `ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public` entry that grants the four DML privileges to `anon`/`authenticated`/`service_role` — established at some point outside any tracked migration (consistent with the fact that 26 of the 41 original tables were also created directly in the Supabase dashboard, outside version control — see the architecture notes referenced in this repo). A database rebuilt purely by replaying `016`+`017` over a raw Postgres connection has no way to reproduce a default-ACL entry that was never captured in the first place.
+
+`018_restore_database_privilege_baseline.sql` closes this gap: it grants the same table/sequence privileges production has to the existing schema, **and** re-declares the matching `ALTER DEFAULT PRIVILEGES` rules so any table created after `018` (by the `postgres` role, matching production's own grantor context) inherits correct privileges automatically, instead of silently repeating this gap on the next migration.
+
+**Deliberately not covered by 018:** function `EXECUTE` privileges. Production's functions get `anon`/`authenticated`/`service_role` access via a mix of explicit per-function grants and an `ALTER DEFAULT PRIVILEGES` entry for functions; staging's functions currently work via a different but effectively equivalent mechanism (Postgres grants `EXECUTE` to `PUBLIC` by default when a function's ACL is `NULL`, and every role is implicitly a member of `PUBLIC`). Both were confirmed to produce the same effective access as of 2026-08-08, so this was left out of `018`'s approved scope. Note for future reference: a same-day recheck of production's function default-ACL state returned different results on two separate reads a short time apart, without any known write occurring to production in between — flagged as an open discrepancy, not yet resolved, and not required to correctly resolve for `018` since `018` doesn't touch functions either way.
+
+**Privilege parity must be verified after any recovery**, not assumed from a successful `016`/`017`/`018` apply. Use a direct `information_schema.role_table_grants` / `pg_default_acl` comparison against production (or, at minimum, spot-check that `anon`/`authenticated`/`service_role` can `SELECT`/`INSERT`/`UPDATE`/`DELETE` against a representative table) before considering recovery complete.
 
 ## 3. Recovery order
 
@@ -40,7 +53,7 @@ This was validated, not assumed: 016 was applied alone against a genuinely empty
 
 2. **Confirm required Supabase platform schemas/extensions are available.** Before applying 016, verify the new project has: the `auth` and `storage` schemas present, and the extensions `pgcrypto`, `uuid-ossp`, `pg_stat_statements`, `plpgsql`, and `supabase_vault` available (016 declares each with `CREATE EXTENSION IF NOT EXISTS`, so it will provision them itself if they're merely *available* but not yet installed — this step is about confirming they're available at all, which is normally guaranteed by Supabase's own project bootstrap, but worth a direct check since it couldn't be independently verified against the live platform during this audit).
 
-3. **Apply `016_complete_schema_baseline.sql` alone.** Run it once, in full, in the Supabase SQL Editor (or via any tool that can execute a `.sql` file against the project's Postgres connection). Do not run any of 001–015 before or after it.
+3. **Apply `016_complete_schema_baseline.sql`, then `017_service_area_infrastructure_repair.sql`, then `018_restore_database_privilege_baseline.sql`, in that order.** Run each once, in full, in the Supabase SQL Editor (or via any tool that can execute a `.sql` file against the project's Postgres connection). Do not run any of 001–015 before, between, or after them. All three are additive/idempotent and safe to re-run individually if needed.
 
 4. **Configure Auth dashboard settings.** Not covered by any migration: email templates, redirect URLs, JWT expiry, password policy, and any OAuth provider configuration. These live in Supabase project settings, not in the database schema.
 
@@ -58,11 +71,11 @@ This was validated, not assumed: 016 was applied alone against a genuinely empty
 
 ## 5. Deliberate exclusion: `service_area_waitlist`
 
-`016` does **not** create the `service_area_waitlist` table or the `profiles.service_area_zip` / `profiles.service_area_status` columns, even though a tracked migration (`005_service_area.sql`) appears to add them. This is intentional: direct evidence (the live `handle_new_user()` function body still matches the *pre*-005 version, byte-for-byte) confirmed that migration 005 was **never actually applied to production**. These objects were genuinely absent from the database at the snapshot date, so a faithful baseline capture must not include them — 016's job is to reproduce what production *is*, not what a tracked migration file *claims* it should be. Full evidence is in the companion investigation (`SERVICE_AREA_WAITLIST_INVESTIGATION.md`). Repairing this gap is intentionally deferred to a future, separate migration — not part of 016.
+`016` does **not** create the `service_area_waitlist` table or the `profiles.service_area_zip` / `profiles.service_area_status` columns, even though a tracked migration (`005_service_area.sql`) appears to add them. This is intentional: direct evidence (the live `handle_new_user()` function body still matches the *pre*-005 version, byte-for-byte) confirmed that migration 005 was **never actually applied to production**. These objects were genuinely absent from the database at the snapshot date, so a faithful baseline capture must not include them — 016's job is to reproduce what production *is*, not what a tracked migration file *claims* it should be. Full evidence is in the companion investigation (`SERVICE_AREA_WAITLIST_INVESTIGATION.md`). **This gap is now closed by `017_service_area_infrastructure_repair.sql`**, applied to production 2026-08-06 and to staging as part of the same `016`→`017`→`018` recovery chain.
 
 ## 6. Migrations after 016
 
-Any migration written after 016 (017 onward, not yet started) should be a genuine, ordered, idempotent migration in the traditional sense: it should assume 016's baseline already exists, use `IF NOT EXISTS`/catalog-guarded patterns consistent with what 016 established, and be safe to re-run. Each should be verified after deployment — confirm it applied cleanly against the actual production database, not just tested in isolation — since this audit's central finding is that assumptions about what migrations do versus what production actually has can silently diverge over time.
+`017_service_area_infrastructure_repair.sql` (closes the §5 gap) and `018_restore_database_privilege_baseline.sql` (closes the §2a gap) are both genuine, ordered, idempotent migrations in the traditional sense: each assumes the prior baseline already exists, uses `IF NOT EXISTS`/catalog-guarded patterns (017) or naturally-idempotent `GRANT`/`ALTER DEFAULT PRIVILEGES` statements (018) consistent with what 016 established, and is safe to re-run. Any migration written after 018 should follow the same pattern. Each should be verified after deployment — confirm it applied cleanly against the actual production database, not just tested in isolation — since this audit's central finding (twice now, for schema in 016/017 and for privileges in 018) is that assumptions about what migrations do versus what production actually has can silently diverge over time.
 
 ## 7. Why 016 should not normally be applied to the existing production database
 
@@ -92,4 +105,4 @@ Confirmed via a genuine from-scratch rebuild in a separate database, cross-check
 
 ## Warning
 
-**Do not run migrations 001 through 015 either before or after 016 in a clean recovery environment.** Running them first fails immediately (§1). Running them after 016 also fails, for a different reason (§2). The only correct recovery procedure is 016 alone, per §3 above.
+**Do not run migrations 001 through 015 either before or after 016 in a clean recovery environment.** Running them first fails immediately (§1). Running them after 016 also fails, for a different reason (§2). The only correct recovery procedure is `016` → `017` → `018` in order, per §3 above — and privilege parity (§2a) must be explicitly verified afterward, not assumed.
