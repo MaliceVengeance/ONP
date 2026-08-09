@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/about" },
-};
+export const metadata = buildPageMetadata({
+  title: "About Us | Our Next Project",
+  description:
+    "Our Next Project is an online bid depository built to bring structure, transparency, and accountability to contractor bidding for homeowners, property owners, and small businesses.",
+  path: "/about",
+});
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",

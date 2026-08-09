@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/trust" },
-};
+export const metadata = buildPageMetadata({
+  title: "Client Trust & Protection | Our Next Project",
+  description:
+    "Learn how sealed bids, documented project records, structured communication, and ONP support are designed to make contractor bidding more transparent and accountable.",
+  path: "/trust",
+});
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",

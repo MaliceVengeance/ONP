@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/for-contractors" },
-};
+export const metadata = buildPageMetadata({
+  title: "For Contractors | Our Next Project",
+  description:
+    "Bid on real projects with a flat subscription, not a per-lead fee. Every bid is sealed, every project follows a documented process, and contractors control which opportunities they pursue. Currently serving El Paso, TX and Las Cruces, NM.",
+  path: "/for-contractors",
+});
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",

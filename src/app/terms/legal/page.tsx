@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata = { title: "Terms of Service (Legal) — Our Next Project", alternates: { canonical: "/terms/legal" } };
+export const metadata = buildPageMetadata({
+  title: "Terms of Service (Legal) — Our Next Project",
+  description: "The full legal Terms of Service governing use of the Our Next Project bidding platform.",
+  path: "/terms/legal",
+});
 
 const h2Style: React.CSSProperties = {
   fontFamily: "'Barlow Condensed', sans-serif",

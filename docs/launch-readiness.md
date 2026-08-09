@@ -34,6 +34,7 @@ Last reviewed: 2026-08-09
 - `getonp.com` redirect post-deploy verification
 - Google Search Console
 - Bing Webmaster Tools
+- Per-page SEO titles/descriptions and text-only social (Open Graph/Twitter) metadata
 
 ### Staging Auth custom SMTP — confirmed configuration/behavior
 
@@ -103,10 +104,38 @@ Last reviewed: 2026-08-09
   current public URLs, including `/for-contractors`,
   `/for-property-managers`, and `/why-onp`.
 
+### Per-page SEO titles, descriptions & social metadata (2026-08-09)
+
+- All 16 public/sitemapped routes now have page-specific `title` and
+  `description` (previously 8 of 16 inherited the generic root layout
+  metadata verbatim).
+- Homepage uses a distinct, search-oriented title
+  (`Our Next Project — Sealed-Bid Contractor Marketplace`); internal
+  marketing/legal pages follow `Page Topic | Our Next Project`; the
+  already-good `/help/*`, `/terms*`, `/privacy*`, and `/*-disclaimer`
+  title families were left unchanged.
+- Added via a shared `buildPageMetadata()` helper
+  (`src/lib/pageMetadata.ts`) so title/description/canonical/OG/Twitter
+  stay consistent across all 16 pages rather than hand-duplicated.
+- Text-only Open Graph (`og:title`, `og:description`, `og:url`,
+  `og:type=website`) and Twitter card (`twitter:card=summary`,
+  `twitter:title`, `twitter:description`) metadata added to all 16 pages,
+  reusing the same per-page title/description. No `og:image`/
+  `twitter:image` yet (deferred, per instruction).
+- Verified live (staging): every route renders exactly one `<title>`, one
+  canonical `<link>`, and one description — all canonical/`og:url` values
+  use `https://ournextproject.us`, never localhost or `www`, despite being
+  served from a localhost dev instance.
+- `sitemap.xml` still exposes exactly 16 URLs; `robots.txt` unchanged.
+- Copy constraints followed as specified: homepage description omits
+  "verified contractors"; `/for-contractors` avoids "every contractor is
+  verified"; `/contractors` avoids implying universal
+  licensing/insurance/availability or directory size.
+
 ## PENDING / IN PROGRESS
 
-- Per-page SEO titles/descriptions (several public pages currently only inherit the root layout's generic title/description)
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach)
+- Social-preview images (`og:image`/`twitter:image`) — deferred from this checkpoint
 - `camo_variant`/cache behavior review
 - Final staging/live polish pass
 

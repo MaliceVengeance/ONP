@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata = {
+export const metadata = buildPageMetadata({
   title: "Contractor Bid Acknowledgment — ONP",
   description: "Contractor bid acknowledgment and disclaimer for the ONP platform.",
-  alternates: { canonical: "/contractor-bid-disclaimer" },
-};
+  path: "/contractor-bid-disclaimer",
+});
 
 export default function ContractorBidDisclaimerPage() {
   const bodyStyle = {

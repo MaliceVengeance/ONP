@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata = { title: "Privacy Policy — Our Next Project", alternates: { canonical: "/privacy" } };
+export const metadata = buildPageMetadata({
+  title: "Privacy Policy — Our Next Project",
+  description:
+    "The plain-English summary of ONP's Privacy Policy — what information is collected, how it's used, and where to find the full legal policy.",
+  path: "/privacy",
+});
 
 const h2Style: React.CSSProperties = {
   fontFamily: "'Barlow Condensed', sans-serif",

@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/for-property-managers" },
-};
+export const metadata = buildPageMetadata({
+  title: "For Property Managers & Developers | Our Next Project",
+  description:
+    "Run competitive sealed bidding across your properties with documented bid history and structured RFIs that keep contractor questions on the record. Currently serving El Paso, TX and Las Cruces, NM.",
+  path: "/for-property-managers",
+});
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",

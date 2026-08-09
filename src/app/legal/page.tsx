@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/legal" },
-};
+export const metadata = buildPageMetadata({
+  title: "Legal | Our Next Project",
+  description: "Links to ONP's Terms of Service and Privacy Policy, in both plain-English and full legal versions.",
+  path: "/legal",
+});
 
 export default function LegalPage() {
   return (

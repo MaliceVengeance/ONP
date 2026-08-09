@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata = {
+export const metadata = buildPageMetadata({
   title: "Understanding Bids — ONP Help",
   description: "Why contractor bids may not be the final price, and how to get more accurate bids.",
-  alternates: { canonical: "/help/bids" },
-};
+  path: "/help/bids",
+});
 
 export default async function HelpBidsPage() {
   const inspectorEnabled = await getFeatureFlag(FLAGS.INSPECTOR_ENABLED);

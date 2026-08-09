@@ -1,14 +1,17 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { SealedBidReveal } from "@/components/SealedBidReveal";
 import { MarketingHeader, MarketingFooter, ServiceAreaBanner } from "@/components/MarketingChrome";
 import { getCamoVariant } from "@/lib/camo/session";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
+export const metadata = buildPageMetadata({
+  title: "Our Next Project — Sealed-Bid Contractor Marketplace",
+  description:
+    "Post a project, get sealed bids, and choose contractors through a documented, transparent bidding process. Currently serving El Paso, TX and Las Cruces, NM.",
+  path: "/",
+});
 
 const btnPrimary: React.CSSProperties = {
   fontFamily: "'Barlow Condensed', sans-serif",

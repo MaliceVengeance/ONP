@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/why-onp" },
-};
+export const metadata = buildPageMetadata({
+  title: "How ONP Works | Our Next Project",
+  description:
+    "See how ONP structures project bidding with sealed bids, documented RFIs, and clear project records for clients and contractors. Currently serving El Paso, TX and Las Cruces, NM.",
+  path: "/why-onp",
+});
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
