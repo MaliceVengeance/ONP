@@ -209,27 +209,65 @@ Last reviewed: 2026-08-09
   `CAMO_COOKIE` constant removed from `src/lib/camo/constants.ts` (no
   runtime reference to it remains anywhere in the app).
 - **Verified outcome**: `/` is now statically prerendered
-  (`Cache-Control` cacheable, no `Set-Cookie: camo_variant`). `/why-onp`
-  no longer gets the camo cookie either, but **stays dynamic for a
-  separate, pre-existing reason**: it reads `searchParams` server-side to
-  drive the post-subscription `?welcome=1` banner, and reading
-  `searchParams` in a Server Component is itself a Next.js dynamic-render
-  trigger, unrelated to camo. Fixing that would mean moving the welcome
-  banner to a client component (`useSearchParams()`) — intentionally left
-  out of this checkpoint. `/contractors` also stays dynamic, for its own
-  already-documented independent reason (its Supabase SSR client reads
-  request cookies for the directory query) — not touched here.
+  (`Cache-Control` cacheable, no `Set-Cookie: camo_variant`). `/contractors`
+  stays dynamic, for its own already-documented independent reason (its
+  Supabase SSR client reads request cookies for the directory query) — not
+  touched here. `/why-onp`'s own dynamic-render cause (a `searchParams`
+  read, unrelated to camo) is documented and resolved separately below.
 - Visual regression: verified locally — hero corner canvas, category-tile
   fallback canvas, and the `SealedBidReveal` card all render the same
   variant on one page load; the variant persists across client-side
   navigation between `/`, `/contractors`, and `/why-onp` in the same tab;
   no hydration warnings/errors in the console.
 
+### `/why-onp` static caching restored (2026-08-09)
+
+- Follow-up to the camo checkpoint above: `/why-onp` remained dynamically
+  rendered even with camo removed, because it read `searchParams`
+  server-side (`{ welcome?: string }`) to decide whether to show a
+  post-subscription "Welcome to ONP!" banner. Reading `searchParams` in a
+  Server Component is itself a Next.js dynamic-render trigger, independent
+  of camo.
+- Fixed by extracting only the welcome-banner condition into a small client
+  component, `src/app/why-onp/WelcomeBanner.tsx`, which reads the query
+  string via `useSearchParams()` and renders `null` unless `welcome=1`.
+  `/why-onp/page.tsx` no longer accepts or reads `searchParams` at all and
+  wraps the banner in a minimal `<Suspense fallback={null}>` boundary (the
+  only container Next.js requires around `useSearchParams()` for static
+  prerendering). Banner content, styling, and the `welcome=1` condition are
+  byte-for-byte unchanged; the rest of the page (hero, comparison rows,
+  process steps, feature-flagged support tiles, CTA) is untouched and still
+  server-rendered normally.
+- **Investigation note**: while tracing where `?welcome=1` is generated,
+  found that the live Stripe subscription `success_url`
+  (`src/app/dashboard/contractor/subscribe/actions.ts`) actually redirects
+  to `/dashboard/contractor?welcome=1` — a separate page with its own,
+  independent welcome banner — not to `/why-onp?welcome=1`. Nothing else in
+  the app currently links to or generates `/why-onp?welcome=1`, so that
+  banner is presently only reachable by a manually-typed URL. Left as-is
+  (out of scope for a caching fix); worth a product decision later on
+  whether the `/why-onp` banner should be removed or wired up to a real
+  redirect.
+- **Verified outcome**: `npx tsc --noEmit` and `npm run build` both clean;
+  build output shows `/why-onp` as static (`○`) instead of dynamic (`ƒ`).
+  Canonical stays `https://ournextproject.us/why-onp` (no query string) in
+  both cases; title/description unchanged. Live on production: `/why-onp`
+  returns `Cache-Control: public, max-age=0, must-revalidate`, with
+  `X-Vercel-Cache: PRERENDER` on the first request and `HIT` on the second,
+  and no `Set-Cookie` of any kind. Since the page is now statically
+  prerendered, the welcome banner can no longer appear in the raw served
+  HTML for `?welcome=1` (there is no per-request server render to condition
+  on) — it renders client-side after hydration instead, confirmed live in
+  a real browser: `/why-onp` shows no banner, `/why-onp?welcome=1` shows
+  the identical banner within the same static shell, no console errors.
+  `/contractors` (still `private, no-store`, unrelated Supabase SSR cause)
+  and `/` (still static) were both re-checked and are unaffected by this
+  checkpoint.
+
 ## PENDING / IN PROGRESS
 
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach; kept `noindex` until legitimate profiles exist in meaningful volume)
 - Social-preview images (`og:image`/`twitter:image`) — deferred from this checkpoint
-- `/why-onp` remains dynamically rendered due to its `searchParams` read for the `?welcome=1` banner (unrelated to camo) — candidate for a future checkpoint if caching it matters
 - Final staging/live polish pass
 
 ## FUTURE / NOT LAUNCH BLOCKING
