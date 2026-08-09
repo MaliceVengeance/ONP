@@ -36,6 +36,7 @@ Last reviewed: 2026-08-09
 - Bing Webmaster Tools
 - Per-page SEO titles/descriptions and text-only social (Open Graph/Twitter) metadata
 - Contractor-profile launch SEO safety (`/contractors/[id]` noindex until legitimate profiles exist)
+- `camo_variant` moved client-side; homepage caching restored (2026-08-09)
 
 ### Staging Auth custom SMTP — confirmed configuration/behavior
 
@@ -181,11 +182,54 @@ Last reviewed: 2026-08-09
   currently shows zero listings, which is the correct, honest state until
   real contractors sign up and complete verification.
 
+### `camo_variant` moved client-side; homepage caching restored (2026-08-09)
+
+- The camo (military-pattern) visual branding is unchanged; only *where the
+  variant is chosen* moved. Previously `src/middleware.ts` set a
+  `camo_variant` cookie on every request to `/`, `/why-onp`, and
+  `/contractors`, and each page read it server-side via `cookies()` — which
+  forced all three routes to opt out of static rendering (`Cache-Control:
+  private, no-cache, no-store, max-age=0, must-revalidate`), whether or not
+  the page actually used the variant.
+- Replaced with a small client-side hook,
+  `src/lib/camo/useCamoVariant()`, backed by `sessionStorage` (key
+  `onp_camo_variant`) plus a module-level cache so every `CamoCanvas`/
+  `SealedBidReveal` instance on a page converges on the same variant
+  instantly, with no prop drilling. First component in a browser session
+  generates and persists the variant (`pickRandomCamoVariant()`, existing
+  `isCamoVariant()` type guard); every later instance/page in that session
+  reuses it. A new browser session (new tab that doesn't inherit
+  `sessionStorage`, or the browser fully restarting) may roll a new variant.
+  No cookie is written for this anymore.
+- Removed: the camo cookie-write block in `src/middleware.ts`, the
+  server-side reader `src/lib/camo/session.ts`, and the `getCamoVariant()`
+  calls/props in `src/app/page.tsx` and `src/app/contractors/page.tsx`.
+  Middleware's `matcher` now only covers `/dashboard/:path*` — `/`,
+  `/why-onp`, and `/contractors` had no other middleware dependency.
+  `CAMO_COOKIE` constant removed from `src/lib/camo/constants.ts` (no
+  runtime reference to it remains anywhere in the app).
+- **Verified outcome**: `/` is now statically prerendered
+  (`Cache-Control` cacheable, no `Set-Cookie: camo_variant`). `/why-onp`
+  no longer gets the camo cookie either, but **stays dynamic for a
+  separate, pre-existing reason**: it reads `searchParams` server-side to
+  drive the post-subscription `?welcome=1` banner, and reading
+  `searchParams` in a Server Component is itself a Next.js dynamic-render
+  trigger, unrelated to camo. Fixing that would mean moving the welcome
+  banner to a client component (`useSearchParams()`) — intentionally left
+  out of this checkpoint. `/contractors` also stays dynamic, for its own
+  already-documented independent reason (its Supabase SSR client reads
+  request cookies for the directory query) — not touched here.
+- Visual regression: verified locally — hero corner canvas, category-tile
+  fallback canvas, and the `SealedBidReveal` card all render the same
+  variant on one page load; the variant persists across client-side
+  navigation between `/`, `/contractors`, and `/why-onp` in the same tab;
+  no hydration warnings/errors in the console.
+
 ## PENDING / IN PROGRESS
 
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach; kept `noindex` until legitimate profiles exist in meaningful volume)
 - Social-preview images (`og:image`/`twitter:image`) — deferred from this checkpoint
-- `camo_variant`/cache behavior review
+- `/why-onp` remains dynamically rendered due to its `searchParams` read for the `?welcome=1` banner (unrelated to camo) — candidate for a future checkpoint if caching it matters
 - Final staging/live polish pass
 
 ## FUTURE / NOT LAUNCH BLOCKING
