@@ -35,6 +35,7 @@ Last reviewed: 2026-08-09
 - Google Search Console
 - Bing Webmaster Tools
 - Per-page SEO titles/descriptions and text-only social (Open Graph/Twitter) metadata
+- Contractor-profile launch SEO safety (`/contractors/[id]` noindex until legitimate profiles exist)
 
 ### Staging Auth custom SMTP — confirmed configuration/behavior
 
@@ -132,9 +133,34 @@ Last reviewed: 2026-08-09
   verified"; `/contractors` avoids implying universal
   licensing/insurance/availability or directory size.
 
+### Contractor-profile launch SEO safety (2026-08-09)
+
+- Audit found a real, live issue: a test contractor profile on production
+  (`contractor_id 401480cc-74e8-4cd5-ae4a-a4d197f2e5da`, "Bravo Remodeling")
+  passed all three reachability gates (`is_listed`, `directory_verified`,
+  active subscription) and was linked directly from the indexed
+  `/contractors` page, with `/contractors/[id]` emitting no robots directive
+  at all — defaulting to index,follow.
+- Fixed by adding `robots: { index: false, follow: true }` to
+  `/contractors/[id]`'s metadata. The route stays fully functional and
+  crawlable; only indexing is suppressed. No change to gating logic,
+  `notFound()` behavior, data fetching, directory links, sitemap, or
+  robots.txt.
+- Verified live on production post-deploy: the same reachable test profile
+  now returns `200`, renders normally, and emits
+  `<meta name="robots" content="noindex, follow">`. `/contractors` itself
+  remains unaffected (still default index,follow, no robots meta); an
+  ineligible contractor ID still 404s; sitemap.xml unchanged at 16 static
+  URLs with zero `/contractors/*` entries; robots.txt unchanged.
+- Dynamic contractor profile sitemap/indexing strategy remains deliberately
+  deferred — see below. This should only be revisited once ONP has
+  legitimate contractor profiles that are intentionally public, complete,
+  listed, appropriately verified, and present in meaningful volume, not
+  reactively the first time any one profile happens to pass the gates.
+
 ## PENDING / IN PROGRESS
 
-- Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach)
+- Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach; kept `noindex` until legitimate profiles exist in meaningful volume)
 - Social-preview images (`og:image`/`twitter:image`) — deferred from this checkpoint
 - `camo_variant`/cache behavior review
 - Final staging/live polish pass
