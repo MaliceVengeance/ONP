@@ -21,18 +21,43 @@ Last reviewed: 2026-08-09
 - `getonp.com` DNS/Vercel attachment
 - `getonp.com` → 308 → `ournextproject.us` (Vercel domain-level redirect, verified)
 - `www.getonp.com` → 308 → `ournextproject.us` (Vercel domain-level redirect, verified)
+- Staging Auth custom SMTP
+- Full real contractor signup + email-confirmation E2E
+- Full real client signup + email-confirmation E2E
+- Confirmation-link behavior verified
+- Role-based login redirect verified after confirmation
+
+### Staging Auth custom SMTP — confirmed configuration/behavior
+
+- Sender: `ONP Staging <staging-auth@ournextproject.us>`
+- Custom SMTP provider: Resend
+- Staging Site URL: `http://localhost:3000`
+- Staging redirect allow-list: `http://localhost:3000/**`
+- Email confirmation remains enabled
+- Confirmation link confirms the account but does **not** auto-login; the user
+  lands logged out and then signs in manually. This matches the current
+  signup UI copy ("Check your email to confirm your account, then log in.")
+  and is not being treated as a defect.
+- Contractor confirmation/login routes to `/dashboard/contractor`
+- Client confirmation/login routes to `/dashboard/client`
+- No shared Supabase built-in mailer rate-limit issue occurred after custom
+  SMTP was configured (the earlier rate-limit blocker was specific to
+  Supabase's default shared mailer, not custom SMTP)
 
 ## PENDING / IN PROGRESS
 
-- Staging Auth custom SMTP (audit + plan complete — see below; not yet configured)
-- Full real signup + email-confirmation E2E (blocked on the above)
-- Deploy + verify `www.ournextproject.us` → `ournextproject.us` (rule committed in `046e7f4`, not yet deployed)
-- Per-page SEO titles/descriptions (several public pages currently only inherit the root layout's generic title/description)
-- Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach)
+- **Deploy `review/service-area-waitlist-commit-b` and perform live verification of:**
+  - `www.ournextproject.us` → 308 → `ournextproject.us`
+  - `/robots.txt`
+  - `/sitemap.xml`
+  - canonical metadata
+  - `getonp.com` redirects remain correct after deployment
 - Google Search Console
 - Bing Webmaster Tools
+- Per-page SEO titles/descriptions (several public pages currently only inherit the root layout's generic title/description)
+- Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach)
 - `camo_variant`/cache behavior review
-- Final staging E2E/polish pass
+- Final staging/live polish pass
 
 ## FUTURE / NOT LAUNCH BLOCKING
 
