@@ -51,6 +51,31 @@ function getPeriodEnd(sub: any): string {
   return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 }
 
+/**
+ * The current Stripe API shape (confirmed against a live staging
+ * subscription) has no top-level current_period_start on the Subscription
+ * object -- only the subscription item carries it, same as current_period_end
+ * (see getPeriodEnd above). Falling back to "now" on a missing value would
+ * make this drift forward on every webhook retry/resend rather than staying
+ * anchored to the real billing period, so the second-line fallback is
+ * start_date -- a stable, always-present field on every Subscription object
+ * -- not the processing timestamp. "Now" only applies if Stripe's own object
+ * is missing even start_date, which should not happen in practice.
+ */
+function getPeriodStart(sub: any): string {
+  const raw =
+    sub.current_period_start ??
+    sub.items?.data?.[0]?.current_period_start ??
+    sub.start_date ??
+    null;
+
+  if (raw && !isNaN(Number(raw))) {
+    return new Date(Number(raw) * 1000).toISOString();
+  }
+
+  return new Date().toISOString();
+}
+
 type ConditionalUpdateOutcome = "applied" | "already-done";
 
 /**
@@ -555,9 +580,7 @@ export async function POST(req: NextRequest) {
 
         const { priceCents, planInterval, termMonths, commitmentEndsAt } = getBillingFields(sub);
         const currency = (sub.currency ?? "usd").toUpperCase();
-        const periodStart = sub.current_period_start
-          ? new Date(sub.current_period_start * 1000).toISOString()
-          : new Date().toISOString();
+        const periodStart = getPeriodStart(sub);
         const periodEnd = getPeriodEnd(sub);
 
         const { error: upsertError } = await supabaseAdmin
@@ -676,6 +699,7 @@ export async function POST(req: NextRequest) {
           .from("contractor_subscriptions")
           .update({
             status: sub.status.toUpperCase(),
+            current_period_start: getPeriodStart(sub),
             current_period_end: getPeriodEnd(sub),
             price_cents: priceCents,
             plan_interval: planInterval,
