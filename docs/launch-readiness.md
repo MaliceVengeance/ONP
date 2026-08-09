@@ -26,6 +26,12 @@ Last reviewed: 2026-08-09
 - Full real client signup + email-confirmation E2E
 - Confirmation-link behavior verified
 - Role-based login redirect verified after confirmation
+- Production deployment of the launch-readiness branch (`review/service-area-waitlist-commit-b`, commit `50b92aa`)
+- `www.ournextproject.us` → apex live redirect (root path included — see note below)
+- `robots.txt` live
+- `sitemap.xml` live
+- Canonical metadata live
+- `getonp.com` redirect post-deploy verification
 
 ### Staging Auth custom SMTP — confirmed configuration/behavior
 
@@ -44,14 +50,33 @@ Last reviewed: 2026-08-09
   SMTP was configured (the earlier rate-limit blocker was specific to
   Supabase's default shared mailer, not custom SMTP)
 
+### Production deployment — live verification results (2026-08-09)
+
+- Deployed commit `50b92aa` to production via the normal Vercel CLI production
+  path (`vercel --prod`), aliased to `https://ournextproject.us`.
+- `https://www.ournextproject.us/` → `308` → `https://ournextproject.us/`
+  (single hop, no loop)
+- `https://www.ournextproject.us/about`, `/for-contractors`,
+  `/contractors?example=1` → all `308` to the equivalent apex URL, query
+  strings preserved
+- `https://ournextproject.us/` → `200`, no redirect (apex stays canonical)
+- `https://getonp.com/` and `https://www.getonp.com/` → still `308` to the
+  apex, unchanged by this deploy
+- `/robots.txt`, `/sitemap.xml`, and canonical `<link>` tags on `/`, `/about`,
+  `/for-contractors`, `/for-property-managers`, `/contractors`, `/terms` all
+  verified live and correct in an earlier deployment of this same branch (see
+  the deployment/verification checkpoint before this one) — not re-verified
+  in detail here since nothing in this change touches them, only the one
+  root-path redirect defect found in that earlier pass.
+- **Root-path defect found and fixed in this checkpoint**: the original
+  `www.ournextproject.us` redirect rule (`source: "/:path*"`) matched every
+  non-root path correctly but not the bare root `/` — a known category of
+  Vercel edge-case with wildcard `has`-conditioned redirects. Fixed by adding
+  an explicit second rule for `source: "/"` ahead of the existing catch-all
+  in `vercel.json` (commit `50b92aa`). Verified live post-fix.
+
 ## PENDING / IN PROGRESS
 
-- **Deploy `review/service-area-waitlist-commit-b` and perform live verification of:**
-  - `www.ournextproject.us` → 308 → `ournextproject.us`
-  - `/robots.txt`
-  - `/sitemap.xml`
-  - canonical metadata
-  - `getonp.com` redirects remain correct after deployment
 - Google Search Console
 - Bing Webmaster Tools
 - Per-page SEO titles/descriptions (several public pages currently only inherit the root layout's generic title/description)
