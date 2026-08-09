@@ -1,9 +1,21 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+
+// Kept out of search results until ONP intentionally launches contractor-
+// profile SEO for legitimate, verified contractor profiles in meaningful
+// volume -- see docs/launch-readiness.md. The page itself stays fully
+// functional and crawlable (follow: true); only indexing is suppressed.
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",
