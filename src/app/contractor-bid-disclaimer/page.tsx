@@ -3,6 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "Contractor Bid Acknowledgment — ONP",
   description: "Contractor bid acknowledgment and disclaimer for the ONP platform.",
+  alternates: { canonical: "/contractor-bid-disclaimer" },
 };
 
 export default function ContractorBidDisclaimerPage() {

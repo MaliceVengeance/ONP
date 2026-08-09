@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -5,6 +6,10 @@ import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { getCamoVariant } from "@/lib/camo/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/contractors" },
+};
 
 // Directory listing requires an active (or trialing) subscription — a
 // contractor can build a full profile for free, but nothing about them is

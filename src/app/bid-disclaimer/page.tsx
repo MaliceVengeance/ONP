@@ -3,6 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "Bid Disclaimer — ONP",
   description: "ONP bid disclaimer: bids submitted through the platform are estimates, not fixed-price quotations.",
+  alternates: { canonical: "/bid-disclaimer" },
 };
 
 export default function BidDisclaimerPage() {

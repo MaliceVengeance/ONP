@@ -4,6 +4,7 @@ import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 export const metadata = {
   title: "Understanding Bids — ONP Help",
   description: "Why contractor bids may not be the final price, and how to get more accurate bids.",
+  alternates: { canonical: "/help/bids" },
 };
 
 export default async function HelpBidsPage() {

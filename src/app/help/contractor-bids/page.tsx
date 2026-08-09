@@ -4,6 +4,7 @@ import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
 export const metadata = {
   title: "Contractor Bidding Guide — ONP Help",
   description: "How to price your bids, use RFIs, and understand your obligations on the ONP platform.",
+  alternates: { canonical: "/help/contractor-bids" },
 };
 
 export default async function HelpContractorBidsPage() {

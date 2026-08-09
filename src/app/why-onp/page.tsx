@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { getFeatureFlag, FLAGS } from "@/lib/featureFlags";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/why-onp" },
+};
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",

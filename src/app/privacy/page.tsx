@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Privacy Policy — Our Next Project" };
+export const metadata = { title: "Privacy Policy — Our Next Project", alternates: { canonical: "/privacy" } };
 
 const h2Style: React.CSSProperties = {
   fontFamily: "'Barlow Condensed', sans-serif",

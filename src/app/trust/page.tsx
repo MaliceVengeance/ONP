@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/trust" },
+};
 
 const eyebrow: React.CSSProperties = {
   fontFamily: "'IBM Plex Mono', monospace",

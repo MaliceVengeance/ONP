@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { SealedBidReveal } from "@/components/SealedBidReveal";
 import { MarketingHeader, MarketingFooter, ServiceAreaBanner } from "@/components/MarketingChrome";
 import { getCamoVariant } from "@/lib/camo/session";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const btnPrimary: React.CSSProperties = {
   fontFamily: "'Barlow Condensed', sans-serif",

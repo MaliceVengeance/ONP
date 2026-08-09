@@ -7,7 +7,12 @@
 // change, and any environment that doesn't set it degrades to production
 // rather than silently breaking.
 
-const PRODUCTION_SITE_URL = "https://ournextproject.us";
+// Exported (not just an internal fallback) because SEO-facing metadata
+// (canonical URLs, robots.txt, sitemap.xml) must always declare the real
+// production origin, never wherever the app instance actually happens to be
+// running — unlike SITE_URL below, which deliberately reflects the current
+// environment for things like Stripe redirect URLs.
+export const PRODUCTION_SITE_URL = "https://ournextproject.us";
 
 function stripTrailingSlashes(url: string): string {
   return url.replace(/\/+$/, "");
