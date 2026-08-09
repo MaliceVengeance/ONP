@@ -32,6 +32,7 @@ Last reviewed: 2026-08-09
 - `sitemap.xml` live
 - Canonical metadata live
 - `getonp.com` redirect post-deploy verification
+- Google Search Console
 
 ### Staging Auth custom SMTP — confirmed configuration/behavior
 
@@ -75,9 +76,21 @@ Last reviewed: 2026-08-09
   an explicit second rule for `source: "/"` ahead of the existing catch-all
   in `vercel.json` (commit `50b92aa`). Verified live post-fix.
 
+### Google Search Console (2026-08-09)
+
+- Domain ownership verified for `ournextproject.us` (DNS verification via
+  GoDaddy).
+- Sitemap (`https://ournextproject.us/sitemap.xml`) submitted and accepted
+  successfully.
+- Homepage inspection confirms `https://ournextproject.us/` is already
+  indexed ("URL is on Google", HTTPS valid).
+- Manually submitted indexing requests for the three priority marketing
+  pages: `/for-contractors`, `/for-property-managers`, `/why-onp`.
+- No further action needed immediately — indexing/crawl status should be
+  monitored over time (Search Console's Coverage/Pages reports).
+
 ## PENDING / IN PROGRESS
 
-- Google Search Console
 - Bing Webmaster Tools
 - Per-page SEO titles/descriptions (several public pages currently only inherit the root layout's generic title/description)
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach)
