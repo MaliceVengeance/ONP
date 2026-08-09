@@ -158,6 +158,29 @@ Last reviewed: 2026-08-09
   listed, appropriately verified, and present in meaningful volume, not
   reactively the first time any one profile happens to pass the gates.
 
+### Production test contractor de-listed from public directory (2026-08-09)
+
+- The one production test contractor account ("Bravo Remodeling",
+  `contractor_id 401480cc-74e8-4cd5-ae4a-a4d197f2e5da`) has been de-listed
+  from public directory visibility via a single reversible data-state
+  change: `contractor_profiles.is_listed` set to `false`. No code,
+  migration, RLS, or application deployment involved.
+- No longer appears on `https://ournextproject.us/contractors`; the direct
+  public profile URL now returns `404` — both verified live.
+- `directory_verified` remains `true`, and `contractor_subscriptions`
+  (status `ACTIVE`, Stripe customer/subscription linkage) is completely
+  unchanged — the account's verified/subscribed test state is intentionally
+  preserved for future production E2E testing. `auth.users` and `profiles`
+  (role `CONTRACTOR`) are unchanged, so the account can still authenticate
+  and use the contractor dashboard normally; nothing in the dashboard or
+  bidding code paths depends on `is_listed` (confirmed by code audit).
+- Confirmed exactly one row exists in production's `contractor_profiles`
+  table, total — no other production contractor profiles exist to worry
+  about.
+- **No legitimate production contractors exist yet.** `/contractors`
+  currently shows zero listings, which is the correct, honest state until
+  real contractors sign up and complete verification.
+
 ## PENDING / IN PROGRESS
 
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach; kept `noindex` until legitimate profiles exist in meaningful volume)
