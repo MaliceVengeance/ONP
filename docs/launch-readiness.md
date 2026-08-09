@@ -33,6 +33,7 @@ Last reviewed: 2026-08-09
 - Canonical metadata live
 - `getonp.com` redirect post-deploy verification
 - Google Search Console
+- Bing Webmaster Tools
 
 ### Staging Auth custom SMTP — confirmed configuration/behavior
 
@@ -89,9 +90,21 @@ Last reviewed: 2026-08-09
 - No further action needed immediately — indexing/crawl status should be
   monitored over time (Search Console's Coverage/Pages reports).
 
+### Bing Webmaster Tools (2026-08-09)
+
+- Site added and verified: `https://ournextproject.us/`, via Bing DNS
+  auto-verification through GoDaddy.
+- Sitemap `https://ournextproject.us/sitemap.xml` submitted — status
+  Success, 1 known sitemap, 0 errors, 0 warnings, 16 URLs discovered
+  (matches the full current public route list).
+- The Bing Webmaster Tools UI did not expose a visible manual "URL
+  Submission" navigation item for this property — not treated as a
+  blocker, since the successfully crawled sitemap already exposes all 16
+  current public URLs, including `/for-contractors`,
+  `/for-property-managers`, and `/why-onp`.
+
 ## PENDING / IN PROGRESS
 
-- Bing Webmaster Tools
 - Per-page SEO titles/descriptions (several public pages currently only inherit the root layout's generic title/description)
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach)
 - `camo_variant`/cache behavior review
@@ -101,3 +114,6 @@ Last reviewed: 2026-08-09
 
 - Contractor-defined service areas
 - Demand-driven geographic expansion beyond the initial El Paso / Las Cruces launch area
+- Evaluate IndexNow integration so ONP can automatically notify Bing and other
+  participating search engines when public pages are added, updated, or
+  removed
