@@ -3,7 +3,6 @@ import Link from "next/link";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { SealedBidReveal } from "@/components/SealedBidReveal";
 import { MarketingHeader, MarketingFooter, ServiceAreaBanner } from "@/components/MarketingChrome";
-import { getCamoVariant } from "@/lib/camo/session";
 import { buildPageMetadata } from "@/lib/pageMetadata";
 
 export const metadata = buildPageMetadata({
@@ -64,9 +63,7 @@ const categoryTiles = [
   { label: "Fencing", photo: "/images/tile-fencing.jpg" },
 ];
 
-export default async function HomePage() {
-  const camoVariant = await getCamoVariant();
-
+export default function HomePage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader />
@@ -91,7 +88,7 @@ export default async function HomePage() {
             }}
           />
           <div style={{ position: "absolute", bottom: 0, right: 0, width: "38%", height: "55%", opacity: 0.4 }}>
-            <CamoCanvas variant={camoVariant} cell={9} seed={7}
+            <CamoCanvas cell={9} seed={7}
               style={{ maskImage: "linear-gradient(135deg, transparent 20%, black 70%)", WebkitMaskImage: "linear-gradient(135deg, transparent 20%, black 70%)" }}
             />
           </div>
@@ -166,7 +163,7 @@ export default async function HomePage() {
           <p style={{ color: "var(--camo-gunmetal)", marginBottom: "30px", lineHeight: 1.6 }}>
             Tap the card. This is what a sealed bid looks like on <strong>ONP</strong> — hidden like cover, revealed only when the bidding window closes.
           </p>
-          <SealedBidReveal variant={camoVariant} />
+          <SealedBidReveal />
         </div>
       </section>
 
@@ -200,7 +197,7 @@ export default async function HomePage() {
                 ) : (
                   <>
                     <div style={{ position: "absolute", inset: 0, opacity: 0.35 }}>
-                      <CamoCanvas variant={camoVariant} cell={8} seed={tile.label.length} />
+                      <CamoCanvas cell={8} seed={tile.label.length} />
                     </div>
                     <div style={{ position: "absolute", inset: 0, background: "var(--camo-charcoal)", opacity: 0.55 }} />
                   </>

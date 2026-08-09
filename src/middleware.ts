@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { CAMO_COOKIE, pickRandomCamoVariant } from "@/lib/camo/constants";
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
@@ -37,17 +36,10 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Camo session variant — picked once per session, stays consistent across
-  // every camo-rendering marketing page. No maxAge => browser-session cookie,
-  // so it re-rolls on the next visit after the browser fully closes.
-  if (!req.cookies.get(CAMO_COOKIE)) {
-    res.cookies.set(CAMO_COOKIE, pickRandomCamoVariant());
-  }
-
   return res;
 }
 
 // Only run middleware on these routes
 export const config = {
-  matcher: ["/", "/why-onp", "/contractors", "/dashboard/:path*"],
+  matcher: ["/dashboard/:path*"],
 };

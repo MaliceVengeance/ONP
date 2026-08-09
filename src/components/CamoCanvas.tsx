@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useCamoVariant } from "@/lib/camo/useCamoVariant";
 
 /**
- * Palette registry for the camo system. All four deployment-environment
- * variants ship together — which one renders is decided per-session
- * (see src/lib/camo/session.ts), not per-component.
+ * Palette registry for the camo system. All four variants ship together —
+ * which one renders is decided once per browser session, client-side (see
+ * src/lib/camo/useCamoVariant.ts), and shared by every instance on the page.
  */
 const PALETTES = {
   urban: ["#202326", "#4B5054", "#9BA3A6", "#E9EAEA"],
@@ -17,23 +18,22 @@ const PALETTES = {
 export type CamoVariant = keyof typeof PALETTES;
 
 export function CamoCanvas({
-  variant = "urban",
   cell = 9,
   seed,
   className,
   style,
 }: {
-  variant?: CamoVariant;
   cell?: number;
   seed?: number;
   className?: string;
   style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const variant = useCamoVariant();
 
   useEffect(() => {
     const canvas = ref.current;
-    if (!canvas) return;
+    if (!canvas || !variant) return;
 
     const palette = PALETTES[variant];
     const s = seed ?? Math.random();

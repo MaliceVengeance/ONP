@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CamoCanvas, type CamoVariant } from "./CamoCanvas";
+import { CamoCanvas } from "./CamoCanvas";
 
 /**
  * ONE-TIME MARKETING/TEACHING MOMENT ONLY.
@@ -11,7 +11,7 @@ import { CamoCanvas, type CamoVariant } from "./CamoCanvas";
  * are plain, static, and reveal all-at-once when a project's window closes
  * (see Bid Detail Page spec). Do not reuse this component for actual bid data.
  */
-export function SealedBidReveal({ variant = "urban" }: { variant?: CamoVariant }) {
+export function SealedBidReveal() {
   const [revealed, setRevealed] = useState(false);
 
   return (
@@ -49,7 +49,7 @@ export function SealedBidReveal({ variant = "urban" }: { variant?: CamoVariant }
           pointerEvents: revealed ? "none" : "auto",
         }}
       >
-        <CamoCanvas variant={variant} cell={7} seed={42} />
+        <CamoCanvas cell={7} seed={42} />
       </div>
 
       {/* Tap hint, only visible while sealed */}

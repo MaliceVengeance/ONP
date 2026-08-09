@@ -1,6 +1,5 @@
 import type { CamoVariant } from "@/components/CamoCanvas";
 
-export const CAMO_COOKIE = "camo_variant";
 export const CAMO_VARIANTS: CamoVariant[] = ["urban", "desert", "jungle", "arctic"];
 
 export function isCamoVariant(value: string | undefined): value is CamoVariant {

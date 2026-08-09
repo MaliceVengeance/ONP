@@ -3,7 +3,6 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { CamoCanvas } from "@/components/CamoCanvas";
-import { getCamoVariant } from "@/lib/camo/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { buildPageMetadata } from "@/lib/pageMetadata";
 
@@ -68,7 +67,6 @@ export default async function ContractorDirectoryPage({
 }) {
   const sp = await searchParams;
   const cookieStore = await cookies();
-  const camoVariant = await getCamoVariant();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -230,7 +228,6 @@ export default async function ContractorDirectoryPage({
                 <div key={c.contractor_id} style={{ position: "relative", overflow: "hidden", background: "var(--camo-concrete)", border: `1px solid ${c.veteran_verified ? "var(--camo-accent)" : "#d9dbdb"}`, borderRadius: "8px", padding: "24px" }}>
                   <div style={{ position: "absolute", top: 0, right: 0, width: "120px", height: "120px", opacity: 0.12, pointerEvents: "none" }}>
                     <CamoCanvas
-                      variant={camoVariant}
                       cell={7}
                       seed={c.contractor_id.length}
                       style={{ maskImage: "radial-gradient(circle at top right, black 0%, transparent 70%)", WebkitMaskImage: "radial-gradient(circle at top right, black 0%, transparent 70%)" }}
