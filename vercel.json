@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.ournextproject.us" }],
+      "destination": "https://ournextproject.us/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.ournextproject.us" }],
       "destination": "https://ournextproject.us/:path*",
