@@ -264,10 +264,129 @@ Last reviewed: 2026-08-09
   and `/` (still static) were both re-checked and are unaffected by this
   checkpoint.
 
+### RFI information-revision tracking & bid eligibility enforcement (2026-08-10)
+
+- **Founder rule enforced**: every bid must acknowledge the latest posted
+  project information (RFI answers) at or after the moment it was submitted
+  or reconfirmed. New DB-enforced concept: `projects.information_revision_number`
+  (bumped only by a genuine RFI answer, via a trigger — asking an RFI does
+  not bump it) and `bid_versions.acknowledged_information_revision` /
+  `acknowledgment_affirmed` / `information_acknowledged_at` (server-stamped
+  at insert time; a client cannot forge the revision it claims to have
+  acknowledged). `award_project_bid` now rejects awarding a bid whose latest
+  version's acknowledgment doesn't match the project's current revision.
+  Deliberately does not reuse the older, dormant `projects.revision_number`
+  / `bids.ack_project_revision_number` fields — those remain reserved for a
+  possible future general project-revision system.
+- Standard projects: an RFI answered with ≤24h remaining extends the
+  deadline by 24h (from the existing deadline, not from `now()`), capped at
+  `max_deadline_resets` (default 2). Emergency projects: same mechanism,
+  ≤12h / +12h. Both applied atomically via a row-locked DB function
+  (`apply_rfi_deadline_extension`), safe under concurrent RFI answers.
+- `rfis_update_client` RLS hardened to require
+  `project_is_open_for_bidding(project_id)` — an RFI can no longer be
+  answered after the deadline, on a closed project, or on an awarded one,
+  enforced at the database layer, not just in application code.
+- New durable notification outbox (`notification_outbox` table): RFI-answer
+  notifications (asker-specific, and an info-update email to every other
+  current bidder) and post-deadline ineligibility notifications are queued
+  transactionally, attempted synchronously for immediacy, and retried by a
+  cron on failure — `sent_at` (and `bids.ineligibility_notified_at`) is
+  only set after a confirmed successful send, so a failed delivery is never
+  silently dropped.
+- Migrations: `021_rfi_information_revision_and_bid_eligibility.sql`,
+  `022_grandfather_preexisting_bid_acknowledgment.sql`.
+
+**Migration 022 — grandfathering result**: migration 021's eligibility check
+initially had a backward-compatibility gap — every `bid_versions` row that
+existed before 021 defaulted to `acknowledgment_affirmed = false` (the
+checkbox didn't exist yet when they were submitted), which would have
+incorrectly blocked awarding any pre-existing bid. Migration 022 backfilled
+all such rows to `acknowledgment_affirmed = true`, stamped against each
+project's information revision at migration time. Verified in production
+post-migration: `remaining_unacknowledged = 0`; the historical "Upgrade
+Swamp Cooler to HVAC" bid confirmed eligible
+(`acknowledged_information_revision = 0 = project's current revision 0`,
+`acknowledgment_affirmed = true`) — not awarded, per instruction, since that
+decision belongs to the client.
+
+**Bug found and fixed during production E2E — RFI status-guard mismatch**:
+`respondToRfi`'s idempotency guard checked `.eq("status", "SENT")`, but
+`"SENT"` is only the `rfis` column's unused schema default — no live code
+path ever inserts it. Contractor-submitted questions insert
+`status: "OPEN"` (`src/app/dashboard/contractor/projects/[id]/rfis/actions.ts`).
+The guard silently matched zero rows for every real contractor question,
+producing a false-positive success banner while the response was never
+saved and none of the downstream effects (revision bump, notification,
+extension check) ever ran. Found by answering a real RFI in production and
+noticing it didn't persist. Fixed to `.neq("status", "ANSWERED")`, matching
+every real "not yet answered" status value; regression-tested on staging
+against the actual status contractor submissions use before redeploying.
+Commit `82a3aa5`; live in deployment `dpl_8RrZ5Vu2HwXs6enoB8FK6Peo3HhJ`.
+
+**Vercel Hobby plan cron limitation**: the notification-outbox cron was
+designed to run hourly but Vercel Hobby only permits daily cron schedules.
+Temporarily set to once daily (07:00 UTC, `52aea1f`). This delays only
+notification *delivery* — bid eligibility itself is immediate and
+DB-enforced regardless of cron timing; a stale bid is non-awardable the
+instant the deadline passes. Upgrade back to hourly (`vercel.json`,
+`"0 * * * *"`) once ONP moves to Vercel Pro or another sub-daily scheduler.
+
+**Production E2E verification boundary** — verified live in production
+using the existing test accounts (client `SEBravofamily@gmail.com`,
+contractor "Bravo Remodeling") against a real reposted project ("Front
+Porch Renovation, Concrete Replacement, ADA Ramp Access", a genuine future
+project given a fresh bidding window):
+
+*Production-observed*:
+- Bid submission requires and records the new information acknowledgment
+  (checkbox rendered, required, server-stamped).
+- RFI answered → `information_revision_number` advanced by exactly 1 per
+  genuine answer (confirmed at revision 2 after two real RFI answers — the
+  7 pre-populated catalog Q&A answered at publish time correctly did **not**
+  bump it, since those are inserted already-`ANSWERED`, not transitioned by
+  `UPDATE`, so the trigger correctly never fires for them).
+- Reconfirm-without-price-change produces a new bid version with unchanged
+  amount/notes and a freshly server-stamped acknowledgment.
+- A second RFI answer after a reconfirm correctly makes the bid stale
+  again: final verified state — project revision `2` > bid's acknowledged
+  revision `1` → bid is currently stale/ineligible, exactly as designed.
+  Left in that state, not force-fixed, per instruction.
+- Notification fan-out: asker-specific path exercised on both RFI answers;
+  the "notify other current bidders" list was correctly empty both times,
+  since the sole bidder was also the asker (no duplicate send to self) — a
+  correct, but narrow, production observation. Multi-bidder fan-out was not
+  exercised live (would have required creating an additional production
+  contractor solely for this test, which was intentionally not done) and
+  remains staging-verified only.
+- Migration 022 grandfathering, confirmed via read-only production query
+  (above).
+
+*Staging E2E verified / production not forced* — the following depend on
+deadline proximity or elapsed time and were intentionally **not**
+recreated in production (no `deadline_at` mutation, no cron manually
+invoked, no direct production writes), since forcing them would have meant
+bypassing normal application behavior on a real client's project:
+  - standard ≤24h RFI extension (+24h)
+  - emergency ≤12h RFI extension (+12h)
+  - `max_deadline_resets` cap enforcement
+  - RFI answer rejected after the deadline
+  - stale bid shown anonymously/non-selectable once bids unlock
+  - stale bid rejected by `award_project_bid`
+  - post-deadline ineligibility notification
+  - retry/idempotency of that notification
+
+These are recorded as staging-verified, not as "production E2E passed" —
+they were exercised via 33 direct DB-layer assertions on staging
+(`qbdihnmgxtowqnvzflfh`) covering the exact same trigger/RLS/function code
+now live in production, but not re-triggered live against real user data.
+
 ## PENDING / IN PROGRESS
 
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach; kept `noindex` until legitimate profiles exist in meaningful volume)
 - Social-preview images (`og:image`/`twitter:image`) — deferred from this checkpoint
+- Notification-outbox cron: upgrade from daily back to hourly once on Vercel Pro (or another sub-daily scheduler)
+- Multi-bidder RFI notification fan-out: staging-verified only, not yet observed against real production bidders
 - Final staging/live polish pass
 
 ## FUTURE / NOT LAUNCH BLOCKING
