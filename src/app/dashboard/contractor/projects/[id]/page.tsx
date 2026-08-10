@@ -165,7 +165,9 @@ export default async function ContractorProjectDetail({
       .limit(1)
       .maybeSingle();
 
-    if (versionRow) existingBid = versionRow as ExistingBid;
+    // BidForm needs the parent bids.id (for reconfirmBid), not the
+    // bid_versions row's own id -- override it explicitly here.
+    if (versionRow) existingBid = { ...(versionRow as ExistingBid), id: bidRow.id };
   }
 
   // Dismissal — shown immediately regardless of whether the project itself

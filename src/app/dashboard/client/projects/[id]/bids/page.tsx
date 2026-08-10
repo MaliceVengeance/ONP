@@ -13,6 +13,7 @@ type BidRow = {
   submitted_at: string;
   notes: string | null;
   review_rank: number | null;
+  eligible: boolean;
 };
 
 type DismissalInfo = {
@@ -82,7 +83,7 @@ export default async function ClientProjectBidsPage({
 
   const { data: project, error: pErr } = await supabase
     .from("projects")
-    .select("id,title,state,deadline_at,emergency_bid_mode,is_emergency")
+    .select("id,title,state,deadline_at,emergency_bid_mode,is_emergency,information_revision_number")
     .eq("id", projectId)
     .single();
 
@@ -131,7 +132,7 @@ export default async function ClientProjectBidsPage({
         // Get latest bid_version for each bid
         const { data: versionRows, error: vErr } = await supabaseAdmin
           .from("bid_versions")
-          .select("bid_id, amount_cents, version_number, notes, created_at")
+          .select("bid_id, amount_cents, version_number, notes, created_at, acknowledged_information_revision, acknowledgment_affirmed")
           .in("bid_id", bidIds)
           .order("version_number", { ascending: false });
 
@@ -144,10 +145,15 @@ export default async function ClientProjectBidsPage({
             if (!latestMap.has(v.bid_id)) latestMap.set(v.bid_id, v);
           });
 
+          const liveInfoRevision = (project as any).information_revision_number ?? 0;
+
           let rawBids: BidRow[] = bidIds
             .map((id) => {
               const v = latestMap.get(id);
               if (!v) return null;
+              const eligible =
+                v.acknowledgment_affirmed === true &&
+                v.acknowledged_information_revision === liveInfoRevision;
               return {
                 bid_id: id,
                 amount_cents: v.amount_cents,
@@ -155,6 +161,7 @@ export default async function ClientProjectBidsPage({
                 submitted_at: v.created_at,
                 notes: v.notes ?? null,
                 review_rank: reviewRankLookup.get(id) ?? null,
+                eligible,
               } as BidRow;
             })
             .filter(Boolean) as BidRow[];
@@ -239,7 +246,8 @@ export default async function ClientProjectBidsPage({
     (dismissalRows ?? []).forEach((d) => dismissalMap.set(d.bid_id, d as DismissalInfo));
   }
 
-  const activeBids = bids.filter((b) => !dismissalMap.has(b.bid_id));
+  const activeBids = bids.filter((b) => !dismissalMap.has(b.bid_id) && b.eligible);
+  const ineligibleBids = bids.filter((b) => !dismissalMap.has(b.bid_id) && !b.eligible);
   const dismissedBids = bids.filter((b) => dismissalMap.has(b.bid_id));
   const reasonLabelMap = new Map(reasons.map((r) => [r.code, r.label]));
 
@@ -831,9 +839,9 @@ export default async function ClientProjectBidsPage({
                             projectId={projectId}
                             bidId={b.bid_id}
                             bidDisplayIndex={idx + 1}
-                            otherBids={bids
+                            otherBids={activeBids
                               .filter((ob) => ob.bid_id !== b.bid_id)
-                              .map((ob, i) => ({
+                              .map((ob) => ({
                                 bidId: ob.bid_id,
                                 displayIndex: bids.indexOf(ob) + 1,
                               }))}
@@ -873,6 +881,38 @@ export default async function ClientProjectBidsPage({
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Ineligible bids — anonymous, non-selectable. Updated project
+              information was posted and the contractor didn't reconfirm
+              before the deadline. No name, price, or notes shown — those
+              details serve no purpose on a bid that can't be selected, and
+              withholding them preserves the platform's existing bidder
+              anonymity model. */}
+          {ineligibleBids.length > 0 && (
+            <div style={{ marginTop: "28px" }}>
+              <h2 style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                fontSize: "16px",
+                letterSpacing: "1px",
+                color: "var(--camo-gunmetal)",
+                textTransform: "uppercase",
+                marginBottom: "6px",
+              }}>
+                {ineligibleBids.length} bid{ineligibleBids.length !== 1 ? "s" : ""} became ineligible
+              </h2>
+              <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
+                Updated project information was not acknowledged before the bidding deadline. These bids cannot be selected.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {ineligibleBids.map((b) => (
+                  <div key={b.bid_id} style={{ background: "var(--camo-concrete)", border: "1px dashed #d9dbdb", borderRadius: "10px", padding: "14px 20px", fontSize: "12px", color: "var(--camo-gunmetal)" }}>
+                    Not eligible for consideration.
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { submitBid } from "@/app/dashboard/contractor/bids/actions";
+import { submitBid, reconfirmBid } from "@/app/dashboard/contractor/bids/actions";
 
 const DISCLAIMER_VERSION = "v1.0-2026-05-25";
 
 type ExistingBid = {
+  id: string;
   amount_cents: number;
   notes: string | null;
   version_number: number;
@@ -34,7 +35,7 @@ export default function BidForm({
   coiExpiresSoon?: string | null;
   isEmergency?: boolean;
 }) {
-  const [step, setStep] = useState<"form" | "confirm">("form");
+  const [step, setStep] = useState<"form" | "confirm" | "reconfirm">("form");
   const [amount, setAmount] = useState(
     existingBid ? (existingBid.amount_cents / 100).toFixed(2) : ""
   );
@@ -42,6 +43,7 @@ export default function BidForm({
   const [termsChecked, setTermsChecked] = useState(false);
   const [credentialsChecked, setCredentialsChecked] = useState(false);
   const [emergencyChecked, setEmergencyChecked] = useState(false);
+  const [informationChecked, setInformationChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +56,8 @@ export default function BidForm({
   const [estimateValidUntil, setEstimateValidUntil] = useState("");
   const [quotePdf, setQuotePdf] = useState<File | null>(null);
 
-  const bothChecked = termsChecked && credentialsChecked && (!isEmergency || emergencyChecked);
+  const bothChecked =
+    termsChecked && credentialsChecked && informationChecked && (!isEmergency || emergencyChecked);
 
   function updateLineItem(idx: number, field: keyof LineItemDraft, value: string) {
     setLineItems((items) => items.map((li, i) => (i === idx ? { ...li, [field]: value } : li)));
@@ -69,6 +72,7 @@ export default function BidForm({
     fd.set("notes", notes);
     fd.set("terms_acknowledged", "true");
     fd.set("credentials_acknowledged", "true");
+    fd.set("information_acknowledged", "true");
     fd.set("disclaimer_version", DISCLAIMER_VERSION);
     if (isEmergency && emergencyChecked) {
       fd.set("emergency_acknowledged", "true");
@@ -93,6 +97,21 @@ export default function BidForm({
 
     try {
       await submitBid(projectId, fd);
+      window.location.href = `/dashboard/contractor/projects/${projectId}?bid=ok`;
+    } catch (e: any) {
+      setError(e?.message ?? "Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
+  }
+
+  async function handleReconfirm() {
+    if (!existingBid || !informationChecked) return;
+    setSubmitting(true);
+    setError(null);
+    const fd = new FormData();
+    fd.set("information_acknowledged", "true");
+    try {
+      await reconfirmBid(existingBid.id, fd);
       window.location.href = `/dashboard/contractor/projects/${projectId}?bid=ok`;
     } catch (e: any) {
       setError(e?.message ?? "Something went wrong. Please try again.");
@@ -353,6 +372,130 @@ export default function BidForm({
         >
           Review & Submit →
         </button>
+
+        {existingBid && (
+          <button
+            type="button"
+            onClick={() => setStep("reconfirm")}
+            style={{
+              marginTop: "10px",
+              marginLeft: "10px",
+              background: "transparent",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
+              padding: "12px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "13px",
+              cursor: "pointer",
+            }}
+          >
+            Reconfirm without changing price
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── Reconfirm without price change ─────────────────────────────────────────
+  if (step === "reconfirm") {
+    return (
+      <div style={{
+        background: "var(--camo-concrete)",
+        border: "1px solid #d9dbdb",
+        borderRadius: "12px",
+        padding: "24px",
+      }}>
+        <h2 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          fontSize: "20px",
+          letterSpacing: "1px",
+          color: "var(--camo-charcoal)",
+          textTransform: "uppercase",
+          marginBottom: "4px",
+        }}>
+          Reconfirm Your Bid
+        </h2>
+        <p style={{ fontSize: "13px", color: "var(--camo-gunmetal)", lineHeight: 1.6, marginTop: "10px", marginBottom: "16px" }}>
+          Your bid amount and terms stay exactly the same — this only records that you've reviewed the current project information.
+        </p>
+
+        <label style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          cursor: "pointer",
+          marginBottom: "16px",
+          padding: "10px 12px",
+          background: informationChecked ? "#F0FDF4" : "#FFFFFF",
+          border: `1px solid ${informationChecked ? "#166534" : "#d9dbdb"}`,
+          borderRadius: "8px",
+        }}>
+          <input
+            type="checkbox"
+            checked={informationChecked}
+            onChange={(e) => setInformationChecked(e.target.checked)}
+            style={{ marginTop: "2px", accentColor: "var(--camo-gunmetal)", flexShrink: 0 }}
+          />
+          <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
+            I confirm that I have reviewed the current posted project information and all RFI responses available for this project, and that my bid reflects that information.
+          </span>
+        </label>
+
+        {error && (
+          <div style={{
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
+            color: "#991B1B",
+            padding: "10px 14px",
+            borderRadius: "6px",
+            fontSize: "13px",
+            marginBottom: "12px",
+          }}>
+            ❌ {error}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            disabled={!informationChecked || submitting}
+            onClick={handleReconfirm}
+            style={{
+              background: informationChecked ? "var(--camo-accent)" : "#d9dbdb",
+              color: "var(--camo-ink)",
+              border: "none",
+              padding: "12px 28px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 600,
+              fontSize: "14px",
+              letterSpacing: "0.5px",
+              cursor: informationChecked && !submitting ? "pointer" : "not-allowed",
+              opacity: submitting ? 0.7 : 1,
+            }}
+          >
+            {submitting ? "Reconfirming…" : "Reconfirm Bid"}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setStep("form"); setInformationChecked(false); setError(null); }}
+            style={{
+              background: "transparent",
+              color: "var(--camo-gunmetal)",
+              border: "1px solid #d9dbdb",
+              padding: "12px 20px",
+              borderRadius: "6px",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: "13px",
+              cursor: "pointer",
+            }}
+          >
+            ← Back
+          </button>
+        </div>
       </div>
     );
   }
@@ -470,7 +613,30 @@ export default function BidForm({
         </span>
       </label>
 
-      {/* Checkbox 3 — Emergency acknowledgment */}
+      {/* Checkbox 3 — Information/RFI acknowledgment */}
+      <label style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "10px",
+        cursor: "pointer",
+        marginBottom: isEmergency ? "10px" : "16px",
+        padding: "10px 12px",
+        background: informationChecked ? "#F0FDF4" : "#FFFFFF",
+        border: `1px solid ${informationChecked ? "#166534" : "#d9dbdb"}`,
+        borderRadius: "8px",
+      }}>
+        <input
+          type="checkbox"
+          checked={informationChecked}
+          onChange={(e) => setInformationChecked(e.target.checked)}
+          style={{ marginTop: "2px", accentColor: "var(--camo-gunmetal)", flexShrink: 0 }}
+        />
+        <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
+          I confirm that I have reviewed the current posted project information and all RFI responses available for this project, and that my bid reflects that information.
+        </span>
+      </label>
+
+      {/* Checkbox 4 — Emergency acknowledgment */}
       {isEmergency && (
         <label style={{
           display: "flex",
@@ -532,7 +698,7 @@ export default function BidForm({
         </button>
         <button
           type="button"
-          onClick={() => { setStep("form"); setTermsChecked(false); setCredentialsChecked(false); setEmergencyChecked(false); }}
+          onClick={() => { setStep("form"); setTermsChecked(false); setCredentialsChecked(false); setEmergencyChecked(false); setInformationChecked(false); }}
           style={{
             background: "transparent",
             color: "var(--camo-gunmetal)",

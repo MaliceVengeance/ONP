@@ -2,11 +2,74 @@
 
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
-import { sendRfiAnsweredEmail } from "@/lib/email";
+import { sendRfiAnsweredEmail, sendRfiInfoUpdateEmail } from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
+}
+
+/**
+ * Queues a notification durably (notification_outbox), then makes a
+ * best-effort synchronous send for immediacy. On failure the row stays
+ * unsent and is retried by the hourly outbox-processing cron -- nothing is
+ * silently lost, but the common case still delivers right away.
+ */
+async function notifyRecipient({
+  kind,
+  projectId,
+  recipientContractorId,
+  payload,
+  send,
+}: {
+  kind: string;
+  projectId: string;
+  recipientContractorId: string;
+  payload: Record<string, unknown>;
+  send: (email: string) => Promise<unknown>;
+}) {
+  // payload is stored so the notification-outbox cron can reconstruct and
+  // retry this send later without depending on this request's live closures.
+  const { data: outboxRow, error: insErr } = await supabaseAdmin
+    .from("notification_outbox")
+    .insert({
+      kind,
+      project_id: projectId,
+      recipient_contractor_id: recipientContractorId,
+      payload,
+    })
+    .select("id")
+    .single();
+
+  if (insErr || !outboxRow) {
+    console.error("Failed to queue notification:", insErr);
+    return;
+  }
+
+  try {
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(
+      recipientContractorId
+    );
+    const email = authUser?.user?.email;
+    if (!email) throw new Error("No email on file for recipient");
+
+    await send(email);
+
+    await supabaseAdmin
+      .from("notification_outbox")
+      .update({ sent_at: new Date().toISOString(), attempt_count: 1, last_attempt_at: new Date().toISOString() })
+      .eq("id", outboxRow.id);
+  } catch (e: any) {
+    // Leave sent_at NULL -- the hourly outbox-processing cron retries.
+    await supabaseAdmin
+      .from("notification_outbox")
+      .update({
+        attempt_count: 1,
+        last_attempt_at: new Date().toISOString(),
+        last_error: String(e?.message ?? e),
+      })
+      .eq("id", outboxRow.id);
+  }
 }
 
 export async function respondToRfi(
@@ -33,37 +96,115 @@ export async function respondToRfi(
     .eq("id", projectId)
     .single();
 
-  const { error } = await supabase
-    .from("rfis")
-    .update({
-      response,
-      responded_at: new Date().toISOString(),
-      status: "ANSWERED",
-    })
-    .eq("id", rfiId)
-    .eq("project_id", projectId);
-
-  if (error) throw wrapErr("rfis.update", error);
-
-  // Send email to contractor
+  // Record the answer. `.eq("status", "SENT")` makes a retry/double-submit a
+  // no-op instead of re-running side effects. The real "not after the
+  // deadline" enforcement is rfis_update_client's RLS (requires
+  // project_is_open_for_bidding) -- Postgres raises a row-level-security
+  // error rather than silently affecting zero rows when the row is visible
+  // (client owns it) but WITH CHECK fails, so that's translated into a
+  // clean message below rather than surfaced raw.
+  let updatedRows: { id: string }[] | null = null;
   try {
-    if (rfi?.contractor_id) {
-      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(
-        rfi.contractor_id
-      );
+    const { data, error } = await supabase
+      .from("rfis")
+      .update({
+        response,
+        responded_at: new Date().toISOString(),
+        status: "ANSWERED",
+      })
+      .eq("id", rfiId)
+      .eq("project_id", projectId)
+      .eq("status", "SENT")
+      .select("id");
 
-      if (authUser?.user?.email) {
-        await sendRfiAnsweredEmail({
-          contractorEmail: authUser.user.email,
-          projectTitle: project?.title ?? "Project",
-          question: rfi.question ?? (rfi.rfi_catalog as any)?.prompt ?? "Your question",
-          response,
-          projectId,
-        });
-      }
+    if (error) throw error;
+    updatedRows = data;
+  } catch (err: any) {
+    if (/row-level security/i.test(err?.message ?? "")) {
+      throw new Error(
+        "This question can no longer be answered — the bidding deadline has passed, or the project is closed or awarded."
+      );
+    }
+    throw wrapErr("rfis.update", err);
+  }
+
+  if (!updatedRows || updatedRows.length === 0) {
+    // Already answered (retry / double-submit) -- no duplicate side effects.
+    redirect(`/dashboard/client/projects/${projectId}/rfis?saved=1`);
+  }
+
+  // projects.information_revision_number has already been advanced by the
+  // rfis_bump_information_revision trigger, in the same transaction as the
+  // update above.
+
+  // Apply the standard (24h) / emergency (12h) deadline-extension rule, if
+  // applicable -- a single row-locked DB function, safe under concurrent
+  // RFI answers on the same project.
+  let finalDeadlineAt: string | undefined;
+  try {
+    const { data: extendResult } = await supabaseAdmin.rpc(
+      "apply_rfi_deadline_extension",
+      { p_project_id: projectId }
+    );
+    finalDeadlineAt = (extendResult as any)?.[0]?.deadline_at;
+  } catch (e) {
+    console.error("Deadline extension check failed:", e);
+  }
+
+  // Notify: asker gets the existing asker-specific email; every other
+  // distinct contractor who already has a bid on this project gets the
+  // info-update email. Contractors who have not bid are never notified.
+  try {
+    const { data: bidRows } = await supabaseAdmin
+      .from("bids")
+      .select("contractor_id")
+      .eq("project_id", projectId);
+
+    const bidderIds = Array.from(
+      new Set((bidRows ?? []).map((b) => b.contractor_id as string))
+    );
+    const askerId = rfi?.contractor_id ?? null;
+    const otherBidderIds = bidderIds.filter((id) => id !== askerId);
+    const deadlineIso = finalDeadlineAt ?? new Date().toISOString();
+
+    const projectTitle = project?.title ?? "Project";
+    const questionText =
+      rfi?.question ?? (rfi?.rfi_catalog as any)?.prompt ?? "Your question";
+
+    if (askerId) {
+      await notifyRecipient({
+        kind: "rfi_answered_asker",
+        projectId,
+        recipientContractorId: askerId,
+        payload: { project_title: projectTitle, question: questionText, response },
+        send: (email) =>
+          sendRfiAnsweredEmail({
+            contractorEmail: email,
+            projectTitle,
+            question: questionText,
+            response,
+            projectId,
+          }),
+      });
+    }
+
+    for (const contractorId of otherBidderIds) {
+      await notifyRecipient({
+        kind: "rfi_info_update",
+        projectId,
+        recipientContractorId: contractorId,
+        payload: { project_title: projectTitle, deadline_at: deadlineIso },
+        send: (email) =>
+          sendRfiInfoUpdateEmail({
+            contractorEmail: email,
+            projectTitle,
+            deadlineAt: deadlineIso,
+            projectId,
+          }),
+      });
     }
   } catch (e) {
-    console.error("Failed to send RFI answer email:", e);
+    console.error("RFI notification dispatch failed:", e);
   }
 
   redirect(`/dashboard/client/projects/${projectId}/rfis?saved=1`);

@@ -65,6 +65,18 @@ export async function submitBid(projectId: string, formData: FormData) {
     );
   }
 
+  // Information-revision acknowledgment — required, separate from the
+  // existing legal terms/disclaimer acknowledgment below. "I confirm that I
+  // have reviewed the current posted project information and all RFI
+  // responses available for this project, and that my bid reflects that
+  // information."
+  const informationAcknowledged = formData.get("information_acknowledged") === "true";
+  if (!informationAcknowledged) {
+    throw new Error(
+      "You must confirm you've reviewed the current posted project information and RFI responses before submitting your bid."
+    );
+  }
+
   const amountInput = clean(formData.get("amount"));
   const notes = clean(formData.get("notes"));
   const amount_cents = moneyToCents(amountInput);
@@ -197,6 +209,7 @@ export async function submitBid(projectId: string, formData: FormData) {
       estimate_valid_until,
       quote_pdf_path,
       quote_pdf_filename,
+      acknowledgment_affirmed: true,
     })
     .select("id")
     .single();
@@ -260,4 +273,91 @@ export async function submitBid(projectId: string, formData: FormData) {
     }
   }
 
+}
+
+/**
+ * Reconfirm an existing bid without changing price/terms. Requires the
+ * identical information acknowledgment as a full revision — there is no
+ * weaker path. Duplicates the latest bid_versions row's terms unchanged and
+ * inserts a new version purely to record a fresh, auditable acknowledgment
+ * against the project's current information revision.
+ */
+export async function reconfirmBid(bidId: string, formData: FormData) {
+  const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
+
+  if (formData.get("information_acknowledged") !== "true") {
+    throw new Error(
+      "You must confirm you've reviewed the current posted project information and RFI responses before reconfirming your bid."
+    );
+  }
+
+  const { data: bidRow, error: bidErr } = await supabase
+    .from("bids")
+    .select("id, project_id, contractor_id")
+    .eq("id", bidId)
+    .maybeSingle();
+
+  if (bidErr) throw wrapErr("bids.select(bid)", bidErr);
+  if (!bidRow || bidRow.contractor_id !== user.id) {
+    throw new Error("Bid not found or you do not have access.");
+  }
+
+  const { data: windowRows, error: wErr } = await supabase.rpc(
+    "get_open_project_window",
+    { p_project_id: bidRow.project_id }
+  );
+  if (wErr) throw wrapErr("rpc.get_open_project_window", wErr);
+
+  const row = (windowRows as ProjectWindowRow[] | null)?.[0];
+  if (!row) throw new Error("Project not found or you do not have access.");
+  if (row.state !== "OPEN" || !row.deadline_at) {
+    throw new Error("Project is not open for bidding.");
+  }
+  if (new Date(row.deadline_at).getTime() <= Date.now()) {
+    throw new Error("Bidding has closed for this project.");
+  }
+
+  const projectRevisionNumber =
+    typeof row.revision_number === "number" ? row.revision_number : 0;
+
+  const { data: lastVersion, error: lastErr } = await supabase
+    .from("bid_versions")
+    .select(
+      "version_number, amount_cents, duration_days, start_window, inclusions, exclusions, notes, warranty_terms, deposit_terms, scope_disclaimers, estimate_valid_until, quote_pdf_path, quote_pdf_filename"
+    )
+    .eq("bid_id", bidId)
+    .order("version_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (lastErr) throw wrapErr("bid_versions.select(last_version)", lastErr);
+  if (!lastVersion) throw new Error("Cannot reconfirm: no existing bid version found.");
+
+  const nextVersion = (lastVersion.version_number ?? 0) + 1;
+
+  const { error: vErr } = await supabase.from("bid_versions").insert({
+    bid_id: bidId,
+    version_number: nextVersion,
+    project_revision_number: projectRevisionNumber,
+    amount_cents: lastVersion.amount_cents,
+    duration_days: lastVersion.duration_days,
+    start_window: lastVersion.start_window,
+    inclusions: lastVersion.inclusions,
+    exclusions: lastVersion.exclusions,
+    notes: lastVersion.notes,
+    warranty_terms: lastVersion.warranty_terms,
+    deposit_terms: lastVersion.deposit_terms,
+    scope_disclaimers: lastVersion.scope_disclaimers,
+    estimate_valid_until: lastVersion.estimate_valid_until,
+    quote_pdf_path: lastVersion.quote_pdf_path,
+    quote_pdf_filename: lastVersion.quote_pdf_filename,
+    acknowledgment_affirmed: true,
+  });
+
+  if (vErr) throw wrapErr("bid_versions.insert(reconfirm)", vErr);
+
+  await supabase
+    .from("bids")
+    .update({ updated_at: new Date().toISOString() })
+    .eq("id", bidId);
 }

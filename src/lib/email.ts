@@ -150,6 +150,85 @@ export async function sendRfiAnsweredEmail({
   });
 }
 
+export async function sendRfiInfoUpdateEmail({
+  contractorEmail,
+  projectTitle,
+  deadlineAt,
+  projectId,
+}: {
+  contractorEmail: string;
+  projectTitle: string;
+  deadlineAt: string;
+  projectId: string;
+}) {
+  const deadlineLabel = new Date(deadlineAt).toLocaleString("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `Updated Project Information on "${projectTitle}"`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #FBBF24; margin-top: 0;">📋 Updated Project Information</h2>
+          <p style="color: #B0C4DE;">New project information (an RFI answer) was posted on <strong style="color: #fff;">"${projectTitle}"</strong>, a project you're currently bidding on.</p>
+          <p style="color: #B0C4DE;">To remain eligible for consideration, please review the update and reconfirm or revise your bid before the bidding deadline.</p>
+          <div style="background: #1E3A8A; border-left: 3px solid #FBBF24; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+            <p style="color: #7A9CC4; margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Current bidding deadline</p>
+            <p style="color: #F0F4FF; margin: 0; font-weight: bold;">${deadlineLabel}</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="${loginLink(`/dashboard/contractor/projects/${projectId}`)}"
+             style="background: #C8102E; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Review Project & Reconfirm Bid
+          </a>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendBidIneligibleEmail({
+  contractorEmail,
+  projectTitle,
+}: {
+  contractorEmail: string;
+  projectTitle: string;
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: contractorEmail,
+    subject: `Your Bid on "${projectTitle}" Was Not Eligible`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1E3A8A; color: #F0F4FF; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; color: #fff; letter-spacing: 4px; margin: 0;">★ ONP ★</h1>
+          <p style="color: #7A9CC4; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;">Our Next Project</p>
+        </div>
+        <div style="background: #0F2040; border: 1px solid #1B4F8A; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+          <h2 style="color: #F87171; margin-top: 0;">Bid Not Eligible</h2>
+          <p style="color: #B0C4DE;">Your bid on <strong style="color: #fff;">"${projectTitle}"</strong> was not eligible for consideration.</p>
+          <p style="color: #B0C4DE;">One or more RFI responses were posted after your last bid submission or reconfirmation, and the bidding deadline passed before you acknowledged the updated project information.</p>
+          <p style="color: #B0C4DE;">ONP did not change, evaluate, or reject your pricing.</p>
+        </div>
+        <p style="color: #3A5A7A; font-size: 11px; text-align: center; margin-top: 32px; text-transform: uppercase; letter-spacing: 1px;">
+          Honoring American Veterans — ournextproject.us
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendBidAwardedEmail({
   contractorEmail,
   contractorName,
