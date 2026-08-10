@@ -291,13 +291,24 @@ export async function archiveProject(projectId: string) {
     throw new Error("This project never received a bid — delete it instead of archiving, since there's nothing to preserve.");
   }
 
-  const { error: updErr } = await supabase
+  // Re-assert the same eligibility condition checked above, atomically, on
+  // the UPDATE itself -- the pre-read above is otherwise just a TOCTOU
+  // window (nothing stopped the project's state from changing between the
+  // read and the write). `.select()` + a rowCount check turns "the row
+  // didn't match" into an explicit error instead of a silent no-op.
+  const nowIso = new Date().toISOString();
+  const { data: updated, error: updErr } = await supabase
     .from("projects")
-    .update({ state: "CANCELED", updated_at: new Date().toISOString() })
+    .update({ state: "CANCELED", updated_at: nowIso })
     .eq("id", projectId)
-    .eq("client_id", user.id);
+    .eq("client_id", user.id)
+    .or(`state.in.(AWARDED,COMPLETED),and(state.eq.OPEN,deadline_at.lte.${nowIso})`)
+    .select("id");
 
   if (updErr) throw updErr;
+  if (!updated || updated.length === 0) {
+    throw new Error("This project can no longer be archived — its state may have changed. Please refresh and try again.");
+  }
 
   // Notify every contractor who bid — only meaningful when the project
   // never reached an award (an awarded/completed project's contractors
@@ -359,7 +370,11 @@ export async function repostProject(projectId: string) {
 
 /**
  * Save / update the client's pre-answered catalog questions on a project.
- * Works on both draft and published projects.
+ * DRAFT only -- once published, this Q&A is what bidders received at
+ * publication and becomes immutable; new clarifications after that point go
+ * through the live RFI system instead (which is notified/revision-tracked).
+ * The database also enforces this independently (rfis_enforce_published_qa_lock
+ * trigger) so this check is defense-in-depth, not the sole guarantee.
  */
 export async function updateProjectRfis(projectId: string, formData: FormData) {
   const supabase = await createSupabaseServerClient();
@@ -369,11 +384,17 @@ export async function updateProjectRfis(projectId: string, formData: FormData) {
   // Ownership check (admins bypass)
   const { data: proj } = await supabase
     .from("projects")
-    .select("client_id")
+    .select("client_id, state")
     .eq("id", projectId)
     .maybeSingle();
 
   if (!proj) throw new Error("Project not found.");
+
+  if (proj.state !== "DRAFT") {
+    throw new Error(
+      "Published project Q&A cannot be modified after publication. Use the RFI system for new clarifications."
+    );
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
