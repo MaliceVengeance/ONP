@@ -96,13 +96,19 @@ export async function respondToRfi(
     .eq("id", projectId)
     .single();
 
-  // Record the answer. `.eq("status", "SENT")` makes a retry/double-submit a
-  // no-op instead of re-running side effects. The real "not after the
-  // deadline" enforcement is rfis_update_client's RLS (requires
-  // project_is_open_for_bidding) -- Postgres raises a row-level-security
-  // error rather than silently affecting zero rows when the row is visible
-  // (client owns it) but WITH CHECK fails, so that's translated into a
-  // clean message below rather than surfaced raw.
+  // Record the answer. `.neq("status", "ANSWERED")` makes a retry/double-submit
+  // a no-op instead of re-running side effects. This is NOT `.eq("status",
+  // "SENT")` -- the "SENT" value is only the column's schema default and is
+  // never actually inserted by live app code: contractor-submitted questions
+  // insert status "OPEN" (src/app/dashboard/contractor/projects/[id]/rfis/actions.ts),
+  // and client-side pre-answers insert status "ANSWERED" directly. Guarding
+  // on the unused default would silently no-op every real contractor
+  // question. The real "not after the deadline" enforcement is
+  // rfis_update_client's RLS (requires project_is_open_for_bidding) --
+  // Postgres raises a row-level-security error rather than silently
+  // affecting zero rows when the row is visible (client owns it) but WITH
+  // CHECK fails, so that's translated into a clean message below rather
+  // than surfaced raw.
   let updatedRows: { id: string }[] | null = null;
   try {
     const { data, error } = await supabase
@@ -114,7 +120,7 @@ export async function respondToRfi(
       })
       .eq("id", rfiId)
       .eq("project_id", projectId)
-      .eq("status", "SENT")
+      .neq("status", "ANSWERED")
       .select("id");
 
     if (error) throw error;
