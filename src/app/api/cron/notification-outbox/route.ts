@@ -7,7 +7,24 @@ import {
 } from "@/lib/email";
 
 /**
- * Vercel Cron — runs hourly.
+ * Vercel Cron — runs once daily (07:00 UTC).
+ *
+ * Intended cadence is hourly; this is temporarily once-daily because the
+ * Vercel plan in use (Hobby) only permits daily cron schedules. Upgrade
+ * vercel.json's schedule back to hourly ("0 * * * *") once ONP moves to
+ * Vercel Pro or another scheduler capable of sub-daily execution.
+ *
+ * This delay affects ONLY notification delivery timing:
+ * - Bid eligibility itself is immediate and DB-enforced (the
+ *   acknowledged_information_revision vs. projects.information_revision_number
+ *   comparison, checked live by the client bid list and by award_project_bid)
+ *   -- it does not depend on this cron running at all.
+ * - A stale bid becomes non-awardable the instant the deadline passes,
+ *   regardless of when this cron next runs.
+ * - What's delayed is only the contractor's "your bid was not eligible"
+ *   email and any RFI-notification retries queued after a failed
+ *   synchronous send -- those may now arrive up to ~24h later instead of
+ *   ~1h. Deadlines/extensions are never altered to compensate for this.
  *
  * Two jobs, sharing one durable/retryable delivery mechanism
  * (notification_outbox):

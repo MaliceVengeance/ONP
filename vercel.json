@@ -32,7 +32,7 @@
     },
     {
       "path": "/api/cron/notification-outbox",
-      "schedule": "0 * * * *"
+      "schedule": "0 7 * * *"
     }
   ]
 }
