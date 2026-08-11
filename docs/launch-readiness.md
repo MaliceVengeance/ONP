@@ -381,12 +381,81 @@ they were exercised via 33 direct DB-layer assertions on staging
 (`qbdihnmgxtowqnvzflfh`) covering the exact same trigger/RLS/function code
 now live in production, but not re-triggered live against real user data.
 
+### Posted project scope lock + published Q&A lock (2026-08-11)
+
+Migration `023_posted_scope_lock_and_published_qa_lock.sql` applied to
+production. Three parts:
+
+- **Posted project scope lock**: a `BEFORE UPDATE` trigger on `projects`
+  blocks changes to `title`, `description`, `category`, `location_general`,
+  `city`, `zip_code`, `target_start_date`, `min_open_days`, `max_open_days`,
+  and `uses_inspector_takeoff` once `OLD.state <> 'DRAFT'`. No admin or
+  service-role bypass — a trigger fires regardless of role, closing the gap
+  where the UI's own "published projects cannot be edited" restriction was
+  previously enforced only in application code, not the database. The
+  publish transition itself is unaffected (`OLD.state` is still `'DRAFT'` at
+  that moment).
+- **`max_deadline_resets` privilege fix**: extends migration 021's
+  column-privilege protection (already covering
+  `information_revision_number` and `deadline_reset_count`) to
+  `max_deadline_resets` — `authenticated` can no longer `UPDATE` it
+  directly, even though no application code path ever wrote it.
+- **Published pre-populated Q&A lock**: a trigger on `rfis` blocks
+  insert/update/delete of pre-populated catalog answers (rows with
+  `contractor_id IS NULL`, written by `updateProjectRfis`) once the
+  project is no longer `DRAFT`. The live, contractor-asked interactive RFI
+  system (`contractor_id NOT NULL`) is untouched — it already had its own
+  correct state-gating via existing RLS. This closes a real gap:
+  `updateProjectRfis` writes via `supabaseAdmin` (service role), so an
+  RLS-only fix would not have been a real backstop; a trigger is.
+  `updateProjectRfis` itself also gained an application-layer DRAFT-only
+  guard as defense-in-depth on top of the DB trigger.
+
+**Production-observed** (via normal UI flows on disposable test fixtures —
+no direct SQL writes, no deadline manipulation): DRAFT scope-field editing
+still works; DRAFT pre-populated Q&A editing still works; attempting to
+edit pre-populated Q&A on the already-published "Front Porch Renovation"
+test project is rejected; the pre-populated answer text was confirmed
+unchanged afterward (no data corruption from the rejected write); the live
+interactive RFI history on that same project remained intact and viewable
+post-migration; both client and contractor dashboards, login, and
+`/contractors` browsing all continued working normally post-deploy.
+
+**Staging-verified only, not forced in production**: the `archiveProject`
+TOCTOU fix (the state/eligibility condition is now asserted atomically on
+the `UPDATE` itself via `.or()`, instead of only in a pre-read) — no
+disposable project existed in production in an archive-eligible state
+(`OPEN` + deadline passed, or `AWARDED`/`COMPLETED`) that could be used
+without manufacturing state solely to test it, so this remains
+staging-verified only (21/21 staging assertions passed, covering this and
+every other part of 023).
+
+**Production bug found and fixed during the regression pass**:
+`updateProjectRfis`'s new DRAFT-only guard correctly rejected edits on the
+published test project, but the client project detail page still rendered
+the Q&A form as a plain, always-active server-action form with no error
+handling — so the rejection surfaced as Next.js's raw crash page
+("Application error: a server-side exception has occurred") instead of a
+clean message. Fixed by mirroring the existing Project Details section's
+pattern: the Q&A fields are now wrapped in a `disabled` `fieldset` and the
+Save button is hidden once the project isn't `DRAFT`, with copy explaining
+the lock and pointing to the RFI system for new clarifications. The same
+commit also corrected the section's advisory text, which previously (and
+now incorrectly) said answers could be updated "at any time — even after
+publishing." Fix commit `39cd11b`; live in production deployment
+`dpl_5b5y65Aeydy6KLRK4eGtWV9cgLvV`.
+
+**023 checkpoint status: COMPLETE.**
+
 ## PENDING / IN PROGRESS
 
 - Dynamic contractor profile sitemap strategy (`/contractors/[id]` deliberately excluded from the static sitemap pending a live-data approach; kept `noindex` until legitimate profiles exist in meaningful volume)
 - Social-preview images (`og:image`/`twitter:image`) — deferred from this checkpoint
 - Notification-outbox cron: upgrade from daily back to hourly once on Vercel Pro (or another sub-daily scheduler)
 - Multi-bidder RFI notification fan-out: staging-verified only, not yet observed against real production bidders
+- Post-publish attachment information-event design (new file uploads incrementing information revision, notifying bidders, staleness, extension-rule interaction) — immediate next follow-up audit item, not yet started
+- `archiveProject` atomic TOCTOU guard: staging-verified only, no production-eligible disposable project existed to observe it live
+- A second, related stale-copy line was noticed but not changed (out of scope for this closeout): the published-project fallback message "This project is published. Edits will trigger a revision workflow in a future update." (same file, non-DRAFT branch of the Project Details section) is also inaccurate now that scope edits are permanently blocked, not deferred to a future workflow — worth a follow-up copy pass
 - Final staging/live polish pass
 
 ## FUTURE / NOT LAUNCH BLOCKING
