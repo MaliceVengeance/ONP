@@ -755,7 +755,9 @@ export default async function EditProjectPage({
             Project Questions
           </h2>
           <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "16px", lineHeight: 1.5 }}>
-            These answers are visible to all bidding contractors immediately. You can update them at any time — even after publishing.
+            {isDraft
+              ? "These answers are visible to all bidding contractors as soon as you publish. You can edit them freely while the project is still a draft."
+              : "These are the answers bidders received when this project was published — they're locked now to keep everyone bidding on the same information. Have something new to add? Use the RFI system instead."}
           </p>
 
           {/* Advisory warning */}
@@ -790,7 +792,8 @@ export default async function EditProjectPage({
             </div>
           )}
 
-          <form action={updateProjectRfis.bind(null, id)}>
+          <form action={isDraft ? updateProjectRfis.bind(null, id) : undefined}>
+          <fieldset disabled={!isDraft} style={{ border: "none", padding: 0, opacity: isDraft ? 1 : 0.6 }}>
             {clientCatalog.map((item, idx) => {
               const existing = existingAnswers.get(item.id);
               const isAnswered = !!(existing?.response);
@@ -843,24 +846,27 @@ export default async function EditProjectPage({
               );
             })}
 
-            <button
-              type="submit"
-              style={{
-                marginTop: "20px",
-                background: "var(--camo-gunmetal)",
-                color: "#FFFFFF",
-                border: "none",
-                padding: "10px 24px",
-                borderRadius: "6px",
-                fontFamily: "'Barlow', sans-serif",
-                fontWeight: 600,
-                fontSize: "13px",
-                cursor: "pointer",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Save Answers
-            </button>
+            {isDraft && (
+              <button
+                type="submit"
+                style={{
+                  marginTop: "20px",
+                  background: "var(--camo-gunmetal)",
+                  color: "#FFFFFF",
+                  border: "none",
+                  padding: "10px 24px",
+                  borderRadius: "6px",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Save Answers
+              </button>
+            )}
+          </fieldset>
           </form>
         </div>
       )}
