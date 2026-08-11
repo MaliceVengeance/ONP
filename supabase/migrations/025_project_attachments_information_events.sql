@@ -202,6 +202,19 @@ CREATE POLICY "clients can delete own project files" ON storage.objects
 -- caller is the awarded contractor for this project. related_rfi_id and
 -- raw created_at are never returned, per the founder's explicit
 -- instruction not to expose either to contractors.
+--
+-- SECURITY DEFINER role-gate: contractor_can_access_project_files() does
+-- NOT itself check profiles.role -- migration 024's Storage policy is safe
+-- despite that because the policy performs its OWN separate role check
+-- before calling the helper. This RPC has no equivalent outer check (no
+-- Storage policy wraps it), so relying on the helper alone would let ANY
+-- authenticated role (CLIENT, ADMIN, INSPECTOR) -- not just CONTRACTOR --
+-- pull privacy-filtered attachment metadata for any project where the
+-- helper's OPEN/awarded condition happens to be true, bypassing the
+-- app-layer requireRole() call entirely (a bare SECURITY DEFINER function
+-- callable via RPC cannot rely on application-layer role checks -- the
+-- caller can invoke it directly). The role check now lives inside the
+-- function itself, not just in the app.
 
 CREATE OR REPLACE FUNCTION public.get_contractor_project_attachments(p_project_id uuid)
 RETURNS TABLE (
@@ -253,7 +266,36 @@ AS $function$
     CASE WHEN (SELECT awarded FROM is_awarded) THEN r.original_filename ELSE NULL END AS original_filename,
     r.information_revision_number > (SELECT acknowledged_revision FROM my_ack) AS is_new
   FROM ranked r
-  WHERE public.contractor_can_access_project_files(p_project_id);
+  WHERE EXISTS (
+    SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'CONTRACTOR'
+  )
+  AND public.contractor_can_access_project_files(p_project_id);
 $function$;
 
+-- Explicit, minimal execute privileges -- PUBLIC (and therefore anon, which
+-- otherwise inherits it) must not be able to invoke a SECURITY DEFINER
+-- function that reads privacy-filtered attachment metadata. Postgres grants
+-- EXECUTE to PUBLIC by default on function creation, so this must be
+-- revoked explicitly; it is not enough to only GRANT to authenticated.
+--
+-- Supabase projects also carry a schema-level ALTER DEFAULT PRIVILEGES
+-- grant that gives anon and authenticated EXECUTE on every new public-schema
+-- function automatically -- confirmed live on staging (anon retained direct
+-- EXECUTE even after revoking PUBLIC). REVOKE FROM PUBLIC alone does not
+-- touch that separate, explicit anon grant; anon must be revoked by name.
+REVOKE ALL ON FUNCTION public.get_contractor_project_attachments(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.get_contractor_project_attachments(uuid) FROM anon;
 GRANT EXECUTE ON FUNCTION public.get_contractor_project_attachments(uuid) TO authenticated;
+
+-- Same hardening for contractor_can_access_project_files(): it still had
+-- its default PUBLIC + anon EXECUTE grants from migration 024. Confirmed
+-- safe to tighten -- the only caller is the "contractors can read
+-- authorized project files" Storage policy, which runs strictly as the
+-- authenticated role (per `TO authenticated` on the policy itself); no
+-- anon-facing Storage policy references this function, and
+-- service_role/postgres bypass RLS (and therefore never need to call it)
+-- entirely. Revoking PUBLIC/anon does not change Storage policy evaluation
+-- for the authenticated role, which retains its own explicit grant below.
+REVOKE ALL ON FUNCTION public.contractor_can_access_project_files(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.contractor_can_access_project_files(uuid) FROM anon;
+GRANT EXECUTE ON FUNCTION public.contractor_can_access_project_files(uuid) TO authenticated;
