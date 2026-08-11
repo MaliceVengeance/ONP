@@ -2,43 +2,47 @@
 
 import { useState, useRef } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { uploadProjectFile } from "./actions";
+import { uploadProjectFile, deleteProjectFile } from "./actions";
 
-type FileObject = {
-  name: string;
-  metadata?: {
-    size?: number;
-    mimetype?: string;
-  };
-  created_at?: string;
+type Attachment = {
+  id: string;
+  storage_object_key: string;
+  original_filename: string;
+  mime_type: string | null;
+  file_size_bytes: number | null;
+  created_at: string;
 };
 
 export default function FileUploader({
   projectId,
-  existingFiles,
+  projectState,
+  existingAttachments,
 }: {
   projectId: string;
-  existingFiles: FileObject[];
+  projectState: string;
+  existingAttachments: Attachment[];
 }) {
-  const [files, setFiles] = useState<FileObject[]>(existingFiles);
+  const [attachments, setAttachments] = useState<Attachment[]>(existingAttachments);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isDraft = projectState === "DRAFT";
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  async function refreshFiles() {
-    const { data } = await supabase.storage
-      .from("project-files")
-      .list(projectId, {
-        sortBy: { column: "created_at", order: "desc" },
-      });
-    setFiles(data ?? []);
+  async function refreshAttachments() {
+    const { data } = await supabase
+      .from("project_attachments")
+      .select("id, storage_object_key, original_filename, mime_type, file_size_bytes, created_at")
+      .eq("project_id", projectId)
+      .is("withdrawn_at", null)
+      .order("created_at", { ascending: false });
+    setAttachments((data as Attachment[]) ?? []);
   }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -67,39 +71,39 @@ export default function FileUploader({
       }
     }
 
-    setSuccess(`${selected.length} file${selected.length > 1 ? "s" : ""} uploaded successfully.`);
+    setSuccess(
+      !isDraft
+        ? `${selected.length} file${selected.length > 1 ? "s" : ""} uploaded — bidding contractors will be notified of the update.`
+        : `${selected.length} file${selected.length > 1 ? "s" : ""} uploaded successfully.`
+    );
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    await refreshFiles();
+    await refreshAttachments();
   }
 
-  async function handleDelete(fileName: string) {
-    setDeleting(fileName);
+  async function handleDelete(attachmentId: string) {
+    setDeleting(attachmentId);
     setError(null);
-
-    const { error: deleteError } = await supabase.storage
-      .from("project-files")
-      .remove([`${projectId}/${fileName}`]);
-
-    if (deleteError) {
-      setError(`Failed to delete ${fileName}: ${deleteError.message}`);
-    } else {
-      await refreshFiles();
+    try {
+      await deleteProjectFile(projectId, attachmentId);
+      await refreshAttachments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete file.");
     }
     setDeleting(null);
   }
 
-  async function handleDownload(fileName: string) {
+  async function handleDownload(storageObjectKey: string) {
     const { data } = await supabase.storage
       .from("project-files")
-      .createSignedUrl(`${projectId}/${fileName}`, 60);
+      .createSignedUrl(storageObjectKey, 60);
 
     if (data?.signedUrl) {
       window.open(data.signedUrl, "_blank");
     }
   }
 
-  function formatSize(bytes?: number) {
+  function formatSize(bytes?: number | null) {
     if (!bytes) return "—";
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -110,10 +114,10 @@ export default function FileUploader({
     const ext = name.split(".").pop()?.toLowerCase();
     switch (ext) {
       case "pdf": return "📄";
-      case "jpg": case "jpeg": case "png": case "gif": case "webp": return "🖼️";
+      case "jpg": case "jpeg": case "png": case "gif": case "webp": case "heic": case "heif": return "🖼️";
       case "doc": case "docx": return "📝";
       case "xls": case "xlsx": return "📊";
-      case "zip": case "rar": return "🗜️";
+      case "dwg": case "dxf": return "📐";
       default: return "📎";
     }
   }
@@ -147,7 +151,9 @@ export default function FileUploader({
           Photos, PDFs, plans, documents — max 10MB per file
         </div>
         <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
-          All files are visible to bidding contractors
+          {isDraft
+            ? "All files are visible to bidding contractors"
+            : "Adding a file updates project info — bidding contractors will be notified and may briefly extend the deadline"}
         </div>
         <input
           ref={fileInputRef}
@@ -155,7 +161,7 @@ export default function FileUploader({
           multiple
           onChange={handleUpload}
           style={{ display: "none" }}
-          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
+          accept="image/*,.heic,.heif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
           disabled={uploading}
         />
         {!uploading && (
@@ -232,10 +238,10 @@ export default function FileUploader({
           textTransform: "uppercase",
           marginBottom: "14px",
         }}>
-          Uploaded Files ({files.length})
+          Uploaded Files ({attachments.length})
         </h2>
 
-        {files.length === 0 ? (
+        {attachments.length === 0 ? (
           <div style={{
             fontSize: "13px",
             color: "var(--camo-gunmetal)",
@@ -250,8 +256,8 @@ export default function FileUploader({
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {files.map((file) => (
-              <div key={file.name} style={{
+            {attachments.map((a) => (
+              <div key={a.id} style={{
                 background: "var(--camo-concrete)",
                 border: "1px solid #d9dbdb",
                 borderRadius: "8px",
@@ -263,7 +269,7 @@ export default function FileUploader({
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
                   <span style={{ fontSize: "22px", flexShrink: 0 }}>
-                    {getFileIcon(file.name)}
+                    {getFileIcon(a.original_filename)}
                   </span>
                   <div style={{ minWidth: 0 }}>
                     <div style={{
@@ -274,17 +280,17 @@ export default function FileUploader({
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
                     }}>
-                      {file.name.replace(/^\d+_/, "")}
+                      {a.original_filename}
                     </div>
                     <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)" }}>
-                      {formatSize(file.metadata?.size)}
+                      {formatSize(a.file_size_bytes)}
                     </div>
                   </div>
                 </div>
 
                 <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
                   <button
-                    onClick={() => handleDownload(file.name)}
+                    onClick={() => handleDownload(a.storage_object_key)}
                     style={{
                       background: "transparent",
                       color: "var(--camo-gunmetal)",
@@ -298,22 +304,24 @@ export default function FileUploader({
                   >
                     View
                   </button>
-                  <button
-                    onClick={() => handleDelete(file.name)}
-                    disabled={deleting === file.name}
-                    style={{
-                      background: "#FEF2F2",
-                      color: "#991B1B",
-                      border: "1px solid #FCA5A5",
-                      padding: "5px 12px",
-                      borderRadius: "6px",
-                      fontFamily: "'Barlow', sans-serif",
-                      fontSize: "12px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {deleting === file.name ? "…" : "Delete"}
-                  </button>
+                  {isDraft && (
+                    <button
+                      onClick={() => handleDelete(a.id)}
+                      disabled={deleting === a.id}
+                      style={{
+                        background: "#FEF2F2",
+                        color: "#991B1B",
+                        border: "1px solid #FCA5A5",
+                        padding: "5px 12px",
+                        borderRadius: "6px",
+                        fontFamily: "'Barlow', sans-serif",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {deleting === a.id ? "…" : "Delete"}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

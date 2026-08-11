@@ -226,11 +226,15 @@ export default async function ContractorProjectDetail({
     if (r.catalog_id) rfiByCategory.set(r.catalog_id, r.response ?? null);
   });
 
-  const { data: projectFiles } = await supabase.storage
-    .from("project-files")
-    .list(projectId, {
-      sortBy: { column: "created_at", order: "desc" },
-    });
+  // Metadata-driven, privacy-preserving listing: this RPC re-checks the
+  // same project-file authorization boundary as Storage RLS (migration
+  // 024's contractor_can_access_project_files) and returns a stable
+  // neutral label pre-award, the real filename only if this contractor is
+  // the awarded contractor, and never related_rfi_id or raw timestamps.
+  const { data: projectFiles } = await supabase.rpc(
+    "get_contractor_project_attachments",
+    { p_project_id: projectId }
+  );
 
   const deadline = project.deadline_at ? new Date(project.deadline_at) : null;
   const now = new Date();
@@ -614,11 +618,12 @@ export default async function ContractorProjectDetail({
             📁 Project Files ({projectFiles?.length})
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {projectFiles?.map((file) => (
+            {projectFiles?.map((file: any) => (
               <ProjectFileLink
-                key={file.name}
-                projectId={projectId}
-                fileName={file.name}
+                key={file.id}
+                storageObjectKey={file.storage_object_key}
+                displayLabel={file.original_filename ?? file.display_label}
+                isNew={file.is_new}
               />
             ))}
           </div>

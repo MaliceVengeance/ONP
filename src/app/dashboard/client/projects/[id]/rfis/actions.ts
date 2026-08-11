@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { sendRfiAnsweredEmail, sendRfiInfoUpdateEmail } from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { validateFile, uploadOneFile, removeUploadedFiles } from "../files/fileValidation";
 
 function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
@@ -77,10 +78,21 @@ export async function respondToRfi(
   rfiId: string,
   formData: FormData
 ) {
-  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
+  const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
 
   const response = (formData.get("response") as string)?.trim();
   if (!response) throw new Error("Response cannot be empty.");
+
+  // Inline attachments: validate the whole batch up front, before touching
+  // Storage or the DB, so a bad file rejects the entire submission cleanly
+  // (the RFI answer text is not saved either -- "fail together" per design).
+  const attachedFiles = formData.getAll("attachments").filter(
+    (f): f is File => f instanceof File && f.size > 0
+  );
+  for (const file of attachedFiles) {
+    const validationError = validateFile(file);
+    if (validationError) throw new Error(validationError);
+  }
 
   // Fetch RFI details before updating
   const { data: rfi } = await supabase
@@ -95,6 +107,19 @@ export async function respondToRfi(
     .select("title")
     .eq("id", projectId)
     .single();
+
+  // Upload all attachments before the RFI answer is recorded -- if any
+  // upload in the batch fails, best-effort-remove whichever files in this
+  // batch already succeeded and abort before the answer is ever written.
+  const uploaded: { key: string; originalFilename: string; mimeType: string; sizeBytes: number }[] = [];
+  try {
+    for (const file of attachedFiles) {
+      uploaded.push(await uploadOneFile(projectId, file));
+    }
+  } catch (err) {
+    await removeUploadedFiles(uploaded.map((u) => u.key));
+    throw new Error(`Attachment upload failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
   // Record the answer. `.neq("status", "ANSWERED")` makes a retry/double-submit
   // a no-op instead of re-running side effects. This is NOT `.eq("status",
@@ -126,6 +151,9 @@ export async function respondToRfi(
     if (error) throw error;
     updatedRows = data;
   } catch (err: any) {
+    // Answer was not recorded -- clean up any files already uploaded for
+    // this submission rather than leaving them orphaned indefinitely.
+    await removeUploadedFiles(uploaded.map((u) => u.key));
     if (/row-level security/i.test(err?.message ?? "")) {
       throw new Error(
         "This question can no longer be answered — the bidding deadline has passed, or the project is closed or awarded."
@@ -135,13 +163,40 @@ export async function respondToRfi(
   }
 
   if (!updatedRows || updatedRows.length === 0) {
-    // Already answered (retry / double-submit) -- no duplicate side effects.
+    // Already answered (retry / double-submit) -- no duplicate side effects,
+    // and no duplicate attachment metadata: clean up this submission's
+    // uploads (they were never linked to anything) and redirect.
+    await removeUploadedFiles(uploaded.map((u) => u.key));
     redirect(`/dashboard/client/projects/${projectId}/rfis?saved=1`);
   }
 
   // projects.information_revision_number has already been advanced by the
   // rfis_bump_information_revision trigger, in the same transaction as the
   // update above.
+
+  // Attach the uploaded files to this RFI answer. Because this insert runs
+  // AFTER the rfis update above, the project's information_revision_number
+  // is already at its post-answer value -- the project_attachments
+  // stamp-and-bump trigger sees related_rfi_id IS NOT NULL and takes the
+  // no-bump branch, so these rows simply inherit that value rather than
+  // bumping again. This is the deterministic replacement for a
+  // timing-window heuristic: ordering, not a clock, makes it exact.
+  if (uploaded.length > 0) {
+    const { error: attachErr } = await supabaseAdmin.from("project_attachments").insert(
+      uploaded.map((u) => ({
+        project_id: projectId,
+        storage_object_key: u.key,
+        original_filename: u.originalFilename,
+        mime_type: u.mimeType,
+        file_size_bytes: u.sizeBytes,
+        uploaded_by: user.id,
+        related_rfi_id: rfiId,
+      }))
+    );
+    if (attachErr) {
+      console.error("Failed to record RFI attachment metadata:", attachErr);
+    }
+  }
 
   // Apply the standard (24h) / emergency (12h) deadline-extension rule, if
   // applicable -- a single row-locked DB function, safe under concurrent

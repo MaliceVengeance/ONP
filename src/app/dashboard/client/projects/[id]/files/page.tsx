@@ -20,12 +20,14 @@ export default async function ProjectFilesPage({
     .eq("id", projectId)
     .single();
 
-  // Fetch existing files
-  const { data: files } = await supabase.storage
-    .from("project-files")
-    .list(projectId, {
-      sortBy: { column: "created_at", order: "desc" },
-    });
+  // Metadata-driven listing (project_attachments), not raw Storage listing --
+  // switched only after the historical-file backfill was verified complete.
+  const { data: attachments } = await supabase
+    .from("project_attachments")
+    .select("id, storage_object_key, original_filename, mime_type, file_size_bytes, created_at")
+    .eq("project_id", projectId)
+    .is("withdrawn_at", null)
+    .order("created_at", { ascending: false });
 
   return (
     <div style={{ maxWidth: "600px" }}>
@@ -75,7 +77,8 @@ export default async function ProjectFilesPage({
       {/* Upload component */}
       <FileUploader
         projectId={projectId}
-        existingFiles={files ?? []}
+        projectState={project?.state ?? "DRAFT"}
+        existingAttachments={attachments ?? []}
       />
 
       {isCreationStep && (

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { respondToRfi } from "./actions";
+import RfiResponseForm from "./RfiResponseForm";
 
 type RfiRow = {
   id: string;
@@ -241,43 +241,7 @@ export default async function ClientRfiPage({
                   )}
 
                   {/* Response form */}
-                  <form action={respondToRfi.bind(null, projectId, r.id)}>
-                    <label style={{
-                      display: "block",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      color: "var(--camo-gunmetal)",
-                      textTransform: "uppercase",
-                      letterSpacing: "1px",
-                      marginBottom: "4px",
-                    }}>
-                      Your Response
-                    </label>
-                    <textarea
-                      name="response"
-                      style={inputStyle}
-                      placeholder="Type your response here… This will be visible to all contractors bidding on this project."
-                      required
-                    />
-                    <button
-                      type="submit"
-                      style={{
-                        marginTop: "10px",
-                        background: "var(--camo-accent)",
-                        color: "var(--camo-ink)",
-                        border: "none",
-                        padding: "10px 20px",
-                        borderRadius: "6px",
-                        fontFamily: "'Barlow', sans-serif",
-                        fontWeight: 600,
-                        fontSize: "13px",
-                        cursor: "pointer",
-                        width: "100%",
-                      }}
-                    >
-                      Post Response
-                    </button>
-                  </form>
+                  <RfiResponseForm projectId={projectId} rfiId={r.id} inputStyle={inputStyle} />
                 </div>
               </div>
             ))}
