@@ -73,7 +73,7 @@ export default function RfiResponseForm({
         name="attachments"
         multiple
         disabled={submitting}
-        accept="image/*,.heic,.heif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
+        accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
         style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}
       />
       <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>

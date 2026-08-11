@@ -114,7 +114,7 @@ export default function FileUploader({
     const ext = name.split(".").pop()?.toLowerCase();
     switch (ext) {
       case "pdf": return "📄";
-      case "jpg": case "jpeg": case "png": case "gif": case "webp": case "heic": case "heif": return "🖼️";
+      case "jpg": case "jpeg": case "png": case "gif": case "webp": return "🖼️";
       case "doc": case "docx": return "📝";
       case "xls": case "xlsx": return "📊";
       case "dwg": case "dxf": return "📐";
@@ -161,7 +161,7 @@ export default function FileUploader({
           multiple
           onChange={handleUpload}
           style={{ display: "none" }}
-          accept="image/*,.heic,.heif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
+          accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.dwg,.dxf"
           disabled={uploading}
         />
         {!uploading && (

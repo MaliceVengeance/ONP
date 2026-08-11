@@ -9,13 +9,21 @@ export const MAX_FILE_BYTES = 10 * 1024 * 1024;
 // MIME cross-check only rejects an implausible combination when the browser
 // actually reported a specific, meaningful type. DWG/DXF MIME reporting is
 // inconsistent across browsers/OS, so those two rely on extension alone.
+//
+// HEIC/HEIF are deliberately NOT in this allowlist. sharp's EXIF/GPS-strip
+// path (below) cannot be verified to support HEIC/HEIF input in the
+// deployed environment (it depends on libheif being present in the sharp
+// build), and phone photos in this format routinely embed exact GPS
+// coordinates. Silently accepting a format we can't guarantee stripping
+// for is not acceptable -- rejecting it at validation time, with a clear
+// message, is safer than uploading an unstripped image.
+// BACKLOG: "HEIC/HEIF safe conversion + EXIF/GPS stripping" -- not
+// implemented in this checkpoint.
 export const ALLOWED_EXTENSIONS: Record<string, string[] | null> = {
   jpg: ["image/jpeg"],
   jpeg: ["image/jpeg"],
   png: ["image/png"],
   webp: ["image/webp"],
-  heic: ["image/heic", "image/heif"],
-  heif: ["image/heic", "image/heif"],
   gif: ["image/gif"],
   pdf: ["application/pdf"],
   doc: ["application/msword"],
@@ -27,11 +35,19 @@ export const ALLOWED_EXTENSIONS: Record<string, string[] | null> = {
   dxf: null,
 };
 
+const UNSUPPORTED_EXTENSIONS: Record<string, string> = {
+  heic: "HEIC/HEIF photos aren't supported yet. Please upload JPG, PNG, WebP, or PDF.",
+  heif: "HEIC/HEIF photos aren't supported yet. Please upload JPG, PNG, WebP, or PDF.",
+};
+
 export function validateFile(file: File): string | null {
   if (file.size === 0) return `${file.name} is empty.`;
   if (file.size > MAX_FILE_BYTES) return `${file.name} is too large. Maximum file size is 10MB.`;
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (ext in UNSUPPORTED_EXTENSIONS) {
+    return UNSUPPORTED_EXTENSIONS[ext];
+  }
   if (!(ext in ALLOWED_EXTENSIONS)) {
     return `${file.name} is not an accepted file type. Allowed: images, PDF, Word/Excel documents, text, DWG/DXF.`;
   }
@@ -42,12 +58,9 @@ export function validateFile(file: File): string | null {
   return null;
 }
 
-// sharp supports HEIC/HEIF input only when built with libheif, which is not
-// guaranteed present in the deployed environment. Rather than risk an
-// unhandled sharp failure on every phone photo in that format, HEIC/HEIF
-// files are stored as-is (EXIF/GPS NOT stripped for this format) and this
-// is surfaced via this explicit allowlist rather than attempting and
-// silently failing.
+// Every remaining accepted image format is verified to go through this
+// strip path -- there is no accepted image extension left that bypasses it
+// (HEIC/HEIF, the one format that would have, is rejected above instead).
 const EXIF_STRIP_SUPPORTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 async function stripExifIfSupported(buffer: Buffer, mimeType: string): Promise<Buffer> {
