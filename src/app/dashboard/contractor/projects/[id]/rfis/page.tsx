@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
-import { submitRfi } from "./actions";
+import AskQuestionForm from "./AskQuestionForm";
 
 type RfiCatalogItem = {
   id: string;
@@ -86,19 +86,6 @@ export default async function ContractorRfiPage({
 
   const answered = rfiRows.filter((r) => r.response);
   const unanswered = rfiRows.filter((r) => !r.response);
-
-  const inputStyle = {
-    width: "100%",
-    background: "var(--camo-charcoal)",
-    border: "1px solid var(--camo-gunmetal)",
-    color: "var(--camo-paper)",
-    borderRadius: "6px",
-    padding: "10px 14px",
-    fontFamily: "'Barlow', sans-serif",
-    fontSize: "14px",
-    outline: "none",
-    marginTop: "6px",
-  } as React.CSSProperties;
 
   return (
     <div style={{ maxWidth: "680px" }}>
@@ -233,66 +220,7 @@ export default async function ContractorRfiPage({
               No question types are available at this time.
             </div>
           ) : (
-            <form action={submitRfi.bind(null, projectId)}>
-              <label style={{
-                display: "block",
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "var(--camo-steel)",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-              }}>
-                Question Type
-              </label>
-              <select
-                name="catalog_id"
-                style={inputStyle}
-                required
-              >
-                <option value="">Select a question type…</option>
-                {availableCatalog.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.prompt}
-                  </option>
-                ))}
-              </select>
-
-              <label style={{
-                display: "block",
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "var(--camo-steel)",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                marginTop: "14px",
-              }}>
-                Additional Details (optional)
-              </label>
-              <textarea
-                name="question"
-                style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }}
-                placeholder="Add any specific details about your question…"
-              />
-
-              <button
-                type="submit"
-                style={{
-                  marginTop: "12px",
-                  background: "var(--camo-accent)",
-                  color: "var(--camo-ink)",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "6px",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                Submit Question
-              </button>
-            </form>
+            <AskQuestionForm projectId={projectId} availableCatalog={availableCatalog} />
           )}
         </div>
       )}
