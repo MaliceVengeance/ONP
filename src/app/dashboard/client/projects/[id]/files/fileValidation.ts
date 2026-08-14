@@ -138,6 +138,53 @@ export async function uploadOneFile(projectId: string, file: File): Promise<Uplo
     console.log(`[TEMP-DIAG project-files-upload] ${diagId} read-back threw:`, e instanceof Error ? e.message : String(e));
   }
 
+  // TEMPORARY DIAGNOSTIC #2 -- Buffer vs ArrayBuffer hypothesis test. Uploads
+  // the identical post-sharp bytes AGAIN, but as a plain ArrayBuffer instead
+  // of a Node Buffer, to a brand-new, never-before-used opaque test key
+  // (never overwrites the primary upload above or the earlier corrupted
+  // diagnostic object). No metadata row, no revision/notification logic --
+  // this exists purely to isolate whether Buffer-specific serialization is
+  // the cause. Wrapped in try/catch so it can never affect the real upload
+  // this function already completed above.
+  try {
+    diagHash(`${diagId} [ARRAYBUFFER-TEST] before conversion (== post-sharp outputBuffer)`, outputBuffer);
+
+    // Explicit copy into a freshly-allocated Uint8Array -- guaranteed NOT to
+    // alias Node's internal Buffer memory pool (Buffer.from/allocUnsafe can
+    // share a larger pooled ArrayBuffer with an offset; constructing a new
+    // Uint8Array from an existing Buffer copies exactly its bytes into a
+    // fresh, exactly-sized backing ArrayBuffer). No text/base64 step anywhere.
+    const uint8Copy = new Uint8Array(outputBuffer);
+    const arrayBufferCopy: ArrayBuffer = uint8Copy.buffer;
+
+    diagHash(`${diagId} [ARRAYBUFFER-TEST] after conversion to ArrayBuffer`, Buffer.from(arrayBufferCopy));
+
+    const diagKey = `${projectId}/DIAG-ARRAYBUFFER-${randomUUID()}.jpg`;
+    console.log(`[TEMP-DIAG project-files-upload] ${diagId} [ARRAYBUFFER-TEST] diagnostic storage key: ${diagKey}`);
+
+    // ArrayBuffer is an explicitly supported FileBody type for
+    // supabase-js storage .upload() (alongside Buffer, Uint8Array/
+    // ArrayBufferView, Blob, File, ReadableStream, etc).
+    const { error: diagUploadErr } = await supabaseAdmin.storage
+      .from("project-files")
+      .upload(diagKey, arrayBufferCopy, { contentType: file.type || undefined });
+
+    if (diagUploadErr) {
+      console.log(`[TEMP-DIAG project-files-upload] ${diagId} [ARRAYBUFFER-TEST] upload FAILED:`, diagUploadErr);
+    } else {
+      console.log(`[TEMP-DIAG project-files-upload] ${diagId} [ARRAYBUFFER-TEST] upload succeeded`);
+      const { data: diagDl, error: diagDlErr } = await supabaseAdmin.storage.from("project-files").download(diagKey);
+      if (diagDlErr || !diagDl) {
+        console.log(`[TEMP-DIAG project-files-upload] ${diagId} [ARRAYBUFFER-TEST] read-back FAILED:`, diagDlErr);
+      } else {
+        const diagDownloadedBuf = Buffer.from(await diagDl.arrayBuffer());
+        diagHash(`${diagId} [ARRAYBUFFER-TEST] read back from Storage immediately after upload`, diagDownloadedBuf);
+      }
+    }
+  } catch (e) {
+    console.log(`[TEMP-DIAG project-files-upload] ${diagId} [ARRAYBUFFER-TEST] threw:`, e instanceof Error ? e.message : String(e));
+  }
+
   return { key, originalFilename: file.name, mimeType: file.type || "application/octet-stream", sizeBytes: file.size };
 }
 
