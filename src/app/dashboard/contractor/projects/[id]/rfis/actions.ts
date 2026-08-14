@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
 import { sendRfiSubmittedEmail } from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { isOpenEndedRfiPrompt } from "@/lib/isOpenEndedRfiPrompt";
 
 function wrapErr(step: string, err: any) {
   return new Error(`${step} failed: ${JSON.stringify(err)}`);
@@ -34,8 +35,7 @@ export async function submitRfi(projectId: string, formData: FormData) {
     .eq("id", catalog_id)
     .maybeSingle();
 
-  const isOpenEnded =
-    catalogItem?.prompt === "I have a specific question not covered above.";
+  const isOpenEnded = isOpenEndedRfiPrompt(catalogItem?.prompt);
 
   // For all question types except the open-ended one, only one per project is allowed
   if (!isOpenEnded) {
