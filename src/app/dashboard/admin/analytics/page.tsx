@@ -38,8 +38,11 @@ export default async function AdminAnalyticsPage() {
     supabase.from("rfis").select("id", { count: "exact", head: true }).is("response", null),
     supabase.from("project_inspector_assignments").select("id", { count: "exact", head: true }).eq("request_status", "PENDING"),
     supabase.from("projects").select("id", { count: "exact", head: true }).not("override_requested_at", "is", null).eq("urgent_override", false),
-    // Bid volume by month
-    supabase.from("bid_versions").select("amount_cents, submitted_at").order("submitted_at", { ascending: true }),
+    // Bid volume by month -- excludes RECONFIRMATION rows (post-close
+    // information-acknowledgment versions that duplicate the prior
+    // version's amount_cents unchanged) so they don't inflate bid-volume
+    // figures with dollar amounts that were never a new submission.
+    supabase.from("bid_versions").select("amount_cents, submitted_at").in("version_kind", ["ORIGINAL", "REVISION"]).order("submitted_at", { ascending: true }),
     // Projects by month
     supabase.from("projects").select("created_at, state, published_at").order("created_at", { ascending: true }),
     // Users by week

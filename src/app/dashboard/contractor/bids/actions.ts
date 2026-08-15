@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CONTRACTOR_EMERGENCY_BID_SUBMIT } from "@/lib/disclaimers/contractorEmergencyBidSubmit";
 import { isProfileComplete, profileMissingFields } from "@/lib/contractor/profileComplete";
+import { isPostCloseReconfirmationAllowed } from "@/lib/postCloseReconfirmation";
 
 function clean(v: FormDataEntryValue | null) {
   return String(v ?? "").trim();
@@ -210,6 +211,7 @@ export async function submitBid(projectId: string, formData: FormData) {
       quote_pdf_path,
       quote_pdf_filename,
       acknowledgment_affirmed: true,
+      version_kind: nextVersion === 1 ? "ORIGINAL" : "REVISION",
     })
     .select("id")
     .single();
@@ -281,6 +283,29 @@ export async function submitBid(projectId: string, formData: FormData) {
  * weaker path. Duplicates the latest bid_versions row's terms unchanged and
  * inserts a new version purely to record a fresh, auditable acknowledgment
  * against the project's current information revision.
+ *
+ * While bidding is genuinely still open, this uses the RLS-scoped client
+ * exactly as before this feature existed — bid_versions_insert_own's own
+ * WITH CHECK (ownership + project_is_open_for_bidding()) remains the DB-
+ * layer backstop, unchanged.
+ *
+ * After bidding has closed, this instead calls the reconfirm_bid_post_close
+ * RPC (migration 028), which independently re-verifies every invariant
+ * itself inside a SECURITY DEFINER body rather than trusting this action's
+ * own pre-flight check alone — necessary because RLS would otherwise
+ * correctly (and, for this one narrow case, undesirably) block the insert
+ * once project_is_open_for_bidding() is false. isPostCloseReconfirmationAllowed()
+ * is still called first here, purely to surface a clean, specific error
+ * message before ever reaching the DB — it is not the security boundary.
+ *
+ * This is the resolution path for a post-close published-file withdrawal:
+ * the withdrawal bumps the information revision, which makes every
+ * acknowledged bid stale and unawardable (award_project_bid's own
+ * eligibility check), and this action lets a contractor re-affirm their
+ * existing bid against the new information without opening a new
+ * competitive round. Every row inserted here is stamped
+ * version_kind = 'RECONFIRMATION' so it is never mistaken for a genuine
+ * price/terms revision by analytics or any future audit.
  */
 export async function reconfirmBid(bidId: string, formData: FormData) {
   const { supabase, user } = await requireRole(["CONTRACTOR", "ADMIN"]);
@@ -310,54 +335,100 @@ export async function reconfirmBid(bidId: string, formData: FormData) {
 
   const row = (windowRows as ProjectWindowRow[] | null)?.[0];
   if (!row) throw new Error("Project not found or you do not have access.");
-  if (row.state !== "OPEN" || !row.deadline_at) {
-    throw new Error("Project is not open for bidding.");
-  }
-  if (new Date(row.deadline_at).getTime() <= Date.now()) {
-    throw new Error("Bidding has closed for this project.");
+
+  const isGenuinelyOpen =
+    row.state === "OPEN" &&
+    !!row.deadline_at &&
+    new Date(row.deadline_at).getTime() > Date.now();
+
+  if (isGenuinelyOpen) {
+    // Unchanged from before this feature existed: RLS-scoped client, RLS
+    // (bid_versions_insert_own / bids_update_own) is the enforcement layer.
+    const projectRevisionNumber =
+      typeof row.revision_number === "number" ? row.revision_number : 0;
+
+    const { data: lastVersion, error: lastErr } = await supabase
+      .from("bid_versions")
+      .select(
+        "version_number, amount_cents, duration_days, start_window, inclusions, exclusions, notes, warranty_terms, deposit_terms, scope_disclaimers, estimate_valid_until, quote_pdf_path, quote_pdf_filename"
+      )
+      .eq("bid_id", bidId)
+      .order("version_number", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (lastErr) throw wrapErr("bid_versions.select(last_version)", lastErr);
+    if (!lastVersion) throw new Error("Cannot reconfirm: no existing bid version found.");
+
+    const nextVersion = (lastVersion.version_number ?? 0) + 1;
+
+    const { error: vErr } = await supabase.from("bid_versions").insert({
+      bid_id: bidId,
+      version_number: nextVersion,
+      project_revision_number: projectRevisionNumber,
+      amount_cents: lastVersion.amount_cents,
+      duration_days: lastVersion.duration_days,
+      start_window: lastVersion.start_window,
+      inclusions: lastVersion.inclusions,
+      exclusions: lastVersion.exclusions,
+      notes: lastVersion.notes,
+      warranty_terms: lastVersion.warranty_terms,
+      deposit_terms: lastVersion.deposit_terms,
+      scope_disclaimers: lastVersion.scope_disclaimers,
+      estimate_valid_until: lastVersion.estimate_valid_until,
+      quote_pdf_path: lastVersion.quote_pdf_path,
+      quote_pdf_filename: lastVersion.quote_pdf_filename,
+      acknowledgment_affirmed: true,
+      version_kind: "RECONFIRMATION",
+    });
+    if (vErr) throw wrapErr("bid_versions.insert(reconfirm)", vErr);
+
+    await supabase
+      .from("bids")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", bidId);
+    return;
   }
 
-  const projectRevisionNumber =
-    typeof row.revision_number === "number" ? row.revision_number : 0;
+  // Post-close path: pre-flight check for a clean error message only --
+  // reconfirm_bid_post_close is the actual, independently re-verifying
+  // security boundary (see doc comment above).
+  const { data: projectRow, error: projErr } = await supabaseAdmin
+    .from("projects")
+    .select("information_revision_number, bidding_paused_at")
+    .eq("id", bidRow.project_id)
+    .single();
+  if (projErr || !projectRow) throw wrapErr("projects.select(pause/revision)", projErr);
 
-  const { data: lastVersion, error: lastErr } = await supabase
+  const { data: awardRow } = await supabaseAdmin
+    .from("project_awards")
+    .select("id")
+    .eq("project_id", bidRow.project_id)
+    .maybeSingle();
+
+  const { data: currentVersion } = await supabaseAdmin
     .from("bid_versions")
-    .select(
-      "version_number, amount_cents, duration_days, start_window, inclusions, exclusions, notes, warranty_terms, deposit_terms, scope_disclaimers, estimate_valid_until, quote_pdf_path, quote_pdf_filename"
-    )
+    .select("acknowledged_information_revision")
     .eq("bid_id", bidId)
     .order("version_number", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (lastErr) throw wrapErr("bid_versions.select(last_version)", lastErr);
-  if (!lastVersion) throw new Error("Cannot reconfirm: no existing bid version found.");
-
-  const nextVersion = (lastVersion.version_number ?? 0) + 1;
-
-  const { error: vErr } = await supabase.from("bid_versions").insert({
-    bid_id: bidId,
-    version_number: nextVersion,
-    project_revision_number: projectRevisionNumber,
-    amount_cents: lastVersion.amount_cents,
-    duration_days: lastVersion.duration_days,
-    start_window: lastVersion.start_window,
-    inclusions: lastVersion.inclusions,
-    exclusions: lastVersion.exclusions,
-    notes: lastVersion.notes,
-    warranty_terms: lastVersion.warranty_terms,
-    deposit_terms: lastVersion.deposit_terms,
-    scope_disclaimers: lastVersion.scope_disclaimers,
-    estimate_valid_until: lastVersion.estimate_valid_until,
-    quote_pdf_path: lastVersion.quote_pdf_path,
-    quote_pdf_filename: lastVersion.quote_pdf_filename,
-    acknowledgment_affirmed: true,
+  const gate = isPostCloseReconfirmationAllowed({
+    state: row.state,
+    deadlineAt: row.deadline_at,
+    isAwarded: !!awardRow,
+    biddingPausedAt: projectRow.bidding_paused_at,
+    acknowledgedInformationRevision: currentVersion?.acknowledged_information_revision ?? null,
+    liveInformationRevision: projectRow.information_revision_number,
   });
 
-  if (vErr) throw wrapErr("bid_versions.insert(reconfirm)", vErr);
+  if (!gate.allowed) {
+    throw new Error(gate.reason ?? "Project is not open for bidding.");
+  }
 
-  await supabase
-    .from("bids")
-    .update({ updated_at: new Date().toISOString() })
-    .eq("id", bidId);
+  const { error: rpcErr } = await supabaseAdmin.rpc("reconfirm_bid_post_close", {
+    p_bid_id: bidId,
+  });
+  if (rpcErr) throw wrapErr("rpc.reconfirm_bid_post_close", rpcErr);
 }

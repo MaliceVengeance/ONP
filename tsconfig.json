@@ -33,6 +33,7 @@
     "node_modules",
     "src/app/dashboard/client/projects/[id]/files/uploadPipeline.test.ts",
     "src/lib/isNextRedirectError.test.ts",
-    "src/lib/isOpenEndedRfiPrompt.test.ts"
+    "src/lib/isOpenEndedRfiPrompt.test.ts",
+    "src/lib/postCloseReconfirmation.test.ts"
   ]
 }

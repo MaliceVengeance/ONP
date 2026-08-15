@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { sendRfiInfoUpdateEmail } from "@/lib/email";
 import { validateFile, uploadOneFile, removeUploadedFiles } from "./fileValidation";
+import { runQuarantineSequence } from "@/lib/quarantineService";
 
 /**
  * Standalone file upload (client "Files" page, not tied to answering a
@@ -155,6 +156,83 @@ export async function deleteProjectFile(projectId: string, attachmentId: string)
     .delete()
     .eq("id", attachmentId);
   if (deleteErr) throw new Error(`project_attachments.delete failed: ${JSON.stringify(deleteErr)}`);
+
+  revalidatePath(`/dashboard/client/projects/${projectId}/files`);
+}
+
+/**
+ * Withdraw a published (non-DRAFT) file, ordinary or sensitive. All the
+ * exactly-once machinery (revision bump, inline deadline evaluation,
+ * notification enqueue, review/pause creation for sensitive removal) lives
+ * inside the withdraw_project_attachment DB RPC (migration 028) -- this
+ * action's job is authorization, calling it, and -- for sensitive removal
+ * only -- kicking off the quarantine sequence (best-effort synchronous
+ * attempt; the sensitive-removal-cleanup cron is the durable retry
+ * backstop, mirroring the existing notification-outbox pattern).
+ *
+ * reasonCode = 'SENSITIVE_INFO' always routes to the sensitive path
+ * regardless of what the caller passes as `action` -- the UI should already
+ * enforce this, but the server action does not trust the client's routing
+ * choice for a decision with this much consequence.
+ */
+export async function withdrawProjectFile(
+  projectId: string,
+  attachmentId: string,
+  reasonCode: string,
+  reasonOtherText: string | null
+) {
+  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
+
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, state")
+    .eq("id", projectId)
+    .maybeSingle();
+  if (!project) throw new Error("Project not found or you don't have access to it.");
+  if (project.state === "DRAFT") {
+    throw new Error("Draft files should be deleted, not withdrawn.");
+  }
+
+  const { data: attachment } = await supabaseAdmin
+    .from("project_attachments")
+    .select("id, project_id, mime_type, storage_object_key")
+    .eq("id", attachmentId)
+    .eq("project_id", projectId)
+    .maybeSingle();
+  if (!attachment) throw new Error("File not found.");
+
+  const action = reasonCode === "SENSITIVE_INFO" ? "SENSITIVE_REMOVE" : "WITHDRAW";
+
+  const { data, error } = await supabaseAdmin.rpc("withdraw_project_attachment", {
+    p_attachment_id: attachmentId,
+    p_action: action,
+    p_reason_code: reasonCode,
+    p_reason_other_text: reasonOtherText,
+  });
+  if (error) throw new Error(`withdraw_project_attachment failed: ${JSON.stringify(error)}`);
+
+  const result = Array.isArray(data) ? data[0] : data;
+  if (!result?.ok && !result?.already_handled) {
+    throw new Error("Withdrawal did not complete.");
+  }
+
+  if (action === "SENSITIVE_REMOVE" && result?.ok) {
+    // Best-effort, synchronous attempt. Contractor access is ALREADY denied
+    // at this point (the RPC's DB transaction already committed the
+    // SENSITIVE_REMOVAL_PENDING status, and the object-aware Storage helper
+    // checks that live status, not object existence) -- this call is only
+    // about relocating the bytes and closing the already-issued-signed-URL
+    // gap. Any failure here is not user-facing; the cleanup cron retries.
+    try {
+      await runQuarantineSequence({
+        attachmentId,
+        storageObjectKey: attachment.storage_object_key,
+        mimeType: attachment.mime_type,
+      });
+    } catch (e) {
+      console.error("Quarantine sequence failed synchronously, cleanup cron will retry:", e);
+    }
+  }
 
   revalidatePath(`/dashboard/client/projects/${projectId}/files`);
 }

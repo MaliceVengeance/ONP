@@ -21,11 +21,16 @@ export async function GET(req: NextRequest) {
 
   try {
     // Find all open emergency projects whose auto-close time has passed
+    // bidding_paused_at IS NULL: a project paused for a sensitive-removal
+    // review must not be auto-expired out from under that review -- the
+    // clock resumes only once an admin resolves the pause (resolve_bidding_
+    // pause), not silently via this cron.
     const { data: expiredProjects, error: fetchErr } = await supabaseAdmin
       .from("projects")
       .select("id, title")
       .eq("is_emergency", true)
       .eq("state", "OPEN")
+      .is("bidding_paused_at", null)
       .lte("emergency_auto_close_at", now.toISOString());
 
     if (fetchErr) {
