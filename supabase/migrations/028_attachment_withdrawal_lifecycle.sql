@@ -586,8 +586,19 @@ BEGIN
 END;
 $function$;
 
+-- Supabase projects carry a schema-level ALTER DEFAULT PRIVILEGES rule that
+-- auto-grants authenticated (and anon) EXECUTE on every newly created
+-- public-schema function -- REVOKE FROM PUBLIC alone does not touch it
+-- (confirmed live on staging: this function retained authenticated EXECUTE
+-- despite the PUBLIC/anon revokes below, until this explicit authenticated
+-- revoke was added). Must be revoked by name, same as migration 025 already
+-- documented for anon. This function trusts the caller entirely (no
+-- internal ownership re-verification), so a live authenticated grant would
+-- let any logged-in user withdraw/sensitive-remove any attachment on any
+-- project directly, bypassing the calling server action's ownership check.
 REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) FROM anon;
+REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) TO service_role;
 -- authenticated is deliberately NOT granted execute here: the calling
 -- server action always runs as supabaseAdmin (service role), matching the
@@ -715,8 +726,12 @@ BEGIN
 END;
 $function$;
 
+-- Same schema-level-default-privilege correction as withdraw_project_
+-- attachment above -- authenticated must be revoked by name, not merely
+-- omitted from an explicit GRANT.
 REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid) FROM anon;
+REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.reconfirm_bid_post_close(uuid) TO service_role;
 -- service-role only, same reasoning as withdraw_project_attachment: the
 -- calling server action still performs its own pre-flight check (for a
@@ -758,8 +773,14 @@ BEGIN
 END;
 $function$;
 
+-- Same schema-level-default-privilege correction -- this function in
+-- particular has zero internal authorization checks of its own (it only
+-- matches on attachment_status = 'SENSITIVE_REMOVAL_PENDING'), so a live
+-- authenticated grant would let anyone flip an attachment straight to
+-- SENSITIVE_REMOVED without the quarantine copy ever actually existing.
 REVOKE ALL ON FUNCTION public.finalize_sensitive_removal(uuid, text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.finalize_sensitive_removal(uuid, text) FROM anon;
+REVOKE ALL ON FUNCTION public.finalize_sensitive_removal(uuid, text) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.finalize_sensitive_removal(uuid, text) TO service_role;
 
 -- ============================================================
