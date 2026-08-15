@@ -181,7 +181,7 @@ export async function withdrawProjectFile(
   reasonCode: string,
   reasonOtherText: string | null
 ) {
-  const { supabase } = await requireRole(["CLIENT", "ADMIN"]);
+  const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
 
   const { data: project } = await supabase
     .from("projects")
@@ -208,6 +208,10 @@ export async function withdrawProjectFile(
     p_action: action,
     p_reason_code: reasonCode,
     p_reason_other_text: reasonOtherText,
+    // From requireRole()'s authenticated session -- never from client-
+    // submitted form data. Re-validated independently inside the RPC
+    // itself against live database state, not trusted at face value.
+    p_actor_id: user.id,
   });
   if (error) throw new Error(`withdraw_project_attachment failed: ${JSON.stringify(error)}`);
 

@@ -429,6 +429,10 @@ export async function reconfirmBid(bidId: string, formData: FormData) {
 
   const { error: rpcErr } = await supabaseAdmin.rpc("reconfirm_bid_post_close", {
     p_bid_id: bidId,
+    // From requireRole()'s authenticated session -- never client-submitted.
+    // Re-validated independently inside the RPC against live database
+    // state (role = CONTRACTOR, bid ownership) before being trusted.
+    p_actor_id: user.id,
   });
   if (rpcErr) throw wrapErr("rpc.reconfirm_bid_post_close", rpcErr);
 }

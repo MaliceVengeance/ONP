@@ -439,12 +439,26 @@ CREATE TRIGGER project_attachments_bump_on_withdrawal
 --           'SENSITIVE_REMOVE' -> ACTIVE -> SENSITIVE_REMOVAL_PENDING
 --           (never directly to SENSITIVE_REMOVED -- see finalize_sensitive_
 --           removal, section 12, for the post-quarantine completion step).
+--
+-- p_actor_id: the calling server action always invokes this via
+-- supabaseAdmin (service role) -- required so ownership/eligibility can be
+-- correctly bypassed only for the intended reasons (see the RLS-bypass
+-- notes elsewhere in this file), but a service-role call carries no end-
+-- user JWT, so auth.uid() is always NULL in this context. p_actor_id must
+-- therefore be supplied explicitly by the caller (from requireRole()'s
+-- authenticated session -- never from client-submitted form data) and is
+-- independently re-validated against live database state below before it
+-- is trusted for anything, including being written to an audit column.
+-- This function does NOT merely accept p_actor_id at face value.
+
+DROP FUNCTION IF EXISTS public.withdraw_project_attachment(uuid, text, text, text);
 
 CREATE OR REPLACE FUNCTION public.withdraw_project_attachment(
   p_attachment_id uuid,
   p_action text,
   p_reason_code text,
-  p_reason_other_text text DEFAULT NULL
+  p_reason_other_text text,
+  p_actor_id uuid
 )
 RETURNS TABLE (
   ok boolean,
@@ -458,17 +472,27 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 DECLARE
+  v_actor_role text;
   v_target_status text;
   v_event_type text;
   v_project_id uuid;
+  v_client_id uuid;
   v_new_revision integer;
   v_event_id uuid;
   v_review_id uuid;
-  v_actor uuid := auth.uid();
   v_notification_kind text;
   v_project_state text;
   v_awarded_contractor_id uuid;
 BEGIN
+  -- 1/2. actor exists and holds a role permitted to withdraw attachments.
+  SELECT role::text INTO v_actor_role FROM public.profiles WHERE id = p_actor_id;
+  IF v_actor_role IS NULL THEN
+    RAISE EXCEPTION 'Actor not found';
+  END IF;
+  IF v_actor_role NOT IN ('CLIENT', 'ADMIN') THEN
+    RAISE EXCEPTION 'Forbidden: role % is not permitted to withdraw attachments', v_actor_role;
+  END IF;
+
   IF p_action = 'WITHDRAW' THEN
     v_target_status := 'WITHDRAWN';
     v_event_type := 'WITHDRAWN';
@@ -479,19 +503,41 @@ BEGIN
     RAISE EXCEPTION 'Invalid action: %', p_action;
   END IF;
 
-  -- Guarded, idempotent transition. Row lock from the UPDATE itself
-  -- serializes concurrent callers; a losing/retried caller matches zero
-  -- rows here and falls through to the "already handled" branch below.
+  -- 5. the attachment must actually belong to a real project -- load both
+  -- in one step so the client-ownership check below has the live client_id.
+  SELECT pa.project_id, p.client_id INTO v_project_id, v_client_id
+  FROM public.project_attachments pa
+  JOIN public.projects p ON p.id = pa.project_id
+  WHERE pa.id = p_attachment_id;
+
+  IF v_project_id IS NULL THEN
+    RAISE EXCEPTION 'Attachment not found';
+  END IF;
+
+  -- 3/4. authorization: a CLIENT actor must own this specific project.
+  -- ADMIN is explicitly, unconditionally permitted -- stated here rather
+  -- than merely falling through an unchecked branch, matching the same
+  -- explicit "owner client or ADMIN" pattern already used by
+  -- award_project_bid.
+  IF v_actor_role = 'CLIENT' AND v_client_id IS DISTINCT FROM p_actor_id THEN
+    RAISE EXCEPTION 'Forbidden: actor does not own this project';
+  END IF;
+
+  -- 6. Guarded, idempotent transition -- unchanged from before. Row lock
+  -- from the UPDATE itself serializes concurrent callers; a losing/retried
+  -- caller matches zero rows here and falls through to the "already
+  -- handled" branch below. p_actor_id is written to withdrawn_by only now,
+  -- after every check above has passed.
   UPDATE public.project_attachments
   SET attachment_status = v_target_status,
       withdrawal_reason_code = p_reason_code,
       withdrawal_reason_other_text = p_reason_other_text,
-      withdrawn_by = v_actor,
+      withdrawn_by = p_actor_id,
       withdrawn_at = now()
   WHERE id = p_attachment_id
     AND attachment_status = 'ACTIVE'
-  RETURNING project_id, withdrawal_information_revision_number
-    INTO v_project_id, v_new_revision;
+  RETURNING withdrawal_information_revision_number
+    INTO v_new_revision;
 
   IF NOT FOUND THEN
     RETURN QUERY SELECT false, true, NULL::uuid, NULL::text, NULL::uuid;
@@ -566,7 +612,7 @@ BEGIN
 
   IF p_action = 'SENSITIVE_REMOVE' THEN
     INSERT INTO public.attachment_sensitive_removal_reviews (project_id, attachment_id, requested_by, status, bidding_paused_at)
-    VALUES (v_project_id, p_attachment_id, v_actor, 'PENDING_REVIEW', now())
+    VALUES (v_project_id, p_attachment_id, p_actor_id, 'PENDING_REVIEW', now())
     RETURNING id INTO v_review_id;
 
     UPDATE public.attachment_lifecycle_events SET review_id = v_review_id WHERE id = v_event_id;
@@ -596,17 +642,17 @@ $function$;
 -- internal ownership re-verification), so a live authenticated grant would
 -- let any logged-in user withdraw/sensitive-remove any attachment on any
 -- project directly, bypassing the calling server action's ownership check.
-REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) FROM anon;
-REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text) TO service_role;
+REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text, uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text, uuid) FROM anon;
+REVOKE ALL ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text, uuid) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.withdraw_project_attachment(uuid, text, text, text, uuid) TO service_role;
 -- authenticated is deliberately NOT granted execute here: the calling
 -- server action always runs as supabaseAdmin (service role), matching the
 -- existing "all application writes to project_attachments go through
--- supabaseAdmin" convention from migration 025. Ownership/role checks
--- (client owns this project, or admin) are performed in the server action
--- before calling this RPC, exactly like uploadProjectFile/deleteProjectFile
--- already do today.
+-- supabaseAdmin" convention from migration 025. Ownership/role checks are
+-- now performed INSIDE this function against p_actor_id (see above) --
+-- not merely in the server action -- since a service-role-only grant means
+-- RLS/auth.uid() cannot provide any backstop for this call.
 
 -- ============================================================
 -- 11a. reconfirm_bid_post_close(): self-verifying RPC, not a thin wrapper
@@ -625,16 +671,27 @@ GRANT EXECUTE ON FUNCTION public.withdraw_project_attachment(uuid, text, text, t
 -- remains useful as a pre-flight check for a clean error message before
 -- ever reaching the DB, but this function, not that TypeScript function, is
 -- the actual security boundary.
+--
+-- p_actor_id: same reasoning as withdraw_project_attachment -- this
+-- function is invoked via supabaseAdmin (service role, to bypass
+-- project_is_open_for_bidding()-gated RLS once the deadline has passed),
+-- so auth.uid() is always NULL here. The caller supplies p_actor_id from
+-- requireRole()'s authenticated session (never client-submitted form
+-- data), and it is independently re-validated below -- role must be
+-- exactly CONTRACTOR (no ADMIN carve-out for this specific action, per
+-- explicit requirement) and must own the bid -- before being trusted for
+-- anything.
 
-CREATE OR REPLACE FUNCTION public.reconfirm_bid_post_close(p_bid_id uuid)
+DROP FUNCTION IF EXISTS public.reconfirm_bid_post_close(uuid);
+
+CREATE OR REPLACE FUNCTION public.reconfirm_bid_post_close(p_bid_id uuid, p_actor_id uuid)
 RETURNS TABLE (bid_version_id uuid, version_number integer)
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 DECLARE
-  v_role text;
-  v_actor uuid := auth.uid();
+  v_actor_role text;
   v_project_id uuid;
   v_contractor_id uuid;
   v_state text;
@@ -645,9 +702,13 @@ DECLARE
   v_next_version integer;
   v_new_id uuid;
 BEGIN
-  SELECT role::text INTO v_role FROM public.profiles WHERE id = v_actor;
-  IF v_role IS NULL THEN
-    RAISE EXCEPTION 'Not authenticated';
+  -- actor exists and holds exactly the CONTRACTOR role.
+  SELECT role::text INTO v_actor_role FROM public.profiles WHERE id = p_actor_id;
+  IF v_actor_role IS NULL THEN
+    RAISE EXCEPTION 'Actor not found';
+  END IF;
+  IF v_actor_role <> 'CONTRACTOR' THEN
+    RAISE EXCEPTION 'Forbidden: role % is not permitted to reconfirm a bid', v_actor_role;
   END IF;
 
   SELECT b.project_id, b.contractor_id INTO v_project_id, v_contractor_id
@@ -657,10 +718,11 @@ BEGIN
     RAISE EXCEPTION 'Bid not found';
   END IF;
 
-  -- ownership: the calling contractor must own this bid (admin may act on
-  -- any bid, matching the existing site-wide CONTRACTOR/ADMIN convention)
-  IF NOT (v_actor = v_contractor_id OR v_role = 'ADMIN') THEN
-    RAISE EXCEPTION 'Forbidden';
+  -- ownership: the bid must belong to this exact actor. No ADMIN carve-out
+  -- here, per explicit requirement -- unlike withdraw_project_attachment
+  -- and award_project_bid, this action is contractor-only.
+  IF v_contractor_id IS DISTINCT FROM p_actor_id THEN
+    RAISE EXCEPTION 'Forbidden: bid does not belong to this actor';
   END IF;
 
   SELECT state::text, deadline_at, bidding_paused_at, information_revision_number
@@ -729,14 +791,15 @@ $function$;
 -- Same schema-level-default-privilege correction as withdraw_project_
 -- attachment above -- authenticated must be revoked by name, not merely
 -- omitted from an explicit GRANT.
-REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid) FROM anon;
-REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid) FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.reconfirm_bid_post_close(uuid) TO service_role;
+REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid, uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid, uuid) FROM anon;
+REVOKE ALL ON FUNCTION public.reconfirm_bid_post_close(uuid, uuid) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.reconfirm_bid_post_close(uuid, uuid) TO service_role;
 -- service-role only, same reasoning as withdraw_project_attachment: the
 -- calling server action still performs its own pre-flight check (for a
 -- clean error message) before invoking this via supabaseAdmin, but this
--- function is what actually enforces every invariant.
+-- function independently re-verifies every invariant against p_actor_id,
+-- not merely against the caller's app-layer checks.
 
 -- ============================================================
 -- 12. finalize_sensitive_removal(): post-quarantine completion
