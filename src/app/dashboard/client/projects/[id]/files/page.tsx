@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import FileUploader from "./FileUploader";
+import SensitiveRemovalBanner from "./SensitiveRemovalBanner";
 
 export default async function ProjectFilesPage({
   params,
@@ -28,6 +30,24 @@ export default async function ProjectFilesPage({
     .eq("project_id", projectId)
     .is("withdrawn_at", null)
     .order("created_at", { ascending: false });
+
+  // Sensitive-removal reviews this client still needs to act on (or that
+  // are already with ONP for review) -- fetched via supabaseAdmin since
+  // this table has no client-facing RLS SELECT policy (migration 028); the
+  // ownership check already happened via the `project` fetch above.
+  const { data: pendingReviewRows } = await supabaseAdmin
+    .from("attachment_sensitive_removal_reviews")
+    .select("id, attachment_id, status, project_attachments(original_filename)")
+    .eq("project_id", projectId)
+    .in("status", ["PENDING_CLIENT_DECISION", "PENDING_REVIEW"])
+    .order("requested_at", { ascending: true });
+
+  const pendingReviews = (pendingReviewRows ?? []).map((r: any) => ({
+    id: r.id,
+    attachment_id: r.attachment_id,
+    attachment_filename: r.project_attachments?.original_filename ?? "the removed file",
+    status: r.status,
+  }));
 
   return (
     <div style={{ maxWidth: "600px" }}>
@@ -73,6 +93,8 @@ export default async function ProjectFilesPage({
           </Link>
         )}
       </div>
+
+      <SensitiveRemovalBanner projectId={projectId} reviews={pendingReviews} />
 
       {/* Upload component */}
       <FileUploader

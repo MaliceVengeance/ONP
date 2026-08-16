@@ -37,6 +37,7 @@
     "src/lib/postCloseReconfirmation.test.ts",
     "src/lib/withdrawalReasonRouting.test.ts",
     "src/lib/rfiAttachmentPreview.test.ts",
-    "src/lib/attachmentHistoryDisplay.test.ts"
+    "src/lib/attachmentHistoryDisplay.test.ts",
+    "src/lib/sensitiveRemovalDecision.test.ts"
   ]
 }

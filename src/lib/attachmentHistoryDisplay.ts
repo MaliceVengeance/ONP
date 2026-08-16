@@ -22,7 +22,7 @@ export function getHistoryDisplay(status: AttachmentStatus, viewer: ViewerRole, 
   if (status === "SENSITIVE_REMOVAL_PENDING" || status === "SENSITIVE_REMOVED") {
     if (viewer === "CONTRACTOR") {
       return {
-        label: "Removed for a privacy/safety concern",
+        label: "File unavailable — privacy removal",
         showDownloadLink: false,
         showFilename: false,
         showThumbnail: false,

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { uploadProjectFile, deleteProjectFile } from "./actions";
 import WithdrawDialog from "./WithdrawDialog";
@@ -32,6 +33,7 @@ export default function FileUploader({
   const [withdrawTarget, setWithdrawTarget] = useState<Attachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isDraft = projectState === "DRAFT";
+  const router = useRouter();
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -365,6 +367,10 @@ export default function FileUploader({
           onWithdrawn={async () => {
             setWithdrawTarget(null);
             await refreshAttachments();
+            // Sensitive removal may have created a review the client needs
+            // to act on -- that banner lives in the server-rendered page,
+            // so a client-only re-fetch of attachments isn't enough.
+            router.refresh();
           }}
         />
       )}

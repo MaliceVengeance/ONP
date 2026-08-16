@@ -15,6 +15,7 @@ export default function ResolveForm({ projectId, reviewId }: { projectId: string
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,10 +25,15 @@ export default function ResolveForm({ projectId, reviewId }: { projectId: string
     }
     setSubmitting(true);
     setError(null);
+    setNotice(null);
     try {
-      await resolveSensitiveRemoval(projectId, reviewId, resolution, note.trim() || null);
+      const result = await resolveSensitiveRemoval(projectId, reviewId, resolution, note.trim() || null);
+      if (!result.pauseCleared) {
+        setNotice("Resolved, but bidding remains paused — another item on this project is still outstanding (quarantine pending or a separate unresolved review).");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to resolve.");
+    } finally {
       setSubmitting(false);
     }
   }
@@ -60,6 +66,7 @@ export default function ResolveForm({ projectId, reviewId }: { projectId: string
         {submitting ? "Working…" : "Resolve & Clear Pause"}
       </button>
       {error && <div style={{ width: "100%", fontSize: "12px", color: "#991B1B" }}>{error}</div>}
+      {notice && <div style={{ width: "100%", fontSize: "12px", color: "#9A3412" }}>{notice}</div>}
     </form>
   );
 }

@@ -34,19 +34,23 @@ export async function uploadProjectFile(projectId: string, formData: FormData) {
 
   const uploaded = await uploadOneFile(projectId, file);
 
-  const { error: insertErr } = await supabaseAdmin.from("project_attachments").insert({
-    project_id: projectId,
-    storage_object_key: uploaded.key,
-    original_filename: uploaded.originalFilename,
-    mime_type: uploaded.mimeType,
-    file_size_bytes: uploaded.sizeBytes,
-    uploaded_by: user.id,
-    related_rfi_id: null,
-    // information_revision_number intentionally omitted -- the
-    // project_attachments_stamp_and_bump trigger computes it.
-  });
+  const { data: insertedAttachment, error: insertErr } = await supabaseAdmin
+    .from("project_attachments")
+    .insert({
+      project_id: projectId,
+      storage_object_key: uploaded.key,
+      original_filename: uploaded.originalFilename,
+      mime_type: uploaded.mimeType,
+      file_size_bytes: uploaded.sizeBytes,
+      uploaded_by: user.id,
+      related_rfi_id: null,
+      // information_revision_number intentionally omitted -- the
+      // project_attachments_stamp_and_bump trigger computes it.
+    })
+    .select("id")
+    .single();
 
-  if (insertErr) {
+  if (insertErr || !insertedAttachment) {
     // DB write failed after a successful Storage upload -- clean up eagerly
     // rather than leaving an orphan for the (separately scheduled) sweep,
     // since this failure mode is synchronous and immediately known.
@@ -69,6 +73,8 @@ export async function uploadProjectFile(projectId: string, formData: FormData) {
   }
 
   revalidatePath(`/dashboard/client/projects/${projectId}/files`);
+
+  return { attachmentId: insertedAttachment.id as string };
 }
 
 async function notifyCurrentBidders(projectId: string) {
@@ -179,7 +185,8 @@ export async function withdrawProjectFile(
   projectId: string,
   attachmentId: string,
   reasonCode: string,
-  reasonOtherText: string | null
+  reasonOtherText: string | null,
+  isHighRisk: boolean = false
 ) {
   const { supabase, user } = await requireRole(["CLIENT", "ADMIN"]);
 
@@ -212,6 +219,7 @@ export async function withdrawProjectFile(
     // submitted form data. Re-validated independently inside the RPC
     // itself against live database state, not trusted at face value.
     p_actor_id: user.id,
+    p_is_high_risk: isHighRisk,
   });
   if (error) throw new Error(`withdraw_project_attachment failed: ${JSON.stringify(error)}`);
 
@@ -227,6 +235,10 @@ export async function withdrawProjectFile(
     // checks that live status, not object existence) -- this call is only
     // about relocating the bytes and closing the already-issued-signed-URL
     // gap. Any failure here is not user-facing; the cleanup cron retries.
+    // finalize_sensitive_removal (called inside runQuarantineSequence) is
+    // also what clears bidding_paused_at if the client's decision was
+    // already recorded before quarantine finished -- nothing further to do
+    // here either way.
     try {
       await runQuarantineSequence({
         attachmentId,
@@ -239,4 +251,50 @@ export async function withdrawProjectFile(
   }
 
   revalidatePath(`/dashboard/client/projects/${projectId}/files`);
+
+  return {
+    action,
+    reviewId: (result?.review_id as string | undefined) ?? null,
+  };
+}
+
+/**
+ * The client's own routine decision after a sensitive removal: does the
+ * file contain information contractors still need? Handles NOT_NEEDED and
+ * REPLACEMENT_UPLOADED entirely self-service (no admin involvement) via
+ * resolve_sensitive_removal_client_decision, which independently re-derives
+ * everything it needs from live database state -- this action's job is
+ * just authorization and forwarding. UNSURE flips the review to admin-
+ * actionable without clearing the pause; the admin queue picks it up from
+ * there via the existing resolve_bidding_pause path, unchanged.
+ */
+export async function resolveSensitiveRemovalClientDecision(
+  projectId: string,
+  reviewId: string,
+  decision: "NOT_NEEDED" | "REPLACEMENT_UPLOADED" | "UNSURE",
+  replacementAttachmentId: string | null
+) {
+  const { user } = await requireRole(["CLIENT", "ADMIN"]);
+
+  const { data, error } = await supabaseAdmin.rpc("resolve_sensitive_removal_client_decision", {
+    p_project_id: projectId,
+    p_review_id: reviewId,
+    p_actor_id: user.id,
+    p_decision: decision,
+    p_replacement_attachment_id: replacementAttachmentId,
+  });
+  if (error) throw new Error(`resolve_sensitive_removal_client_decision failed: ${JSON.stringify(error)}`);
+
+  const result = Array.isArray(data) ? data[0] : data;
+  if (!result?.ok && !result?.already_handled) {
+    throw new Error("Could not record your decision.");
+  }
+
+  revalidatePath(`/dashboard/client/projects/${projectId}/files`);
+
+  return {
+    alreadyHandled: !!result?.already_handled,
+    newStatus: result?.new_status as string | null,
+    pauseCleared: !!result?.pause_cleared,
+  };
 }

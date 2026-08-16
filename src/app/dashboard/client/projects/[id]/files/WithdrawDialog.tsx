@@ -33,6 +33,7 @@ export default function WithdrawDialog({
 }) {
   const [reasonCode, setReasonCode] = useState("");
   const [reasonOtherText, setReasonOtherText] = useState("");
+  const [isHighRisk, setIsHighRisk] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"choose" | "confirm">("choose");
@@ -54,7 +55,13 @@ export default function WithdrawDialog({
     setSubmitting(true);
     setError(null);
     try {
-      await withdrawProjectFile(projectId, attachmentId, reasonCode, requiresFreeText(reasonCode) ? reasonOtherText.trim() : null);
+      await withdrawProjectFile(
+        projectId,
+        attachmentId,
+        reasonCode,
+        requiresFreeText(reasonCode) ? reasonOtherText.trim() : null,
+        isSensitive ? isHighRisk : false
+      );
       onWithdrawn();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to withdraw file.");
@@ -112,6 +119,15 @@ export default function WithdrawDialog({
               />
             )}
 
+            {isSensitive && (
+              <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#991B1B", marginBottom: "12px", background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: "6px", padding: "10px 12px" }}>
+                <input type="checkbox" checked={isHighRisk} onChange={(e) => setIsHighRisk(e.target.checked)} style={{ marginTop: "2px" }} />
+                <span>
+                  This involves unusually serious information — government ID, financial account details, credentials/passwords, medical information, information about a minor, or similarly high-risk material. (Check this to route directly to an ONP admin review instead of the standard self-service flow.)
+                </span>
+              </label>
+            )}
+
             {error && <div style={{ color: "#991B1B", fontSize: "12px", marginBottom: "12px" }}>{error}</div>}
 
             <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
@@ -131,10 +147,14 @@ export default function WithdrawDialog({
                   This is a sensitive-information removal
                 </div>
                 <ul style={{ fontSize: "12px", color: "#991B1B", margin: 0, paddingLeft: "18px", lineHeight: 1.6 }}>
-                  <li>Contractor access to this file will be revoked going forward.</li>
+                  <li>Contractor access to this file is revoked immediately, before anything else happens.</li>
                   <li>Already-downloaded copies cannot be recalled — this cannot undo any prior access.</li>
-                  <li>Bidding on this project will pause immediately.</li>
-                  <li>An ONP admin review will be required before bidding can resume.</li>
+                  <li>Bidding on this project pauses immediately.</li>
+                  {isHighRisk ? (
+                    <li>Because you flagged this as high-risk, an ONP admin will review it directly.</li>
+                  ) : (
+                    <li>Next, you&apos;ll be asked whether this file contained information contractors still need — most removals are resolved by you, without ONP staff needing to review the file.</li>
+                  )}
                 </ul>
               </div>
             ) : (

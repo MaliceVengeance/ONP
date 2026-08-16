@@ -28,7 +28,7 @@ export async function resolveSensitiveRemoval(
     throw new Error("Please choose a valid resolution.");
   }
 
-  const { error } = await supabase.rpc("resolve_bidding_pause", {
+  const { data, error } = await supabase.rpc("resolve_bidding_pause", {
     p_project_id: projectId,
     p_review_id: reviewId,
     p_resolution_action: resolutionAction,
@@ -37,4 +37,12 @@ export async function resolveSensitiveRemoval(
   if (error) throw wrapErr("rpc.resolve_bidding_pause", error);
 
   revalidatePath("/dashboard/admin/sensitive-removals");
+
+  // resolve_bidding_pause only clears bidding_paused_at if
+  // project_has_unresolved_sensitive_removal() is now false (migration
+  // 030) -- e.g. quarantine still pending on this attachment, or another
+  // review on the same project is still open. Surface that distinction
+  // rather than implying resumption that didn't happen.
+  const row = Array.isArray(data) ? data[0] : data;
+  return { pauseCleared: !!row?.pause_cleared };
 }
