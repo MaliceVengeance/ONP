@@ -450,6 +450,15 @@ GRANT EXECUTE ON FUNCTION public.resolve_sensitive_removal_client_decision(uuid,
 -- actually cleared so the admin UI can say "resolved, but bidding remains
 -- paused -- N other item(s) outstanding" instead of implying resumption
 -- that didn't happen.
+--
+-- CREATE OR REPLACE cannot change a function's return type (RETURNS void
+-- -> RETURNS TABLE(pause_cleared boolean) here) -- confirmed by direct
+-- failure against staging ("cannot change return type of existing
+-- function") before this DROP was added. Explicit drop first, matching the
+-- same pattern already used elsewhere in this migration for signature
+-- changes.
+
+DROP FUNCTION IF EXISTS public.resolve_bidding_pause(uuid, uuid, text, text);
 
 CREATE OR REPLACE FUNCTION public.resolve_bidding_pause(
   p_project_id uuid,
@@ -508,6 +517,12 @@ GRANT EXECUTE ON FUNCTION public.resolve_bidding_pause(uuid, uuid, text, text) T
 -- this is what actually clears the pause when the client's decision was
 -- recorded BEFORE quarantine finished (the ordering the entire fix in this
 -- migration exists to handle).
+--
+-- Same CREATE OR REPLACE return-type restriction as resolve_bidding_pause
+-- above -- explicit drop first (this function's RETURNS TABLE column list
+-- is changing, adding pause_cleared).
+
+DROP FUNCTION IF EXISTS public.finalize_sensitive_removal(uuid, text);
 
 CREATE OR REPLACE FUNCTION public.finalize_sensitive_removal(
   p_attachment_id uuid,
