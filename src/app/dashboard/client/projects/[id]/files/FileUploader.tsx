@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 import { createBrowserClient } from "@supabase/ssr";
 import { uploadProjectFile, deleteProjectFile } from "./actions";
+import WithdrawDialog from "./WithdrawDialog";
 
 type Attachment = {
   id: string;
@@ -27,6 +29,7 @@ export default function FileUploader({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [withdrawTarget, setWithdrawTarget] = useState<Attachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isDraft = projectState === "DRAFT";
 
@@ -304,7 +307,7 @@ export default function FileUploader({
                   >
                     View
                   </button>
-                  {isDraft && (
+                  {isDraft ? (
                     <button
                       onClick={() => handleDelete(a.id)}
                       disabled={deleting === a.id}
@@ -321,6 +324,22 @@ export default function FileUploader({
                     >
                       {deleting === a.id ? "…" : "Delete"}
                     </button>
+                  ) : (
+                    <button
+                      onClick={() => setWithdrawTarget(a)}
+                      style={{
+                        background: "#FFF7ED",
+                        color: "#9A3412",
+                        border: "1px solid #FDBA74",
+                        padding: "5px 12px",
+                        borderRadius: "6px",
+                        fontFamily: "'Barlow', sans-serif",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Withdraw File
+                    </button>
                   )}
                 </div>
               </div>
@@ -328,6 +347,27 @@ export default function FileUploader({
           </div>
         )}
       </div>
+
+      {!isDraft && (
+        <div style={{ marginTop: "12px", textAlign: "right" }}>
+          <Link href={`/dashboard/client/projects/${projectId}/files/history`} style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
+            View Bid Information History →
+          </Link>
+        </div>
+      )}
+
+      {withdrawTarget && (
+        <WithdrawDialog
+          projectId={projectId}
+          attachmentId={withdrawTarget.id}
+          filename={withdrawTarget.original_filename}
+          onClose={() => setWithdrawTarget(null)}
+          onWithdrawn={async () => {
+            setWithdrawTarget(null);
+            await refreshAttachments();
+          }}
+        />
+      )}
     </div>
   );
 }

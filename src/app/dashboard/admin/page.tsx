@@ -23,6 +23,7 @@ export default async function AdminDashboard() {
     { count: dismissalPendingCount },
     { count: problemReportOpenCount },
     { count: subscriptionDisputeOpenCount },
+    { count: sensitiveRemovalPendingCount },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
     supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
@@ -42,6 +43,7 @@ export default async function AdminDashboard() {
     supabaseAdmin.from("bid_dismissals").select("id", { count: "exact", head: true }).eq("moderation_status", "pending_review"),
     supabaseAdmin.from("problem_reports").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
     supabaseAdmin.from("subscription_disputes").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
+    supabaseAdmin.from("attachment_sensitive_removal_reviews").select("id", { count: "exact", head: true }).eq("status", "PENDING_REVIEW"),
   ]);
 
   const dirPendingCount = (dirCandidates ?? []).filter(
@@ -114,6 +116,14 @@ export default async function AdminDashboard() {
       stat: subscriptionDisputeOpenCount ?? 0,
       statLabel: "open disputes",
       accent: (subscriptionDisputeOpenCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
+    },
+    {
+      title: "Sensitive-Removal Reviews",
+      description: "Client-initiated sensitive-file removals that pause bidding until an admin resolves the review.",
+      href: "/dashboard/admin/sensitive-removals",
+      stat: sensitiveRemovalPendingCount ?? 0,
+      statLabel: "pending review",
+      accent: (sensitiveRemovalPendingCount ?? 0) > 0 ? "var(--camo-accent)" : "var(--camo-gunmetal)",
     },
     {
       title: "Support Requests",

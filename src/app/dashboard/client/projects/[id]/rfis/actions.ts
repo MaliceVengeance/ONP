@@ -94,6 +94,14 @@ export async function respondToRfi(
     if (validationError) throw new Error(validationError);
   }
 
+  // Server independently requires the acknowledgment flag whenever
+  // attachments are present -- never trusts a disabled client button alone.
+  if (attachedFiles.length > 0 && formData.get("attachments_acknowledged") !== "true") {
+    throw new Error(
+      "You must confirm you understand these attachments will become part of the published project information before submitting."
+    );
+  }
+
   // Fetch RFI details before updating
   const { data: rfi } = await supabase
     .from("rfis")

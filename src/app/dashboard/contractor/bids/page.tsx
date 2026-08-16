@@ -3,6 +3,8 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge, projectStateLabel } from "@/lib/ui";
 import HoverCard from "@/components/HoverCard";
+import ReconfirmButton from "./ReconfirmButton";
+import { isPostCloseReconfirmationAllowed } from "@/lib/postCloseReconfirmation";
 
 type MyBidRow = {
   project_id: string;
@@ -83,6 +85,41 @@ export default async function ContractorMyBidsPage() {
   // Stats
   const totalBidValue = bids.reduce((sum, b) => sum + Number(b.latest_amount_cents), 0);
   const wonCount = awarded.length;
+
+  // Post-close reconfirmation eligibility: only ever evaluated for OPEN-state
+  // bids whose deadline has already elapsed and are not awarded -- reuses
+  // the same allowlist enforced server-side by reconfirm_bid_post_close, so
+  // this button is only ever shown where the action would actually succeed.
+  const candidateBids = openBids.filter((b) => {
+    const deadline = b.deadline_at ? new Date(b.deadline_at) : null;
+    return deadline && deadline.getTime() <= Date.now() && !awardedBidIds.has(b.project_id);
+  });
+  const reconfirmAllowedBidIds = new Set<string>();
+  if (candidateBids.length > 0) {
+    const projectIds = [...new Set(candidateBids.map((b) => b.project_id))];
+    const [{ data: projectRows }, { data: versionRows }] = await Promise.all([
+      supabaseAdmin.from("projects").select("id, state, deadline_at, bidding_paused_at, information_revision_number").in("id", projectIds),
+      supabaseAdmin.from("bid_versions").select("bid_id, acknowledged_information_revision, version_number").in("bid_id", candidateBids.map((b) => b.bid_id)).order("version_number", { ascending: false }),
+    ]);
+    const projectById = new Map((projectRows ?? []).map((p: any) => [p.id, p]));
+    const latestAckByBid = new Map<string, number | null>();
+    for (const v of versionRows ?? []) {
+      if (!latestAckByBid.has((v as any).bid_id)) latestAckByBid.set((v as any).bid_id, (v as any).acknowledged_information_revision);
+    }
+    for (const b of candidateBids) {
+      const project = projectById.get(b.project_id);
+      if (!project) continue;
+      const gate = isPostCloseReconfirmationAllowed({
+        state: project.state,
+        deadlineAt: project.deadline_at,
+        isAwarded: false,
+        biddingPausedAt: project.bidding_paused_at,
+        acknowledgedInformationRevision: latestAckByBid.get(b.bid_id) ?? null,
+        liveInformationRevision: project.information_revision_number,
+      });
+      if (gate.allowed) reconfirmAllowedBidIds.add(b.bid_id);
+    }
+  }
 
   return (
     <div>
@@ -283,7 +320,7 @@ export default async function ContractorMyBidsPage() {
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {openBids.map((b) => (
-                  <BidCard key={b.bid_id} b={b} isWon={awardedBidIds.has(b.project_id)} />
+                  <BidCard key={b.bid_id} b={b} isWon={awardedBidIds.has(b.project_id)} canReconfirm={reconfirmAllowedBidIds.has(b.bid_id)} />
                 ))}
               </div>
             </div>
@@ -317,12 +354,13 @@ export default async function ContractorMyBidsPage() {
   );
 }
 
-function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
+function BidCard({ b, isWon, canReconfirm = false }: { b: MyBidRow; isWon: boolean; canReconfirm?: boolean }) {
   const deadline = b.deadline_at ? new Date(b.deadline_at) : null;
   const deadlinePassed = !!deadline && deadline.getTime() <= Date.now();
   const isOpen = b.project_state === "OPEN";
 
   return (
+    <div>
     <Link href={`/dashboard/contractor/projects/${b.project_id}`} style={{ textDecoration: "none" }}>
       <HoverCard style={{
         background: "var(--camo-concrete)",
@@ -380,5 +418,11 @@ function BidCard({ b, isWon }: { b: MyBidRow; isWon: boolean }) {
         </div>
       </HoverCard>
     </Link>
+    {canReconfirm && (
+      <div style={{ marginTop: "8px" }}>
+        <ReconfirmButton bidId={b.bid_id} />
+      </div>
+    )}
+    </div>
   );
 }

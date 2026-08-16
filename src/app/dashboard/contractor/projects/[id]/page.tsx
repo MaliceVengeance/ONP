@@ -627,6 +627,11 @@ export default async function ContractorProjectDetail({
               />
             ))}
           </div>
+          <div style={{ marginTop: "10px", textAlign: "right" }}>
+            <Link href={`/dashboard/contractor/projects/${projectId}/history`} style={{ fontSize: "12px", color: "var(--camo-steel)" }}>
+              View Bid Information History →
+            </Link>
+          </div>
         </div>
       )}
 

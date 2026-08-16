@@ -34,6 +34,9 @@
     "src/app/dashboard/client/projects/[id]/files/uploadPipeline.test.ts",
     "src/lib/isNextRedirectError.test.ts",
     "src/lib/isOpenEndedRfiPrompt.test.ts",
-    "src/lib/postCloseReconfirmation.test.ts"
+    "src/lib/postCloseReconfirmation.test.ts",
+    "src/lib/withdrawalReasonRouting.test.ts",
+    "src/lib/rfiAttachmentPreview.test.ts",
+    "src/lib/attachmentHistoryDisplay.test.ts"
   ]
 }
