@@ -37,7 +37,9 @@ export default async function ProjectFilesPage({
   // ownership check already happened via the `project` fetch above.
   const { data: pendingReviewRows } = await supabaseAdmin
     .from("attachment_sensitive_removal_reviews")
-    .select("id, attachment_id, status, project_attachments(original_filename)")
+    .select(
+      "id, attachment_id, status, project_attachments!attachment_sensitive_removal_reviews_attachment_id_fkey(original_filename)"
+    )
     .eq("project_id", projectId)
     .in("status", ["PENDING_CLIENT_DECISION", "PENDING_REVIEW"])
     .order("requested_at", { ascending: true });
