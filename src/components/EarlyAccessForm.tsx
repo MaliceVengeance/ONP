@@ -12,10 +12,14 @@ const ROLE_LABELS: Record<EarlyAccessRole, string> = {
   PROPERTY_MANAGER: "Property Manager / Developer",
 };
 
+// Category codes that are acronyms and must stay fully uppercase rather
+// than being Title Cased like every other word (e.g. "HVAC", not "Hvac").
+const ACRONYM_WORDS = new Set(["HVAC"]);
+
 function formatCategoryLabel(cat: string): string {
   return cat
     .split("_")
-    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+    .map((w) => (ACRONYM_WORDS.has(w) ? w : w.charAt(0) + w.slice(1).toLowerCase()))
     .join(" ");
 }
 
