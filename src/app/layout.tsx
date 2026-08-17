@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import ReportProblemButton from "@/components/ReportProblemButton";
+import DemoModeBanner from "@/components/DemoModeBanner";
 import { PRODUCTION_SITE_URL } from "@/lib/siteUrl";
 import "./globals.css";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <GoogleAnalytics />
+        <DemoModeBanner />
         {children}
         <ReportProblemButton />
       </body>

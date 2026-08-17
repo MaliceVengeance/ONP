@@ -5,6 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "dev:staging": "dotenv -e .env.staging.local -- next dev",
+    "dev:demo": "dotenv -e .env.demo.local -- next dev",
+    "demo:seed": "dotenv -e .env.demo.local -- node scripts/demo/seed.ts",
+    "demo:reset": "dotenv -e .env.demo.local -- node scripts/demo/reset.ts",
+    "demo:reveal": "dotenv -e .env.demo.local -- node scripts/demo/reveal.ts",
+    "demo:award": "dotenv -e .env.demo.local -- node scripts/demo/award.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
