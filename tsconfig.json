@@ -38,6 +38,7 @@
     "src/lib/withdrawalReasonRouting.test.ts",
     "src/lib/rfiAttachmentPreview.test.ts",
     "src/lib/attachmentHistoryDisplay.test.ts",
-    "src/lib/sensitiveRemovalDecision.test.ts"
+    "src/lib/sensitiveRemovalDecision.test.ts",
+    "src/lib/earlyAccess/normalize.test.ts"
   ]
 }

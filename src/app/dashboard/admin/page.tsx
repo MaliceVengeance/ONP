@@ -24,6 +24,7 @@ export default async function AdminDashboard() {
     { count: problemReportOpenCount },
     { count: subscriptionDisputeOpenCount },
     { count: sensitiveRemovalPendingCount },
+    { count: earlyAccessCount },
   ] = await Promise.all([
     supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
     supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
@@ -44,6 +45,7 @@ export default async function AdminDashboard() {
     supabaseAdmin.from("problem_reports").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
     supabaseAdmin.from("subscription_disputes").select("id", { count: "exact", head: true }).eq("status", "OPEN"),
     supabaseAdmin.from("attachment_sensitive_removal_reviews").select("id", { count: "exact", head: true }).eq("status", "PENDING_REVIEW"),
+    supabaseAdmin.from("early_access_signups").select("id", { count: "exact", head: true }),
   ]);
 
   const dirPendingCount = (dirCandidates ?? []).filter(
@@ -187,6 +189,14 @@ export default async function AdminDashboard() {
       href: "/dashboard/admin/coupons",
       stat: null,
       statLabel: "promo codes",
+      accent: "var(--camo-gunmetal)",
+    },
+    {
+      title: "Early Access",
+      description: "Pre-launch demand-validation signups from the Coming Soon landing page.",
+      href: "/dashboard/admin/early-access",
+      stat: earlyAccessCount ?? 0,
+      statLabel: "total signups",
       accent: "var(--camo-gunmetal)",
     },
     {

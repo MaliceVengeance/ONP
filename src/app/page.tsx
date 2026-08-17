@@ -3,14 +3,27 @@ import Link from "next/link";
 import { CamoCanvas } from "@/components/CamoCanvas";
 import { SealedBidReveal } from "@/components/SealedBidReveal";
 import { MarketingHeader, MarketingFooter, ServiceAreaBanner } from "@/components/MarketingChrome";
+import ComingSoonPage from "@/components/ComingSoonPage";
 import { buildPageMetadata } from "@/lib/pageMetadata";
 
-export const metadata = buildPageMetadata({
-  title: "Our Next Project — Sealed-Bid Contractor Marketplace",
-  description:
-    "Post a project, get sealed bids, and choose contractors through a documented, transparent bidding process. Currently serving El Paso, TX and Las Cruces, NM.",
-  path: "/",
-});
+// Server-only — never NEXT_PUBLIC_. The launch gate is controlled entirely
+// by middleware/server rendering (see src/middleware.ts for the second,
+// independent read point); no client code needs this value.
+const LAUNCH_GATE_ENABLED = process.env.LAUNCH_GATE_ENABLED === "true";
+
+export const metadata = LAUNCH_GATE_ENABLED
+  ? buildPageMetadata({
+      title: "Our Next Project — Public Launch Coming Soon",
+      description:
+        "ONP is putting the finishing touches on its public launch. Join the Early Access List to be notified when access opens in your area.",
+      path: "/",
+    })
+  : buildPageMetadata({
+      title: "Our Next Project — Sealed-Bid Contractor Marketplace",
+      description:
+        "Post a project, get sealed bids, and choose contractors through a documented, transparent bidding process. Currently serving El Paso, TX and Las Cruces, NM.",
+      path: "/",
+    });
 
 const btnPrimary: React.CSSProperties = {
   fontFamily: "'Barlow Condensed', sans-serif",
@@ -64,6 +77,13 @@ const categoryTiles = [
 ];
 
 export default function HomePage() {
+  if (LAUNCH_GATE_ENABLED) {
+    return <ComingSoonPage />;
+  }
+  return <ExistingHomePage />;
+}
+
+function ExistingHomePage() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--camo-paper)", color: "var(--camo-ink)", fontFamily: "'Barlow', sans-serif" }}>
       <MarketingHeader />

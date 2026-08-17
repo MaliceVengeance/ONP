@@ -88,6 +88,7 @@ export default function PrivacyLegalPage() {
             <li style={liStyle}><strong>(e) Messages and Communications.</strong> Content of messages exchanged through the Platform, communications with ONP, and content of reviews and ratings.</li>
             <li style={liStyle}><strong>(f) Payment Information.</strong> Card data is collected and processed by <strong>Stripe, Inc.</strong> ONP receives only a limited token (card brand, last four digits, transaction status) and does not store full card numbers.</li>
             <li style={liStyle}><strong>(g) Support and Correspondence.</strong> Information provided when contacting support@ournextproject.us.</li>
+            <li style={liStyle}><strong>(h) Early Access List.</strong> If you join our Early Access List prior to creating an account, we collect your email address, ZIP code, and selected role (Client/Homeowner, Contractor, or Property Manager/Developer), and, where applicable, your primary contractor trade.</li>
           </ul>
           <h3 style={h3Style}>1.2 Information Collected Automatically</h3>
           <ul style={{ paddingLeft: "24px", marginBottom: "12px" }}>
@@ -127,6 +128,7 @@ export default function PrivacyLegalPage() {
                   ["Internet / network activity", "Browsing, usage, cookie data", "Automatic", "Analytics, security, advertising"],
                   ["Geolocation (approximate)", "IP-derived location", "Automatic", "Service localization, fraud prevention"],
                   ["Professional information", "License, insurance, BBB, CVOB", "You, third parties", "Verification, badge display"],
+                  ["Early Access interest", "Email, ZIP code, role, contractor trade (if provided)", "You", "Launch notification, demand analysis"],
                   ["Inferences", "Engagement preferences", "Derived", "Personalization, marketing"],
                   ["Sensitive (limited)", "Veteran status (where claimed)", "You, CVOB registry", "CVOB badge display only"],
                 ].map(([cat, ex, src, purp], i) => (
@@ -205,6 +207,7 @@ export default function PrivacyLegalPage() {
           <p style={pStyle}><strong>5.1 Transactional Communications.</strong> Communications regarding your account, security, payments, Bids, Awards, and Inspections are integral to the Service and are not subject to marketing opt-out while you maintain an account.</p>
           <p style={pStyle}><strong>5.2 Marketing Communications.</strong> You may opt out at any time by using the unsubscribe link in any marketing email or by contacting support@ournextproject.us.</p>
           <p style={pStyle}><strong>5.3 SMS/Text Communications.</strong> If you opt in to receive text messages, message and data rates may apply. Reply STOP to opt out.</p>
+          <p style={pStyle}><strong>5.4 Early Access Notifications.</strong> If you join the Early Access List, you consent to receive email communications from ONP notifying you when the Platform becomes available in your area. If you separately opt in to receive additional communications from ONP, you may unsubscribe from those additional communications at any time using the unsubscribe mechanism provided in those messages. ONP will send electronic communications in accordance with applicable law.</p>
         </div>
 
         {/* Section 6 */}

@@ -29,10 +29,34 @@ const STATIC_ROUTES: Array<{
   { path: "/contractor-bid-disclaimer", changeFrequency: "yearly", priority: 0.2 },
 ];
 
+// Server-only — never NEXT_PUBLIC_. Mirrors the same flag read in
+// src/middleware.ts and src/app/page.tsx.
+const LAUNCH_GATE_ENABLED = process.env.LAUNCH_GATE_ENABLED === "true";
+
+// Paths that 307-redirect to "/" while the launch gate is on (see
+// src/middleware.ts's LAUNCH_GATED_PATHS) — a redirecting URL in a
+// sitemap is a minor quality signal worth avoiding, so these are
+// filtered out here automatically rather than requiring a manual edit
+// that has to be remembered and reverted at real launch.
+const GATED_MARKETING_PATHS = new Set([
+  "/why-onp",
+  "/for-contractors",
+  "/for-property-managers",
+  "/contractors",
+  "/about",
+  "/trust",
+  "/help/bids",
+  "/help/contractor-bids",
+]);
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  return STATIC_ROUTES.map((route) => ({
+  const routes = LAUNCH_GATE_ENABLED
+    ? STATIC_ROUTES.filter((route) => !GATED_MARKETING_PATHS.has(route.path))
+    : STATIC_ROUTES;
+
+  return routes.map((route) => ({
     url: `${PRODUCTION_SITE_URL}${route.path === "/" ? "" : route.path}`,
     lastModified,
     changeFrequency: route.changeFrequency,

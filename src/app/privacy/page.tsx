@@ -85,6 +85,7 @@ export default function PrivacyPage() {
             <li style={liStyle}><strong>Reviews and ratings:</strong> what you say about other users.</li>
             <li style={liStyle}><strong>Payment info:</strong> your card or bank info goes to Stripe, not us. We just get back enough to know the payment worked.</li>
             <li style={liStyle}><strong>Support requests:</strong> anything you send to support@ournextproject.us.</li>
+            <li style={liStyle}><strong>Early Access List:</strong> if you join our Early Access List before creating an account, we collect your email, ZIP code, and whether you&apos;re a homeowner/client, contractor, or property manager — plus your trade, if you&apos;re a contractor. We use this to tell you when ONP is available in your area.</li>
           </ul>
           <p style={subheadStyle}>We collect automatically:</p>
           <ul style={{ paddingLeft: "24px", marginBottom: "12px" }}>
@@ -112,6 +113,7 @@ export default function PrivacyPage() {
             <li style={liStyle}>Match clients and contractors and process Bids</li>
             <li style={liStyle}>Process payments through Stripe</li>
             <li style={liStyle}>Send transactional emails (account, billing, project notifications)</li>
+            <li style={liStyle}>Notify Early Access List members when the Platform becomes available in their area</li>
             <li style={liStyle}>Send marketing emails about ONP news, features, and updates (you can opt out anytime)</li>
             <li style={liStyle}>Show ads on the Platform</li>
             <li style={liStyle}>Detect fraud, abuse, and violations of our Terms</li>
@@ -151,6 +153,7 @@ export default function PrivacyPage() {
           <ul style={{ paddingLeft: "24px" }}>
             <li style={liStyle}><strong>Transactional emails</strong> (account, payment, project alerts): part of using ONP — you can&apos;t opt out while you have an account.</li>
             <li style={liStyle}><strong>News and updates:</strong> unsubscribe anytime via the link in those emails or by emailing support@ournextproject.us.</li>
+            <li style={liStyle}><strong>Early Access launch notice:</strong> If you join the Early Access List, you agree that ONP may email you to let you know when access becomes available in your area. If you also choose to receive additional ONP updates, you can unsubscribe from those additional communications at any time.</li>
           </ul>
         </div>
 
