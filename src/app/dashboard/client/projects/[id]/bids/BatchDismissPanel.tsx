@@ -4,7 +4,7 @@ import { useState } from "react";
 import { batchDismissBids } from "./actions";
 
 type Reason = { code: string; label: string };
-type Candidate = { bidId: string; displayIndex: number; amountLabel: string };
+type Candidate = { bidId: string; displayIndex: number; amountLabel: string; businessName: string | null };
 
 const inputStyle = {
   width: "100%",
@@ -84,7 +84,7 @@ export default function BatchDismissPanel({
               onChange={() => toggle(c.bidId)}
               style={{ accentColor: "#991B1B" }}
             />
-            <span style={{ flex: 1 }}>Bid #{c.displayIndex}</span>
+            <span style={{ flex: 1 }}>Bid #{c.displayIndex} — {c.businessName ?? "Unnamed business"}</span>
             <span style={{ fontWeight: 600 }}>{c.amountLabel}</span>
           </label>
         ))}

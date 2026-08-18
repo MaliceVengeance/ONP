@@ -551,7 +551,8 @@ export default async function ClientProjectBidsPage({
             </form>
 
             <p style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "12px" }}>
-              Bids are anonymous. Contractor identities are revealed only after award.
+              Contractor identities are shown below now that bidding has closed. Your contact information
+              stays private until you award a bid — only the winning contractor will receive it.
             </p>
           </div>
 
@@ -587,6 +588,7 @@ export default async function ClientProjectBidsPage({
                 bidId: b.bid_id,
                 displayIndex: bids.indexOf(b) + 1,
                 amountLabel: centsToMoney(b.amount_cents),
+                businessName: contractorMap.get(b.bid_id)?.business_name ?? null,
               }))}
           />
 
@@ -648,6 +650,22 @@ export default async function ClientProjectBidsPage({
                             </span>
                           )}
                         </div>
+                        {contractor && (
+                          <div style={{
+                            fontFamily: "'Barlow Condensed', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            color: "var(--camo-charcoal)",
+                            marginBottom: "2px",
+                          }}>
+                            {contractor.business_name ?? "Unnamed business"}
+                            {[contractor.city, contractor.state].filter(Boolean).length > 0 && (
+                              <span style={{ fontFamily: "'Barlow', sans-serif", fontWeight: 400, fontSize: "12px", color: "var(--camo-gunmetal)" }}>
+                                {" "}· {[contractor.city, contractor.state].filter(Boolean).join(", ")}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
                           Submitted: {new Date(b.submitted_at).toLocaleString()}
                         </div>
@@ -844,10 +862,11 @@ export default async function ClientProjectBidsPage({
                               .map((ob) => ({
                                 bidId: ob.bid_id,
                                 displayIndex: bids.indexOf(ob) + 1,
+                                businessName: contractorMap.get(ob.bid_id)?.business_name ?? null,
                               }))}
                           />
                           <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "6px" }}>
-                            Reveals contractor identity for this bid only.
+                            Shares your contact information with this contractor.
                           </p>
                         </>
                       ) : isAwarded ? (
@@ -934,6 +953,7 @@ export default async function ClientProjectBidsPage({
                 {dismissedBids.map((b) => {
                   const idx = bids.indexOf(b);
                   const d = dismissalMap.get(b.bid_id)!;
+                  const dismissedContractor = contractorMap.get(b.bid_id);
                   const reasonDelivered = d.reason_code === "OTHER"
                     ? (d.moderation_status === "not_applicable" || d.moderation_status === "approved" ? d.reason_other_text : null)
                     : (d.reason_code ? reasonLabelMap.get(d.reason_code) ?? d.reason_code : null);
@@ -944,6 +964,11 @@ export default async function ClientProjectBidsPage({
                           <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "14px", color: "var(--camo-gunmetal)", textTransform: "uppercase" }}>
                             Bid #{idx + 1} — Dismissed
                           </div>
+                          {dismissedContractor && (
+                            <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>
+                              {dismissedContractor.business_name ?? "Unnamed business"}
+                            </div>
+                          )}
                           <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>
                             {new Date(d.dismissed_at).toLocaleDateString()}
                             {reasonDelivered && ` · ${reasonDelivered}`}

@@ -6,6 +6,7 @@ import { awardBid, type BidReview } from "./actions";
 type OtherBid = {
   bidId: string;
   displayIndex: number;
+  businessName: string | null;
 };
 
 const inputStyle = {
@@ -254,7 +255,7 @@ export default function AwardButton({
                 <option value="">— Skip —</option>
                 {rank2Options.map((b) => (
                   <option key={b.bidId} value={b.bidId}>
-                    Bid #{b.displayIndex}
+                    Bid #{b.displayIndex} — {b.businessName ?? "Unnamed business"}
                   </option>
                 ))}
               </select>
@@ -301,7 +302,7 @@ export default function AwardButton({
                 <option value="">— Skip —</option>
                 {rank3Options.map((b) => (
                   <option key={b.bidId} value={b.bidId}>
-                    Bid #{b.displayIndex}
+                    Bid #{b.displayIndex} — {b.businessName ?? "Unnamed business"}
                   </option>
                 ))}
               </select>
@@ -362,7 +363,7 @@ export default function AwardButton({
       </div>
 
       <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "10px" }}>
-        Awarding reveals the contractor&apos;s identity. This action cannot be undone.{" "}
+        Awarding shares your contact information with the winning contractor. This action cannot be undone.{" "}
         <a href="/bid-disclaimer" target="_blank" style={{ color: "var(--camo-gunmetal)" }}>
           Read full bid disclaimer →
         </a>
