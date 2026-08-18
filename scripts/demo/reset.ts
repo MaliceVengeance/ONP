@@ -35,6 +35,13 @@ export async function resetDemoData(admin: SupabaseClient): Promise<void> {
   const projectIds = (projectRows ?? []).map((p) => p.id as string);
 
   for (const projectId of projectIds) {
+    // enforce_published_qa_lock (migration 023) refuses to INSERT, UPDATE,
+    // or DELETE any contractor_id-IS-NULL rfis row once the project has
+    // left DRAFT — including on delete, which blocked cleanup of a
+    // published demo project's pre-publish Q&A. Reverting to DRAFT first
+    // (the project is being torn down anyway) lets that delete proceed.
+    check("revert project to DRAFT for rfi cleanup", (await admin.from("projects").update({ state: "DRAFT" }).eq("id", projectId)).error);
+
     const { data: bidRows, error: bidFindError } = await admin.from("bids").select("id").eq("project_id", projectId);
     check("find bids", bidFindError);
     const bidIds = (bidRows ?? []).map((b) => b.id as string);

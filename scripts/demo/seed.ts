@@ -6,7 +6,14 @@
 import { assertDemoEnvironment } from "./assertDemoEnvironment.ts";
 import { buildDemoAdminClient, findUserIdByEmail } from "./supabaseAdminClient.ts";
 import { resetDemoData } from "./reset.ts";
-import { DEMO_CLIENT, DEMO_CONTRACTORS, DEMO_PROJECT, DEMO_RFIS, DEMO_BIDS } from "./data.ts";
+import {
+  DEMO_CLIENT,
+  DEMO_CONTRACTORS,
+  DEMO_PROJECT,
+  DEMO_PREPUBLISH_ANSWERS,
+  DEMO_RFIS,
+  DEMO_BIDS,
+} from "./data.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SEED_DEADLINE_DAYS_FROM_NOW = 7; // sealed by default right after seeding
@@ -92,30 +99,47 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
         state: c.state,
         address_zip: c.serviceAreaZip,
         phone: c.phone,
-        license_number: c.licenseNumber,
-        license_expiry: c.licenseExpiry,
-        coi_provider: c.coiProvider,
-        coi_policy_number: c.coiPolicyNumber,
-        coi_expiry: c.coiExpiry,
-        coi_amount: c.coiAmount,
+        license_number: c.primaryLicenseNumber,
+        license_expiry: c.primaryLicenseExpiry,
         directory_verified: c.directoryVerified,
         is_listed: true,
+        bbb_url: c.bbbUrl,
+        veteran_verified: c.veteranVerified,
+        military_branch: c.militaryBranch,
+        description: c.description,
       },
       { onConflict: "contractor_id" }
     );
     if (cpError) throw new Error(`contractor_profiles upsert(${c.email}) failed: ${cpError.message}`);
 
-    const { error: credError } = await admin.from("contractor_credentials").insert({
-      contractor_id: id,
-      credential_type: "STATE_LICENSE",
-      state: c.state,
-      credential_number: c.licenseNumber,
-      issuing_authority: `${c.state} Licensing Board (placeholder)`,
-      trade: c.categories[0] ?? null,
-      expiration_date: c.licenseExpiry,
-      verified: true,
-    });
-    if (credError) throw new Error(`contractor_credentials insert(${c.email}) failed: ${credError.message}`);
+    // Detailed "Licenses, Registrations & Bonding" rows — only what's
+    // explicitly earned per the canonical brief. No STATE_LICENSE row is
+    // fabricated for contractors whose trade doesn't require a TX general
+    // license (see report).
+    for (const cred of c.credentials) {
+      const { error: credError } = await admin.from("contractor_credentials").insert({
+        contractor_id: id,
+        credential_type: cred.credentialType,
+        state: cred.state ?? null,
+        city: cred.city ?? null,
+        credential_number: cred.credentialNumber ?? null,
+        issuing_authority: cred.issuingAuthority ?? null,
+        trade: cred.trade ?? null,
+        expiration_date: cred.expirationDate ?? null,
+        verified: true,
+      });
+      if (credError) throw new Error(`contractor_credentials insert(${c.email}) failed: ${credError.message}`);
+    }
+
+    if (c.bonded) {
+      const { error: bondError } = await admin.from("contractor_credentials").insert({
+        contractor_id: id,
+        credential_type: "BOND",
+        state: c.state,
+        verified: true,
+      });
+      if (bondError) throw new Error(`contractor_credentials (BOND) insert(${c.email}) failed: ${bondError.message}`);
+    }
 
     const now = new Date();
     const oneYearOut = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
@@ -133,22 +157,29 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
   }
 
   // --- Project --------------------------------------------------------
+  // Inserted as DRAFT first: a real trigger (enforce_published_qa_lock,
+  // migration 023) refuses to write contractor_id-IS-NULL rfis rows once a
+  // project leaves DRAFT state ("Published project Q&A cannot be modified
+  // after publication"). The pre-publish Q&A must be seeded before
+  // publishing, exactly like the real client flow (answer questions, then
+  // publish) — discovered empirically when the first attempt at inserting
+  // directly as OPEN was rejected by this trigger.
   const now = new Date();
   const deadlineAt = new Date(now.getTime() + SEED_DEADLINE_DAYS_FROM_NOW * 24 * 60 * 60 * 1000);
+  const targetStartDate = new Date(now.getTime() + DEMO_PROJECT.targetStartDaysFromNow * 24 * 60 * 60 * 1000);
   const { data: projectRow, error: projectError } = await admin
     .from("projects")
     .insert({
       client_id: clientId,
-      state: "OPEN",
+      state: "DRAFT",
       title: DEMO_PROJECT.title,
       category: DEMO_PROJECT.category,
       description: DEMO_PROJECT.description,
       city: DEMO_PROJECT.city,
       zip_code: DEMO_PROJECT.zipCode,
-      published_at: now.toISOString(),
-      deadline_at: deadlineAt.toISOString(),
       min_open_days: DEMO_PROJECT.minOpenDays,
       max_open_days: DEMO_PROJECT.maxOpenDays,
+      target_start_date: targetStartDate.toISOString().slice(0, 10),
     })
     .select("id, information_revision_number")
     .single();
@@ -157,7 +188,48 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
   }
   const projectId = projectRow.id as string;
 
-  // --- RFIs -------------------------------------------------------------
+  // --- Pre-publish client Q&A (contractor_id IS NULL) --------------------
+  // Rendered on the client's own project page as "PROJECT QUESTIONS" — the
+  // answers bidders saw when the project was published. Must be written
+  // while the project is still DRAFT (see note above).
+  for (const item of DEMO_PREPUBLISH_ANSWERS) {
+    const { data: catalogRow, error: catalogError } = await admin
+      .from("rfi_catalog")
+      .select("id")
+      .eq("code", item.catalogCode)
+      .single();
+    if (catalogError || !catalogRow) {
+      throw new Error(
+        `rfi_catalog lookup for code="${item.catalogCode}" failed: ${catalogError?.message ?? "not found"} ` +
+          `(run migration 026 against this demo project if rfi_catalog is empty)`
+      );
+    }
+    const { error: answerError } = await admin.from("rfis").insert({
+      project_id: projectId,
+      contractor_id: null,
+      revision_number: 1,
+      catalog_id: catalogRow.id,
+      question: null,
+      status: "ANSWERED",
+      response: item.answer,
+      responded_at: now.toISOString(),
+      responded_by: clientId,
+    });
+    if (answerError) throw new Error(`pre-publish rfis insert failed: ${answerError.message}`);
+  }
+
+  // --- Publish -------------------------------------------------------------
+  const { error: publishError } = await admin
+    .from("projects")
+    .update({
+      state: "OPEN",
+      published_at: now.toISOString(),
+      deadline_at: deadlineAt.toISOString(),
+    })
+    .eq("id", projectId);
+  if (publishError) throw new Error(`project publish failed: ${publishError.message}`);
+
+  // --- Canonical contractor-initiated RFIs --------------------------------
   for (const rfi of DEMO_RFIS) {
     const { data: catalogRow, error: catalogError } = await admin
       .from("rfi_catalog")
@@ -179,10 +251,10 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
       revision_number: 1,
       catalog_id: catalogRow.id,
       question: rfi.question,
-      status: rfi.answer ? "ANSWERED" : "OPEN",
+      status: "ANSWERED",
       response: rfi.answer,
-      responded_at: rfi.answer ? new Date().toISOString() : null,
-      responded_by: rfi.answer ? clientId : null,
+      responded_at: now.toISOString(),
+      responded_by: clientId,
     });
     if (rfiError) throw new Error(`rfis insert failed: ${rfiError.message}`);
   }
@@ -208,10 +280,13 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
         project_revision_number: projectRow.information_revision_number ?? 0,
         amount_cents: bid.amountCents,
         duration_days: bid.durationDays,
+        start_window: bid.startWindow,
         inclusions: bid.inclusions,
         exclusions: bid.exclusions,
         notes: bid.notes,
         warranty_terms: bid.warrantyTerms,
+        deposit_terms: bid.depositTerms,
+        scope_disclaimers: bid.scopeDisclaimers,
         submitted_at: new Date().toISOString(),
         version_kind: "ORIGINAL",
         acknowledgment_affirmed: true,
