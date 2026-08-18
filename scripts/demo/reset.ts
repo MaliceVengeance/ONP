@@ -46,6 +46,13 @@ export async function resetDemoData(admin: SupabaseClient): Promise<void> {
     check("find bids", bidFindError);
     const bidIds = (bidRows ?? []).map((b) => b.id as string);
 
+    // project_awards must be deleted before bid_versions/bids: it holds FKs
+    // to both (awarded_bid_version_id, bid_id), and deleting the awarded
+    // bid_version first trips "project_awards_awarded_bid_version_id_fkey"
+    // — confirmed empirically when demo:seed's internal reset failed with
+    // exactly that FK violation against an already-awarded demo project.
+    check("delete project_awards", (await admin.from("project_awards").delete().eq("project_id", projectId)).error);
+
     if (bidIds.length > 0) {
       const { data: versionRows, error: versionFindError } = await admin
         .from("bid_versions")
@@ -67,7 +74,6 @@ export async function resetDemoData(admin: SupabaseClient): Promise<void> {
       "delete project_attachments",
       (await admin.from("project_attachments").delete().eq("project_id", projectId)).error
     );
-    check("delete project_awards", (await admin.from("project_awards").delete().eq("project_id", projectId)).error);
   }
   if (projectIds.length > 0) {
     check("delete projects", (await admin.from("projects").delete().in("id", projectIds)).error);
