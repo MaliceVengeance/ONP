@@ -15,14 +15,52 @@ function getTimeLeft(deadline: string) {
 }
 
 export default function CountdownTimer({ deadline }: { deadline: string }) {
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft(deadline));
+  // Initial state must be identical on the server and on the client's first
+  // (hydration) render — it cannot be computed from Date.now() here, since
+  // that reads a different instant on the server (SSR time) than on the
+  // client (hydration time), which was producing mismatched seconds/minutes
+  // (and occasionally a mismatched isUrgent/deadline-passed branch) between
+  // the server-rendered HTML and the client's first render, triggering
+  // "Hydration failed because the server rendered HTML didn't match the
+  // client." The real, time-dependent value is computed only after mount,
+  // inside useEffect, which never runs during SSR or hydration.
+  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof getTimeLeft> | undefined>(undefined);
 
   useEffect(() => {
+    setTimeLeft(getTimeLeft(deadline));
     const interval = setInterval(() => {
       setTimeLeft(getTimeLeft(deadline));
     }, 1000);
     return () => clearInterval(interval);
   }, [deadline]);
+
+  if (timeLeft === undefined) {
+    // Same markup on the server and the client's initial render — no
+    // Date.now()-derived content, so nothing to mismatch. Replaced by the
+    // real countdown immediately after mount.
+    return (
+      <div style={{
+        background: "var(--camo-ink)",
+        border: "1px solid var(--camo-gunmetal)",
+        borderRadius: "10px",
+        padding: "12px 16px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        flexWrap: "wrap",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          fontSize: "12px",
+          color: "var(--camo-steel)",
+          fontFamily: "'Barlow', sans-serif",
+          fontWeight: 500,
+        }}>
+          ⏳ Bidding closes in —
+        </div>
+      </div>
+    );
+  }
 
   if (!timeLeft) {
     return (
