@@ -10,6 +10,7 @@
     "demo:reset": "dotenv -e .env.demo.local -- node scripts/demo/reset.ts",
     "demo:reveal": "dotenv -e .env.demo.local -- node scripts/demo/reveal.ts",
     "demo:award": "dotenv -e .env.demo.local -- node scripts/demo/award.ts",
+    "demo:verify-protection": "dotenv -e .env.demo.local -- node scripts/demo/verifyTrustFieldProtection.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
