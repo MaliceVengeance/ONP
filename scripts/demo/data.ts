@@ -259,10 +259,10 @@ export const DEMO_PROJECT = {
   zipCode: "79901",
   minOpenDays: 5,
   maxOpenDays: 10,
-  // "Client prefers construction to begin approximately 30-45 days after
-  // award" — target_start_date takes a single date, so this is seeded as
-  // today + 37 days (the midpoint); the full 30-45 day range is also
-  // spelled out verbatim in the TIMELINE_CONSTRAINT pre-publish answer.
+  // Client prefers construction to begin roughly a month after award —
+  // target_start_date takes a single date, so this is seeded as today + 37
+  // days, consistent with the "about a month" framing in the
+  // TIMELINE_CONSTRAINT pre-publish answer.
   targetStartDaysFromNow: 37,
 };
 
@@ -277,44 +277,58 @@ export type DemoPrepublishAnswerFixture = {
   answer: string;
 };
 
+// Content-authenticity pass: these answers are written in the client's own
+// voice (conversational, first person) rather than professional scope
+// language, since ONP has no AI agent that rewrites client input. Several
+// of the 8 available catalog slots below hold two combined topics, because
+// the canonical Q&A brief lists more distinct topics than there are
+// pre-publish catalog codes — combined per-topic where the catalog code's
+// generic prompt (shown as the on-page heading) still makes sense, without
+// dropping any topic's facts.
 export const DEMO_PREPUBLISH_ANSWERS: DemoPrepublishAnswerFixture[] = [
-  {
-    catalogCode: "EXISTING_CONDITIONS",
-    answer:
-      "This is a single-story residence. The existing rear slab is approximately 10' x 12'. Backyard access is through a side gate (normal residential access). The electrical panel appears to have available capacity, subject to field verification. There are no known underground utilities in the proposed footprint. Irrigation may require minor relocation. These are project/client-provided conditions, not guarantees.",
-  },
   {
     catalogCode: "GOALS",
     answer:
-      "Construct a new 16' x 24' covered patio (approximately 384 sq. ft.), extending the existing concrete patio, to create a durable outdoor living space that coordinates with the existing home.",
-  },
-  {
-    catalogCode: "MATERIAL_SPEC",
-    answer:
-      "Architectural-shingle roofing intended to coordinate with the existing home. Two ceiling fans and one decorative exterior light fixture will be supplied by the client; the contractor should include required wiring, rated boxes/support, switches, and installation unless specifically excluded in the bid.",
-  },
-  {
-    catalogCode: "SITE_ACCESS",
-    answer: "Normal residential backyard access through a side gate.",
-  },
-  {
-    catalogCode: "TIMELINE_CONSTRAINT",
-    answer: "Client prefers construction to begin approximately 30-45 days after award, subject to permitting and materials.",
+      "We want to extend our back patio and add a covered area that we can use year-round. We're thinking about a 16 by 24 covered patio with concrete underneath, room for two ceiling fans, a couple of outlets, and a light.",
   },
   {
     catalogCode: "MEASUREMENT_CLARIFICATION",
     answer:
-      "New patio cover: 16' x 24' (approximately 384 sq. ft.). Existing rear slab is approximately 10' x 12' and will be extended.",
+      "There's already a small concrete slab in the backyard, about 10 by 12 feet. We want the new patio to extend out to about 16 by 24 total.",
   },
   {
-    catalogCode: "PLANS_BLUEPRINTS",
+    catalogCode: "SITE_ACCESS",
+    answer: "There's a side gate to get into the backyard. It's normal residential access, nothing unusual that we know of.",
+  },
+  {
+    // Electrical + underground utilities/irrigation — both existing-conditions facts.
+    catalogCode: "EXISTING_CONDITIONS",
     answer:
-      "No formal architectural plans have been prepared. Please include any required design or structural engineering as part of your proposal where applicable.",
+      "The electrical panel looks like it has room, but I'm not an electrician, so that would need to be checked before the work starts. We don't know of any underground utilities in the area where the patio is going. There is some irrigation back there, so a little of that may need to be moved.",
   },
   {
+    // Materials/roof + owner-supplied fixtures — mirrors the prior combined slot.
+    catalogCode: "MATERIAL_SPEC",
+    answer:
+      "We want a wood-framed patio cover with shingles that look as close as possible to what's already on the house. We already plan to buy the two ceiling fans and the outside light fixture ourselves. We just need the contractor to include everything needed to wire and install them.",
+  },
+  {
+    // Concrete finish + paint/stain.
     catalogCode: "MATERIALS_FINISHES",
     answer:
-      "Minimum 4-inch reinforced concrete with a standard broom finish, including normal control joints/saw cuts. Architectural-shingle roofing to coordinate with the existing home. Paint/stain finish where included by the bidder.",
+      "A regular broom finish is fine. Nothing decorative. We'd like the exposed wood painted or stained so it looks finished. Contractors can include whatever finish they recommend in their bid.",
+  },
+  {
+    // Permits — no dedicated catalog code; placed here as the closest fit (project requirements/paperwork).
+    catalogCode: "PLANS_BLUEPRINTS",
+    answer:
+      "We expect the contractor to handle the normal permits and inspections needed for the job, unless they clearly say otherwise in their bid.",
+  },
+  {
+    // Timing + cleanup — start-to-finish schedule expectations.
+    catalogCode: "TIMELINE_CONSTRAINT",
+    answer:
+      "We'd like to get started about a month after we choose a contractor. We know permits and material availability could move that around a little. We want all the construction debris cleaned up and hauled away when the job is finished.",
   },
 ];
 
@@ -346,29 +360,28 @@ export type DemoRfiFixture = {
 export const DEMO_RFIS: DemoRfiFixture[] = [
   {
     catalogCode: "SCOPE_CLARIFICATION",
-    question:
-      "Is the patio cover intended to attach to the existing house, or should bidders price it as a freestanding structure?",
+    question: "Do you want the patio cover attached to the house, or should we price it as freestanding?",
     answer:
-      "An attached patio cover is preferred if structurally feasible. If a contractor recommends a freestanding design or identifies a structural concern, please describe that recommendation and any pricing impact in the bid.",
+      "We'd prefer it attached to the house if that works. If you think it needs to be freestanding or you see a structural issue, just explain that in your bid and let us know what it does to the price.",
     askedByContractorEmail: `contractor.demo.two@${DEMO_EMAIL_DOMAIN}`,
   },
   {
     catalogCode: "PHOTO_REQUEST",
-    question: "What finish is requested for the new concrete slab?",
-    answer: "Standard broom finish. Include normal control joints or saw cuts as appropriate for the proposed installation.",
+    question: "What kind of finish do you want on the new concrete?",
+    answer: "Just a standard broom finish is fine. Please include whatever normal control joints or saw cuts you think are needed.",
     askedByContractorEmail: `contractor.demo.one@${DEMO_EMAIL_DOMAIN}`,
   },
   {
     catalogCode: "OTHER",
-    question: "Are the ceiling fans and exterior light fixture supplied by the client or contractor?",
+    question: "Are you providing the ceiling fans and outside light, or should we include those?",
     answer:
-      "The client will supply two ceiling fans and one decorative exterior light fixture. The contractor should include the required wiring, rated boxes/support, switches, receptacles and installation unless specifically excluded in the bid.",
+      "We'll provide the two ceiling fans and the outside light fixture. Please include the wiring, boxes or supports, switches, outlets, and installation.",
     askedByContractorEmail: `contractor.demo.four@${DEMO_EMAIL_DOMAIN}`,
   },
   {
     catalogCode: "OTHER",
-    question: "Is HOA approval or an HOA architectural-review submission required?",
-    answer: "No HOA approval is required for this project.",
+    question: "Do you need HOA approval for the patio?",
+    answer: "No, we don't have an HOA approval requirement for this.",
     askedByContractorEmail: `contractor.demo.six@${DEMO_EMAIL_DOMAIN}`,
   },
 ];
