@@ -69,6 +69,12 @@ export type DemoContractorFixture = {
   // as an absence of the negative has_no_license warning badge.
   primaryLicenseNumber: string | null;
   primaryLicenseExpiry: string | null;
+  // Tri-state contractor attestation (migration 032) -- the status itself IS
+  // the attestation. Never paired with a fabricated coi_provider/coi_policy_
+  // number/coi_amount for INSURED contractors: per the canonical brief, no
+  // carrier or coverage-amount detail is invented merely to prove insurance.
+  insuranceStatus: "INSURED" | "NOT_INSURED" | "NOT_PROVIDED";
+  bondStatus: "BONDED" | "NOT_BONDED" | "NOT_PROVIDED";
   bonded: boolean; // whether to insert a BOND credential row (no amount/company given)
   credentials: DemoCredentialFixture[]; // detailed "Licenses, Registrations & Bonding" rows
 };
@@ -91,6 +97,8 @@ export const DEMO_CONTRACTORS: DemoContractorFixture[] = [
     description: null,
     primaryLicenseNumber: null,
     primaryLicenseExpiry: null,
+    insuranceStatus: "INSURED",
+    bondStatus: "NOT_BONDED",
     bonded: false,
     credentials: [],
   },
@@ -111,6 +119,8 @@ export const DEMO_CONTRACTORS: DemoContractorFixture[] = [
     description: null,
     primaryLicenseNumber: "ELP-CR-DEMO-0002",
     primaryLicenseExpiry: DEMO_CREDENTIAL_EXPIRY,
+    insuranceStatus: "INSURED",
+    bondStatus: "BONDED",
     bonded: true,
     credentials: [
       {
@@ -140,6 +150,8 @@ export const DEMO_CONTRACTORS: DemoContractorFixture[] = [
     description: null,
     primaryLicenseNumber: "ELP-CR-DEMO-0003",
     primaryLicenseExpiry: DEMO_CREDENTIAL_EXPIRY,
+    insuranceStatus: "INSURED",
+    bondStatus: "BONDED",
     bonded: true,
     credentials: [
       {
@@ -177,6 +189,8 @@ export const DEMO_CONTRACTORS: DemoContractorFixture[] = [
     description: null,
     primaryLicenseNumber: null,
     primaryLicenseExpiry: null,
+    insuranceStatus: "INSURED",
+    bondStatus: "NOT_BONDED",
     bonded: false,
     credentials: [],
   },
@@ -197,6 +211,8 @@ export const DEMO_CONTRACTORS: DemoContractorFixture[] = [
     description: null,
     primaryLicenseNumber: "NM-DEMO-LIC-0005",
     primaryLicenseExpiry: DEMO_CREDENTIAL_EXPIRY,
+    insuranceStatus: "INSURED",
+    bondStatus: "BONDED",
     bonded: true,
     credentials: [
       {
@@ -227,6 +243,8 @@ export const DEMO_CONTRACTORS: DemoContractorFixture[] = [
       "Mission Ridge Construction is a veteran-owned (U.S. Navy) contractor based in El Paso, TX, with a strong portfolio of completed outdoor living and patio-cover projects. Workmanship is backed by a five-year warranty.",
     primaryLicenseNumber: "ELP-CR-DEMO-0006",
     primaryLicenseExpiry: DEMO_CREDENTIAL_EXPIRY,
+    insuranceStatus: "INSURED",
+    bondStatus: "BONDED",
     bonded: true,
     credentials: [
       {

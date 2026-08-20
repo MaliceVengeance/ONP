@@ -3,6 +3,30 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { handleDirectoryDecision, updateBbbLink } from "./actions";
 import { setCredentialVerified, deleteCredentialAdmin } from "../users/[id]/actions";
+import {
+  insuranceStatusDisplay,
+  bondStatusDisplay,
+  type InsuranceStatus,
+  type BondStatus,
+} from "@/lib/contractorTrustStatus";
+
+const STATUS_TONE_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  positive: { bg: "#F0FDF4", fg: "#15803D", border: "#166534" },
+  negative: { bg: "#FEF2F2", fg: "#991B1B", border: "#FCA5A5" },
+  neutral: { bg: "#F3F4F6", fg: "#4B5563", border: "#d9dbdb" },
+};
+
+function StatusBadge({ text, tone }: { text: string; tone: string }) {
+  const c = STATUS_TONE_COLORS[tone] ?? STATUS_TONE_COLORS.neutral;
+  return (
+    <span style={{
+      fontSize: "11px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px",
+      background: c.bg, color: c.fg, border: `1px solid ${c.border}`,
+    }}>
+      {text}
+    </span>
+  );
+}
 
 const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
   STATE_LICENSE: "State License",
@@ -26,6 +50,8 @@ type ContractorProfile = {
   directory_verified_at: string | null;
   is_listed: boolean | null;
   bbb_url: string | null;
+  insurance_status: InsuranceStatus;
+  bond_status: BondStatus;
 };
 
 function formatDate(d: string | null) {
@@ -73,7 +99,7 @@ export default async function ContractorVerificationPage({
     .select(
       "contractor_id, business_name, city, state, " +
       "license_number, license_expiry, coi_provider, coi_policy_number, coi_expiry, coi_amount, " +
-      "directory_verified, directory_verified_at, is_listed, bbb_url"
+      "directory_verified, directory_verified_at, is_listed, bbb_url, insurance_status, bond_status"
     )
     .order("business_name", { ascending: true });
 
@@ -97,6 +123,7 @@ export default async function ContractorVerificationPage({
   const credentials = (credData ?? []).map((c) => ({
     ...c,
     business_name: profileLookup.get(c.contractor_id)?.business_name ?? null,
+    bond_status: (profileLookup.get(c.contractor_id)?.bond_status ?? "NOT_PROVIDED") as BondStatus,
   }));
 
   const credPending  = credentials.filter((c) => !c.verified);
@@ -181,8 +208,13 @@ export default async function ContractorVerificationPage({
                       <div style={{ fontWeight: 600, fontSize: "15px", color: "var(--camo-charcoal)", marginBottom: "2px" }}>
                         {p.business_name ?? "No business name set"}
                       </div>
-                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "12px" }}>
+                      <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginBottom: "8px" }}>
                         {[p.city, p.state].filter(Boolean).join(", ") || "No location set"}
+                      </div>
+                      {/* Contractor's own attestation -- distinct from the paperwork review below */}
+                      <div style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+                        <StatusBadge {...insuranceStatusDisplay(p.insurance_status)} />
+                        <StatusBadge {...bondStatusDisplay(p.bond_status)} />
                       </div>
 
                       {/* License & COI details */}
@@ -290,6 +322,10 @@ export default async function ContractorVerificationPage({
                       {p.directory_verified_at && (
                         <div style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "2px" }}>Verified: {formatDate(p.directory_verified_at)}</div>
                       )}
+                      <div style={{ display: "flex", gap: "6px", marginTop: "6px" }}>
+                        <StatusBadge {...insuranceStatusDisplay(p.insurance_status)} />
+                        <StatusBadge {...bondStatusDisplay(p.bond_status)} />
+                      </div>
                       {/* BBB link — editable any time, independent of directory verification status */}
                       <form action={updateBbbLink.bind(null, p.contractor_id)} style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
                         <input
@@ -406,6 +442,9 @@ export default async function ContractorVerificationPage({
                           <div style={{ color: "var(--camo-charcoal)" }}>
                             {c.bond_amount_cents ? fmtMoney(c.bond_amount_cents / 100) : "—"}
                             {c.bonding_company && ` via ${c.bonding_company}`}
+                          </div>
+                          <div style={{ marginTop: "4px" }}>
+                            <StatusBadge {...bondStatusDisplay(c.bond_status)} />
                           </div>
                         </div>
                       )}

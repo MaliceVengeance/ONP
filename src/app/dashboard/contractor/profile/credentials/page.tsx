@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { addCredential, deleteCredential } from "./actions";
+import { bondStatusDisplay, type BondStatus } from "@/lib/contractorTrustStatus";
 
 const TYPE_LABELS: Record<string, string> = {
   STATE_LICENSE: "State License",
@@ -50,6 +51,20 @@ export default async function ContractorCredentialsPage() {
 
   const credentials = data ?? [];
 
+  const { data: profileRow } = await supabaseAdmin
+    .from("contractor_profiles")
+    .select("bond_status")
+    .eq("contractor_id", user.id)
+    .maybeSingle();
+  const bondStatus = ((profileRow as any)?.bond_status ?? "NOT_PROVIDED") as BondStatus;
+  const bondDisplay = bondStatusDisplay(bondStatus);
+  const toneColors: Record<string, { bg: string; fg: string; border: string }> = {
+    positive: { bg: "#F0FDF4", fg: "#15803D", border: "#166534" },
+    negative: { bg: "#FEF2F2", fg: "#991B1B", border: "#FCA5A5" },
+    neutral: { bg: "var(--camo-concrete)", fg: "var(--camo-gunmetal)", border: "#d9dbdb" },
+  };
+  const bondColors = toneColors[bondDisplay.tone];
+
   return (
     <div>
       <div className="mob-col mob-gap-sm" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
@@ -69,6 +84,18 @@ export default async function ContractorCredentialsPage() {
       <div style={{ background: "#FFFBEB", border: "1px solid #FCD34D", borderRadius: "8px", padding: "12px 16px", marginBottom: "24px", fontSize: "12px", color: "#92400E", lineHeight: 1.6 }}>
         <strong>Insurance protects you if something goes wrong on the job. A bond guarantees the contractor will follow through on their obligations, and gives you recourse if they don&apos;t.</strong>{" "}
         These are entered separately — insurance stays on your main profile, licenses/registrations/bonds go here.
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
+        <span style={{
+          fontSize: "12px", fontWeight: 600, padding: "4px 12px", borderRadius: "20px",
+          background: bondColors.bg, color: bondColors.fg, border: `1px solid ${bondColors.border}`,
+        }}>
+          Your bonding status: {bondDisplay.text}
+        </span>
+        <Link href="/dashboard/contractor/profile" style={{ fontSize: "12px", color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
+          Change on your profile →
+        </Link>
       </div>
 
       {credentials.length > 0 && (

@@ -5,6 +5,8 @@
 **Baseline file:** `supabase/migrations/016_complete_schema_baseline.sql`
 **Recovery chain as of 2026-08-08:** `016` → `017` → `018` → `019` → `020` (see §2a, §2b, and §6 — 016 alone is no longer sufficient; a genuine from-scratch recovery was validated against a separate staging project and required all five). `018` restores table/sequence privilege parity; `019` restores future-function default privilege parity; `020` hardens `handle_new_user()` against caller search_path variance.
 
+**Migrations after 020:** `021` through the current latest (`032` as of 2026-08-20) are ordinary, idempotent, additive migrations in the traditional sense — see §6. They are not individually chronicled here (only the five baseline-gap-closing repair migrations above get their own section) but are still required: after applying `016`→`020` per §3, continue by applying every subsequent numbered migration file in order. `032_contractor_insurance_bond_status.sql` is the most recent — it adds `contractor_profiles.insurance_status`/`bond_status` (tri-state contractor attestation, replacing the retired `has_no_insurance` boolean) and two defense-in-depth triggers guarding admin-only verification fields; its own backfill logic only touches pre-existing rows and requires no special recovery-order handling.
+
 This document explains how to rebuild the ONP database schema from nothing — disaster recovery, a new environment, or a fresh Supabase project — and why the recovery procedure is not "run every migration file in order."
 
 ---
@@ -64,6 +66,8 @@ This is not a staging/production drift issue like §2a — the function definiti
 2. **Confirm required Supabase platform schemas/extensions are available.** Before applying 016, verify the new project has: the `auth` and `storage` schemas present, and the extensions `pgcrypto`, `uuid-ossp`, `pg_stat_statements`, `plpgsql`, and `supabase_vault` available (016 declares each with `CREATE EXTENSION IF NOT EXISTS`, so it will provision them itself if they're merely *available* but not yet installed — this step is about confirming they're available at all, which is normally guaranteed by Supabase's own project bootstrap, but worth a direct check since it couldn't be independently verified against the live platform during this audit).
 
 3. **Apply `016_complete_schema_baseline.sql`, then `017_service_area_infrastructure_repair.sql`, then `018_restore_database_privilege_baseline.sql`, then `019_restore_function_default_privileges.sql`, then `020_harden_handle_new_user_search_path.sql`, in that order.** Run each once, in full, in the Supabase SQL Editor (or via any tool that can execute a `.sql` file against the project's Postgres connection). Do not run any of 001–015 before, between, or after them. All five are additive/idempotent and safe to re-run individually if needed.
+
+   **Then continue with every subsequent numbered migration file (`021` onward) in order, through the current latest.** Unlike 001–015, these are genuine ordinary migrations — each is additive/idempotent and assumes the prior state already exists (see §6). None of them are optional; skipping any leaves the schema behind the application code.
 
 4. **Configure Auth dashboard settings.** Not covered by any migration: email templates, redirect URLs, JWT expiry, password policy, and any OAuth provider configuration. These live in Supabase project settings, not in the database schema.
 

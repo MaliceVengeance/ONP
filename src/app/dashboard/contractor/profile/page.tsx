@@ -24,7 +24,7 @@ export default async function ContractorProfilePage({
   const { data: profile } = await supabase
     .from("contractor_profiles")
     .select(
-      "business_name,phone,address_line1,address_line2,city,state,address_zip,categories,description,is_listed,veteran_applied_at,veteran_verified,veteran_verified_at,veteran_credential_type,veteran_credential_reference,veteran_rejection_reason,military_branch,license_number,license_expiry,coi_provider,coi_policy_number,coi_expiry,coi_amount,directory_verified,directory_verified_at,has_no_license,has_no_insurance"
+      "business_name,phone,address_line1,address_line2,city,state,address_zip,categories,description,is_listed,veteran_applied_at,veteran_verified,veteran_verified_at,veteran_credential_type,veteran_credential_reference,veteran_rejection_reason,military_branch,license_number,license_expiry,coi_provider,coi_policy_number,coi_expiry,coi_amount,directory_verified,directory_verified_at,has_no_license,insurance_status,bond_status"
     )
     .eq("contractor_id", user.id)
     .maybeSingle();
@@ -417,20 +417,35 @@ export default async function ContractorProfilePage({
                   </span>
                 </span>
               </label>
-              <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  name="has_no_insurance"
-                  defaultChecked={!!(profile as any)?.has_no_insurance}
-                  style={{ width: "16px", height: "16px", accentColor: "var(--camo-accent)", marginTop: "2px", flexShrink: 0 }}
-                />
-                <span style={{ fontSize: "13px", color: "var(--camo-charcoal)", lineHeight: 1.5 }}>
-                  I do not carry liability insurance.{" "}
-                  <span style={{ color: "#991B1B", fontSize: "12px" }}>
-                    (A "No Insurance" notice will appear on your bids.)
-                  </span>
-                </span>
-              </label>
+            </div>
+
+            {/* Insurance & bonding status -- the contractor's own attestation.
+                Kept distinct from ONP's directory_verified/credential review,
+                which is admin-only and shown read-only elsewhere on this page. */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+              <div>
+                <label style={labelStyle}>Liability Insurance</label>
+                <select name="insurance_status" defaultValue={(profile as any)?.insurance_status ?? "NOT_PROVIDED"} style={inputStyle}>
+                  <option value="NOT_PROVIDED">Prefer not to say / not yet provided</option>
+                  <option value="INSURED">Yes — I carry liability insurance</option>
+                  <option value="NOT_INSURED">No — I do not carry liability insurance</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Bonding</label>
+                <select name="bond_status" defaultValue={(profile as any)?.bond_status ?? "NOT_PROVIDED"} style={inputStyle}>
+                  <option value="NOT_PROVIDED">Prefer not to say / not yet provided</option>
+                  <option value="BONDED">Yes — I am bonded</option>
+                  <option value="NOT_BONDED">No — I am not bonded</option>
+                </select>
+                <p style={{ fontSize: "11px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
+                  Add the bond company, amount, and expiration on the{" "}
+                  <Link href="/dashboard/contractor/profile/credentials" style={{ color: "var(--camo-gunmetal)", textDecoration: "underline" }}>
+                    Licenses, Registrations &amp; Bonding
+                  </Link>{" "}
+                  page.
+                </p>
+              </div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>

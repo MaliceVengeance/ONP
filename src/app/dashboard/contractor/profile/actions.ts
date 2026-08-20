@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/requireRole";
+import { isInsuranceStatus, isBondStatus } from "@/lib/contractorTrustStatus";
 
 function normalizeCategories(input: string) {
   return input
@@ -29,7 +30,10 @@ export async function saveContractorProfile(formData: FormData) {
   const categoriesText = String(formData.get("categories") ?? "").trim();
   const is_listed = formData.get("is_listed") === "on";
   const has_no_license = formData.get("has_no_license") === "on";
-  const has_no_insurance = formData.get("has_no_insurance") === "on";
+  const insurance_status_raw = formData.get("insurance_status");
+  const insurance_status = isInsuranceStatus(insurance_status_raw) ? insurance_status_raw : "NOT_PROVIDED";
+  const bond_status_raw = formData.get("bond_status");
+  const bond_status = isBondStatus(bond_status_raw) ? bond_status_raw : "NOT_PROVIDED";
   const apply_veteran = formData.get("apply_veteran") === "on";
   const military_branch = clean(formData.get("military_branch"));
   const veteran_credential_type = clean(formData.get("veteran_credential_type"));
@@ -59,7 +63,8 @@ export async function saveContractorProfile(formData: FormData) {
     categories,
     is_listed,
     has_no_license,
-    has_no_insurance,
+    insurance_status,
+    bond_status,
     military_branch,
     veteran_credential_type,
     veteran_credential_reference,

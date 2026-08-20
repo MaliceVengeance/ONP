@@ -122,6 +122,8 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
         phone: c.phone,
         license_number: c.primaryLicenseNumber,
         license_expiry: c.primaryLicenseExpiry,
+        insurance_status: c.insuranceStatus,
+        bond_status: c.bondStatus,
         directory_verified: c.directoryVerified,
         is_listed: true,
         bbb_url: c.bbbUrl,

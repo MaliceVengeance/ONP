@@ -5,6 +5,38 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import AwardButton from "./AwardButton";
 import DismissBidButton from "./DismissBidButton";
 import BatchDismissPanel from "./BatchDismissPanel";
+import {
+  insuranceStatusDisplay,
+  bondStatusDisplay,
+  type InsuranceStatus,
+  type BondStatus,
+} from "@/lib/contractorTrustStatus";
+
+const TRUST_TONE_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  positive: { bg: "#F0FDF4", fg: "#15803D", border: "#166534" },
+  negative: { bg: "#FEF2F2", fg: "#991B1B", border: "#FCA5A5" },
+  neutral: { bg: "#F3F4F6", fg: "#4B5563", border: "#d9dbdb" },
+};
+
+function TrustStatusBadge({ text, tone }: { text: string; tone: string }) {
+  const c = TRUST_TONE_COLORS[tone] ?? TRUST_TONE_COLORS.neutral;
+  return (
+    <span style={{
+      fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px",
+      background: c.bg, color: c.fg, border: `1px solid ${c.border}`,
+    }}>
+      {text}
+    </span>
+  );
+}
+
+type BondCredentialInfo = {
+  id: string;
+  bonding_company: string | null;
+  bond_amount_cents: number | null;
+  expiration_date: string | null;
+  verified: boolean;
+};
 
 type BidRow = {
   bid_id: string;
@@ -37,7 +69,8 @@ type ContractorInfo = {
   coi_expiry: string | null;
   coi_amount: number | null;
   has_no_license: boolean | null;
-  has_no_insurance: boolean | null;
+  insurance_status: InsuranceStatus;
+  bond_status: BondStatus;
 };
 
 function centsToMoney(cents: number | string) {
@@ -203,6 +236,9 @@ export default async function ClientProjectBidsPage({
 
   // Fetch contractor profiles for all bids using admin client
   const contractorMap = new Map<string, ContractorInfo>();
+  // bid_id -> that contractor's BOND credential rows (compact comparison view;
+  // full multi-type credential list stays on the bid detail page).
+  const bondCredentialMap = new Map<string, BondCredentialInfo[]>();
   if (unlocked && bids.length > 0) {
     try {
       // Get bid contractor IDs
@@ -216,16 +252,26 @@ export default async function ClientProjectBidsPage({
       if (contractorIds.length > 0) {
         const { data: contractorProfiles } = await supabaseAdmin
           .from("contractor_profiles")
-          .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, has_no_insurance")
+          .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, insurance_status, bond_status")
           .in("contractor_id", contractorIds);
 
-        // Map bid_id -> contractor info
+        const { data: bondCredentials } = await supabaseAdmin
+          .from("contractor_credentials")
+          .select("id, contractor_id, bonding_company, bond_amount_cents, expiration_date, verified")
+          .in("contractor_id", contractorIds)
+          .eq("credential_type", "BOND");
+
+        // Map bid_id -> contractor info / bond credentials
         (bidRows ?? []).forEach((bidRow) => {
           const profile = (contractorProfiles ?? []).find(
             (p) => p.contractor_id === bidRow.contractor_id
           );
           if (profile) {
             contractorMap.set(bidRow.id, profile as ContractorInfo);
+          }
+          const bonds = (bondCredentials ?? []).filter((c) => c.contractor_id === bidRow.contractor_id);
+          if (bonds.length > 0) {
+            bondCredentialMap.set(bidRow.id, bonds as BondCredentialInfo[]);
           }
         });
       }
@@ -769,19 +815,11 @@ export default async function ClientProjectBidsPage({
                             </span>
                           )}
 
-                          {contractor.has_no_insurance && (
-                            <span style={{
-                              fontSize: "11px",
-                              fontWeight: 600,
-                              padding: "4px 10px",
-                              borderRadius: "20px",
-                              background: "#FEF2F2",
-                              color: "#991B1B",
-                              border: "1px solid #FCA5A5",
-                            }}>
-                              ⚠ No Insurance
-                            </span>
-                          )}
+                          {/* Insurance/bonding: the contractor's own attestation, separate
+                              from the ONP Verified paperwork-review badge above. NOT_PROVIDED
+                              renders neutral, never with the red "No X" warning treatment. */}
+                          <TrustStatusBadge {...insuranceStatusDisplay(contractor.insurance_status)} />
+                          <TrustStatusBadge {...bondStatusDisplay(contractor.bond_status)} />
                         </div>
 
                         {/* License info */}
@@ -799,20 +837,26 @@ export default async function ClientProjectBidsPage({
                               {licenseExpired && " ⚠ Expired"}
                             </div>
                           </div>
-                          <div>
-                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Insurance Provider</div>
-                            <div style={{ color: "var(--camo-charcoal)" }}>
-                              {contractor.coi_provider ?? "Not provided"}
+                          {/* COI paperwork detail only shown when the contractor has actually
+                              attested INSURED -- an empty/expired-looking row for NOT_PROVIDED
+                              would look like data that doesn't exist. Policy number is
+                              deliberately never shown here -- see report. */}
+                          {contractor.insurance_status === "INSURED" && contractor.coi_provider && (
+                            <div>
+                              <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Insurance Provider</div>
+                              <div style={{ color: "var(--camo-charcoal)" }}>{contractor.coi_provider}</div>
                             </div>
-                          </div>
-                          <div>
-                            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
-                            <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
-                              {formatDate(contractor.coi_expiry)}
-                              {coiExpired && " ⚠ Expired"}
+                          )}
+                          {contractor.insurance_status === "INSURED" && contractor.coi_expiry && (
+                            <div>
+                              <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
+                              <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
+                                {formatDate(contractor.coi_expiry)}
+                                {coiExpired && " ⚠ Expired"}
+                              </div>
                             </div>
-                          </div>
-                          {contractor.coi_amount && (
+                          )}
+                          {contractor.insurance_status === "INSURED" && contractor.coi_amount && (
                             <div>
                               <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Coverage Amount</div>
                               <div style={{ color: "var(--camo-charcoal)" }}>
@@ -821,6 +865,27 @@ export default async function ClientProjectBidsPage({
                             </div>
                           )}
                         </div>
+
+                        {/* Bond detail -- compact, BOND-credential-only view. Full multi-type
+                            credential list (licenses/registrations too) stays on Bid Detail. */}
+                        {(bondCredentialMap.get(b.bid_id) ?? []).length > 0 && (
+                          <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                            {(bondCredentialMap.get(b.bid_id) ?? []).map((bond) => (
+                              <div key={bond.id} style={{ fontSize: "12px", color: "var(--camo-gunmetal)" }}>
+                                Bond:{" "}
+                                {bond.bond_amount_cents ? fmtMoney(bond.bond_amount_cents / 100) : "amount not provided"}
+                                {bond.bonding_company && ` via ${bond.bonding_company}`}
+                                {bond.expiration_date && `, expires ${formatDate(bond.expiration_date)}`}
+                                {" — "}
+                                {bond.verified ? (
+                                  <span style={{ color: "#15803D", fontWeight: 600 }}>✅ Verified</span>
+                                ) : (
+                                  <span style={{ color: "#92400E", fontWeight: 600 }}>⏳ Pending Review</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
 

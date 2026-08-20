@@ -3,6 +3,30 @@ import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { stateBadge, projectStateLabel } from "@/lib/ui";
 import { updateContractorVerification, setCredentialVerified, deleteCredentialAdmin } from "./actions";
+import {
+  insuranceStatusDisplay,
+  bondStatusDisplay,
+  type InsuranceStatus,
+  type BondStatus,
+} from "@/lib/contractorTrustStatus";
+
+const TRUST_TONE_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  positive: { bg: "#F0FDF4", fg: "#15803D", border: "#166534" },
+  negative: { bg: "#FEF2F2", fg: "#991B1B", border: "#FCA5A5" },
+  neutral: { bg: "#F3F4F6", fg: "#4B5563", border: "#d9dbdb" },
+};
+
+function TrustStatusBadge({ text, tone }: { text: string; tone: string }) {
+  const c = TRUST_TONE_COLORS[tone] ?? TRUST_TONE_COLORS.neutral;
+  return (
+    <span style={{
+      display: "inline-flex", fontSize: "11px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px",
+      background: c.bg, color: c.fg, border: `1px solid ${c.border}`, marginRight: "6px", marginBottom: "6px",
+    }}>
+      {text}
+    </span>
+  );
+}
 
 const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
   STATE_LICENSE: "State License",
@@ -84,7 +108,7 @@ export default async function AdminUserProfilePage({
         "business_name, phone, address_line1, address_line2, city, state, address_zip, categories, description, is_listed, " +
         "veteran_applied_at, veteran_verified, veteran_verified_at, military_branch, " +
         "license_number, license_expiry, coi_provider, coi_policy_number, coi_expiry, coi_amount, bbb_url, " +
-        "directory_verified, directory_verified_at, has_no_license, has_no_insurance"
+        "directory_verified, directory_verified_at, has_no_license, insurance_status, bond_status"
       )
       .eq("contractor_id", userId)
       .maybeSingle(),
@@ -574,11 +598,13 @@ export default async function AdminUserProfilePage({
                     Contractor disclosed: no license
                   </div>
                 )}
-                {(contractorProfile as any).has_no_insurance && (
-                  <div style={{ fontSize: "12px", color: "#991B1B", fontStyle: "italic", marginBottom: "10px" }}>
-                    Contractor disclosed: no insurance
-                  </div>
-                )}
+
+                {/* Contractor's own insurance/bond attestation -- separate from the
+                    directory_verified paperwork-review badge above. */}
+                <div style={{ marginBottom: "10px" }}>
+                  <TrustStatusBadge {...insuranceStatusDisplay((contractorProfile as any).insurance_status as InsuranceStatus)} />
+                  <TrustStatusBadge {...bondStatusDisplay((contractorProfile as any).bond_status as BondStatus)} />
+                </div>
 
                 <form action={updateContractorVerification.bind(null, userId)}>
                   <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>

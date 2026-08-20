@@ -5,6 +5,30 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { MarketingHeader, MarketingFooter } from "@/components/MarketingChrome";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import {
+  insuranceStatusDisplay,
+  bondStatusDisplay,
+  type InsuranceStatus,
+  type BondStatus,
+} from "@/lib/contractorTrustStatus";
+
+const TRUST_TONE_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  positive: { bg: "#F0FDF4", fg: "#15803D", border: "#166534" },
+  negative: { bg: "#FEF2F2", fg: "#991B1B", border: "#FCA5A5" },
+  neutral: { bg: "#F3F4F6", fg: "#4B5563", border: "#d9dbdb" },
+};
+
+function TrustStatusBadge({ text, tone }: { text: string; tone: string }) {
+  const c = TRUST_TONE_COLORS[tone] ?? TRUST_TONE_COLORS.neutral;
+  return (
+    <span style={{
+      fontSize: "0.78rem", fontWeight: 700, padding: "4px 12px", borderRadius: "20px",
+      background: c.bg, color: c.fg, border: `1px solid ${c.border}`,
+    }}>
+      {text}
+    </span>
+  );
+}
 
 // Kept out of search results until ONP intentionally launches contractor-
 // profile SEO for legitimate, verified contractor profiles in meaningful
@@ -57,7 +81,7 @@ export default async function ContractorProfilePage({
 
   const { data: profile } = await supabase
     .from("contractor_profiles")
-    .select("contractor_id, business_name, city, state, categories, description, veteran_verified, directory_verified, is_listed, bbb_url")
+    .select("contractor_id, business_name, city, state, categories, description, veteran_verified, directory_verified, is_listed, bbb_url, insurance_status, bond_status")
     .eq("contractor_id", id)
     .eq("is_listed", true)
     .eq("directory_verified", true)
@@ -118,6 +142,10 @@ export default async function ContractorProfilePage({
             </span>
           </div>
           <span style={eyebrow}>{[profile.city, profile.state].filter(Boolean).join(", ") || "Service area not listed"}</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
+            <TrustStatusBadge {...insuranceStatusDisplay(profile.insurance_status as InsuranceStatus)} />
+            <TrustStatusBadge {...bondStatusDisplay(profile.bond_status as BondStatus)} />
+          </div>
           <div style={{ fontSize: "0.82rem", color: "var(--camo-gunmetal)", marginTop: "8px" }}>
             <span style={{ fontWeight: 600, color: "var(--camo-charcoal)" }}>BBB: </span>
             {profile.bbb_url ? (

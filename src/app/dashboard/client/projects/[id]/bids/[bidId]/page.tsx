@@ -1,6 +1,30 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth/requireRole";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import {
+  insuranceStatusDisplay,
+  bondStatusDisplay,
+  type InsuranceStatus,
+  type BondStatus,
+} from "@/lib/contractorTrustStatus";
+
+const TRUST_TONE_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
+  positive: { bg: "#F0FDF4", fg: "#15803D", border: "#166534" },
+  negative: { bg: "#FEF2F2", fg: "#991B1B", border: "#FCA5A5" },
+  neutral: { bg: "#F3F4F6", fg: "#4B5563", border: "#d9dbdb" },
+};
+
+function TrustStatusBadge({ text, tone }: { text: string; tone: string }) {
+  const c = TRUST_TONE_COLORS[tone] ?? TRUST_TONE_COLORS.neutral;
+  return (
+    <span style={{
+      fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px",
+      background: c.bg, color: c.fg, border: `1px solid ${c.border}`,
+    }}>
+      {text}
+    </span>
+  );
+}
 
 const CREDENTIAL_TYPE_LABELS: Record<string, string> = {
   STATE_LICENSE: "State License",
@@ -33,7 +57,8 @@ type ContractorInfo = {
   coi_expiry: string | null;
   coi_amount: number | null;
   has_no_license: boolean | null;
-  has_no_insurance: boolean | null;
+  insurance_status: InsuranceStatus;
+  bond_status: BondStatus;
 };
 
 function centsToMoney(cents: number | string | null | undefined) {
@@ -158,7 +183,7 @@ export default async function BidDetailPage({
 
   const { data: contractor } = await supabaseAdmin
     .from("contractor_profiles")
-    .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, is_listed, bbb_url, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, has_no_insurance")
+    .select("contractor_id, business_name, city, state, directory_verified, veteran_verified, is_listed, bbb_url, license_number, license_expiry, coi_provider, coi_expiry, coi_amount, has_no_license, insurance_status, bond_status")
     .eq("contractor_id", bidRow.contractor_id)
     .maybeSingle();
   const contractorInfo = contractor as ContractorInfo | null;
@@ -249,11 +274,10 @@ export default async function BidDetailPage({
                 ⚠ No License
               </span>
             )}
-            {contractorInfo?.has_no_insurance && (
-              <span style={{ fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", background: "#FEF2F2", color: "#991B1B", border: "1px solid #FCA5A5" }}>
-                ⚠ No Insurance
-              </span>
-            )}
+            {/* Insurance/bonding: the contractor's own attestation, separate from the
+                ONP Verified paperwork-review badge above. NOT_PROVIDED renders neutral. */}
+            {contractorInfo && <TrustStatusBadge {...insuranceStatusDisplay(contractorInfo.insurance_status)} />}
+            {contractorInfo && <TrustStatusBadge {...bondStatusDisplay(contractorInfo.bond_status)} />}
           </div>
         )}
 
@@ -282,14 +306,34 @@ export default async function BidDetailPage({
           </div>
         )}
 
-        <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px", marginBottom: unlocked && credentials.length > 0 ? "16px" : 0 }}>
-          <div>
-            <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
-            <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
-              {formatDate(contractorInfo?.coi_expiry)}{coiExpired && " ⚠ Expired"}
-            </div>
+        {/* COI paperwork detail only shown when the contractor has actually attested
+            INSURED -- an empty/dashed row for NOT_INSURED or NOT_PROVIDED would look
+            like data that doesn't exist. Policy number is deliberately never shown
+            to clients here -- see report. */}
+        {unlocked && contractorInfo?.insurance_status === "INSURED" && (
+          <div className="mob-grid-1" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "12px", marginBottom: credentials.length > 0 ? "16px" : 0 }}>
+            {contractorInfo.coi_provider && (
+              <div>
+                <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Insurance Provider</div>
+                <div style={{ color: "var(--camo-charcoal)" }}>{contractorInfo.coi_provider}</div>
+              </div>
+            )}
+            {contractorInfo.coi_expiry && (
+              <div>
+                <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>COI Expires</div>
+                <div style={{ color: coiExpired ? "#991B1B" : "var(--camo-charcoal)" }}>
+                  {formatDate(contractorInfo.coi_expiry)}{coiExpired && " ⚠ Expired"}
+                </div>
+              </div>
+            )}
+            {contractorInfo.coi_amount && (
+              <div>
+                <div style={{ color: "var(--camo-gunmetal)", marginBottom: "2px" }}>Coverage Amount</div>
+                <div style={{ color: "var(--camo-charcoal)" }}>${contractorInfo.coi_amount.toLocaleString("en-US")}</div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Licenses, registrations & bonding — flexible per-credential list, since a single
             license field can't represent either El Paso or Las Cruces requirements correctly. */}
