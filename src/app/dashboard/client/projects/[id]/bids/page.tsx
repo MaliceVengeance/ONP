@@ -106,7 +106,10 @@ export default async function ClientProjectBidsPage({
   const isEmergencyPaid = !!(project as any).is_emergency;
   const deadlinePassed = !!(deadline && deadline.getTime() <= now.getTime());
   const unlocked = deadlinePassed || project.state !== "OPEN" || isEmergencyBidMode || isEmergencyPaid;
-  const sort = sp.sort === "amount_desc" ? "amount_desc" : "amount_asc";
+  const sort =
+    sp.sort === "amount_desc" ? "amount_desc" :
+    sp.sort === "submitted_asc" ? "submitted_asc" :
+    "amount_asc";
   const minCents = moneyToCents(sp.min);
   const maxCents = moneyToCents(sp.max);
 
@@ -172,6 +175,9 @@ export default async function ClientProjectBidsPage({
 
           // Sort
           rawBids.sort((a, b) => {
+            if (sort === "submitted_asc") {
+              return new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime();
+            }
             const diff = Number(a.amount_cents) - Number(b.amount_cents);
             return sort === "amount_desc" ? -diff : diff;
           });
@@ -518,6 +524,7 @@ export default async function ClientProjectBidsPage({
                 <select name="sort" defaultValue={sort} style={inputStyle}>
                   <option value="amount_asc">Lowest first</option>
                   <option value="amount_desc">Highest first</option>
+                  <option value="submitted_asc">Submission order</option>
                 </select>
               </div>
               <button type="submit" style={{

@@ -857,6 +857,13 @@ export default async function ContractorProjectDetail({
                   </div>
                 )}
               </div>
+              <div style={{ fontSize: "12px", color: "var(--camo-gunmetal)", marginTop: "12px", paddingTop: "10px", borderTop: "1px solid #d9dbdb" }}>
+                For project-related communication and documentation, use{" "}
+                <a href="#messages" style={{ color: "var(--camo-gunmetal)", fontWeight: 600 }}>
+                  Project Messages
+                </a>{" "}
+                whenever possible.
+              </div>
             </div>
           ) : (
             <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "8px" }}>

@@ -27,8 +27,28 @@ async function createOrUpdateDemoUser(
     displayName: string;
     companyName: string | null;
     serviceAreaZip: string;
+    phone?: string;
+    addressLine1?: string;
+    addressCity?: string;
+    addressState?: string;
+    addressZip?: string;
   }
 ): Promise<string> {
+  // handle_new_user only copies role/display_name/company_name off
+  // raw_user_meta_data on insert — service_area_zip/phone/address are never
+  // read by the trigger, so both the existing-user and brand-new-user paths
+  // explicitly write the full profile via an update after the account exists.
+  const profileUpdate = {
+    display_name: opts.displayName,
+    company_name: opts.companyName,
+    service_area_zip: opts.serviceAreaZip,
+    ...(opts.phone !== undefined ? { phone: opts.phone } : {}),
+    ...(opts.addressLine1 !== undefined ? { address_line1: opts.addressLine1 } : {}),
+    ...(opts.addressCity !== undefined ? { address_city: opts.addressCity } : {}),
+    ...(opts.addressState !== undefined ? { address_state: opts.addressState } : {}),
+    ...(opts.addressZip !== undefined ? { address_zip: opts.addressZip } : {}),
+  };
+
   const existingId = await findUserIdByEmail(admin, opts.email);
   if (existingId) {
     const { error } = await admin.auth.admin.updateUserById(existingId, {
@@ -36,14 +56,7 @@ async function createOrUpdateDemoUser(
     });
     if (error) throw new Error(`updateUserById(${opts.email}) failed: ${error.message}`);
     // Keep profiles in sync too, in case data.ts changed between seed runs.
-    await admin
-      .from("profiles")
-      .update({
-        display_name: opts.displayName,
-        company_name: opts.companyName,
-        service_area_zip: opts.serviceAreaZip,
-      })
-      .eq("id", existingId);
+    await admin.from("profiles").update(profileUpdate).eq("id", existingId);
     return existingId;
   }
 
@@ -61,6 +74,9 @@ async function createOrUpdateDemoUser(
   if (error || !data.user) {
     throw new Error(`createUser(${opts.email}) failed: ${error?.message ?? "no user returned"}`);
   }
+  // The trigger only sets display_name/company_name — fill in the rest now
+  // that the profiles row exists.
+  await admin.from("profiles").update(profileUpdate).eq("id", data.user.id);
   return data.user.id;
 }
 
@@ -75,6 +91,11 @@ export async function seedDemoData(admin: SupabaseClient, accountPassword: strin
     displayName: DEMO_CLIENT.displayName,
     companyName: DEMO_CLIENT.companyName,
     serviceAreaZip: DEMO_CLIENT.serviceAreaZip,
+    phone: DEMO_CLIENT.phone,
+    addressLine1: DEMO_CLIENT.addressLine1,
+    addressCity: DEMO_CLIENT.addressCity,
+    addressState: DEMO_CLIENT.addressState,
+    addressZip: DEMO_CLIENT.addressZip,
   });
 
   // --- Contractors --------------------------------------------------------

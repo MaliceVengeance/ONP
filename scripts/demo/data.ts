@@ -24,6 +24,17 @@ export const DEMO_CLIENT = {
   displayName: "Demo Client",
   companyName: null as string | null,
   serviceAreaZip: "79901",
+  // Fictional demo contact/jobsite details, disclosed to the winning contractor
+  // only after award (see get_awarded_project_client_info). Phone continues the
+  // existing 555-0N0-000N fictional-number convention used for contractors
+  // (555 is the reserved, non-dialable US test exchange). The street address is
+  // a generic placeholder, not a real property, in the same 79901 (El Paso, TX)
+  // area already established by serviceAreaZip.
+  phone: "555-020-0001",
+  addressLine1: "482 Demo Canyon Trail",
+  addressCity: "El Paso",
+  addressState: "TX",
+  addressZip: "79901",
 };
 
 export type DemoCredentialFixture = {
