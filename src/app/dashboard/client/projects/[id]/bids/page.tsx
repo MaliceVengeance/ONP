@@ -149,6 +149,28 @@ export default async function ClientProjectBidsPage({
   let bids: BidRow[] = [];
   let bidsErrText: string | null = null;
 
+  // Sealed-state bid count: the client should be able to know bids exist
+  // without any competitive content leaking. "Submitted" here means a bid
+  // that genuinely went through submitBid() -- a bids row with at least one
+  // bid_versions row. bids.insert() and bid_versions.insert() in that action
+  // are two separate sequential writes, not one transaction, so a bids row
+  // can in principle exist with zero versions if the second write failed
+  // partway through -- the inner join excludes that case rather than
+  // over-counting an incomplete/failed submission attempt as "submitted".
+  // Dismissed and eligibility-stale bids still count: both only ever happen
+  // to a bid that was genuinely submitted, and "submitted" describes that
+  // historical fact, not current award-eligibility. This query returns a
+  // count only -- no bid id, amount, or contractor identity ever leaves the
+  // database.
+  let sealedBidCount = 0;
+  if (!unlocked) {
+    const { count } = await supabaseAdmin
+      .from("bids")
+      .select("id, bid_versions!inner(id)", { count: "exact", head: true })
+      .eq("project_id", projectId);
+    sealedBidCount = count ?? 0;
+  }
+
   if (unlocked) {
     // Fetch bids directly via admin client (bypasses RLS which would block client user)
     const { data: bidRows, error: bidRowsErr } = await supabaseAdmin
@@ -298,6 +320,11 @@ export default async function ClientProjectBidsPage({
     (dismissalRows ?? []).forEach((d) => dismissalMap.set(d.bid_id, d as DismissalInfo));
   }
 
+  // bids (pre-dismissal/eligibility split) already only contains bids with a
+  // version, matching sealedBidCount's definition exactly -- so this stays a
+  // consistent "how many bids were submitted" figure across both states.
+  const submittedBidCount = unlocked ? bids.length : sealedBidCount;
+
   const activeBids = bids.filter((b) => !dismissalMap.has(b.bid_id) && b.eligible);
   const ineligibleBids = bids.filter((b) => !dismissalMap.has(b.bid_id) && !b.eligible);
   const dismissedBids = bids.filter((b) => dismissalMap.has(b.bid_id));
@@ -375,6 +402,11 @@ export default async function ClientProjectBidsPage({
           }}>
             {unlocked ? "✅ BIDS UNLOCKED" : "🔒 BIDS LOCKED"}
           </div>
+          {!unlocked && (
+            <div style={{ fontSize: "14px", color: "var(--camo-charcoal)", fontWeight: 600, marginTop: "4px" }}>
+              {submittedBidCount === 1 ? "1 bid submitted" : `${submittedBidCount} bids submitted`}
+            </div>
+          )}
           <div style={{ fontSize: "13px", color: "var(--camo-gunmetal)", marginTop: "4px" }}>
             {unlocked
               ? (isEmergencyBidMode || isEmergencyPaid) && !deadlinePassed
