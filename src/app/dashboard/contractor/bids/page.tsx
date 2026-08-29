@@ -184,7 +184,7 @@ export default async function ContractorMyBidsPage() {
           { label: "Total Bids", count: bids.length, value: null, accent: false },
           { label: "Pending", count: openBids.length, value: null, accent: openBids.length > 0 },
           { label: "Won", count: wonCount, value: null, accent: wonCount > 0 },
-          { label: "Total Bid Value", count: null, value: fmtMoney(totalBidValue), accent: false },
+          { label: "Submitted Bid Value", count: null, value: fmtMoney(totalBidValue), accent: false },
         ].map((s) => (
           <div key={s.label} style={{
             background: "var(--camo-concrete)",
