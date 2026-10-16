@@ -16,6 +16,8 @@ type RfiRow = {
   responded_at: string | null;
   status: string;
   created_at: string;
+  // Only ever reveals the viewer's own authorship -- never who else asked.
+  asked_by_me: boolean;
   rfi_catalog: { code: string; prompt: string } | null;
 };
 
@@ -70,6 +72,7 @@ export default async function ContractorRfiPage({
     responded_at: r.responded_at,
     status: r.status,
     created_at: r.created_at,
+    asked_by_me: r.asked_by_me === true,
     rfi_catalog: r.catalog_prompt ? { code: r.catalog_code ?? "", prompt: r.catalog_prompt } : null,
   }));
   const askedCatalogIds = rfiRows.map((r) => r.catalog_id);
@@ -342,7 +345,7 @@ export default async function ContractorRfiPage({
                       lineHeight: 1.6,
                     }}>
                       <div style={{ fontSize: "10px", color: "var(--camo-steel)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
-                        Your notes
+                        {r.asked_by_me ? "Your question" : "Contractor question"}
                       </div>
                       {r.question}
                     </div>
@@ -406,7 +409,7 @@ export default async function ContractorRfiPage({
                       lineHeight: 1.6,
                     }}>
                       <div style={{ fontSize: "10px", color: "var(--camo-steel)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
-                        Your notes
+                        {r.asked_by_me ? "Your question" : "Contractor question"}
                       </div>
                       {r.question}
                     </div>
