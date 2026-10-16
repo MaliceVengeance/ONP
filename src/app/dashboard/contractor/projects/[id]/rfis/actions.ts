@@ -39,14 +39,14 @@ export async function submitRfi(projectId: string, formData: FormData) {
 
   // For all question types except the open-ended one, only one per project is allowed
   if (!isOpenEnded) {
-    const { data: existing } = await supabase
-      .from("rfis")
-      .select("id")
-      .eq("project_id", projectId)
-      .eq("catalog_id", catalog_id)
-      .maybeSingle();
+    // Contractors can't read public.rfis directly (migration 034); the
+    // identity-free RPC still sees every contractor's rows for this check.
+    const { data: existingRows, error: existingErr } = await supabase.rpc("get_contractor_project_rfis", {
+      p_project_id: projectId,
+    });
+    if (existingErr) throw wrapErr("rpc.get_contractor_project_rfis", existingErr);
 
-    if (existing) {
+    if (((existingRows ?? []) as { catalog_id: string }[]).some((r) => r.catalog_id === catalog_id)) {
       throw new Error("This question type has already been asked on this project.");
     }
   }

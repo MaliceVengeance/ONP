@@ -200,7 +200,8 @@ export default async function ContractorProjectDetail({
   };
 
   const [{ data: rfiData }, { data: catalogData }] = await Promise.all([
-    supabase.from("rfis").select("id, catalog_id, response").eq("project_id", projectId),
+    // Identity-free shared Q&A (migration 034).
+    supabase.rpc("get_contractor_project_rfis", { p_project_id: projectId }),
     supabase.from("rfi_catalog").select("id, code, prompt").order("code"),
   ]);
 

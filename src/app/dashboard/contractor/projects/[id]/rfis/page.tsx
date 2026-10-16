@@ -55,13 +55,23 @@ export default async function ContractorRfiPage({
 
   const catalogItems = (catalog ?? []) as RfiCatalogItem[];
 
-  const { data: rfis, error: rfisErr } = await supabase
-    .from("rfis")
-    .select("id, catalog_id, question, response, responded_at, status, created_at, rfi_catalog(code, prompt)")
-    .eq("project_id", projectId)
-    .order("created_at", { ascending: true });
+  // Shared Q&A without asker identity (migration 034) -- contractors never
+  // read public.rfis directly, so contractor_id/responded_by can't leak.
+  const { data: rfis, error: rfisErr } = await supabase.rpc("get_contractor_project_rfis", {
+    p_project_id: projectId,
+  });
 
-  const rfiRows = (rfis ?? []) as unknown as RfiRow[];
+  type SharedRfiRow = Omit<RfiRow, "rfi_catalog"> & { catalog_code: string | null; catalog_prompt: string | null };
+  const rfiRows: RfiRow[] = ((rfis ?? []) as SharedRfiRow[]).map((r) => ({
+    id: r.id,
+    catalog_id: r.catalog_id,
+    question: r.question,
+    response: r.response,
+    responded_at: r.responded_at,
+    status: r.status,
+    created_at: r.created_at,
+    rfi_catalog: r.catalog_prompt ? { code: r.catalog_code ?? "", prompt: r.catalog_prompt } : null,
+  }));
   const askedCatalogIds = rfiRows.map((r) => r.catalog_id);
 
   // Most catalog questions are pre-answered by the client in the RFP form.
